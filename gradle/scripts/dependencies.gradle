@@ -1,0 +1,29 @@
+repositories {
+    mavenLocal()
+    mavenCentral()
+
+    maven {
+        name "Mods"
+        url "http://dl.tsr.me/artifactory/libs-release/"
+    }
+    maven {
+        name = 'spongepowered-repo'
+        url = 'http://repo.spongepowered.org/maven/'
+    }
+}
+
+configurations {
+    mods
+    shade
+    compile.extendsFrom shade
+}
+
+dependencies {
+    mods "com.fireball1725.devworld:devworld:1.11-b15-client"
+
+    compile("org.spongepowered:mixin:0.6.4-SNAPSHOT") {
+        exclude module: "launchwrapper"
+    }
+
+    compile group: 'org.springframework', name: 'spring-context', version: '4.3.8.RELEASE'
+}
