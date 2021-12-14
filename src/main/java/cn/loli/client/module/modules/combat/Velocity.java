@@ -42,7 +42,7 @@ public class Velocity extends Module {
         if (event.getPacket() instanceof S12PacketEntityVelocity) {
             S12PacketEntityVelocity packet = (S12PacketEntityVelocity) event.getPacket();
             if (packet.getEntityID() == mc.thePlayer.getEntityId()) {
-                ChatUtils.send("Received A KB Packet");
+               // ChatUtils.send("Received A KB Packet");
                 event.setCancelled(true);
 
                 if (horizon.getObject() == 0 && vertical.getObject() == 0)

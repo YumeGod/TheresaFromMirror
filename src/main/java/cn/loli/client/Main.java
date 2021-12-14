@@ -71,8 +71,8 @@ public class Main {
 
     @EventTarget
     public void onWorldChange(PacketEvent e) {
-        if (e.getPacket() instanceof S01PacketJoinGame)
-            new SoundFxPlayer().playSound(SoundFxPlayer.SoundType.EDITION, -7);
+   //     if (e.getPacket() instanceof S01PacketJoinGame)
+         //   new SoundFxPlayer().playSound(SoundFxPlayer.SoundType.EDITION, -7);
     }
 
     

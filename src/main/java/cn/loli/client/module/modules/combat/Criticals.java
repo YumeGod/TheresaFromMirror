@@ -36,30 +36,36 @@ public class Criticals extends Module {
                 if (((C02PacketUseEntity) e.getPacket()).getAction() == C02PacketUseEntity.Action.ATTACK) {
                     Entity entity = ((C02PacketUseEntity) e.getPacket()).getEntityFromWorld(mc.theWorld);
                     if (!(entity instanceof EntityLiving)) return;
-                    switch (mode.getCurrentMode()) {
-                        case "Packet": {
-                            sendPacket(0.012 + ThreadLocalRandom.current().nextDouble(1.0E-4, 9.0E-4));
-                            sendPacket(0.005 + ThreadLocalRandom.current().nextDouble(0.001));
-                            break;
-                        }
-                        case "Hover": {
-                            sendPacket(0.001);
-                            sendPacket(-0.0075);
-                            sendPacket(0.01);
-                            break;
-                        }
-                        case "Edit": {
-                            sendPacket(0);
-                            sendPacket(0.075 + ThreadLocalRandom.current().nextDouble(0.008) * (new Random().nextBoolean() ? 0.98 : 0.99) + mc.thePlayer.ticksExisted % 0.0215 * 0.94);
-                            sendPacket((new Random().nextBoolean() ? 0.01063469198817 : 0.013999999) * (new Random().nextBoolean() ? 0.98 : 0.99));
-                            break;
-                        }
-                        default:
-                            NotificationManager.show(new Notification(NotificationType.WARNING, this.getName(), "Invalid mode: " + mode.getCurrentMode(), 2));
-                    }
                     counter ++;
                 }
             }
+        }
+    }
+
+    public void onCrit(){
+        if (!(mc.thePlayer.isCollidedVertically && mc.thePlayer.onGround))
+            return;
+
+        switch (mode.getCurrentMode()) {
+            case "Packet": {
+                sendPacket(0.012 + ThreadLocalRandom.current().nextDouble(1.0E-4, 9.0E-4));
+                sendPacket(0.005 + ThreadLocalRandom.current().nextDouble(0.001));
+                break;
+            }
+            case "Hover": {
+                sendPacket(0.001);
+                sendPacket(-0.0075);
+                sendPacket(0.01);
+                break;
+            }
+            case "Edit": {
+                sendPacket(0);
+                sendPacket(0.075 + ThreadLocalRandom.current().nextDouble(0.008) * (new Random().nextBoolean() ? 0.98 : 0.99) + mc.thePlayer.ticksExisted % 0.0215 * 0.94);
+                sendPacket((new Random().nextBoolean() ? 0.01063469198817 : 0.013999999) * (new Random().nextBoolean() ? 0.98 : 0.99));
+                break;
+            }
+            default:
+                NotificationManager.show(new Notification(NotificationType.WARNING, this.getName(), "Invalid mode: " + mode.getCurrentMode(), 2));
         }
     }
 

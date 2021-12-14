@@ -36,7 +36,7 @@ public class ModuleManager {
     public void addModules() {
         //Combat
         addModule(new AimBot());
-     //   addModule(new Aura());
+        addModule(new Aura());
         addModule(new AutoClicker());
         addModule(new Criticals());
         addModule(new KeepSprint());

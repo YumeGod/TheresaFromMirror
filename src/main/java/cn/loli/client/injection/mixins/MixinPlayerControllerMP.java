@@ -2,6 +2,7 @@ package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
 import cn.loli.client.injection.implementations.IPlayerControllerMP;
+import cn.loli.client.module.modules.combat.Criticals;
 import cn.loli.client.module.modules.combat.KeepSprint;
 
 
@@ -22,6 +23,15 @@ public class MixinPlayerControllerMP implements IPlayerControllerMP {
 
     @Shadow
     private int blockHitDelay;
+
+    @Inject(method = "attackEntity",  at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/PlayerControllerMP;syncCurrentPlayItem()V", shift = At.Shift.AFTER))
+    private void attackEntity(EntityPlayer playerIn, Entity targetEntity, CallbackInfo ci){
+        if (!Main.INSTANCE.moduleManager.getModule(Criticals.class).getState())
+            return;
+
+            Main.INSTANCE.moduleManager.getModule(Criticals.class).onCrit();
+
+    }
 
     @Override
     public void setCurBlockDamageMP(float f) {

@@ -83,10 +83,14 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
     }
 
 
-    @Inject(method = "attackTargetEntityWithCurrentItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;addVelocity(DDD)V", shift = At.Shift.BEFORE), cancellable = true)
+    @Inject(method = "attackTargetEntityWithCurrentItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/EntityPlayer;setSprinting(Z)V", shift = At.Shift.AFTER), cancellable = true)
     private void attackEntity(Entity targetEntity, CallbackInfo ci) {
-        if (Main.INSTANCE.moduleManager.getModule(KeepSprint.class).getState())
-            ci.cancel();
+        if (Main.INSTANCE.moduleManager.getModule(KeepSprint.class).getState()){
+            this.motionX /= 0.6D;
+            this.motionZ /= 0.6D;
+            this.setSprinting(true);
+        }
+
     }
 
 }
