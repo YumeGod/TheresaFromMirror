@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinNetworkManager {
     @Inject(method = "channelRead0*", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/Packet;processPacket(Lnet/minecraft/network/INetHandler;)V", shift = At.Shift.BEFORE), cancellable = true)
     private void packetReceived(ChannelHandlerContext p_channelRead0_1_, Packet packet, CallbackInfo ci) {
-        PacketEvent event = new PacketEvent(EventType.RECIEVE, packet);
+        PacketEvent event = new PacketEvent(EventType.RECEIVE, packet);
         EventManager.call(event);
 
         if (event.isCancelled()) ci.cancel();

@@ -61,6 +61,7 @@ public class ModuleManager {
         addModule(new BlockHit());
         addModule(new FullBright());
         addModule(new ItemRenderer());
+        addModule(new NameTags());
         addModule(new OldAnimations());
         addModule(new Tracers());
         addModule(new ViewClip());

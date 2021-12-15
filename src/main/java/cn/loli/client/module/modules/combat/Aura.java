@@ -90,9 +90,14 @@ public class Aura extends Module {
 
     @Override
     public void onEnable() {
-        curYaw = mc.thePlayer.rotationYaw;
-        curPitch = mc.thePlayer.rotationPitch;
-        rots = new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch};
+        try {
+            curYaw = mc.thePlayer.rotationYaw;
+            curPitch = mc.thePlayer.rotationPitch;
+            rots = new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch};
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
         super.onEnable();
     }
 
