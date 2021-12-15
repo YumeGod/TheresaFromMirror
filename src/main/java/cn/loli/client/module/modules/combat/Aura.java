@@ -4,6 +4,7 @@ package cn.loli.client.module.modules.combat;
 
 import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.RenderEvent;
+import cn.loli.client.injection.implementations.IEntityPlayer;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.injection.mixins.IAccessorRenderManager;
 import cn.loli.client.module.Module;
@@ -21,6 +22,9 @@ import net.minecraft.entity.INpc;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemSword;
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
+import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
@@ -37,9 +41,7 @@ public class Aura extends Module {
     private final NumberValue<Integer> minCps = new NumberValue<>("MinCPS", 8, 1, 20);
     private final NumberValue<Integer> maxCps = new NumberValue<>("MaxCPS", 12, 1, 20);
 
-    private final NumberValue<Float> precision = new NumberValue<>("Precision", 0.1f, 0.05f, 0.5f);
-    private final NumberValue<Float> accuracy = new NumberValue<>("Accuracy", 0.3f, 0.1f, 0.8f);
-    private final NumberValue<Float> predictionMultiplier = new NumberValue<>("Prediction Multiplier", 0.4f, 0f, 1f);
+    private final NumberValue<Float> pitchoffset = new NumberValue<>("Pitch Offset", 0f, -1f, 1f);
     private final NumberValue<Float> turnspeed = new NumberValue<>("Turn Speed", 0.1f, 0.0f, 1.0f);
 
     private final NumberValue<Integer> ticksExisted = new NumberValue<>("TicksExisted", 20, 0, 500);
@@ -57,13 +59,13 @@ public class Aura extends Module {
     private final BooleanValue rotations = new BooleanValue("Rotations", false);
 
     private final BooleanValue slient = new BooleanValue("Slient", true);
-    private final BooleanValue instant = new BooleanValue("Instant", false);
+
+    private final BooleanValue hresolver = new BooleanValue("H-Resolver", false);
+    private final BooleanValue vresolver = new BooleanValue("V-Resolver", false);
 
     private final ColorValue espColor = new ColorValue("ESP-Color", Color.BLUE);
 
-
     public static Rotation serverRotation = new Rotation(0, 0);
-
     private EntityLivingBase target;
     private final TimeHelper attacktimer = new TimeHelper();
 
@@ -76,6 +78,8 @@ public class Aura extends Module {
 
     float[] rots;
 
+    static boolean isBlocking = false;
+
     public Aura() {
         super("Aura", "Automatically attacks enemies around you.", ModuleCategory.COMBAT);
     }
@@ -85,7 +89,7 @@ public class Aura extends Module {
     public void onEnable() {
         curYaw = mc.thePlayer.rotationYaw;
         curPitch = mc.thePlayer.rotationPitch;
-        rots = new float[]{mc.thePlayer.rotationYaw , mc.thePlayer.rotationPitch};
+        rots = new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch};
         super.onEnable();
     }
 
@@ -95,6 +99,13 @@ public class Aura extends Module {
         targets = null;
         entities.clear();
         sounds.clear();
+
+        if (isBlocking){
+            ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
+            mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(new Random().nextInt(8)));
+            mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+        }
+
         super.onDisable();
     }
 
@@ -128,28 +139,50 @@ public class Aura extends Module {
     public void onMotionUpdate(MotionUpdateEvent event) {
         if (event.getEventType() == EventType.PRE) {
             target = getClosest(range.getObject() + blockrange.getObject());
-            if (target == null) return;
+            if (target == null) {
+                if (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
+                        && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() && isBlocking) {
+                    ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
 
-            try {
-                serverRotation.setYaw(rots[0]);
-                serverRotation.setPitch(rots[1]);
-                float[] lastrots = rots;
-
-                rots = RotationUtils.convertBack(RotationUtils.limitAngleChange(RotationUtils.convert(lastrots),
-                        RotationUtils.convert(RotationUtils.getNeededRotations(getLocation(target.getEntityBoundingBox().expand(0.11, 0.11, 0.11), 0, 0, false, false, 0),
-                                new Vec3(0, 0, 0), false, 0)), (turnspeed.getObject() * 180)));
-
-                if (rotations.getObject()) {
-                    yaw = rots[0];
-                    pitch = rots[1];
-                } else {
-                    yaw = mc.thePlayer.rotationYaw;
-                    pitch = mc.thePlayer.rotationPitch;
+                    mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(new Random().nextInt(8)));
+                    mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                    isBlocking = false;
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+                return;
             }
 
+            //Sever-side
+            serverRotation.setYaw(rots[0]);
+            serverRotation.setPitch(rots[1]);
+
+            //Save the last rotation
+            float[] lastrots = rots;
+
+            rots = RotationUtils.convertBack(RotationUtils.limitAngleChange(RotationUtils.convert(lastrots),
+                    RotationUtils.convert(RotationUtils.getNeededRotations(getLocation(target.getEntityBoundingBox().expand(0.11, 0.11, 0.11),
+                                    0, 0, hresolver.getObject(), vresolver.getObject(), pitchoffset.getObject()),
+                            new Vec3(0, 0, 0), false, 0)), (turnspeed.getObject() * 180)));
+
+            //Set Rotation --> Event Pre Motion;
+
+            if (rotations.getObject()) {
+                yaw = rots[0];
+                pitch = rots[1];
+            } else {
+                yaw = mc.thePlayer.rotationYaw;
+                pitch = mc.thePlayer.rotationPitch;
+            }
+
+            if (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
+                    && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() && isBlocking) {
+                ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
+
+                mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(new Random().nextInt(8)));
+                mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                isBlocking = false;
+            }
+
+            //Pre Attack
             if (mc.thePlayer.getDistanceToEntity(target) < range.getObject()) {
                 while (cps > 0) {
                     attack(target);
@@ -157,7 +190,7 @@ public class Aura extends Module {
                 }
             }
 
-
+            //Slient Rotation
             event.setYaw(yaw);
             event.setPitch(pitch);
 
@@ -166,9 +199,20 @@ public class Aura extends Module {
         if (event.getEventType() == EventType.POST) {
             if (target == null) return;
 
+            //Nah Slient Rotation
             if (!slient.getObject()) {
                 mc.thePlayer.rotationYaw = yaw;
                 mc.thePlayer.rotationPitch = pitch;
+            }
+
+            if (target != null && (mc.thePlayer.getHeldItem() != null &&
+                    mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() || mc.thePlayer.isBlocking())
+                    && !isBlocking) {
+
+                ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
+
+                mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                isBlocking = true;
             }
         }
     }

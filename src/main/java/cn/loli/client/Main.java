@@ -89,7 +89,7 @@ public class Main {
     }
 
     @EventTarget
-    public void onWorldChange(PacketEvent e) {
+    private void onWorldChange(PacketEvent e) {
         if (e.getPacket() instanceof S07PacketRespawn || e.getPacket() instanceof S01PacketJoinGame){
             packetQueue.clear();
             ms.reset();
@@ -97,7 +97,7 @@ public class Main {
     }
 
     @EventTarget
-    public void onTick(LoopEvent e) {
+    private void onTick(LoopEvent e) {
         if (Minecraft.getMinecraft().thePlayer.ticksExisted < 5)
             return;
 

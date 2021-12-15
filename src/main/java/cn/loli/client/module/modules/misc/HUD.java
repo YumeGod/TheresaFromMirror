@@ -138,7 +138,7 @@ public class HUD extends Module {
 
         if (showClientInfo.getObject()) {
             GL11.glScaled(2.0, 2.0, 2.0);
-            int i = fontRenderer.drawString("溯夜观星", 2, 2, rainbow(0), true);
+            int i = fontRenderer.drawString("朔夜观星", 2, 2, rainbow(0), true);
             GL11.glScaled(0.5, 0.5, 0.5);
 
             fontRenderer.drawString(Main.CLIENT_VERSION, i * 2, fontRenderer.FONT_HEIGHT * 2 - 7, rainbow(100), true);

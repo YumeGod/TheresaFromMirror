@@ -1,13 +1,18 @@
 package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
+import cn.loli.client.module.modules.render.NameTags;
 import cn.loli.client.module.modules.render.OldAnimations;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 
@@ -21,6 +26,13 @@ public abstract class MixinRendererLivingEntity<T extends EntityLivingBase> {
 
     @Shadow
     protected abstract void unsetBrightness();
+
+
+    @Inject(method = "renderName(Lnet/minecraft/entity/EntityLivingBase;DDD)V", at = @At("HEAD"), cancellable = true)
+    public void onChat(EntityLivingBase entity, double x, double y, double z, CallbackInfo ci) {
+        if (Main.INSTANCE.moduleManager.getModule(NameTags.class).getState() && entity instanceof EntityPlayer)
+            ci.cancel();
+    }
 
     /**
      * @author 65_7a

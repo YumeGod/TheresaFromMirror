@@ -1,6 +1,7 @@
 package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
+import cn.loli.client.injection.implementations.IEntityPlayer;
 import cn.loli.client.module.modules.combat.KeepSprint;
 import cn.loli.client.module.modules.render.OldAnimations;
 import net.minecraft.client.Minecraft;
@@ -10,14 +11,18 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityPlayer.class)
-public abstract class MixinEntityPlayer extends EntityLivingBase {
+public abstract class MixinEntityPlayer extends EntityLivingBase implements IEntityPlayer {
     private float currentHeight = 1.62F;
     private long lastMillis = System.currentTimeMillis();
+
+    @Shadow
+    private int itemInUseCount;
 
     public MixinEntityPlayer(World worldIn) {
         super(worldIn);
@@ -90,7 +95,11 @@ public abstract class MixinEntityPlayer extends EntityLivingBase {
             this.motionZ /= 0.6D;
             this.setSprinting(true);
         }
+    }
 
+    @Override
+    public void setItemInUseCount(int i) {
+        itemInUseCount = i;
     }
 
 }
