@@ -234,7 +234,7 @@ public class CrashUtils {
     }
 
 
-    //TODO: GUI For Crasher // Netty Crasher // Non - Burst Crasher // Multi Tags Crasher // Non Book Make Crasher
+    //TODO: GUI For Crasher // Multi Tags Crasher // Non Book Make Crasher
     //PlayerUtil.debug(Main.INSTANCE.aesUtil.AESEncode(String.valueOf(packetBuffer))); Thread.sleep(delay);
 
 
