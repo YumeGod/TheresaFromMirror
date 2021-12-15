@@ -3,6 +3,7 @@
 package cn.loli.client.module.modules.combat;
 
 import cn.loli.client.events.MotionUpdateEvent;
+import cn.loli.client.events.Render2DEvent;
 import cn.loli.client.events.RenderEvent;
 import cn.loli.client.injection.implementations.IEntityPlayer;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
@@ -63,6 +64,8 @@ public class Aura extends Module {
     private final BooleanValue hresolver = new BooleanValue("H-Resolver", false);
     private final BooleanValue vresolver = new BooleanValue("V-Resolver", false);
 
+    private final BooleanValue show = new BooleanValue("Show-Target", true);
+
     private final ColorValue espColor = new ColorValue("ESP-Color", Color.BLUE);
 
     public static Rotation serverRotation = new Rotation(0, 0);
@@ -111,7 +114,7 @@ public class Aura extends Module {
 
 
     @EventTarget
-    public void onRender(RenderEvent event) {
+    private void onRender(RenderEvent event) {
         if (target != null && attacktimer.hasReached(randomClickDelay(Math.min(minCps.getObject(), maxCps.getObject()), Math.max(minCps.getObject(), maxCps.getObject())))) {
             cps++;
             attacktimer.reset();
@@ -136,7 +139,12 @@ public class Aura extends Module {
     }
 
     @EventTarget
-    public void onMotionUpdate(MotionUpdateEvent event) {
+    public void onRender2D(Render2DEvent event){
+    }
+    
+
+    @EventTarget
+    private void onMotionUpdate(MotionUpdateEvent event) {
         if (event.getEventType() == EventType.PRE) {
             target = getClosest(range.getObject() + blockrange.getObject());
             if (target == null) {
