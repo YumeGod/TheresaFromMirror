@@ -7,7 +7,10 @@ import cn.loli.client.module.ModuleCategory;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
+import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.server.S30PacketWindowItems;
+
+import java.util.Random;
 
 public class NoSlowDown extends Module {
 
@@ -15,9 +18,16 @@ public class NoSlowDown extends Module {
         super("NoSlowDown", "You wont get slowdown when you hold or eating", ModuleCategory.MOVEMENT);
     }
 
+
     @EventTarget
     public void onPost(MotionUpdateEvent event) {
         if (!mc.thePlayer.isUsingItem()) return;
+
+        if (event.getEventType() == EventType.PRE) {
+            mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(new Random().nextInt(8)));
+            mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+        }
+
         if (event.getEventType() == EventType.POST) {
             mc.getNetHandler().addToSendQueue(new C08PacketPlayerBlockPlacement(mc.thePlayer.inventory.getCurrentItem()));
         }
@@ -25,10 +35,8 @@ public class NoSlowDown extends Module {
 
     @EventTarget
     public void onPacket(PacketEvent event) {
-
         if (event.getPacket() instanceof S30PacketWindowItems)
             event.setCancelled(mc.thePlayer.isUsingItem());
-
     }
 
 }

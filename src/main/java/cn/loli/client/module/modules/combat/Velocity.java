@@ -48,7 +48,6 @@ public class Velocity extends Module {
                 if (horizon.getObject() == 0 && vertical.getObject() == 0)
                     return;
 
-
                 mc.thePlayer.setVelocity(packet.getMotionX() / 8000d * hor,
                         packet.getMotionY() / 8000d * ver,
                         packet.getMotionZ() / 8000d * hor);
