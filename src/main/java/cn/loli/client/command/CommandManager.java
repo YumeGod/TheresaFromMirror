@@ -24,6 +24,7 @@ public class CommandManager {
         addCommand(new ConnectCommand());
         addCommand(new ScriptCommand());
         addCommand(new HelpCommand());
+        addCommand(new CrashCommand());
     }
 
     private void addCommand(Command cmd) {

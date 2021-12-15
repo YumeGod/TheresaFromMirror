@@ -4,6 +4,7 @@ package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
 import cn.loli.client.events.KeyEvent;
+import cn.loli.client.events.LoopEvent;
 import cn.loli.client.events.TickEvent;
 import cn.loli.client.events.WindowResizeEvent;
 import cn.loli.client.module.modules.render.BlockHit;
@@ -57,6 +58,11 @@ public abstract class MixinMinecraft {
     @Inject(method = "startGame", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;ingameGUI:Lnet/minecraft/client/gui/GuiIngame;", shift = At.Shift.AFTER))
     private void startGame(CallbackInfo ci) {
         Main.INSTANCE.startClient();
+    }
+
+    @Inject(method = "runGameLoop", at = @At("HEAD"))
+    private void runGameLoop(CallbackInfo ci) {
+        EventManager.call(new LoopEvent());
     }
 
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;dispatchKeypresses()V", shift = At.Shift.AFTER))
