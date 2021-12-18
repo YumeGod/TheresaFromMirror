@@ -7,11 +7,8 @@ import cn.loli.client.module.modules.combat.*;
 import cn.loli.client.module.modules.misc.ClickGUIModule;
 import cn.loli.client.module.modules.misc.HUD;
 import cn.loli.client.module.modules.movement.*;
-import cn.loli.client.module.modules.player.AutoTools;
+import cn.loli.client.module.modules.player.*;
 import cn.loli.client.module.modules.render.*;
-import cn.loli.client.module.modules.player.NoFall;
-import cn.loli.client.module.modules.player.NoRightClickDelay;
-import cn.loli.client.module.modules.player.SpeedMine;
 import cn.loli.client.module.modules.world.Eagle;
 import cn.loli.client.module.modules.world.Timer;
 import cn.loli.client.scripting.ScriptModule;
@@ -39,6 +36,7 @@ public class ModuleManager {
         addModule(new AimBot());
         addModule(new Aura());
         addModule(new AutoClicker());
+        addModule(new BowAimbot());
         addModule(new Criticals());
         addModule(new KeepSprint());
         addModule(new Velocity());
@@ -55,6 +53,7 @@ public class ModuleManager {
         addModule(new NoFall());
         addModule(new NoRightClickDelay());
         addModule(new SpeedMine());
+        addModule(new RageBot());
 
 
         //Render
