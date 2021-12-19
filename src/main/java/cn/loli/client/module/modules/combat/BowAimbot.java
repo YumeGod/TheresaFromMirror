@@ -19,12 +19,14 @@ import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBow;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
+import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class BowAimbot extends Module {
@@ -40,6 +42,7 @@ public class BowAimbot extends Module {
     private final NumberValue<Float> fov = new NumberValue<>("FOV", 360f, 0f, 360f);
     private final BooleanValue slient = new BooleanValue("Slient", true);
     private final BooleanValue auto = new BooleanValue("Auto Release", true);
+    private final BooleanValue ray = new BooleanValue("RayTrace", false);
 
     public static ArrayList<EntityLivingBase> attackList = new ArrayList<>();
     public static ArrayList<EntityLivingBase> targets = new ArrayList<>();
@@ -94,17 +97,14 @@ public class BowAimbot extends Module {
                 }
 
                 if (mc.thePlayer.getItemInUseDuration() > 20 && this.auto.getObject()) {
-                    mc.thePlayer.sendQueue.addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, mc.thePlayer.getPosition(), EnumFacing.fromAngle(mc.thePlayer.rotationYaw)));
-                    mc.thePlayer.stopUsingItem();
+                    mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(new Random().nextInt(8)));
+                    mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                 }
-
             }
 
         }
 
-
     }
-
 
     @Override
     public void onDisable() {
@@ -153,7 +153,7 @@ public class BowAimbot extends Module {
         if (target.isOnSameTeam(mc.thePlayer) && !team.getObject()) return false;
         if (target.isInvisible() && !invisibles.getObject()) return false;
         if (!isInFOV(target, fov.getObject())) return false;
-        if (!target.canEntityBeSeen(mc.thePlayer)) return false;
+        if (target.canEntityBeSeen(mc.thePlayer) && ray.getObject()) return false;
 
         return target != mc.thePlayer && target.isEntityAlive() && mc.thePlayer.getDistanceToEntity(target) <= range.getObject();
     }

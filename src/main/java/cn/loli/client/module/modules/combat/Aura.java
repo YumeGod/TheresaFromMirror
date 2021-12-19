@@ -152,6 +152,7 @@ public class Aura extends Module {
     private void onMotionUpdate(MotionUpdateEvent event) {
         if (event.getEventType() == EventType.PRE) {
             target = getClosest(range.getObject() + blockrange.getObject());
+
             if (target == null) {
                 if (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
                         && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() && isBlocking) {
