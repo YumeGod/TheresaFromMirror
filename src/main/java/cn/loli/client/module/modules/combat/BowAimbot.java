@@ -43,6 +43,7 @@ public class BowAimbot extends Module {
     private final BooleanValue slient = new BooleanValue("Slient", true);
     private final BooleanValue auto = new BooleanValue("Auto Release", true);
     private final BooleanValue ray = new BooleanValue("RayTrace", false);
+    private final NumberValue<Integer> pre = new NumberValue<>("Move Fix", 10, 5, 20);
 
     public static ArrayList<EntityLivingBase> attackList = new ArrayList<>();
     public static ArrayList<EntityLivingBase> targets = new ArrayList<>();
@@ -59,7 +60,7 @@ public class BowAimbot extends Module {
 
 
     @EventTarget
-    public void onPre(MotionUpdateEvent pre) {
+    public void onPre(MotionUpdateEvent event) {
         final List<EntityLivingBase> targets = WorldUtil.getLivingEntities().stream().filter(this::canAttack)
                 .sorted(Comparator.comparing(e -> mc.thePlayer.getDistanceToEntity(e)))
                 .collect(Collectors.toList());
@@ -81,26 +82,29 @@ public class BowAimbot extends Module {
             if (bowVelocity > 1.0f)
                 bowVelocity = 1.0f;
 
-            final double xDistance = targets.get(0).posX - mc.thePlayer.posX + (targets.get(0).posX - targets.get(0).lastTickPosX) * (bowVelocity * 10.0f);
-            final double zDistance = targets.get(0).posZ - mc.thePlayer.posZ + (targets.get(0).posZ - targets.get(0).lastTickPosZ) * (bowVelocity * 10.0f);
-            final double trajectoryXZ = Math.sqrt(xDistance * xDistance + zDistance * zDistance);
-            final float yaw = (float) (Math.atan2(zDistance, xDistance) * 180.0 / 3.141592653589793) - 90.0f;
-            final float pitch = (float) -Math.toDegrees(getLaunchAngle(targets.get(0), v, g)) - 3;
+
+            final double xDistance = targets.get(0).posX - mc.thePlayer.posX + (targets.get(0).posX - targets.get(0).prevPosX) * (bowVelocity * pre.getObject());
+            final double zDistance = targets.get(0).posZ - mc.thePlayer.posZ + (targets.get(0).posZ - targets.get(0).prevPosZ) * (bowVelocity * pre.getObject());
+            final double d4 =  targets.get(0).posY + ( targets.get(0).posY -  targets.get(0).prevPosY) + mc.thePlayer.getDistanceToEntity( targets.get(0)) *
+                    mc.thePlayer.getDistanceToEntity( targets.get(0)) / 300.0F +  targets.get(0).getEyeHeight() - mc.thePlayer.posY - mc.thePlayer.getEyeHeight() - mc.thePlayer.motionY;
+
+            final float yaw = (float) (Math.atan2(zDistance, xDistance) * 180.0 / Math.PI) - 90.0f;
+            final float pitch = (float) -Math.toDegrees(Math.atan2(d4, Math.hypot(xDistance, zDistance)));
 
             if (yaw <= 360 && pitch <= 360) {
                 if (slient.getObject()) {
-                    pre.setYaw(mc.thePlayer.rotationYawHead = yaw);
-                    pre.setPitch(pitch);
+                    event.setYaw(mc.thePlayer.rotationYawHead = yaw);
+                    event.setPitch(pitch);
                 } else {
                     mc.thePlayer.rotationYaw = yaw;
                     mc.thePlayer.rotationPitch = pitch;
                 }
 
                 if (mc.thePlayer.getItemInUseDuration() > 20 && this.auto.getObject()) {
-                    mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(new Random().nextInt(8)));
-                    mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                    mc.playerController.onStoppedUsingItem(mc.thePlayer);
                 }
             }
+
 
         }
 
@@ -153,7 +157,7 @@ public class BowAimbot extends Module {
         if (target.isOnSameTeam(mc.thePlayer) && !team.getObject()) return false;
         if (target.isInvisible() && !invisibles.getObject()) return false;
         if (!isInFOV(target, fov.getObject())) return false;
-        if (target.canEntityBeSeen(mc.thePlayer) && ray.getObject()) return false;
+        if (!target.canEntityBeSeen(mc.thePlayer)) return false;
 
         return target != mc.thePlayer && target.isEntityAlive() && mc.thePlayer.getDistanceToEntity(target) <= range.getObject();
     }
@@ -179,5 +183,13 @@ public class BowAimbot extends Module {
         float pitch = (float) -(Math.atan2(diffY, dist) * 180D / Math.PI);
 
         return new float[]{yaw, pitch};
+    }
+
+    public final float[] rotationsToEntityWithBow(Entity entity) {
+        double d1 = Math.sqrt(mc.thePlayer.getDistanceToEntity(entity) * mc.thePlayer.getDistanceToEntity(entity)) / 1.5D;
+        double d2 = entity.posX + (entity.posX - entity.prevPosX) * d1 - mc.thePlayer.posX;
+        double d3 = entity.posZ + (entity.posZ - entity.prevPosZ) * d1 - mc.thePlayer.posZ;
+        double d4 = entity.posY + (entity.posY - entity.prevPosY) + mc.thePlayer.getDistanceToEntity(entity) * mc.thePlayer.getDistanceToEntity(entity) / 300.0F + entity.getEyeHeight() - mc.thePlayer.posY - mc.thePlayer.getEyeHeight() - mc.thePlayer.motionY;
+        return new float[]{(float) Math.toDegrees(Math.atan2(d3, d2)) - 90.0F, (float) -Math.toDegrees(Math.atan2(d4, Math.hypot(d2, d3)))};
     }
 }
