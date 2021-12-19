@@ -42,8 +42,8 @@ public class BowAimbot extends Module {
     private final NumberValue<Float> fov = new NumberValue<>("FOV", 360f, 0f, 360f);
     private final BooleanValue slient = new BooleanValue("Slient", true);
     private final BooleanValue auto = new BooleanValue("Auto Release", true);
-    private final BooleanValue ray = new BooleanValue("RayTrace", false);
     private final NumberValue<Integer> pre = new NumberValue<>("Move Fix", 10, 5, 20);
+    private final BooleanValue newmode = new BooleanValue("Y Counter", false);
 
     public static ArrayList<EntityLivingBase> attackList = new ArrayList<>();
     public static ArrayList<EntityLivingBase> targets = new ArrayList<>();
@@ -85,11 +85,9 @@ public class BowAimbot extends Module {
 
             final double xDistance = targets.get(0).posX - mc.thePlayer.posX + (targets.get(0).posX - targets.get(0).prevPosX) * (bowVelocity * pre.getObject());
             final double zDistance = targets.get(0).posZ - mc.thePlayer.posZ + (targets.get(0).posZ - targets.get(0).prevPosZ) * (bowVelocity * pre.getObject());
-            final double d4 =  targets.get(0).posY + ( targets.get(0).posY -  targets.get(0).prevPosY) + mc.thePlayer.getDistanceToEntity( targets.get(0)) *
-                    mc.thePlayer.getDistanceToEntity( targets.get(0)) / 300.0F +  targets.get(0).getEyeHeight() - mc.thePlayer.posY - mc.thePlayer.getEyeHeight() - mc.thePlayer.motionY;
 
             final float yaw = (float) (Math.atan2(zDistance, xDistance) * 180.0 / Math.PI) - 90.0f;
-            final float pitch = (float) -Math.toDegrees(Math.atan2(d4, Math.hypot(xDistance, zDistance)));
+            final float pitch = (float) -Math.toDegrees(getLaunchAngle(targets.get(0), v, g)) - 3;
 
             if (yaw <= 360 && pitch <= 360) {
                 if (slient.getObject()) {
@@ -119,7 +117,12 @@ public class BowAimbot extends Module {
     }
 
     private float getLaunchAngle(EntityLivingBase targetEntity, double v, double g) {
-        double yDif = targetEntity.posY + targetEntity.getEyeHeight() / 2.0F - (mc.thePlayer.posY + mc.thePlayer.getEyeHeight());
+        double yDif =
+                newmode.getObject() ? targetEntity.posY + (targetEntity.posY -  targetEntity.prevPosY) + mc.thePlayer.getDistanceToEntity(targetEntity) *
+                        mc.thePlayer.getDistanceToEntity(targetEntity) / 300.0F +  targetEntity.getEyeHeight() - mc.thePlayer.posY - mc.thePlayer.getEyeHeight() - mc.thePlayer.motionY :
+                targetEntity.posY + targetEntity.getEyeHeight() / 2.0F - (mc.thePlayer.posY + mc.thePlayer.getEyeHeight());
+
+
         double xDif = targetEntity.posX - mc.thePlayer.posX;
         double zDif = targetEntity.posZ - mc.thePlayer.posZ;
 
