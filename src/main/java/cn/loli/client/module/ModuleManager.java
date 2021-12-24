@@ -2,7 +2,6 @@
 
 package cn.loli.client.module;
 
-import cn.loli.client.command.commands.CrashCommand;
 import cn.loli.client.module.modules.combat.*;
 import cn.loli.client.module.modules.misc.ClickGUIModule;
 import cn.loli.client.module.modules.misc.HUD;
@@ -59,7 +58,7 @@ public class ModuleManager {
         addModule(new BlockHit());
         addModule(new FullBright());
         addModule(new ItemRenderer());
-        addModule(new NameTags());
+        addModule(new ESP());
         addModule(new OldAnimations());
         addModule(new Tracers());
         addModule(new ViewClip());

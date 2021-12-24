@@ -3,12 +3,14 @@
 package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
+import cn.loli.client.events.Render3DEvent;
 import cn.loli.client.events.RenderEvent;
 import cn.loli.client.events.RenderWorldLastEvent;
 import cn.loli.client.module.modules.render.ViewClip;
 import com.darkmagician6.eventapi.EventManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
+import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -25,6 +27,14 @@ public class MixinEntityRenderer {
     @Inject(method = "renderWorldPass", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/EntityRenderer;renderHand(FI)V"))
     private void onRenderHand(CallbackInfo ci) {
         EventManager.call(new RenderEvent());
+    }
+
+    @Inject(method = "renderWorldPass", at =
+    @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;disableFog()V", shift = At.Shift.AFTER))
+    private void eventRender3D(int pass, float partialTicks, long finishTimeNano, CallbackInfo callbackInfo) {
+        Render3DEvent eventRender = new Render3DEvent(pass, partialTicks, finishTimeNano);
+        EventManager.call(eventRender);
+        GL11.glColor3f(1.0F, 1.0F, 1.0F);
     }
 
 

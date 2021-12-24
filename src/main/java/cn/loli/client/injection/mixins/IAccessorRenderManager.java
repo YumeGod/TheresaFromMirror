@@ -16,4 +16,5 @@ public interface IAccessorRenderManager {
 
     @Accessor
     double getRenderPosZ();
+
 }

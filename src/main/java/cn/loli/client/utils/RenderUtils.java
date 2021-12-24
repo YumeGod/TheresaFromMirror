@@ -1,5 +1,6 @@
 package cn.loli.client.utils;
 
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -7,6 +8,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.AxisAlignedBB;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Cylinder;
+
+import java.awt.*;
 
 public class RenderUtils {
 
@@ -185,4 +188,41 @@ public class RenderUtils {
         tessellator.draw();
     }
 
+    public static void drawOutlinedRect(int x, int y, int width, int height, int lineSize, Color lineColor, Color backgroundColor) {
+        drawRect(x, y, width, height, backgroundColor.getRGB());
+        drawRect(x, y, width, y + lineSize, lineColor.getRGB());
+        drawRect(x, height - lineSize, width, height, lineColor.getRGB());
+        drawRect(x, y + lineSize, x + lineSize, height - lineSize, lineColor.getRGB());
+        drawRect(width - lineSize, y + lineSize, width, height - lineSize, lineColor.getRGB());
+    }
+
+    public static void drawRect(float x1, float y1, float x2, float y2, int color) {
+        GL11.glPushMatrix();
+        GL11.glEnable(3042);
+        GL11.glDisable(3553);
+        GL11.glBlendFunc(770, 771);
+        GL11.glEnable(2848);
+        GL11.glPushMatrix();
+        color(color);
+        GL11.glBegin(7);
+        GL11.glVertex2d(x2, y1);
+        GL11.glVertex2d(x1, y1);
+        GL11.glVertex2d(x1, y2);
+        GL11.glVertex2d(x2, y2);
+        GL11.glEnd();
+        GL11.glPopMatrix();
+        GL11.glEnable(3553);
+        GL11.glDisable(3042);
+        GL11.glDisable(2848);
+        GL11.glPopMatrix();
+        Gui.drawRect(0, 0, 0, 0, 0);
+    }
+
+    public static void color(int color) {
+        float f = (float) (color >> 24 & 255) / 255.0f;
+        float f1 = (float) (color >> 16 & 255) / 255.0f;
+        float f2 = (float) (color >> 8 & 255) / 255.0f;
+        float f3 = (float) (color & 255) / 255.0f;
+        GL11.glColor4f(f1, f2, f3, f);
+    }
 }

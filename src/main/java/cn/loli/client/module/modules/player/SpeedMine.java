@@ -1,6 +1,5 @@
 package cn.loli.client.module.modules.player;
 
-import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.injection.implementations.IPlayerControllerMP;

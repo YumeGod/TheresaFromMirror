@@ -1,7 +1,7 @@
 package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
-import cn.loli.client.module.modules.render.NameTags;
+import cn.loli.client.module.modules.render.ESP;
 import cn.loli.client.module.modules.render.OldAnimations;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
@@ -30,7 +30,7 @@ public abstract class MixinRendererLivingEntity<T extends EntityLivingBase> {
 
     @Inject(method = "renderName(Lnet/minecraft/entity/EntityLivingBase;DDD)V", at = @At("HEAD"), cancellable = true)
     public void onChat(EntityLivingBase entity, double x, double y, double z, CallbackInfo ci) {
-        if (Main.INSTANCE.moduleManager.getModule(NameTags.class).getState() && entity instanceof EntityPlayer)
+        if (Main.INSTANCE.moduleManager.getModule(ESP.class).getState() && entity instanceof EntityPlayer)
             ci.cancel();
     }
 
