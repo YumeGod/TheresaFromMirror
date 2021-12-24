@@ -3,13 +3,15 @@
 package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
-import cn.loli.client.events.MotionUpdateEvent;
-import cn.loli.client.events.UpdateEvent;
+import cn.loli.client.events.*;
 import cn.loli.client.module.modules.movement.NoSlowDown;
 import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.potion.Potion;
+import net.minecraft.stats.StatList;
+import net.minecraft.util.MathHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -93,4 +95,22 @@ public class MixinEntityPlayerSP extends MixinEntity {
     public final boolean isSlow() {
         return !Minecraft.getMinecraft().thePlayer.isUsingItem() || Minecraft.getMinecraft().thePlayer.isRiding();
     }
+
+
+    @Override
+    public void moveEntity(double x, double y, double z) {
+        PlayerMoveEvent moveEvent = new PlayerMoveEvent(x, y, z);
+        EventManager.call(moveEvent);
+
+        if (moveEvent.isCancelled())
+            return;
+
+        x = moveEvent.getX();
+        y = moveEvent.getY();
+        z = moveEvent.getZ();
+
+        super.moveEntity(x , y , z);
+    }
+
+
 }

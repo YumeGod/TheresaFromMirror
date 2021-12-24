@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Entity.class)
-public class MixinEntity {
+public abstract class MixinEntity {
     @Shadow
     public double posX;
     @Shadow
@@ -29,11 +29,14 @@ public class MixinEntity {
     @Shadow
     public boolean onGround;
 
-    @Inject(method = "moveEntity", at = @At("HEAD"))
-    private void onMove(double x, double y, double z, CallbackInfo ci) {
-        if ((Object) this == Minecraft.getMinecraft().thePlayer) {
-            PlayerMoveEvent event = new PlayerMoveEvent(x, y, z);
-            EventManager.call(event);
-        }
-    }
+    @Shadow
+    public double motionX;
+    @Shadow
+    public double motionZ;
+
+    @Shadow
+    public void moveEntity(double x, double y, double z){}
+
+    @Shadow
+    public void moveFlying(float strafe, float forward, float friction){}
 }

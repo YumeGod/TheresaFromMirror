@@ -3,8 +3,9 @@
 package cn.loli.client.events;
 
 import com.darkmagician6.eventapi.events.Event;
+import com.darkmagician6.eventapi.events.callables.EventCancellable;
 
-public class PlayerMoveEvent implements Event {
+public class PlayerMoveEvent extends EventCancellable implements Event {
     public double x;
     public double y;
     public double z;
@@ -16,14 +17,26 @@ public class PlayerMoveEvent implements Event {
     }
 
     public double getX() {
-        return x;
+        return this.x;
+    }
+
+    public void setX(double x) {
+        this.x = x;
     }
 
     public double getY() {
-        return y;
+        return this.y;
+    }
+
+    public void setY(double y) {
+        this.y = y;
     }
 
     public double getZ() {
-        return z;
+        return this.z;
+    }
+
+    public void setZ(double z) {
+        this.z = z;
     }
 }

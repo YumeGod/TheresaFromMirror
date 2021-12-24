@@ -261,20 +261,5 @@ public class FileManager {
         }
     }
 
-    public void loadScripts() {
-        if (!scriptsDir.exists()) scriptsDir.mkdirs();
 
-        File[] files = scriptsDir.listFiles(pathname -> pathname.getName().endsWith("zip") || pathname.getName().endsWith("cbs"));
-
-        if (files != null) {
-            for (File file : files) {
-                try {
-                    Main.INSTANCE.scriptManager.load(file);
-                } catch (Exception e) {
-                    System.err.println("Failed to load script " + file.getName());
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
 }

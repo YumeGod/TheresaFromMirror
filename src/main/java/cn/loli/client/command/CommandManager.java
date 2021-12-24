@@ -22,7 +22,6 @@ public class CommandManager {
         addCommand(new LoginCommand());
         addCommand(new SessionCommand());
         addCommand(new ConnectCommand());
-        addCommand(new ScriptCommand());
         addCommand(new HelpCommand());
         addCommand(new CrashCommand());
     }

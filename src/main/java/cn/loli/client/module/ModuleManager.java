@@ -11,7 +11,6 @@ import cn.loli.client.module.modules.player.*;
 import cn.loli.client.module.modules.render.*;
 import cn.loli.client.module.modules.world.Eagle;
 import cn.loli.client.module.modules.world.Timer;
-import cn.loli.client.scripting.ScriptModule;
 import cn.loli.client.Main;
 import cn.loli.client.events.KeyEvent;
 import com.darkmagician6.eventapi.EventManager;
@@ -104,7 +103,5 @@ public class ModuleManager {
         for (Module module : modules) if (module.getKeybind() == event.getKey()) module.setState(!module.getState());
     }
 
-    public void addScriptModule(ScriptModule module) {
-        addModule(module);
-    }
+
 }

@@ -10,7 +10,6 @@ import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.file.FileManager;
 import cn.loli.client.module.ModuleManager;
 import cn.loli.client.module.modules.misc.ClickGUIModule;
-import cn.loli.client.scripting.ScriptManager;
 import cn.loli.client.utils.SoundFxPlayer;
 import cn.loli.client.utils.TimeHelper;
 import cn.loli.client.value.ValueManager;
@@ -45,7 +44,6 @@ public class Main {
     public CommandManager commandManager;
     public ValueManager valueManager;
     private FileManager fileManager;
-    public ScriptManager scriptManager;
 
     public Queue<Packet<?>> packetQueue;
     TimeHelper ms = new TimeHelper();
@@ -58,13 +56,11 @@ public class Main {
 
     public void startClient() {
         logger = LogManager.getLogger();
-        scriptManager = new ScriptManager();
         fileManager = new FileManager();
         valueManager = new ValueManager();
         commandManager = new CommandManager();
         moduleManager = new ModuleManager();
 
-        fileManager.loadScripts();
         commandManager.addCommands();
         moduleManager.addModules();
         fileManager.load();

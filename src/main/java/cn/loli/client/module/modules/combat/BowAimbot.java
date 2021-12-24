@@ -118,8 +118,7 @@ public class BowAimbot extends Module {
 
     private float getLaunchAngle(EntityLivingBase targetEntity, double v, double g) {
         double yDif =
-                newmode.getObject() ? targetEntity.posY + (targetEntity.posY -  targetEntity.prevPosY) + mc.thePlayer.getDistanceToEntity(targetEntity) *
-                        mc.thePlayer.getDistanceToEntity(targetEntity) / 300.0F +  targetEntity.getEyeHeight() - mc.thePlayer.posY - mc.thePlayer.getEyeHeight() - mc.thePlayer.motionY :
+                newmode.getObject() ?  targetEntity.posY + targetEntity.getEyeHeight() / 2.0F - (mc.thePlayer.posY + mc.thePlayer.getEyeHeight() - mc.thePlayer.motionY) :
                 targetEntity.posY + targetEntity.getEyeHeight() / 2.0F - (mc.thePlayer.posY + mc.thePlayer.getEyeHeight());
 
 
@@ -135,8 +134,8 @@ public class BowAimbot extends Module {
         double yv = 2.0D * y * (v * v);
         double gx = g * (x * x);
         double g2 = g * (gx + yv);
-        double insqrt = v * v * v * v - g2;
-        double sqrt = Math.sqrt(insqrt);
+        double insert = v * v * v * v - g2;
+        double sqrt = Math.sqrt(insert);
 
         double numerator = v * v + sqrt;
         double numerator2 = v * v - sqrt;

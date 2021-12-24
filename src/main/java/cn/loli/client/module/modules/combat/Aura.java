@@ -31,9 +31,10 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Credit: MintyCodes
@@ -45,18 +46,18 @@ public class Aura extends Module {
     private final NumberValue<Float> pitchoffset = new NumberValue<>("Pitch Offset", 0f, -1f, 1f);
     private final NumberValue<Float> turnspeed = new NumberValue<>("Turn Speed", 0.1f, 0.0f, 1.0f);
 
-    private final NumberValue<Integer> ticksExisted = new NumberValue<>("TicksExisted", 20, 0, 500);
-    private final NumberValue<Float> fov = new NumberValue<>("FOV", 360f, 0f, 360f);
-    private final NumberValue<Float> range = new NumberValue<>("Range", 3f, 1f, 6f);
-    private final NumberValue<Float> blockrange = new NumberValue<>("BlockRange", 2f, 1f, 3f);
+    private static final NumberValue<Integer> ticksExisted = new NumberValue<>("TicksExisted", 20, 0, 500);
+    private static final NumberValue<Float> fov = new NumberValue<>("FOV", 360f, 0f, 360f);
+    private static final NumberValue<Float> range = new NumberValue<>("Range", 3f, 1f, 6f);
+    private static final NumberValue<Float> blockrange = new NumberValue<>("BlockRange", 2f, 1f, 3f);
 
     private final BooleanValue autoBlock = new BooleanValue("AutoBlock", true);
-    private final BooleanValue invisibles = new BooleanValue("Invisibles", false);
-    private final BooleanValue players = new BooleanValue("Players", true);
-    private final BooleanValue animals = new BooleanValue("Animals", false);
-    private final BooleanValue mobs = new BooleanValue("Mobs", true);
-    private final BooleanValue villagers = new BooleanValue("Villagers", false);
-    private final BooleanValue team = new BooleanValue("Team", false);
+    private static final BooleanValue invisibles = new BooleanValue("Invisibles", false);
+    private static final BooleanValue players = new BooleanValue("Players", true);
+    private static final BooleanValue animals = new BooleanValue("Animals", false);
+    private static final BooleanValue mobs = new BooleanValue("Mobs", true);
+    private static final BooleanValue villagers = new BooleanValue("Villagers", false);
+    private static final BooleanValue team = new BooleanValue("Team", false);
     private final BooleanValue rotations = new BooleanValue("Rotations", false);
 
     private final BooleanValue slient = new BooleanValue("Slient", true);
@@ -74,7 +75,7 @@ public class Aura extends Module {
 
     public static ArrayList<Entity> entities = new ArrayList<>();
     public static ArrayList<Entity> sounds = new ArrayList<>();
-    public static ArrayList<Entity> targets = new ArrayList<>();
+    public static List<EntityLivingBase> targets = new ArrayList<>();
 
     int cps;
     float yaw, pitch, curYaw, curPitch;
@@ -94,7 +95,7 @@ public class Aura extends Module {
             curYaw = mc.thePlayer.rotationYaw;
             curPitch = mc.thePlayer.rotationPitch;
             rots = new float[]{mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch};
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -103,12 +104,12 @@ public class Aura extends Module {
 
     @Override
     public void onDisable() {
-        target = null;
-        targets = null;
+        targets.clear();
+        target = null; // 清空目标 (AutoBlock动画修复)
         entities.clear();
         sounds.clear();
 
-        if (isBlocking){
+        if (isBlocking) {
             ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
             mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(new Random().nextInt(8)));
             mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
@@ -120,6 +121,12 @@ public class Aura extends Module {
 
     @EventTarget
     private void onRender(RenderEvent event) {
+        try {
+            update();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         if (target != null && attacktimer.hasReached(randomClickDelay(Math.min(minCps.getObject(), maxCps.getObject()), Math.max(minCps.getObject(), maxCps.getObject())))) {
             cps++;
             attacktimer.reset();
@@ -144,20 +151,18 @@ public class Aura extends Module {
     }
 
     @EventTarget
-    public void onRender2D(Render2DEvent event){
+    public void onRender2D(Render2DEvent event) {
     }
-    
+
 
     @EventTarget
     private void onMotionUpdate(MotionUpdateEvent event) {
         if (event.getEventType() == EventType.PRE) {
-            target = getClosest(range.getObject() + blockrange.getObject());
 
             if (target == null) {
                 if (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
                         && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() && isBlocking) {
                     ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
-
                     mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(new Random().nextInt(8)));
                     mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                     isBlocking = false;
@@ -237,27 +242,43 @@ public class Aura extends Module {
     }
 
 
-    private EntityLivingBase getClosest(double range) {
-        double dist = range;
-        EntityLivingBase target = null;
-
-        for (Entity entity : mc.theWorld.loadedEntityList) {
-            if (entity instanceof EntityLivingBase) {
-                EntityLivingBase entityLivingBase = (EntityLivingBase) entity;
-                if (canAttack(entityLivingBase)) {
-                    double currentDist = mc.thePlayer.getDistanceToEntity(entityLivingBase);
-                    if (currentDist <= dist) {
-                        dist = currentDist;
-                        target = entityLivingBase;
-                    }
-                }
-            }
+    private void update() {
+        // 初始化变量
+        try {
+            // 添加实体
+            targets.removeIf(ent -> !canAttack(ent));
+            targets = this.getTargets();
+        } catch (Exception e) {
+            targets = this.getTargets();
+            e.printStackTrace();
         }
 
-        return target;
+        // 拿实体
+        if (targets.size() == 0) { // 实体数量为0停止攻击
+            target = null;
+        } else {
+            target = targets.get(0);// 设置攻击的Target
+        }
     }
 
-    private boolean canAttack(EntityLivingBase target) {
+    private List<EntityLivingBase> getTargets() {
+        Stream<EntityLivingBase> stream = mc.theWorld.loadedEntityList.stream()
+                .filter(entity -> entity instanceof EntityLivingBase)
+                .map(entity -> (EntityLivingBase) entity)
+                .filter(Aura::canAttack);
+        {
+
+            stream = stream.sorted((o1, o2) -> {
+                float[] rot1 = getRotations(o1);
+                float[] rot2 = getRotations(o2);
+                return (int) (mc.thePlayer.rotationYaw - rot1[0] - (mc.thePlayer.rotationYaw - rot2[0]));
+            });
+
+            return stream.collect(Collectors.toList());
+        }
+    }
+
+    private static boolean canAttack(EntityLivingBase target) {
         if (target instanceof EntityPlayer || target instanceof EntityAnimal || target instanceof EntityMob || target instanceof INpc) {
             if (target instanceof EntityPlayer && !players.getObject()) return false;
             if (target instanceof EntityAnimal && !animals.getObject()) return false;
@@ -272,7 +293,7 @@ public class Aura extends Module {
         return target != mc.thePlayer && target.isEntityAlive() && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() + blockrange.getObject() && target.ticksExisted > ticksExisted.getObject();
     }
 
-    private boolean isInFOV(EntityLivingBase entity, double angle) {
+    private static boolean isInFOV(EntityLivingBase entity, double angle) {
         angle *= .5D;
         double angleDiff = getAngleDifference(mc.thePlayer.rotationYaw, getRotations(entity.posX, entity.posY, entity.posZ)[0]);
         return (angleDiff > 0 && angleDiff < angle) || (-angle < angleDiff && angleDiff < 0);
@@ -283,7 +304,7 @@ public class Aura extends Module {
         return f > 180F ? 360F - f : f;
     }
 
-    private float[] getRotations(double x, double y, double z) {
+    private static float[] getRotations(double x, double y, double z) {
         double diffX = x + .5D - mc.thePlayer.posX;
         double diffY = (y + .5D) / 2D - (mc.thePlayer.posY + mc.thePlayer.getEyeHeight());
         double diffZ = z + .5D - mc.thePlayer.posZ;
@@ -369,5 +390,24 @@ public class Aura extends Module {
         ), MathHelper.wrapAngleTo180_float(
                 (float) (-Math.toDegrees(Math.atan2(diffY, Math.sqrt(diffX * diffX + diffZ * diffZ))))
         ));
+    }
+
+    public static float[] getRotations(final Entity entity) {
+        if (entity == null) {
+            return null;
+        }
+        final double diffX = entity.posX - Minecraft.getMinecraft().thePlayer.posX;
+        final double diffZ = entity.posZ - Minecraft.getMinecraft().thePlayer.posZ;
+        double diffY;
+        if (entity instanceof EntityLivingBase) {
+            final EntityLivingBase elb = (EntityLivingBase) entity;
+            diffY = elb.posY + (elb.getEyeHeight()) - (Minecraft.getMinecraft().thePlayer.posY + Minecraft.getMinecraft().thePlayer.getEyeHeight());
+        } else {
+            diffY = (entity.getEntityBoundingBox().minY + entity.getEntityBoundingBox().maxY) / 2.0 - (Minecraft.getMinecraft().thePlayer.posY + Minecraft.getMinecraft().thePlayer.getEyeHeight());
+        }
+        final double dist = MathHelper.sqrt_double(diffX * diffX + diffZ * diffZ);
+        final float yaw = (float) (Math.atan2(diffZ, diffX) * 180.0 / Math.PI) - 90.0f;
+        final float pitch = (float) (-(Math.atan2(diffY, dist) * 180.0 / Math.PI));
+        return new float[]{yaw, pitch};
     }
 }
