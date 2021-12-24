@@ -49,14 +49,15 @@ public class Fly extends Module {
 
     @EventTarget
     private void onMove(PlayerMoveEvent e) {
-        e.setX((mc.thePlayer.motionX = 0));
-        e.setY((mc.thePlayer.motionY = 0));
-        e.setZ((mc.thePlayer.motionZ = 0));
         if (mode.getCurrentMode().equalsIgnoreCase("Hypixel") && !mc.thePlayer.isSpectator()) {
+            e.setX((mc.thePlayer.motionX = 0));
+            e.setY((mc.thePlayer.motionY = 0));
+            e.setZ((mc.thePlayer.motionZ = 0));
+
             if (PlayerUtils.isMoving2()) {
                 if (timer.hasReached(1200)) {
                     double playerYaw = Math.toRadians(mc.thePlayer.rotationYaw);
-                    mc.thePlayer.setPosition(mc.thePlayer.posX + 7 * 1 * -Math.sin(playerYaw), mc.thePlayer.posY - 2, mc.thePlayer.posZ + 7 * 1 * Math.cos(playerYaw));
+                    mc.thePlayer.setPosition(mc.thePlayer.posX + 7 * 1 * -Math.sin(playerYaw), mc.thePlayer.posY - 1.79, mc.thePlayer.posZ + 7 * 1 * Math.cos(playerYaw));
                     timer.reset(); // Don't forget reset
                 }
             } else {

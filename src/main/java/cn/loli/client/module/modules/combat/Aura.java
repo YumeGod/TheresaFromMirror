@@ -3,6 +3,7 @@
 package cn.loli.client.module.modules.combat;
 
 import cn.loli.client.events.MotionUpdateEvent;
+import cn.loli.client.events.PlayerMoveEvent;
 import cn.loli.client.events.Render2DEvent;
 import cn.loli.client.events.RenderEvent;
 import cn.loli.client.injection.implementations.IEntityPlayer;
@@ -158,10 +159,9 @@ public class Aura extends Module {
     @EventTarget
     private void onMotionUpdate(MotionUpdateEvent event) {
         if (event.getEventType() == EventType.PRE) {
-
             if (target == null) {
-                if (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
-                        && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() && isBlocking) {
+                if (mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword
+                        && autoBlock.getObject() && isBlocking) {
                     ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
                     mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(new Random().nextInt(8)));
                     mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
@@ -195,7 +195,6 @@ public class Aura extends Module {
             if (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() && isBlocking) {
                 ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
-
                 mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(new Random().nextInt(8)));
                 mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                 isBlocking = false;
@@ -227,6 +226,7 @@ public class Aura extends Module {
             if (target != null && (mc.thePlayer.getHeldItem() != null &&
                     mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() || mc.thePlayer.isBlocking())
                     && !isBlocking) {
+
 
                 ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
 
