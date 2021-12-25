@@ -6,12 +6,16 @@ import cn.loli.client.Main;
 import cn.loli.client.events.Render3DEvent;
 import cn.loli.client.events.RenderEvent;
 import cn.loli.client.events.RenderWorldLastEvent;
+import cn.loli.client.module.ModuleManager;
+import cn.loli.client.module.modules.movement.NoJumpDelay;
+import cn.loli.client.module.modules.render.NoFov;
 import cn.loli.client.module.modules.render.ViewClip;
 import com.darkmagician6.eventapi.EventManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
 import org.lwjgl.opengl.GL11;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -19,6 +23,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityRenderer.class)
 public class MixinEntityRenderer {
+
+    @Shadow private float fovModifierHand;
+
     @Inject(method = "renderWorldPass", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/ForgeHooksClient;dispatchRenderLast(Lnet/minecraft/client/renderer/RenderGlobal;F)V"))
     private void onRenderWorldPass(int pass, float partialTicks, long finishTimeNano, CallbackInfo ci) {
         EventManager.call(new RenderWorldLastEvent(Minecraft.getMinecraft().renderGlobal, partialTicks));
@@ -37,6 +44,11 @@ public class MixinEntityRenderer {
         GL11.glColor3f(1.0F, 1.0F, 1.0F);
     }
 
+    @Inject(method = "updateFovModifierHand", at = @At("RETURN"))
+    private void updateFovModifierHand(CallbackInfo callbackInfo) {
+        if (Main.INSTANCE.moduleManager.getModule(NoFov.class).getState())
+            fovModifierHand = 1;
+    }
 
     @ModifyVariable(method = { "orientCamera" },  ordinal = 3,  at = @At(value = "STORE",  ordinal = -1),  require = 1)
     private double view(double value) {

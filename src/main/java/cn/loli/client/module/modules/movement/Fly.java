@@ -54,10 +54,15 @@ public class Fly extends Module {
             e.setY((mc.thePlayer.motionY = 0));
             e.setZ((mc.thePlayer.motionZ = 0));
 
+            if (MoveUtils.isOnGround(0.01)){
+                mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.004 * Math.random(), mc.thePlayer.posZ);
+                timer.reset(); // Don't forget reset
+            }
+
             if (PlayerUtils.isMoving2()) {
                 if (timer.hasReached(1200)) {
                     double playerYaw = Math.toRadians(mc.thePlayer.rotationYaw);
-                    mc.thePlayer.setPosition(mc.thePlayer.posX + 7 * 1 * -Math.sin(playerYaw), mc.thePlayer.posY - 1.79, mc.thePlayer.posZ + 7 * 1 * Math.cos(playerYaw));
+                    mc.thePlayer.setPosition(mc.thePlayer.posX + 5 * -Math.sin(playerYaw), mc.thePlayer.posY - 2, mc.thePlayer.posZ + 5 * Math.cos(playerYaw));
                     timer.reset(); // Don't forget reset
                 }
             } else {

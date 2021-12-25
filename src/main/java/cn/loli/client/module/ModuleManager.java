@@ -51,6 +51,7 @@ public class ModuleManager {
         addModule(new NoFall());
         addModule(new NoRightClickDelay());
         addModule(new SpeedMine());
+        addModule(new Phase());
         addModule(new RageBot());
 
 
@@ -59,6 +60,7 @@ public class ModuleManager {
         addModule(new FullBright());
         addModule(new ItemRenderer());
         addModule(new ESP());
+        addModule(new NoFov());
         addModule(new OldAnimations());
         addModule(new Tracers());
         addModule(new ViewClip());

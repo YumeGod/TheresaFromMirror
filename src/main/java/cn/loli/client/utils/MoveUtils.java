@@ -2,11 +2,11 @@ package cn.loli.client.utils;
 
 import cn.loli.client.events.PlayerMoveEvent;
 import net.minecraft.client.Minecraft;
+import net.minecraft.potion.Potion;
 
 public class MoveUtils {
 
     private static final Minecraft mc = Minecraft.getMinecraft();
-
 
     public static void setMotion(PlayerMoveEvent event, double speed) {
         double forward = mc.thePlayer.movementInput.moveForward;
@@ -36,4 +36,17 @@ public class MoveUtils {
         }
     }
 
+    public static boolean isOnGround(double height) {
+        return !mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer,
+                mc.thePlayer.getEntityBoundingBox().offset(0.0D, -height, 0.0D)).isEmpty();
+    }
+
+    public static double getBaseMoveSpeed() {
+        double baseSpeed = 0.2873;
+        if (Minecraft.getMinecraft().thePlayer.isPotionActive(Potion.moveSpeed)) {
+            int amplifier = Minecraft.getMinecraft().thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier();
+            baseSpeed *= 1.0 + 0.2 * (amplifier + 1);
+        }
+        return baseSpeed;
+    }
 }
