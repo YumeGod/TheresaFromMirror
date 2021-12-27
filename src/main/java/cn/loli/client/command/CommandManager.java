@@ -24,6 +24,7 @@ public class CommandManager {
         addCommand(new ConnectCommand());
         addCommand(new HelpCommand());
         addCommand(new CrashCommand());
+        addCommand(new VClipCommand());
     }
 
     private void addCommand(Command cmd) {

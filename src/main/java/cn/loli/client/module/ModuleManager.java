@@ -47,6 +47,7 @@ public class ModuleManager {
         addModule(new Sprint());
 
         //Player
+        addModule(new AutoPlace());
         addModule(new AutoTools());
         addModule(new NoFall());
         addModule(new NoRightClickDelay());
