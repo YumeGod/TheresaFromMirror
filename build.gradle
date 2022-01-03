@@ -46,6 +46,11 @@ repositories {
         name = 'JitPack'
         url = 'https://jitpack.io'
     }
+
+    maven {
+        url "http://repo.ratsiel.me"
+    }
+
 }
 
 
@@ -67,6 +72,7 @@ dependencies {
     compile("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         exclude module: "launchwrapper"
     }
+    implementation 'com.github.Ratsiiel:minecraft-auth-library:71a997108a'
     implementation 'org.jetbrains:annotations:15.0'
     implementation group: 'com.google.zxing', name: 'core', version: '2.1'
     compile fileTree(dir: 'libs', include: ['*.jar'])

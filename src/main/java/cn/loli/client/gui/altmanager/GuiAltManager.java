@@ -5,6 +5,9 @@ package cn.loli.client.gui.altmanager;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.utils.Utils;
 import com.mojang.authlib.exceptions.AuthenticationException;
+import me.ratsiel.auth.model.mojang.MinecraftAuthenticator;
+import me.ratsiel.auth.model.mojang.MinecraftToken;
+import me.ratsiel.auth.model.mojang.profile.MinecraftProfile;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -47,6 +50,10 @@ public class GuiAltManager extends GuiScreen {
         }
 
         if (button.id == 4) {
+            microsoftLogin();
+        }
+
+        if (button.id == 5) {
             usernameField.setText("");
             passwordField.setText("");
             usernamePasswordField.setText("");
@@ -55,7 +62,7 @@ public class GuiAltManager extends GuiScreen {
             status = "Logged in as " + mc.getSession().getUsername() + " [" + sessionType + "]";
         }
 
-        if (button.id == 5) {
+        if (button.id == 6) {
             mc.displayGuiScreen(null);
         }
 
@@ -87,6 +94,37 @@ public class GuiAltManager extends GuiScreen {
             status = "\u00a7aSuccessfully logged in as " + session.getUsername() + " [ONLINE]!";
         } catch (AuthenticationException e) {
             status = "\u00a7cError: " + e.getMessage();
+        }
+    }
+
+    private void microsoftLogin() {
+        if (usernamePasswordField.getText().length() != 0 && usernamePasswordField.getText().contains(":") && !usernamePasswordField.getText().endsWith(":")) {
+            usernameField.setText(usernamePasswordField.getText().split(":")[0]);
+            passwordField.setText(usernamePasswordField.getText().split(":")[1]);
+            usernamePasswordField.setText("");
+        }
+
+        if (!usernameField.getText().matches(".*\\w.*")) {
+            status = "\u00a7cError: Empty username";
+            return;
+        }
+
+        if (passwordField.getText().length() == 0) {
+            Session session = Utils.createOfflineSession(usernameField.getText(), Proxy.NO_PROXY);
+            ((IAccessorMinecraft) mc).setSession(session);
+            status = "\u00a7eSuccessfully logged in as " + usernameField.getText() + " [OFFLINE]!";
+            return;
+        }
+
+        MinecraftAuthenticator minecraftAuthenticator = new MinecraftAuthenticator();
+        MinecraftToken minecraftToken = minecraftAuthenticator.loginWithXbox(usernameField.getText(), passwordField.getText());
+        MinecraftProfile minecraftProfile = minecraftAuthenticator.checkOwnership(minecraftToken);
+        Session session = new Session(minecraftProfile.getUsername(), minecraftProfile.getUuid().toString(), minecraftToken.getAccessToken(), "mojang");
+        ((IAccessorMinecraft) mc).setSession(session);
+        if (session.getToken() != null) {
+            status = "\u00a7aSuccessfully logged in as " + session.getUsername() + " [ONLINE]! (Microsoft Login)";
+        } else {
+            status = "\u00a7cError: login failed!";
         }
     }
 
@@ -134,9 +172,10 @@ public class GuiAltManager extends GuiScreen {
         passwordField.setMaxStringLength(64);
         usernamePasswordField.setMaxStringLength(128);
 
-        buttonList.add(new GuiButton(3, width / 2 - 250 / 2, height / 2 - 220 + 150 + 40 * 3, 122, 20, "Login"));
-        buttonList.add(new GuiButton(4, width / 2 + 3, height / 2 - 220 + 150 + 40 * 3, 122, 20, "Clear"));
-        buttonList.add(new GuiButton(5, width / 2 - 250 / 2, height / 2 - 220 + 150 + 40 * 3 + 25, 250, 20, "Back"));
+        buttonList.add(new GuiButton(3, width / 2 - 250 / 2, height / 2 - 220 + 150 + 40 * 3, 80, 20, "Login"));
+        buttonList.add(new GuiButton(4, width / 2 - 250 / 2 + 85, height / 2 - 220 + 150 + 40 * 3, 80, 20, "MSLogin"));
+        buttonList.add(new GuiButton(5, width / 2 - 250 / 2 + 85 + 85, height / 2 - 220 + 150 + 40 * 3, 80, 20, "Clear"));
+        buttonList.add(new GuiButton(6, width / 2 - 250 / 2, height / 2 - 220 + 150 + 40 * 3 + 25, 250, 20, "Back"));
 
         if (mc.getSession() == null) {
             status = "Not logged in.";
