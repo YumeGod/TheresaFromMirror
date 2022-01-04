@@ -49,9 +49,11 @@ public class ModuleManager {
         //Player
         addModule(new AutoPlace());
         addModule(new AutoTools());
+        addModule(new DamnBridge());
         addModule(new NoFall());
         addModule(new NoRightClickDelay());
         addModule(new SpeedMine());
+        addModule(new TellyBridge());
         addModule(new Phase());
         addModule(new RageBot());
 

@@ -13,4 +13,9 @@ public class PlayerUtils {
         return ((mc.thePlayer.moveForward != 0.0F || mc.thePlayer.moveStrafing != 0.0F));
     }
 
+    public static boolean isOnGround(double height) {
+        return !mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer,
+                mc.thePlayer.getEntityBoundingBox().offset(0.0D, -height, 0.0D)).isEmpty();
+    }
+
 }
