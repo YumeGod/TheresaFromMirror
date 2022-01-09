@@ -47,7 +47,7 @@ public class RageBot extends Module {
     private final NumberValue<Integer> range = new NumberValue<>("Range", 50, 40, 120);
     private final NumberValue<Float> fov = new NumberValue<>("FOV", 360f, 0f, 360f);
     private final BooleanValue headshot = new BooleanValue("Shot Head", false);
-    private final NumberValue<Float> pre = new NumberValue<>("Velocity", 0.8f, 0f, 1f);
+    private final NumberValue<Float> pre = new NumberValue<>("Velocity", 0.8f, 0f, 2f);
     private final NumberValue<Float> y = new NumberValue<>("Y - Offset", 0f, -1f, 1f);
 
     public RageBot() {

@@ -98,8 +98,8 @@ public class Main {
             return;
 
         if (ms.hasReached(timing)) {
-            if (!packetQueue.isEmpty())
-            Minecraft.getMinecraft().getNetHandler().getNetworkManager().sendPacket(packetQueue.poll());
+            if (!packetQueue.isEmpty()) Minecraft.getMinecraft().
+                    getNetHandler().getNetworkManager().sendPacket(packetQueue.poll());
             ms.reset();
         }
     }

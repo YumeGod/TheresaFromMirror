@@ -29,13 +29,11 @@ public class DamnBridge extends Module {
 
     @Override
     public void onEnable() {
+        super.onEnable();
         try {
             if (mc.inGameHasFocus) {
-                if (!PlayerUtils.isOnGround(-1)){
-                    ChatUtils.send(("Error: no blocks nearby found"));
-                    setState(false);
-                }
-
+                if (!PlayerUtils.isOnGround(-1))
+                    this.setState(false);
                 startYaw = mc.thePlayer.rotationYaw;
                 startPitch = mc.thePlayer.rotationPitch;
                 KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), true);
@@ -45,12 +43,12 @@ public class DamnBridge extends Module {
         } catch (Exception e) {
             ChatUtils.send(("Some Error"));
         }
-        super.onEnable();
     }
 
 
     @Override
     public void onDisable() {
+        super.onDisable();
         try {
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), false);
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindBack.getKeyCode(), false);
@@ -58,14 +56,14 @@ public class DamnBridge extends Module {
         } catch (Exception e) {
             ChatUtils.send(("Some Error"));
         }
-        super.onDisable();
     }
 
     @EventTarget
     private void onTick(TickEvent event) {
         if (lastBlock == null || mc.playerController.getCurrentGameType().isCreative()) {
             ChatUtils.send(("Error: no blocks nearby found"));
-            setState(false);
+            this.setState(false);
+            return;
         }
 
         if (mc.thePlayer.posY == Math.round(mc.thePlayer.posY)) {
