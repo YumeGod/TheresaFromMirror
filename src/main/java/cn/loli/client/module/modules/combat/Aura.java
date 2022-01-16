@@ -286,7 +286,7 @@ public class Aura extends Module {
             if (target instanceof INpc && !villagers.getObject()) return false;
         }
 
-        if (target.isOnSameTeam(mc.thePlayer) && !team.getObject()) return false;
+        if (PlayerUtils.isOnSameTeam(target) && !team.getObject()) return false;
         if (target.isInvisible() && !invisibles.getObject()) return false;
         if (!isInFOV(target, fov.getObject())) return false;
 

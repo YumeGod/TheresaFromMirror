@@ -11,11 +11,15 @@ import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.util.MovingObjectPosition;
 import org.lwjgl.input.Mouse;
 
 import java.security.SecureRandom;
 
 public class AutoClicker extends Module {
+
+
+    private final BooleanValue block = new BooleanValue("Ignore Facing Block", true);
     private final BooleanValue holdButton = new BooleanValue("HoldButton", true);
     private final NumberValue<Integer> minCPS = new NumberValue<>("MinCPS", 10, 1, 20);
     private final NumberValue<Integer> maxCPS = new NumberValue<>("MaxCPS", 12, 1, 20);
@@ -34,6 +38,8 @@ public class AutoClicker extends Module {
     @EventTarget
     public void onTick(TickEvent e) {
         if (e.getEventType() != EventType.PRE) return;
+
+        if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && block.getObject()) return;
 
         if ((!holdButton.getObject() || Mouse.isButtonDown(0)) && mc.currentScreen == null) {
             if (maxCPS.getObject() < minCPS.getObject()) {

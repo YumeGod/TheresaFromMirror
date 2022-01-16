@@ -49,6 +49,7 @@ public class MixinEntityPlayerSP extends MixinEntity {
         rotationPitch = event.getPitch();
     }
 
+
     @Inject(method = "onUpdateWalkingPlayer", at = @At("RETURN"))
     private void onUpdateWalkingPlayerPost(CallbackInfo ci) {
         posX = cachedX;

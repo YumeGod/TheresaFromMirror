@@ -3,6 +3,7 @@ package cn.loli.client.module.modules.combat;
 import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import cn.loli.client.utils.PlayerUtils;
 import cn.loli.client.utils.WorldUtil;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
@@ -156,7 +157,7 @@ public class BowAimbot extends Module {
         }
 
         if (target instanceof EntityArmorStand && !armorStand.getObject()) return false;
-        if (target.isOnSameTeam(mc.thePlayer) && !team.getObject()) return false;
+        if (PlayerUtils.isOnSameTeam(target) && !team.getObject()) return false;
         if (target.isInvisible() && !invisibles.getObject()) return false;
         if (!isInFOV(target, fov.getObject())) return false;
         if (!target.canEntityBeSeen(mc.thePlayer)) return false;

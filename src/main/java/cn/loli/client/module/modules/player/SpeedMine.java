@@ -15,7 +15,7 @@ import net.minecraft.util.EnumFacing;
 
 public class SpeedMine extends Module {
 
-    private final NumberValue<Float> speed = new NumberValue<>("Speed", 1.6f, 1.0f, 3.0f);
+    private final NumberValue<Float> speed = new NumberValue<>("Speed", 1.6f, 0.8f, 3.0f);
 
     public BlockPos blockPos;
     public EnumFacing facing;

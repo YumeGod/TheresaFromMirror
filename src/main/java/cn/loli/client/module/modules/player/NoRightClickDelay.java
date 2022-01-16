@@ -18,7 +18,7 @@ public class NoRightClickDelay extends Module {
      */
     @EventTarget
     public void onUpdate(UpdateEvent e) {
-        if (mc.gameSettings.keyBindUseItem.isKeyDown()) {
+        if (mc.gameSettings.keyBindUseItem.isKeyDown() && !mc.thePlayer.isUsingItem()) {
             ((IAccessorMinecraft) mc).invokeRightClickMouse();
         }
     }

@@ -52,6 +52,7 @@ public class ModuleManager {
         addModule(new DamnBridge());
         addModule(new NoFall());
         addModule(new NoRightClickDelay());
+        addModule(new SafeWalk());
         addModule(new SpeedMine());
         addModule(new TellyBridge());
         addModule(new Phase());

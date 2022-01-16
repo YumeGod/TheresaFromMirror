@@ -112,13 +112,13 @@ public class CrashCommand extends Command {
                         crashUtils.crashdemo("\n", bookType, bookvalue, redo, false, CrashUtils.CrashType.CLICK, amounts, setTag, resolvebyte);
                         break;
                     case "nettyp":
-                        crashUtils.crashdemo("\n", bookType, bookvalue, redo, false, CrashUtils.CrashType.PLACE3, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo("\n", bookType, bookvalue, redo, true, CrashUtils.CrashType.PLACE3, amounts, setTag, resolvebyte);
                         break;
                     case "nettypl":
-                        crashUtils.crashdemo("\n", bookType, bookvalue, redo, false, CrashUtils.CrashType.PAYLOAD1, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo("\n", bookType, bookvalue, redo, true, CrashUtils.CrashType.PAYLOAD1, amounts, setTag, resolvebyte);
                         break;
                     case "nettyc":
-                        crashUtils.crashdemo("\n", bookType, bookvalue, redo, false, CrashUtils.CrashType.CREATE, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo("\n", bookType, bookvalue, redo, true, CrashUtils.CrashType.CREATE, amounts, setTag, resolvebyte);
                         break;
                     case "place2":
                         crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, false, CrashUtils.CrashType.PLACE2, amounts, setTag, resolvebyte);

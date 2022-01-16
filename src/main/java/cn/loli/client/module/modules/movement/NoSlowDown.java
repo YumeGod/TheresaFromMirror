@@ -20,15 +20,12 @@ public class NoSlowDown extends Module {
 
 
     @EventTarget
-    public void onPost(MotionUpdateEvent event) {
+    public void onMotion(MotionUpdateEvent event) {
         if (!mc.thePlayer.isUsingItem()) return;
 
         if (event.getEventType() == EventType.PRE) {
-            mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(new Random().nextInt(8)));
             mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
-        }
-
-        if (event.getEventType() == EventType.POST) {
+        } else if (event.getEventType() == EventType.POST) {
             mc.getNetHandler().addToSendQueue(new C08PacketPlayerBlockPlacement(mc.thePlayer.inventory.getCurrentItem()));
         }
     }
