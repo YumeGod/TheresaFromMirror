@@ -20,6 +20,7 @@ import java.util.Random;
 
 public class NoSlowDown extends Module {
 
+    private final BooleanValue slot = new BooleanValue("Switch", false);
     private final BooleanValue itemswitch = new BooleanValue("New", false);
 
     public NoSlowDown() {
@@ -33,10 +34,12 @@ public class NoSlowDown extends Module {
         if (event.getEventType() == EventType.POST) {
             final int curSlot = mc.thePlayer.inventory.currentItem;
             final int spoof = curSlot == 0 ? 1 : -1;
-            if (itemswitch.getObject())
-                mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot + spoof));
+            if (slot.getObject()){
+                if (itemswitch.getObject())
+                    mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot + spoof));
 
-            mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot));
+                mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot));
+            }
             mc.getNetHandler().addToSendQueue(new C08PacketPlayerBlockPlacement(mc.thePlayer.inventory.getCurrentItem()));
         }
     }

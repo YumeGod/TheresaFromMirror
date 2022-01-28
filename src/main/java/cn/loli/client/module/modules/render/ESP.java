@@ -55,6 +55,7 @@ public class ESP extends Module {
     private final BooleanValue box = new BooleanValue("2D Box", false);
     private final BooleanValue healthbar = new BooleanValue("Health Bar", false);
     private final BooleanValue nametags = new BooleanValue("Name tags", false);
+    private final BooleanValue invis = new BooleanValue("Ignore Invis", true);
 
 
     public ESP() {
@@ -139,6 +140,10 @@ public class ESP extends Module {
         if (box.getObject() || healthbar.getObject() || nametags.getObject()) {
             int scaleFactor = res.getScaleFactor();
             for (EntityPlayer player : mc.theWorld.playerEntities) {
+
+                if (player.isInvisible() && invis.getObject())
+                    return;
+
                 if (player.getDistanceToEntity(mc.thePlayer) < 1.0F)
                     continue;
 
