@@ -66,35 +66,38 @@ public class RageBot extends Module {
     }
 
 
+    List<EntityLivingBase> list = new ArrayList<>();;
+
     @EventTarget
     private void onUpdatePre(MotionUpdateEvent event) {
-            List<EntityLivingBase> list;
 
-            final List<EntityLivingBase> targets = WorldUtil.getLivingEntities().stream()
-                    .filter(this::canAttack)
-                    .sorted(Comparator.comparing(e -> mc.thePlayer.getDistanceToEntity(e)))
-                    .collect(Collectors.toList());
-
-            list = new ArrayList<>();
-            list.addAll(targets.stream().filter((entity) -> entity instanceof EntityGiantZombie || entity instanceof EntityWither).collect(Collectors.toList()));
-            list.addAll(targets.stream().filter((entity) -> !(entity instanceof EntityGiantZombie || entity instanceof EntityWither)).collect(Collectors.toList()));
+        list.clear();
+        final List<EntityLivingBase> targets = WorldUtil.getLivingEntities().stream()
+                .filter(this::canAttack)
+                .sorted(Comparator.comparing(e -> mc.thePlayer.getDistanceToEntity(e)))
+                .collect(Collectors.toList());
 
 
-            if (list.size() <= 0){
-                aim = false;
-                return;
-            }
+        list.addAll(targets.stream().filter((entity) -> entity instanceof EntityGiantZombie || entity instanceof EntityWither).collect(Collectors.toList()));
+        list.addAll(targets.stream().filter((entity) -> !(entity instanceof EntityGiantZombie || entity instanceof EntityWither)).collect(Collectors.toList()));
 
-            aim = true;
-      //      System.out.println(list.get(0));
-            aimed = getFixedLocation(list.get(0), pre.getObject(), headshot.getObject());
 
-            final float[] rotations = getRotationToLocation(aimed);
+        if (list.size() <= 0) {
+            aim = false;
+            return;
+        }
+
+        aim = true;
+        aimed = getFixedLocation(list.get(0), pre.getObject(), headshot.getObject());
+
+        final float[] rotations = getRotationToLocation(aimed);
+        if (event.getEventType() == EventType.PRE) {
             event.setYaw(mc.thePlayer.rotationYawHead = rotations[0]);
             event.setPitch(rotations[1]);
-
+        } else {
             if (!(mc.thePlayer.getHeldItem().getItem() instanceof ItemSword || mc.thePlayer.getHeldItem().getItem() instanceof ItemBook))
                 mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem());
+        }
 
     }
 
@@ -112,7 +115,7 @@ public class RageBot extends Module {
 
     private Vec3 getFixedLocation(final EntityLivingBase entity, final float velocity, final boolean head) {
         double x = entity.posX + ((entity.posX - entity.lastTickPosX) * velocity);
-        double y = entity.posY + ((entity.posY - entity.lastTickPosY) * (velocity * 0.3)) + (head ? entity.getEyeHeight() : 1.0) + this.y.getObject() ;
+        double y = entity.posY + ((entity.posY - entity.lastTickPosY) * (velocity * 0.3)) + (head ? entity.getEyeHeight() : 1.0) + this.y.getObject();
         double z = entity.posZ + ((entity.posZ - entity.lastTickPosZ) * velocity);
         return new Vec3(x, y, z);
     }

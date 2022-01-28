@@ -56,6 +56,13 @@ public class BowAimbot extends Module {
 
     @Override
     public void onEnable() {
+        try {
+            targets.clear();
+            attackList.clear();
+            currentTarget = 0;
+        } catch (Exception e) {
+            currentTarget = 0;
+        }
         super.onEnable();
     }
 

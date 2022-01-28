@@ -94,12 +94,5 @@ public class AimUtils {
         return curRot + f;
     }
 
-    public static boolean canEntityBeSeenFixed(Entity entityIn) {
-        return mc.thePlayer.worldObj.rayTraceBlocks(new Vec3(mc.thePlayer.posX, mc.thePlayer.posY + (double) mc.thePlayer.getEyeHeight(), mc.thePlayer.posZ),
-                new Vec3(entityIn.posX, entityIn.posY + (double) entityIn.getEyeHeight(), entityIn.posZ)) == null
-                || mc.thePlayer.worldObj.rayTraceBlocks(
-                new Vec3(mc.thePlayer.posX, mc.thePlayer.posY + (double) mc.thePlayer.getEyeHeight(), mc.thePlayer.posZ),
-                new Vec3(entityIn.posX, entityIn.posY, entityIn.posZ)) == null;
-    }
 
 }

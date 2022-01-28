@@ -5,14 +5,10 @@ package cn.loli.client.injection.mixins;
 import cn.loli.client.Main;
 import cn.loli.client.events.*;
 import cn.loli.client.module.modules.movement.NoSlowDown;
-import cn.loli.client.utils.skids.PlayerHandler;
 import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.potion.Potion;
-import net.minecraft.stats.StatList;
-import net.minecraft.util.MathHelper;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -46,8 +42,8 @@ public class MixinEntityPlayerSP extends MixinEntity {
         posY = event.getY();
         posZ = event.getZ();
 
-        rotationYaw = PlayerHandler.yaw = event.getYaw();
-        rotationPitch = PlayerHandler.pitch = event.getPitch();
+        rotationYaw = event.getYaw();
+        rotationPitch = event.getPitch();
     }
 
 
