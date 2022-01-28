@@ -29,6 +29,10 @@ public class NoSlowDown extends Module {
 
     @EventTarget
     public void onMotion(MotionUpdateEvent event) {
+        if (mc.thePlayer == null
+                || mc.theWorld == null)
+            return;
+
         if (!mc.thePlayer.isUsingItem()) return;
 
         if (event.getEventType() == EventType.POST) {

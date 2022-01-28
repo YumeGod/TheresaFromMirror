@@ -133,7 +133,10 @@ public class Aura extends Module {
             attacktimer.reset();
         }
 
+    }
 
+    @EventTarget
+    public void onRender2D(Render2DEvent event) {
         if (target != null) {
             EntityLivingBase entity = target;
 
@@ -151,13 +154,13 @@ public class Aura extends Module {
         }
     }
 
-    @EventTarget
-    public void onRender2D(Render2DEvent event) {
-    }
-
 
     @EventTarget
     private void onMotionUpdate(MotionUpdateEvent event) {
+        if (mc.thePlayer == null
+                || mc.theWorld == null)
+            return;
+
         if (event.getEventType() == EventType.PRE) {
             if (target == null) {
                 if (mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword

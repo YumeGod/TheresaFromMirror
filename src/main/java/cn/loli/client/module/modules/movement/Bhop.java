@@ -27,13 +27,19 @@ public class Bhop extends Module {
 
     @Override
     public void onDisable() {
-        ((IAccessorMinecraft) mc).getTimer().timerSpeed = 1.0F;
-        ((IAccessorEntityPlayer) mc.thePlayer).setSpeedInAir(0.02F);
         super.onDisable();
+        if (mc.thePlayer != null && mc.theWorld != null) {
+            ((IAccessorMinecraft) mc).getTimer().timerSpeed = 1.0F;
+            ((IAccessorEntityPlayer) mc.thePlayer).setSpeedInAir(0.02F);
+        }
     }
 
     @EventTarget
     private void onUpdate(UpdateEvent event) {
+        if (mc.thePlayer == null
+                || mc.theWorld == null)
+            return;
+
         switch (modes.getCurrentMode()) {
             case "Tired": {
                 if (mc.thePlayer.motionY > -0.1) {

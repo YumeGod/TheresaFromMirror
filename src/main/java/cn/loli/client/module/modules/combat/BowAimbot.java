@@ -56,19 +56,16 @@ public class BowAimbot extends Module {
 
     @Override
     public void onEnable() {
-        try {
-            targets.clear();
-            attackList.clear();
-            currentTarget = 0;
-        } catch (Exception e) {
-            currentTarget = 0;
-        }
         super.onEnable();
     }
 
 
     @EventTarget
     public void onPre(MotionUpdateEvent event) {
+        if (mc.thePlayer == null
+                || mc.theWorld == null)
+            return;
+
         final List<EntityLivingBase> targets = WorldUtil.getLivingEntities().stream().filter(this::canAttack)
                 .sorted(Comparator.comparing(e -> mc.thePlayer.getDistanceToEntity(e)))
                 .collect(Collectors.toList());
