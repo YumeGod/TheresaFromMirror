@@ -5,6 +5,7 @@ package cn.loli.client.injection.mixins;
 import cn.loli.client.Main;
 import cn.loli.client.events.*;
 import cn.loli.client.module.modules.movement.NoSlowDown;
+import cn.loli.client.utils.skids.PlayerHandler;
 import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.client.Minecraft;
@@ -45,8 +46,8 @@ public class MixinEntityPlayerSP extends MixinEntity {
         posY = event.getY();
         posZ = event.getZ();
 
-        rotationYaw = event.getYaw();
-        rotationPitch = event.getPitch();
+        rotationYaw = PlayerHandler.yaw = event.getYaw();
+        rotationPitch = PlayerHandler.pitch = event.getPitch();
     }
 
 
@@ -110,7 +111,7 @@ public class MixinEntityPlayerSP extends MixinEntity {
         y = moveEvent.getY();
         z = moveEvent.getZ();
 
-        super.moveEntity(x , y , z);
+        super.moveEntity(x, y, z);
     }
 
 

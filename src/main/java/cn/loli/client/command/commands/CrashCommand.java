@@ -20,7 +20,7 @@ import java.util.Random;
 public class CrashCommand extends Command {
 
     public static String[] crashType = new String[]{"MV", "Fawe", "Pex", "Position", "PayLoad", "Netty",
-            "Place", "Click", "Create", "Cap", "Place2", "Place3", "Click2", "Click3", "NettyP", "NettyPL", "NettyC"};
+            "Place", "Click", "Create", "Cap", "Place2", "Place3", "Click2", "Click3", "NettyP", "NettyPL", "NettyC" , "AAC5"};
     CrashUtils crashUtils = new CrashUtils();
 
     int bookType, bookvalue, redo, resolvebyte;
@@ -115,7 +115,7 @@ public class CrashCommand extends Command {
                         crashUtils.crashdemo("\n", bookType, bookvalue, redo, true, CrashUtils.CrashType.PLACE3, amounts, setTag, resolvebyte);
                         break;
                     case "nettypl":
-                        crashUtils.crashdemo("\n", bookType, bookvalue, redo, true, CrashUtils.CrashType.PAYLOAD1, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo("\n", bookType, bookvalue, redo, true, CrashUtils.CrashType.PAYLOAD2, amounts, setTag, resolvebyte);
                         break;
                     case "nettyc":
                         crashUtils.crashdemo("\n", bookType, bookvalue, redo, true, CrashUtils.CrashType.CREATE, amounts, setTag, resolvebyte);
@@ -133,7 +133,10 @@ public class CrashCommand extends Command {
                         crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, false, CrashUtils.CrashType.CLICK3, amounts, setTag, resolvebyte);
                         break;
                     case "action":
-                        crashUtils.actioncrash(amounts);
+                        crashUtils.actioncrash(amounts , bookType);
+                        break;
+                    case "aac5":
+                        crashUtils.aac5crash(amounts);
                         break;
                     case "list":
                         ChatUtils.send(Arrays.toString(crashType));

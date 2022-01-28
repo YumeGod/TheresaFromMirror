@@ -26,7 +26,6 @@ public class Sprint extends Module {
                         (mc.thePlayer.movementInput.moveForward >= 0.8F) &&
                         !mc.thePlayer.isSprinting() &&
                         ((float) mc.thePlayer.getFoodStats().getFoodLevel() > 6.0F || mc.thePlayer.capabilities.allowFlying) &&
-                        !mc.thePlayer.isUsingItem() &&
                         !mc.thePlayer.isPotionActive(Potion.blindness))) {
             mc.thePlayer.setSprinting(true);
         }

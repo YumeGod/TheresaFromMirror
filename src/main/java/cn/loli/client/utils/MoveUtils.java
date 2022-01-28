@@ -3,6 +3,7 @@ package cn.loli.client.utils;
 import cn.loli.client.events.PlayerMoveEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.potion.Potion;
+import net.minecraft.util.MathHelper;
 
 public class MoveUtils {
 
@@ -48,5 +49,40 @@ public class MoveUtils {
             baseSpeed *= 1.0 + 0.2 * (amplifier + 1);
         }
         return baseSpeed;
+    }
+
+    public double[] getSpeed(double speed, float yaw, boolean direction) {
+        final double motionX = -Math.sin(Math.toRadians(direction ? getDirection(yaw) : yaw)) * speed;
+        final double motionZ = Math.cos(Math.toRadians(direction ? getDirection(yaw) : yaw)) * speed;
+        return new double[] {motionX, motionZ};
+    }
+
+    public static void setSpeed(double speed) {
+        setSpeed(speed, mc.thePlayer.rotationYaw);
+    }
+
+    public static void setSpeed(double speed, float yaw) {
+        setSpeed(speed, yaw, true);
+    }
+
+    public static void setSpeed(double speed, float yaw, boolean direction) {
+        mc.thePlayer.motionX = -Math.sin(Math.toRadians(direction ? getDirection(yaw) : yaw)) * speed;
+        mc.thePlayer.motionZ = Math.cos(Math.toRadians(direction ? getDirection(yaw) : yaw)) * speed;
+    }
+
+    public static float getDirection(float rotationYaw) {
+        float left = Minecraft.getMinecraft().gameSettings.keyBindLeft.isPressed() ? 
+                mc.gameSettings.keyBindBack.isPressed() ? 45 : mc.gameSettings.keyBindForward.isPressed() ? -45 : -90 : 0;
+        float right = Minecraft.getMinecraft().gameSettings.keyBindRight.isPressed() ?
+                mc.gameSettings.keyBindBack.isPressed() ? -45 : mc.gameSettings.keyBindForward.isPressed() ? 45 : 90 : 0;
+        float back = Minecraft.getMinecraft().gameSettings.keyBindBack.isPressed() ? + 180 : 0;
+        float yaw = left + right + back;
+        return rotationYaw + yaw;
+    }
+
+
+    public static void addMotion(double speed, float yaw) {
+        mc.thePlayer.motionX -= (MathHelper.sin((float) Math.toRadians(yaw)) * speed);
+        mc.thePlayer.motionZ += (MathHelper.cos((float) Math.toRadians(yaw)) * speed);
     }
 }

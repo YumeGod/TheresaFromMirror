@@ -195,7 +195,6 @@ public class Aura extends Module {
             if (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() && isBlocking) {
                 ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
-                mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(new Random().nextInt(8)));
                 mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                 isBlocking = false;
             }
@@ -226,8 +225,6 @@ public class Aura extends Module {
             if (target != null && (mc.thePlayer.getHeldItem() != null &&
                     mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() || mc.thePlayer.isBlocking())
                     && !isBlocking) {
-
-
                 ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
 
                 mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
