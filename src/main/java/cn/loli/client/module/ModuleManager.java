@@ -4,6 +4,7 @@ package cn.loli.client.module;
 
 import cn.loli.client.module.modules.combat.*;
 import cn.loli.client.module.modules.misc.ClickGUIModule;
+import cn.loli.client.module.modules.misc.Abuser;
 import cn.loli.client.module.modules.misc.HUD;
 import cn.loli.client.module.modules.misc.Spoofer;
 import cn.loli.client.module.modules.movement.*;
@@ -35,12 +36,14 @@ public class ModuleManager {
         addModule(new AimBot());
         addModule(new Aura());
         addModule(new AutoClicker());
+        addModule(new BackTrack());
         addModule(new BowAimbot());
         addModule(new Criticals());
         addModule(new KeepSprint());
         addModule(new Velocity());
 
         //Movement
+        addModule(new BaffleSpeed());
         addModule(new Bhop());
         addModule(new FlagDetector());
         addModule(new Fly());
@@ -77,6 +80,7 @@ public class ModuleManager {
 
 
         //Other
+        addModule(new Abuser());
         addModule(new Spoofer());
         addModule(new HUD()); // Needs to be second last
         addModule(new ClickGUIModule()); // Needs to be last

@@ -10,6 +10,7 @@ import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.file.FileManager;
 import cn.loli.client.module.ModuleManager;
 import cn.loli.client.module.modules.misc.ClickGUIModule;
+import cn.loli.client.utils.ChatUtils;
 import cn.loli.client.utils.SoundFxPlayer;
 import cn.loli.client.utils.TimeHelper;
 import cn.loli.client.value.ValueManager;
@@ -17,8 +18,7 @@ import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.S01PacketJoinGame;
-import net.minecraft.network.play.server.S07PacketRespawn;
+import net.minecraft.network.play.server.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -48,6 +48,11 @@ public class Main {
     public Queue<Packet<?>> packetQueue;
     TimeHelper ms = new TimeHelper();
     public long timing;
+
+    //Position Record
+    public int realPosX;
+    public int realPosY;
+    public int realPosZ;
 
     public Main() {
         INSTANCE = this;
@@ -89,6 +94,30 @@ public class Main {
         if (e.getPacket() instanceof S07PacketRespawn || e.getPacket() instanceof S01PacketJoinGame){
             packetQueue.clear();
             ms.reset();
+        }
+
+        if (e.getPacket() instanceof S48PacketResourcePackSend){
+            ChatUtils.info("Receive A Request about resource pack one");
+            ChatUtils.info("Hash: " + ((S48PacketResourcePackSend) e.getPacket()).getHash());
+            ChatUtils.info("URL: " + ((S48PacketResourcePackSend) e.getPacket()).getURL());
+        }
+
+        if (e.getPacket() instanceof S27PacketExplosion) {
+            if (Math.abs(((S27PacketExplosion) e.getPacket()).getStrength()) > 99 ||
+                    Math.abs(((S27PacketExplosion) e.getPacket()).getX()) > 99
+                    || Math.abs(((S27PacketExplosion) e.getPacket()).getY()) > 99
+                    || Math.abs(((S27PacketExplosion) e.getPacket()).getZ()) > 99) {
+                e.setCancelled(true);
+            }
+        }
+
+        if (e.getPacket() instanceof S2APacketParticles) {
+                if(Math.abs(((S2APacketParticles) e.getPacket()).getParticleSpeed()) > 10) {
+                    e.setCancelled(true);
+                }
+                if(((S2APacketParticles) e.getPacket()).getParticleCount() > 500) {
+                    e.setCancelled(true);
+                }
         }
     }
 

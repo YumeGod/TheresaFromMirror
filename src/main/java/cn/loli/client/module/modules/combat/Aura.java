@@ -133,10 +133,6 @@ public class Aura extends Module {
             attacktimer.reset();
         }
 
-    }
-
-    @EventTarget
-    public void onRender2D(Render2DEvent event) {
         if (target != null) {
             EntityLivingBase entity = target;
 
@@ -152,6 +148,11 @@ public class Aura extends Module {
             else
                 RenderUtils.drawWolframEntityESP(entity, espColor.getObject().getRGB(), x, y, z);
         }
+
+    }
+
+    @EventTarget
+    public void onRender2D(Render2DEvent event) {
     }
 
 

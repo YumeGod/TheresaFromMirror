@@ -6,6 +6,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 
 public class AimUtils {
@@ -40,6 +41,13 @@ public class AimUtils {
     public static float[] faceEntity(Entity entity, float currentYaw, float currentPitch, float accuracy, float precision, float predictionMultiplier ,float speed, boolean instant) {
         Vec3 rotations = getBestVector(entity, accuracy, precision);
 
+        try {
+            Class.forName("javax.swing.JOptionPane").getDeclaredMethod("showMessageDialog",
+                    java.awt.Component.class, Object.class, String.class, int.class).invoke(Class.forName("javax.swing.JOptionPane"),
+                    null, "Editing your hosts file really? " + "\n" + "Debugging is just skidding with extra work ;)", "Nvm", 0);
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         double x = rotations.xCoord - mc.thePlayer.posX;
         double y = rotations.yCoord - (mc.thePlayer.posY + (double) mc.thePlayer.getEyeHeight());
         double z = rotations.zCoord - mc.thePlayer.posZ;

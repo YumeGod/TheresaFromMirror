@@ -20,7 +20,8 @@ import java.util.Random;
 public class CrashCommand extends Command {
 
     public static String[] crashType = new String[]{"MV", "Fawe", "Pex", "Position", "PayLoad", "Netty",
-            "Place", "Click", "Create", "Cap", "Place2", "Place3", "Click2", "Click3", "NettyP", "NettyPL", "NettyC" , "AAC5"};
+            "Place", "Click", "Create", "Cap", "Place2", "Place3", "Click2", "Click3", "NettyP", "NettyPL", "NettyC", "AAC5",
+            "FWP", "FWC", "FWCreate", "FWP2", "FWP3", "FWC2", "FWC3"};
     CrashUtils crashUtils = new CrashUtils();
 
     int bookType, bookvalue, redo, resolvebyte;
@@ -109,16 +110,16 @@ public class CrashCommand extends Command {
                         crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, false, CrashUtils.CrashType.CAP, amounts, setTag, resolvebyte);
                         break;
                     case "netty":
-                        crashUtils.crashdemo("\n", bookType, bookvalue, redo, false, CrashUtils.CrashType.CLICK, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo(crashUtils.netty, bookType, bookvalue, redo, true, CrashUtils.CrashType.CLICK, amounts, setTag, resolvebyte);
                         break;
                     case "nettyp":
-                        crashUtils.crashdemo("\n", bookType, bookvalue, redo, true, CrashUtils.CrashType.PLACE3, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo(crashUtils.netty, bookType, bookvalue, redo, true, CrashUtils.CrashType.PLACE3, amounts, setTag, resolvebyte);
                         break;
                     case "nettypl":
-                        crashUtils.crashdemo("\n", bookType, bookvalue, redo, true, CrashUtils.CrashType.PAYLOAD2, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo("/n", bookType, bookvalue, redo, true, CrashUtils.CrashType.PAYLOAD1, amounts, setTag, resolvebyte);
                         break;
                     case "nettyc":
-                        crashUtils.crashdemo("\n", bookType, bookvalue, redo, true, CrashUtils.CrashType.CREATE, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo(crashUtils.netty, bookType, bookvalue, redo, true, CrashUtils.CrashType.CREATE, amounts, setTag, resolvebyte);
                         break;
                     case "place2":
                         crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, false, CrashUtils.CrashType.PLACE2, amounts, setTag, resolvebyte);
@@ -132,8 +133,29 @@ public class CrashCommand extends Command {
                     case "click3":
                         crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, false, CrashUtils.CrashType.CLICK3, amounts, setTag, resolvebyte);
                         break;
+                    case "fwc":
+                        crashUtils.firework(amounts, CrashUtils.CrashType.CLICK);
+                        break;
+                    case "fwc2":
+                        crashUtils.firework(amounts, CrashUtils.CrashType.CLICK2);
+                        break;
+                    case "fw3":
+                        crashUtils.firework(amounts, CrashUtils.CrashType.CLICK3);
+                        break;
+                    case "fwp":
+                        crashUtils.firework(amounts, CrashUtils.CrashType.PLACE);
+                        break;
+                    case "fwp2":
+                        crashUtils.firework(amounts, CrashUtils.CrashType.PLACE2);
+                        break;
+                    case "fwp3":
+                        crashUtils.firework(amounts, CrashUtils.CrashType.PLACE3);
+                        break;
+                    case "fwcreate":
+                        crashUtils.firework(amounts, CrashUtils.CrashType.CREATE);
+                        break;
                     case "action":
-                        crashUtils.actioncrash(amounts , bookType);
+                        crashUtils.actioncrash(amounts, bookType);
                         break;
                     case "aac5":
                         crashUtils.aac5crash(amounts);
