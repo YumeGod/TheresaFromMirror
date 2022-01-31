@@ -68,6 +68,9 @@ public class ESP extends Module {
         ScaledResolution res = new ScaledResolution(mc);
 
         for (EntityPlayer player : entityPosMap.keySet()) {
+            if (player.isInvisible() && invis.getObject())
+                return;
+
             GL11.glPushMatrix();
             mc.entityRenderer.setupOverlayRendering();
             float[] positions = entityPosMap.get(player);
@@ -140,10 +143,6 @@ public class ESP extends Module {
         if (box.getObject() || healthbar.getObject() || nametags.getObject()) {
             int scaleFactor = res.getScaleFactor();
             for (EntityPlayer player : mc.theWorld.playerEntities) {
-
-                if (player.isInvisible() && invis.getObject())
-                    return;
-
                 if (player.getDistanceToEntity(mc.thePlayer) < 1.0F)
                     continue;
 
