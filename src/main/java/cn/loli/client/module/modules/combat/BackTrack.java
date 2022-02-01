@@ -17,16 +17,20 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
+import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.server.*;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.Vec3;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class BackTrack extends Module {
 
     private final ArrayList<Packet<INetHandler>> packets = new ArrayList<>();
+
+    private final LinkedList<Packet<?>> pospacket = new LinkedList<>();
 
     private EntityLivingBase entity = null;
 
@@ -35,6 +39,7 @@ public class BackTrack extends Module {
     private final BooleanValue timer = new BooleanValue("Keep Alive", true);
     private final BooleanValue velocity = new BooleanValue("Velocity", true);
     private final BooleanValue onlyWhenNeed = new BooleanValue("Auto Check", false);
+    private final BooleanValue position = new BooleanValue("Position", false);
 
     private final NumberValue<Integer> delay = new NumberValue<>("Delay", 400, 0, 5000);
     private final NumberValue<Integer> rage_check = new NumberValue<>("Rage Check", 6, 0, 8);
@@ -57,7 +62,7 @@ public class BackTrack extends Module {
     }
 
     @EventTarget
-    private void onProcess(PacketEvent e){
+    private void onProcess(PacketEvent e) {
         if (mc.getNetHandler().getNetworkManager().getNetHandler()
                 != null && mc.getNetHandler().getNetworkManager().getNetHandler() instanceof OldServerPinger) return;
         if (mc.theWorld != null)
@@ -81,37 +86,46 @@ public class BackTrack extends Module {
                     }
 
                     entity = mc.theWorld.playerEntities.stream().filter(entityPlayer -> entityPlayer != mc.thePlayer
-                                        && entityPlayer.isEntityAlive() && mc.thePlayer.getDistanceToEntity(entityPlayer) < range.getObject())
-                                .min((o1, o2) -> Float.compare(mc.thePlayer.getDistanceToEntity(o1), mc.thePlayer.getDistanceToEntity(o2))).orElse(null);
+                                    && entityPlayer.isEntityAlive() && mc.thePlayer.getDistanceToEntity(entityPlayer) < range.getObject())
+                            .min((o1, o2) -> Float.compare(mc.thePlayer.getDistanceToEntity(o1), mc.thePlayer.getDistanceToEntity(o2))).orElse(null);
 
                     if (entity == null) {
+                        resetPackets();
                         resetPackets(mc.getNetHandler().
                                 getNetworkManager().getNetHandler());
                         return;
                     }
                     if (mc.theWorld != null && mc.thePlayer != null) {
                         if (lastWorld != mc.theWorld) {
+                            resetPackets();
                             resetPackets(mc.getNetHandler().getNetworkManager().getNetHandler());
                             lastWorld = mc.theWorld;
                             return;
                         }
+
                         addPackets((Packet<INetHandler>) e.getPacket(), e);
                     }
                     lastWorld = mc.theWorld;
+                }
+            } else if (e.getEventType() == EventType.SEND) {
+                if (position.getObject() && (e.getPacket() instanceof C03PacketPlayer || e.getPacket() instanceof C03PacketPlayer.C04PacketPlayerPosition ||
+                        e.getPacket() instanceof C03PacketPlayer.C06PacketPlayerPosLook || e.getPacket() instanceof C03PacketPlayer.C05PacketPlayerLook)) {
+                    pospacket.add(e.getPacket());
+                    e.setCancelled(true);
                 }
             }
     }
 
     @EventTarget
-    private void onTick(TickEvent event){
+    private void onTick(TickEvent event) {
         if (mc.getNetHandler().getNetworkManager().getNetHandler()
                 != null && mc.getNetHandler().getNetworkManager().getNetHandler() instanceof OldServerPinger) return;
 
         if (entity != null && mc.thePlayer != null &&
                 mc.getNetHandler().getNetworkManager().getNetHandler() != null && mc.theWorld != null) {
-            double d0 = (double)  Main.INSTANCE.realPosX / 32.0D;
-            double d1 = (double)  Main.INSTANCE.realPosY / 32.0D;
-            double d2 = (double)  Main.INSTANCE.realPosZ / 32.0D;
+            double d0 = (double) Main.INSTANCE.realPosX / 32.0D;
+            double d1 = (double) Main.INSTANCE.realPosY / 32.0D;
+            double d2 = (double) Main.INSTANCE.realPosZ / 32.0D;
             double d3 = (double) entity.serverPosX / 32.0D;
             double d4 = (double) entity.serverPosY / 32.0D;
             double d5 = (double) entity.serverPosZ / 32.0D;
@@ -131,17 +145,16 @@ public class BackTrack extends Module {
             double bestX = MathHelper.clamp_double(positionEyes.xCoord, entity.getEntityBoundingBox().minX, entity.getEntityBoundingBox().maxX);
             double bestY = MathHelper.clamp_double(positionEyes.yCoord, entity.getEntityBoundingBox().minY, entity.getEntityBoundingBox().maxY);
             double bestZ = MathHelper.clamp_double(positionEyes.zCoord, entity.getEntityBoundingBox().minZ, entity.getEntityBoundingBox().maxZ);
-            boolean b = false;
-            if (positionEyes.distanceTo(new Vec3(bestX, bestY, bestZ)) > 2.9 || (mc.thePlayer.hurtTime < 8 && mc.thePlayer.hurtTime > 1)) {
-                b = true;
-            }
+            boolean b = positionEyes.distanceTo(new Vec3(bestX, bestY, bestZ)) > 2.9 || (mc.thePlayer.hurtTime < 8 && mc.thePlayer.hurtTime > 1);
             if (!onlyWhenNeed.getObject()) {
                 b = true;
             }
             if (!(b && positionEyes.distanceTo(new Vec3(realX, realY, realZ)) > positionEyes.distanceTo(new Vec3(currentX, currentY, currentZ)) + 0.05) || !(mc.thePlayer.getDistance(d0, d1, d2) < distance) || timeHelper.hasReached((long) delay.getObject())) {
+                resetPackets();
                 resetPackets(mc.getNetHandler().getNetworkManager().getNetHandler());
                 timeHelper.reset();
             }
+
         }
     }
 
@@ -155,9 +168,11 @@ public class BackTrack extends Module {
                     }
                     packets.remove(packets.get(0));
                 }
-
             }
         }
+    }
+
+    private void resetPackets() {
     }
 
     private void addPackets(Packet<INetHandler> packet, PacketEvent eventReadPacket) {
@@ -169,6 +184,7 @@ public class BackTrack extends Module {
         }
     }
 
+
     private boolean blockPacket(Packet<?> packet) {
         if (packet instanceof S03PacketTimeUpdate) {
             return timer.getObject();
@@ -176,6 +192,8 @@ public class BackTrack extends Module {
             return timer.getObject();
         } else if (packet instanceof S12PacketEntityVelocity || packet instanceof S27PacketExplosion) {
             return velocity.getObject();
+        } else if (packet instanceof S08PacketPlayerPosLook) {
+            return position.getObject();
         } else {
             return packet instanceof S32PacketConfirmTransaction || packet instanceof S14PacketEntity || packet instanceof S19PacketEntityStatus || packet instanceof S19PacketEntityHeadLook || packet instanceof S18PacketEntityTeleport || packet instanceof S0FPacketSpawnMob;
         }

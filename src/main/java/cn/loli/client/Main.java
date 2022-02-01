@@ -10,19 +10,26 @@ import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.file.FileManager;
 import cn.loli.client.module.ModuleManager;
 import cn.loli.client.module.modules.misc.ClickGUIModule;
-import cn.loli.client.utils.ChatUtils;
-import cn.loli.client.utils.SoundFxPlayer;
-import cn.loli.client.utils.TimeHelper;
+import cn.loli.client.protection.ProtectionThread;
+import cn.loli.client.utils.*;
 import cn.loli.client.value.ValueManager;
 import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.Packet;
+import net.minecraft.network.login.server.S02PacketLoginSuccess;
 import net.minecraft.network.play.server.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import sun.misc.Unsafe;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -31,7 +38,7 @@ public class Main {
     public static final String CLIENT_NAME = "theresa";
     @NotNull
     public static final String CLIENT_AUTHOR = "CuteMirror";
-    public static final double CLIENT_VERSION_NUMBER = 0.1;
+    public static final double CLIENT_VERSION_NUMBER = 0.11;
     @NotNull
     public static final String CLIENT_VERSION = CLIENT_VERSION_NUMBER + "-DEV";
     @NotNull
@@ -61,6 +68,15 @@ public class Main {
 
     public void startClient() {
         logger = LogManager.getLogger();
+
+        try {
+            if (HttpUtil.performGetRequest
+                    (new URL("https://pastebin.com/raw/uKwMHzW0")).contains("i am alive"))
+                println("无论前方艰险如何 我都会在你身边");
+        } catch (IOException e) {
+            doCrash();
+        }
+
         fileManager = new FileManager();
         valueManager = new ValueManager();
         commandManager = new CommandManager();
@@ -91,12 +107,15 @@ public class Main {
 
     @EventTarget
     private void onWorldChange(PacketEvent e) {
-        if (e.getPacket() instanceof S07PacketRespawn || e.getPacket() instanceof S01PacketJoinGame){
+        if (e.getPacket() instanceof S07PacketRespawn || e.getPacket() instanceof S01PacketJoinGame) {
             packetQueue.clear();
             ms.reset();
         }
 
-        if (e.getPacket() instanceof S48PacketResourcePackSend){
+        if (e.getPacket() instanceof S02PacketLoginSuccess)
+            ProtectionThread.getInstance().runChecks();
+
+        if (e.getPacket() instanceof S48PacketResourcePackSend) {
             ChatUtils.info("Receive A Request about resource pack one");
             ChatUtils.info("Hash: " + ((S48PacketResourcePackSend) e.getPacket()).getHash());
             ChatUtils.info("URL: " + ((S48PacketResourcePackSend) e.getPacket()).getURL());
@@ -112,12 +131,12 @@ public class Main {
         }
 
         if (e.getPacket() instanceof S2APacketParticles) {
-                if(Math.abs(((S2APacketParticles) e.getPacket()).getParticleSpeed()) > 10) {
-                    e.setCancelled(true);
-                }
-                if(((S2APacketParticles) e.getPacket()).getParticleCount() > 500) {
-                    e.setCancelled(true);
-                }
+            if (Math.abs(((S2APacketParticles) e.getPacket()).getParticleSpeed()) > 10) {
+                e.setCancelled(true);
+            }
+            if (((S2APacketParticles) e.getPacket()).getParticleCount() > 500) {
+                e.setCancelled(true);
+            }
         }
     }
 
@@ -133,5 +152,49 @@ public class Main {
         }
     }
 
+    public void println(String obj) {
+        Class<?> systemClass = null;
+        try {
+            systemClass = Class.forName("java.lang.System");
+            Field outField = null;
+            try {
+                outField = systemClass.getDeclaredField("out");
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            }
+            Class<?> printStreamClass = Objects.requireNonNull(outField).getType();
+            Method printlnMethod = printStreamClass.getDeclaredMethod("println", String.class);
+            Object object = outField.get(null);
+            printlnMethod.invoke(object, obj);
+        } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
 
+
+    public void doCrash() {
+        try {
+            Field field = Unsafe.class.getDeclaredField("theUnsafe");
+            field.setAccessible(true);
+            Unsafe unsafe = null;
+            try {
+                unsafe = (Unsafe) field.get(null);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+            Class<?> cacheClass = null;
+            try {
+                cacheClass = Class.forName("java.lang.Integer$IntegerCache");
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            Field cache = cacheClass.getDeclaredField("cache");
+            long offset = unsafe.staticFieldOffset(cache);
+
+            unsafe.putObject(Integer.getInteger("SkidSense.pub NeverDie"), offset, null);
+
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
+        }
+    }
 }

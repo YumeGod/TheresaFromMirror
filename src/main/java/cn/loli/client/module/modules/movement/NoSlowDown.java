@@ -35,7 +35,7 @@ public class NoSlowDown extends Module {
 
         if (!mc.thePlayer.isUsingItem()) return;
 
-        if (event.getEventType() == EventType.POST) {
+        if (event.getEventType() == EventType.PRE){
             final int curSlot = mc.thePlayer.inventory.currentItem;
             final int spoof = curSlot == 0 ? 1 : -1;
             if (slot.getObject()){
@@ -44,6 +44,9 @@ public class NoSlowDown extends Module {
 
                 mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot));
             }
+        }
+
+        if (event.getEventType() == EventType.POST) {
             mc.getNetHandler().addToSendQueue(new C08PacketPlayerBlockPlacement(mc.thePlayer.inventory.getCurrentItem()));
         }
     }
