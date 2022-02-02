@@ -142,7 +142,7 @@ public class HUD extends Module {
             GL11.glScaled(0.5, 0.5, 0.5);
 
             fontRenderer.drawString(Main.CLIENT_VERSION, i * 2, fontRenderer.FONT_HEIGHT * 2 - 7, rainbow(100), true);
-            fontRenderer.drawString("by " + Main.CLIENT_AUTHOR, 4, fontRenderer.FONT_HEIGHT * 2 + 2, rainbow(200), true);
+         //   fontRenderer.drawString("by " + Main.CLIENT_AUTHOR, 4, fontRenderer.FONT_HEIGHT * 2 + 2, rainbow(200), true);
         }
 
         if (showArrayList.getObject()) {

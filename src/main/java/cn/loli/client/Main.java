@@ -5,7 +5,6 @@ package cn.loli.client;
 import cn.loli.client.command.CommandManager;
 import cn.loli.client.events.LoopEvent;
 import cn.loli.client.events.PacketEvent;
-import cn.loli.client.events.TickEvent;
 import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.file.FileManager;
 import cn.loli.client.module.ModuleManager;
@@ -19,6 +18,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.Packet;
 import net.minecraft.network.login.server.S02PacketLoginSuccess;
 import net.minecraft.network.play.server.*;
+import net.minecraft.potion.Potion;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
@@ -38,9 +38,9 @@ public class Main {
     public static final String CLIENT_NAME = "theresa";
     @NotNull
     public static final String CLIENT_AUTHOR = "CuteMirror";
-    public static final double CLIENT_VERSION_NUMBER = 0.11;
+    public static final double CLIENT_VERSION_NUMBER = -1;
     @NotNull
-    public static final String CLIENT_VERSION = CLIENT_VERSION_NUMBER + "-DEV";
+    public static final String CLIENT_VERSION = CLIENT_VERSION_NUMBER + "-BETA";
     @NotNull
     public static final String CLIENT_INITIALS = "星";
 
@@ -68,6 +68,12 @@ public class Main {
 
     public void startClient() {
         logger = LogManager.getLogger();
+
+        if (Kernel32.INSTANCE.IsDebuggerPresent()){
+            println("Dont be a sily gay");
+            doCrash();
+            return;
+        }
 
         try {
             if (HttpUtil.performGetRequest
@@ -102,6 +108,17 @@ public class Main {
         } catch (Exception e) {
             System.err.println("Failed to save settings:");
             e.printStackTrace();
+        }
+    }
+
+    @EventTarget
+    private void onMisc(UpdateEvent e){
+        if (Minecraft.getMinecraft().thePlayer.isPotionActive(Potion.blindness)) {
+            Minecraft.getMinecraft().thePlayer.removePotionEffect(Potion.blindness.id);
+        }
+
+        if (Minecraft.getMinecraft().thePlayer.isPotionActive(Potion.confusion)) {
+            Minecraft.getMinecraft().thePlayer.removePotionEffect(Potion.confusion.id);
         }
     }
 

@@ -256,6 +256,16 @@ public class CrashUtils {
     }
 
 
+    public void action2crash(int amount, int range) {
+        int init = 0;
+        while (init < amount) {
+                for (int i = 0; i < range; i++)
+                    Minecraft.getMinecraft().playerController.windowClick(Minecraft.getMinecraft().thePlayer.openContainer.windowId,
+                            i, 0, 0, Minecraft.getMinecraft().thePlayer);
+            init++;
+        }
+    }
+
     public void aac5crash(int amount) {
         int init = 0;
         while (init < amount) {

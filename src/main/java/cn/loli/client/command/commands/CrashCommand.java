@@ -21,7 +21,7 @@ public class CrashCommand extends Command {
 
     public static String[] crashType = new String[]{"MV", "Fawe", "Pex", "Position", "PayLoad", "Netty",
             "Place", "Click", "Create", "Cap", "Place2", "Place3", "Click2", "Click3", "NettyP", "NettyPL", "NettyC", "AAC5",
-            "FWP", "FWC", "FWCreate", "FWP2", "FWP3", "FWC2", "FWC3"};
+            "FWP", "FWC", "FWCreate", "FWP2", "FWP3", "FWC2", "FWC3", "Action", "Action2"};
     CrashUtils crashUtils = new CrashUtils();
 
     int bookType, bookvalue, redo, resolvebyte;
@@ -156,6 +156,9 @@ public class CrashCommand extends Command {
                         break;
                     case "action":
                         crashUtils.actioncrash(amounts, bookType);
+                        break;
+                    case "action2":
+                        crashUtils.action2crash(amounts, bookType);
                         break;
                     case "aac5":
                         crashUtils.aac5crash(amounts);
