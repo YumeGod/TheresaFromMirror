@@ -2,6 +2,8 @@
 
 package cn.loli.client.notifications;
 
+import cn.loli.client.utils.AnimationUtils;
+import cn.loli.client.utils.fontRenderer.GlyphPageFontRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
@@ -20,10 +22,12 @@ public class Notification {
     private final String messsage;
     private long start;
 
+    private double localHeightOffset;
+
     private final long fadedIn;
     private final long fadeOut;
     private final long end;
-
+    private final AnimationUtils animationUtils = new AnimationUtils();
 
     public Notification(NotificationType type, String title, String messsage, int length) {
         this.type = type;
@@ -105,6 +109,10 @@ public class Notification {
         start = System.currentTimeMillis();
     }
 
+    public long getStart() {
+        return start;
+    }
+
     public boolean isShown() {
         return getTime() <= end;
     }
@@ -113,11 +121,11 @@ public class Notification {
         return System.currentTimeMillis() - start;
     }
 
-    public void render() {
+    public void render(short number) {
         ScaledResolution res = new ScaledResolution(mc);
         double offset;
         int width = Math.max(Minecraft.getMinecraft().fontRendererObj.getStringWidth(messsage) + 20, Minecraft.getMinecraft().fontRendererObj.getStringWidth(title) * 2 + 20);
-        int height = 36;
+        int height = 25;
         long time = getTime();
 
         if (time < fadedIn) {
@@ -142,17 +150,14 @@ public class Notification {
         }
 
         FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
-        int heightOffset = 20;
+        double heightOffset = 20 + number * (height + 5);
+        localHeightOffset = animationUtils.animate(heightOffset, localHeightOffset, 0.2, 10);
+        heightOffset = localHeightOffset;
 
         drawRect(res.getScaledWidth() - offset, res.getScaledHeight() - 5 - height - heightOffset, res.getScaledWidth(), res.getScaledHeight() - 5 - heightOffset, backgroundColor.getRGB());
         drawRect(res.getScaledWidth() - offset, res.getScaledHeight() - 5 - height - heightOffset, res.getScaledWidth() - offset + 4, res.getScaledHeight() - 5 - heightOffset, ribbonColor.getRGB());
 
-        GL11.glPushMatrix();
-        GL11.glScaled(2, 2, 2);
-        fontRenderer.drawString(title, ((int) (res.getScaledWidth() - offset + 8)) / 2, (res.getScaledHeight() - height - heightOffset) / 2, -1);
-        GL11.glScaled(0.5, 0.5, 0.5);
-        GL11.glPopMatrix();
-
-        fontRenderer.drawString(messsage, (int) (res.getScaledWidth() - offset + 8), res.getScaledHeight() - 16 - heightOffset, -1);
+        fontRenderer.drawString(title, ((int) (res.getScaledWidth() - offset + 8)), (int) ((res.getScaledHeight() - height - heightOffset)) - 3, -1);
+        fontRenderer.drawString(messsage, (int) (res.getScaledWidth() - offset + 8), (int) (res.getScaledHeight() - 16 - heightOffset), -1);
     }
 }
