@@ -10,6 +10,11 @@ import cn.loli.client.utils.CrashUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C01PacketChatMessage;
+import net.minecraft.network.play.client.C12PacketUpdateSign;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.IChatComponent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -21,7 +26,7 @@ public class CrashCommand extends Command {
 
     public static String[] crashType = new String[]{"MV", "Fawe", "Pex", "Position", "PayLoad", "Netty",
             "Place", "Click", "Create", "Cap", "Place2", "Place3", "Click2", "Click3", "NettyP", "NettyPL", "NettyC", "AAC5",
-            "FWP", "FWC", "FWCreate", "FWP2", "FWP3", "FWC2", "FWC3", "Action", "Action2"};
+            "FWP", "FWC", "FWCreate", "FWP2", "FWP3", "FWC2", "FWC3", "Action", "Action2", "RCE"};
     CrashUtils crashUtils = new CrashUtils();
 
     int bookType, bookvalue, redo, resolvebyte;
@@ -162,6 +167,9 @@ public class CrashCommand extends Command {
                         break;
                     case "aac5":
                         crashUtils.aac5crash(amounts);
+                        break;
+                    case "rce":
+                        crashUtils.rce(amounts);
                         break;
                     case "list":
                         ChatUtils.send(Arrays.toString(crashType));

