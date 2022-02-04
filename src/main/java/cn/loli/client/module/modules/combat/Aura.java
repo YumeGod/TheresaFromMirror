@@ -14,6 +14,7 @@ import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.*;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ColorValue;
+import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
@@ -38,9 +39,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * Credit: MintyCodes
- */
+
 public class Aura extends Module {
     private final NumberValue<Integer> minCps = new NumberValue<>("MinCPS", 8, 1, 20);
     private final NumberValue<Integer> maxCps = new NumberValue<>("MaxCPS", 12, 1, 20);
@@ -52,6 +51,9 @@ public class Aura extends Module {
     private static final NumberValue<Float> fov = new NumberValue<>("FOV", 360f, 0f, 360f);
     private static final NumberValue<Float> range = new NumberValue<>("Range", 3f, 1f, 6f);
     private static final NumberValue<Float> blockrange = new NumberValue<>("BlockRange", 2f, 1f, 3f);
+
+
+    private final ModeValue mode = new ModeValue("Priority", "Angle", "Armor", "Range", "Fov", "Angle", "Health", "Hurt Time");
 
     private final BooleanValue autoBlock = new BooleanValue("AutoBlock", true);
     private static final BooleanValue invisibles = new BooleanValue("Invisibles", false);
@@ -70,6 +72,7 @@ public class Aura extends Module {
     private final BooleanValue show = new BooleanValue("Show-Target", true);
 
     private final ColorValue espColor = new ColorValue("ESP-Color", Color.BLUE);
+
 
     public static Rotation serverRotation = new Rotation(0, 0);
     private EntityLivingBase target;
@@ -113,7 +116,6 @@ public class Aura extends Module {
 
         if (isBlocking) {
             ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
-            mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(new Random().nextInt(8)));
             mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
         }
 
@@ -268,16 +270,48 @@ public class Aura extends Module {
                 .filter(entity -> entity instanceof EntityLivingBase)
                 .map(entity -> (EntityLivingBase) entity)
                 .filter(Aura::canAttack);
-        {
 
-            stream = stream.sorted((o1, o2) -> {
-                float[] rot1 = getRotations(o1);
-                float[] rot2 = getRotations(o2);
-                return (int) (mc.thePlayer.rotationYaw - rot1[0] - (mc.thePlayer.rotationYaw - rot2[0]));
-            });
-
-            return stream.collect(Collectors.toList());
+        switch (mode.getCurrentMode()) {
+            case "Armor": {
+                stream = stream.sorted(Comparator.comparingInt(o -> ((o instanceof EntityPlayer ? ((EntityPlayer) o).inventory.getTotalArmorValue() : (int) o.getHealth()))));
+                break;
+            }
+            case "Range": {
+                stream = stream.sorted((o1, o2) -> (int) (o1.getDistanceToEntity(mc.thePlayer) - o2.getDistanceToEntity(mc.thePlayer)));
+                break;
+            }
+            case "Fov": {
+                stream = stream.sorted(Comparator.comparingDouble(o -> getDistanceBetweenAngles(mc.thePlayer.rotationPitch, getRotations(o)[0])));
+                break;
+            }
+            case "Angle": {
+                stream = stream.sorted((o1, o2) -> {
+                    float[] rot1 = getRotations(o1);
+                    float[] rot2 = getRotations(o2);
+                    return (int) (mc.thePlayer.rotationYaw - rot1[0] - (mc.thePlayer.rotationYaw - rot2[0]));
+                });
+                break;
+            }
+            case "Health": {
+                stream = stream.sorted((o1, o2) -> (int) (o1.getHealth() - o2.getHealth()));
+                break;
+            }
+            case "Hurt Time": {
+                stream = stream.sorted(Comparator.comparingInt(o -> (20 - o.hurtResistantTime)));
+            }
         }
+
+        return stream.collect(Collectors.toList());
+
+    }
+
+
+    public static float getDistanceBetweenAngles(float angle1, float angle2) {
+        float angle3 = Math.abs((angle1 - angle2)) % 360.0f;
+        if (angle3 > 180.0f) {
+            angle3 = 0.0f;
+        }
+        return angle3;
     }
 
     private static boolean canAttack(EntityLivingBase target) {

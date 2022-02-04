@@ -48,6 +48,7 @@ public class ModuleManager {
         addModule(new Bhop());
         addModule(new FlagDetector());
         addModule(new Fly());
+        addModule(new Booster());
         addModule(new NoJumpDelay());
         addModule(new NoSlowDown());
         addModule(new Sprint());
