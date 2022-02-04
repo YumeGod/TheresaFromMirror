@@ -22,6 +22,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.INpc;
+import net.minecraft.entity.boss.EntityWither;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
@@ -60,6 +61,7 @@ public class Aura extends Module {
     private static final BooleanValue players = new BooleanValue("Players", true);
     private static final BooleanValue animals = new BooleanValue("Animals", false);
     private static final BooleanValue mobs = new BooleanValue("Mobs", true);
+    private static final BooleanValue boss = new BooleanValue("Boss", true);
     private static final BooleanValue villagers = new BooleanValue("Villagers", false);
     private static final BooleanValue team = new BooleanValue("Team", false);
     private final BooleanValue rotations = new BooleanValue("Rotations", false);
@@ -318,6 +320,7 @@ public class Aura extends Module {
         if (target instanceof EntityPlayer || target instanceof EntityAnimal || target instanceof EntityMob || target instanceof INpc) {
             if (target instanceof EntityPlayer && !players.getObject()) return false;
             if (target instanceof EntityAnimal && !animals.getObject()) return false;
+            if (target instanceof EntityWither && boss.getObject()) return true; // true
             if (target instanceof EntityMob && !mobs.getObject()) return false;
             if (target instanceof INpc && !villagers.getObject()) return false;
         }
