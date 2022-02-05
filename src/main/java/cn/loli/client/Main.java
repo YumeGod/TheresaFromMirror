@@ -12,6 +12,7 @@ import cn.loli.client.module.modules.misc.ClickGUIModule;
 import cn.loli.client.protection.ProtectionThread;
 import cn.loli.client.utils.*;
 import cn.loli.client.value.ValueManager;
+import com.Kernel32;
 import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.client.Minecraft;
@@ -29,9 +30,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import static java.lang.System.getProperty;
+
 
 public class Main {
     @NotNull
@@ -69,10 +74,15 @@ public class Main {
     public void startClient() {
         logger = LogManager.getLogger();
 
-        if (Kernel32.INSTANCE.IsDebuggerPresent()){
-            println("Dont be a sily gay");
-            doCrash();
-            return;
+
+        if (getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")){
+            if (Kernel32.INSTANCE.IsDebuggerPresent()) {
+                println("Dont be a sily gay");
+                doCrash();
+                return;
+            }
+        } else {
+            println("Gay");
         }
 
         try {
@@ -112,7 +122,7 @@ public class Main {
     }
 
     @EventTarget
-    private void onMisc(UpdateEvent e){
+    private void onMisc(UpdateEvent e) {
         if (Minecraft.getMinecraft().thePlayer.isPotionActive(Potion.blindness)) {
             Minecraft.getMinecraft().thePlayer.removePotionEffect(Potion.blindness.id);
         }

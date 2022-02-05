@@ -19,6 +19,7 @@ public class Velocity extends Module {
     private final NumberValue<Integer> vertical = new NumberValue<>("Vertical", 80, 0, 100);
     private final BooleanValue explosion = new BooleanValue("Explosion", true);
     private final BooleanValue legit = new BooleanValue("Jump", false);
+    public final BooleanValue antifall = new BooleanValue("AntiFall", false);
 
 
     public Velocity() {

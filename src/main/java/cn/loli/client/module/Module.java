@@ -9,10 +9,15 @@ import cn.loli.client.notifications.NotificationType;
 import cn.loli.client.Main;
 import com.darkmagician6.eventapi.EventManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.GameSettings;
 import org.lwjgl.input.Keyboard;
+
+import java.util.Random;
 
 public abstract class Module {
     protected static final Minecraft mc = Minecraft.getMinecraft();
+    protected static final GameSettings game = mc.gameSettings;
+    protected static final Random r = new Random();
     private final String name;
     private final String description;
     private final ModuleCategory category;

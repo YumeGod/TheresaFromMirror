@@ -8,7 +8,6 @@ import net.minecraft.init.Blocks;
 
 public class Booster extends Module {
 
-    private final BooleanValue ice = new BooleanValue("Ice Boost", false);
     private static final NumberValue<Float> slipper = new NumberValue<>("Slipperiness", 0.39f, 0.1f, 1f);
 
     public Booster() {

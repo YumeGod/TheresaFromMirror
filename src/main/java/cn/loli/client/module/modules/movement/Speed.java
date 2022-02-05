@@ -11,12 +11,12 @@ import cn.loli.client.utils.PlayerUtils;
 import cn.loli.client.value.ModeValue;
 import com.darkmagician6.eventapi.EventTarget;
 
-public class Bhop extends Module {
+public class Speed extends Module {
 
     private final ModeValue modes = new ModeValue("Mode", "Tired", "Tired", "Motion1", "Motion2", "Motion3", "YPort", "CubeCraft", "PacketAbusing");
 
 
-    public Bhop() {
+    public Speed() {
         super("Speed", "Just You Speed Boost", ModuleCategory.MOVEMENT);
     }
 

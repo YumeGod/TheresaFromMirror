@@ -1,4 +1,4 @@
-package cn.loli.client.utils;
+package com;
 
 import com.sun.jna.Native;
 import com.sun.jna.win32.W32APIOptions;
