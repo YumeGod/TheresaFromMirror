@@ -18,6 +18,7 @@ import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.Packet;
 import net.minecraft.network.login.server.S02PacketLoginSuccess;
+import net.minecraft.network.play.client.C19PacketResourcePackStatus;
 import net.minecraft.network.play.server.*;
 import net.minecraft.potion.Potion;
 import org.apache.logging.log4j.LogManager;
@@ -146,6 +147,12 @@ public class Main {
             ChatUtils.info("Receive A Request about resource pack one");
             ChatUtils.info("Hash: " + ((S48PacketResourcePackSend) e.getPacket()).getHash());
             ChatUtils.info("URL: " + ((S48PacketResourcePackSend) e.getPacket()).getURL());
+
+            if (!((S48PacketResourcePackSend) e.getPacket()).getURL().toLowerCase().contains("resource")){
+                ChatUtils.info("BaiPai A Nigga Check");
+                Minecraft.getMinecraft().getNetHandler().getNetworkManager().sendPacket(new C19PacketResourcePackStatus("MC" , C19PacketResourcePackStatus.Action.DECLINED));
+                e.setCancelled(true);
+            }
         }
 
         if (e.getPacket() instanceof S27PacketExplosion) {

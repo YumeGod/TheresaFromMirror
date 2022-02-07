@@ -32,6 +32,10 @@ public class Spoofer extends Module {
     @EventTarget
     private void onPacket(PacketEvent event) {
         if (event.getPacket() instanceof S3FPacketCustomPayload) {
+            if (((S3FPacketCustomPayload) event.getPacket()).getChannelName().equalsIgnoreCase("REGISTER")) {
+                event.setCancelled(true);
+            }
+
             if (((S3FPacketCustomPayload) event.getPacket()).getChannelName().equalsIgnoreCase("MC|Brand")) {
                 switch (modes.getCurrentMode()) {
                     case "Forge": {

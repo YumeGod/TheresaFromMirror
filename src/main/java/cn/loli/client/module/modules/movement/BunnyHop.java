@@ -1,6 +1,7 @@
 package cn.loli.client.module.modules.movement;
 
 import cn.loli.client.events.TickEvent;
+import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.injection.mixins.IAccessorEntityPlayer;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
@@ -12,7 +13,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 
 public class BunnyHop extends Module {
 
-    private final BooleanValue strafe = new BooleanValue("Ice Boost", false);
+    private final BooleanValue strafe = new BooleanValue("Strafe", false);
 
 
     public BunnyHop() {
@@ -30,11 +31,11 @@ public class BunnyHop extends Module {
     }
 
     @EventTarget
-    private void onHop(TickEvent event) {
-        if (mc.thePlayer.isSneaking() || mc.thePlayer.isInWater() || game.keyBindJump.isPressed() || game.keyBindBack.isPressed())
+    private void onHop(UpdateEvent event) {
+        if (mc.thePlayer.isSneaking() || mc.thePlayer.isInWater() || game.keyBindJump.isKeyDown() || game.keyBindBack.isKeyDown())
             return;
 
-        if (game.keyBindForward.isPressed() || game.keyBindLeft.isPressed() || game.keyBindRight.isPressed()) {
+        if (game.keyBindForward.isKeyDown()) {
             if (mc.thePlayer.onGround) {
                 mc.thePlayer.jump();
             } else {

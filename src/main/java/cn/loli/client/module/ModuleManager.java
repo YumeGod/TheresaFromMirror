@@ -45,6 +45,7 @@ public class ModuleManager {
         //Movement
      //   addModule(new AntiFall());
         addModule(new BaffleSpeed());
+     //   addModule(new BunnyHop());
         addModule(new Speed());
         addModule(new FlagDetector());
         addModule(new Fly());
@@ -59,6 +60,7 @@ public class ModuleManager {
         addModule(new DamnBridge());
         addModule(new NoFall());
         addModule(new NoRightClickDelay());
+        addModule(new NoRotate());
         addModule(new SafeWalk());
         addModule(new SpeedMine());
         addModule(new TellyBridge());
