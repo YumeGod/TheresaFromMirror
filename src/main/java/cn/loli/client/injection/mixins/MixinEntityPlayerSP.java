@@ -26,6 +26,9 @@ public class MixinEntityPlayerSP extends MixinEntity {
     private float cacheStrafe = 0.0F;
     private float cacheForward = 0.0F;
 
+    private boolean cacheGround;
+
+
     @Inject(method = "onUpdateWalkingPlayer", at = @At("HEAD"))
     private void onUpdateWalkingPlayerPre(CallbackInfo ci) {
         cachedX = posX;
@@ -34,6 +37,8 @@ public class MixinEntityPlayerSP extends MixinEntity {
 
         cachedRotationYaw = rotationYaw;
         cachedRotationPitch = rotationPitch;
+
+        cacheGround = onGround;
 
         MotionUpdateEvent event = new MotionUpdateEvent(EventType.PRE, posX, posY, posZ, rotationYaw, rotationPitch, onGround);
         EventManager.call(event);
@@ -44,6 +49,7 @@ public class MixinEntityPlayerSP extends MixinEntity {
 
         rotationYaw = event.getYaw();
         rotationPitch = event.getPitch();
+        onGround = event.isOnGround();
     }
 
 
@@ -55,6 +61,8 @@ public class MixinEntityPlayerSP extends MixinEntity {
 
         rotationYaw = cachedRotationYaw;
         rotationPitch = cachedRotationPitch;
+
+        onGround = cacheGround;
 
         EventManager.call(new MotionUpdateEvent(EventType.POST, posX, posY, posZ, rotationYaw, rotationPitch, onGround));
     }

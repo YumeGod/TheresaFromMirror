@@ -3,10 +3,7 @@
 package cn.loli.client.module;
 
 import cn.loli.client.module.modules.combat.*;
-import cn.loli.client.module.modules.misc.ClickGUIModule;
-import cn.loli.client.module.modules.misc.Abuser;
-import cn.loli.client.module.modules.misc.HUD;
-import cn.loli.client.module.modules.misc.Spoofer;
+import cn.loli.client.module.modules.misc.*;
 import cn.loli.client.module.modules.movement.*;
 import cn.loli.client.module.modules.player.*;
 import cn.loli.client.module.modules.render.*;
@@ -86,6 +83,7 @@ public class ModuleManager {
         //Other
         addModule(new Abuser());
         addModule(new Spoofer());
+        addModule(new IgnoreCommands());
         addModule(new HUD()); // Needs to be second last
         addModule(new ClickGUIModule()); // Needs to be last
     }

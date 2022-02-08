@@ -3,6 +3,7 @@
 package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
+import cn.loli.client.module.modules.misc.IgnoreCommands;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -32,6 +33,9 @@ public class MixinGuiScreen {
     @Inject(method = "sendChatMessage(Ljava/lang/String;Z)V", at = @At("HEAD"), cancellable = true)
     private void onChat(String msg, boolean addToChat, @NotNull CallbackInfo ci) {
         if (msg.startsWith(".") && msg.length() > 1) {
+            if (Main.INSTANCE.moduleManager.getModule(IgnoreCommands.class).getState())
+                return;
+
             if (Main.INSTANCE.commandManager.executeCommand(msg)) {
                 this.mc.ingameGUI.getChatGUI().addToSentMessages(msg);
             }
