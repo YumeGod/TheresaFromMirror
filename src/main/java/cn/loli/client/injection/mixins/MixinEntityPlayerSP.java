@@ -73,6 +73,7 @@ public class MixinEntityPlayerSP extends MixinEntity {
     @Redirect(method = "onUpdateWalkingPlayer", at = @At(value = "FIELD", target = "Lnet/minecraft/util/AxisAlignedBB;minY:D"))
     private double posY(AxisAlignedBB instance) {return posY;}
 
+
     @Inject(method = "onUpdate", at = @At("RETURN"))
     private void onUpdate(CallbackInfo ci) {
         EventManager.call(new UpdateEvent());
