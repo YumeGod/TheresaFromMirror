@@ -60,13 +60,11 @@ public abstract class MixinEntity {
 
     @Redirect(method = {"moveEntity"}, at = @At(value = "FIELD", target = "Lnet/minecraft/entity/Entity;onGround:Z", ordinal = 0))
     public boolean isOnGround(Entity entity) {
-        return entity.onGround ||
-                (entity.hurtResistantTime > 0 && Main.INSTANCE.moduleManager.getModule(Velocity.class).getState() && Main.INSTANCE.moduleManager.getModule(Velocity.class).antifall.getObject());
+        return entity.onGround || (entity.hurtResistantTime > 5 && Main.INSTANCE.moduleManager.getModule(Velocity.class).antifall.getObject());
     }
 
     @Redirect(method = {"moveEntity"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;isSneaking()Z"))
     public boolean isSneaking(Entity entity) {
-        return Main.INSTANCE.moduleManager.getModule(SafeWalk.class).getState() || entity.isSneaking() || (entity.hurtResistantTime > 0 &&
-                Main.INSTANCE.moduleManager.getModule(Velocity.class).getState() && Main.INSTANCE.moduleManager.getModule(Velocity.class).antifall.getObject());
+        return Main.INSTANCE.moduleManager.getModule(SafeWalk.class).getState() || entity.isSneaking() || Main.INSTANCE.moduleManager.getModule(Velocity.class).getState();
     }
 }

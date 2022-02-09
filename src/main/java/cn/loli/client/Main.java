@@ -90,8 +90,10 @@ public class Main {
 
         try {
             if (HttpUtil.performGetRequest
-                    (new URL("https://pastebin.com/raw/uKwMHzW0")).contains("i am alive"))
+                    (new URL("https://pastebin.com/raw/T0XipKMF")).contains("i am a man"))
                 println("无论前方艰险如何 我都会在你身边");
+            else
+                doCrash();
         } catch (IOException e) {
             doCrash();
         }
