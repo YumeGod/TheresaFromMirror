@@ -17,7 +17,8 @@ public class NoRotate extends Module {
     public void onPacket(PacketEvent event) {
         if (event.getPacket() instanceof S08PacketPlayerPosLook) {
             if (mc.thePlayer != null && mc.theWorld != null && mc.thePlayer.rotationYaw != -180.0f && mc.thePlayer.rotationPitch != 0.0f) {
-                mc.thePlayer.setPosition(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(), ((S08PacketPlayerPosLook) event.getPacket()).getZ());
+                mc.thePlayer.setPositionAndRotation(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(), ((S08PacketPlayerPosLook) event.getPacket()).getZ(),
+                        mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
                 mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
                         ((S08PacketPlayerPosLook) event.getPacket()).getZ(), ((S08PacketPlayerPosLook) event.getPacket()).getYaw(), ((S08PacketPlayerPosLook) event.getPacket()).getPitch(), false));
                 event.setCancelled(true);

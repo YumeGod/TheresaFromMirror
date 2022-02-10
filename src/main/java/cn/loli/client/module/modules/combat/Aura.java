@@ -76,7 +76,7 @@ public class Aura extends Module {
 
 
     public static Rotation serverRotation = new Rotation(0, 0);
-    private EntityLivingBase target;
+    public EntityLivingBase target;
     private final TimeHelper attacktimer = new TimeHelper();
 
     public static ArrayList<Entity> entities = new ArrayList<>();

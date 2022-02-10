@@ -1,19 +1,31 @@
 package cn.loli.client.module.modules.movement;
 
+import cn.loli.client.Main;
+import cn.loli.client.events.MotionUpdateEvent;
+import cn.loli.client.events.PlayerMoveEvent;
 import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.injection.mixins.IAccessorEntityPlayer;
 import cn.loli.client.injection.mixins.IAccessorKeyBinding;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import cn.loli.client.module.modules.combat.Aura;
+import cn.loli.client.utils.ChatUtils;
 import cn.loli.client.utils.MoveUtils;
 import cn.loli.client.utils.PlayerUtils;
 import cn.loli.client.value.ModeValue;
+import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
+import com.darkmagician6.eventapi.types.EventType;
+import net.minecraft.util.BlockPos;
+import org.lwjgl.Sys;
+
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Speed extends Module {
 
-    private final ModeValue modes = new ModeValue("Mode", "Tired", "Tired", "Motion1", "Motion2", "Motion3", "YPort", "CubeCraft", "PacketAbusing");
+    private final ModeValue modes = new ModeValue("Mode", "Tired", "Tired", "Motion1", "Motion2", "Motion3", "YPort", "PacketAbusing", "Mini");
+    private final NumberValue<Float> multiply = new NumberValue<>("Multiply", 1f, 1f, 2f);
 
 
     public Speed() {
@@ -114,22 +126,6 @@ public class Speed extends Module {
                     }
                 break;
             }
-            case "CubeCraft": {
-                if (PlayerUtils.isMoving2())
-                    if (mc.thePlayer.onGround) {
-                        mc.thePlayer.motionY = 0.4D;
-                        MoveUtils.addMotion(0.2F, mc.thePlayer.rotationYaw);
-                        ((IAccessorMinecraft) mc).getTimer().timerSpeed = 1.0F;
-                    } else {
-                        ((IAccessorMinecraft) mc).getTimer().timerSpeed = 1.1F;
-                        final double currentSpeed = Math.sqrt(mc.thePlayer.motionX * mc.thePlayer.motionX
-                                + mc.thePlayer.motionZ * mc.thePlayer.motionZ);
-                        final double speed = 1;
-                        MoveUtils.setSpeed(speed * currentSpeed, mc.thePlayer.rotationYaw);
-                        mc.thePlayer.motionY -= 0.00028;
-                    }
-                break;
-            }
             case "PacketAbusing": {
                 ((IAccessorMinecraft) mc).getTimer().timerSpeed = 1.0F;
                 if (mc.thePlayer.onGround) {
@@ -142,6 +138,44 @@ public class Speed extends Module {
                 break;
             }
         }
+    }
+
+    @EventTarget
+    private void onMove(PlayerMoveEvent event) {
+        switch (modes.getCurrentMode()) {
+            case "Mini": {
+                if (PlayerUtils.isMoving2()) {
+                    if (PlayerUtils.isInLiquid())
+                        return;
+
+                    MoveUtils.setMotion(event, MoveUtils.getBaseMoveSpeed());
+                }
+                break;
+            }
+        }
+
+    }
+
+    @EventTarget
+    private void onMove(MotionUpdateEvent event) {
+        if (event.getEventType() == EventType.PRE) {
+            switch (modes.getCurrentMode()) {
+                case "Mini": {
+                    if (PlayerUtils.isMoving2()) {
+                        if (PlayerUtils.isInLiquid() ||
+                                mc.gameSettings.keyBindJump.isKeyDown())
+                            return;
+
+                        if (mc.thePlayer.onGround)
+                            mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + (0.11D * multiply.getObject()), mc.thePlayer.posZ);
+
+                    }
+                    break;
+                }
+            }
+        }
+
+
     }
 
 }

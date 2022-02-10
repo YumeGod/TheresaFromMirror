@@ -2,6 +2,9 @@
 
 package cn.loli.client.module.modules.combat;
 
+import cn.loli.client.Main;
+import cn.loli.client.events.MotionUpdateEvent;
+import cn.loli.client.module.modules.movement.Speed;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
@@ -21,7 +24,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Criticals extends Module {
-    private final ModeValue mode = new ModeValue("Mode", "Packet", "Packet", "Edit", "Hover");
+    private final ModeValue mode = new ModeValue("Mode", "Packet", "Packet", "Edit", "Hover", "Hypixel");
     private final NumberValue<Integer> cpc = new NumberValue<>("Hit", 4, 1, 10);
     int counter;
 
@@ -36,13 +39,13 @@ public class Criticals extends Module {
                 if (((C02PacketUseEntity) e.getPacket()).getAction() == C02PacketUseEntity.Action.ATTACK) {
                     Entity entity = ((C02PacketUseEntity) e.getPacket()).getEntityFromWorld(mc.theWorld);
                     if (!(entity instanceof EntityLiving)) return;
-                    counter ++;
+                    counter++;
                 }
             }
         }
     }
 
-    public void onCrit(){
+    public void onCrit() {
         if (!(mc.thePlayer.isCollidedVertically && mc.thePlayer.onGround))
             return;
 
@@ -64,6 +67,9 @@ public class Criticals extends Module {
                 sendPacket((new Random().nextBoolean() ? 0.01063469198817 : 0.013999999) * (new Random().nextBoolean() ? 0.98 : 0.99));
                 break;
             }
+            case "Hypixel": {
+                break;
+            }
             default:
                 NotificationManager.show(new Notification(NotificationType.WARNING, this.getName(), "Invalid mode: " + mode.getCurrentMode(), 2));
         }
@@ -74,6 +80,37 @@ public class Criticals extends Module {
 
         if (counter % cpc.getObject() == 0)
             mc.thePlayer.sendQueue.addToSendQueue(packet);
+    }
+
+    @EventTarget
+    public void onEdit(MotionUpdateEvent e) {
+        if (e.getEventType() == EventType.PRE) {
+            switch (mode.getCurrentMode()) {
+                case "Hypixel": {
+                    if (mc.thePlayer.isCollidedVertically && mc.thePlayer.onGround && !Main.INSTANCE.moduleManager.getModule(Speed.class).getState()) {
+                        int ht = Main.INSTANCE.moduleManager.getModule(Aura.class).target.hurtResistantTime;
+                        switch (ht) {
+                            case 20: {
+                                e.setOnGround(false);
+                                e.setY(mc.thePlayer.posY + ThreadLocalRandom.current().nextDouble(0.0099, 0.011921599284565));
+                                break;
+                            }
+                            case 17:
+                            case 19: {
+                                e.setOnGround(false);
+                                e.setY(mc.thePlayer.posY + ThreadLocalRandom.current().nextDouble(1.5E-4, 1.63166800276E-4));
+                                break;
+                            }
+                            case 18: {
+                                e.setOnGround(false);
+                                e.setY(mc.thePlayer.posY + ThreadLocalRandom.current().nextDouble(0.0019, 0.0091921599284565));
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
