@@ -94,6 +94,7 @@ public abstract class MixinEntityPlayer extends EntityLivingBase implements IEnt
             this.motionX /= 0.6D;
             this.motionZ /= 0.6D;
             this.setSprinting(true);
+            Main.INSTANCE.moduleManager.getModule(KeepSprint.class).fovmodify = true;
         }
     }
 

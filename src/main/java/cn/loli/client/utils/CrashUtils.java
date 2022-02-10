@@ -46,7 +46,7 @@ public class CrashUtils {
 
     public String pexcrashexp1 = "/pex promote a a";
     public String pexcrashexp2 = "/pex promote b b";
-    public String mv = "/Mv ^(.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.++)$^";
+    public String mv = "/multiverse-core:Mv ^(.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.*.++)$^";
     public String fawe = "/to for(i=0;i<256;i++){for(j=0;j<256;j++){for(k=0;k<256;k++){for(l=0;l<256;l++){ln(pi)}}}}";
 
     public String[] oldmv = {"/mv import ../../../../../home normal -t flat",
