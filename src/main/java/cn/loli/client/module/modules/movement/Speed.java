@@ -24,7 +24,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Speed extends Module {
 
-    private final ModeValue modes = new ModeValue("Mode", "Tired", "Tired", "Motion1", "Motion2", "Motion3", "YPort", "PacketAbusing", "Mini");
+    private final ModeValue modes = new ModeValue("Mode", "Mini", "PacketAbusing", "Mini");
     private final NumberValue<Float> multiply = new NumberValue<>("Multiply", 1f, 1f, 2f);
 
 
