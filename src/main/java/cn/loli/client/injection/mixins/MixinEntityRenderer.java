@@ -6,9 +6,7 @@ import cn.loli.client.Main;
 import cn.loli.client.events.Render3DEvent;
 import cn.loli.client.events.RenderEvent;
 import cn.loli.client.events.RenderWorldLastEvent;
-import cn.loli.client.module.ModuleManager;
 import cn.loli.client.module.modules.combat.KeepSprint;
-import cn.loli.client.module.modules.movement.NoJumpDelay;
 import cn.loli.client.module.modules.render.NoFov;
 import cn.loli.client.module.modules.render.ViewClip;
 import com.darkmagician6.eventapi.EventManager;
@@ -51,10 +49,9 @@ public class MixinEntityRenderer {
         if (Main.INSTANCE.moduleManager.getModule(NoFov.class).getState())
             fovModifierHand = 1;
 
-        if (Main.INSTANCE.moduleManager.getModule(KeepSprint.class).fake.getObject()
-                && Main.INSTANCE.moduleManager.getModule(KeepSprint.class).fovmodify) {
-            fovModifierHand *= 0.9F;
-            Main.INSTANCE.moduleManager.getModule(KeepSprint.class).fovmodify = false;
+        if (Main.INSTANCE.moduleManager.getModule(KeepSprint.class).modify) {
+            fovModifierHand *= 0.9f;
+            Main.INSTANCE.moduleManager.getModule(KeepSprint.class).modify = false;
         }
     }
 

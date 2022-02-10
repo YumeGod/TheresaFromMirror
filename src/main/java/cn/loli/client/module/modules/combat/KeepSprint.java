@@ -8,7 +8,7 @@ public class KeepSprint extends Module {
 
     public final BooleanValue fake = new BooleanValue("FakeFov", true);
 
-    public boolean fovmodify = false;
+    public boolean modify = false;
 
     public KeepSprint() {
         super("KeepSprint", "You wont lose your sprint when you attack entity", ModuleCategory.COMBAT);
