@@ -7,6 +7,7 @@ import cn.loli.client.events.LoopEvent;
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.file.FileManager;
+import cn.loli.client.gui.ttfr.FontLoaders;
 import cn.loli.client.module.ModuleManager;
 import cn.loli.client.module.modules.misc.ClickGUIModule;
 import cn.loli.client.protection.ProtectionThread;
@@ -51,6 +52,8 @@ public class Main {
     public static final String CLIENT_VERSION = CLIENT_VERSION_NUMBER + "-BETA";
     @NotNull
     public static final String CLIENT_INITIALS = "星";
+
+    public static FontLoaders fontLoaders;
 
     public static Main INSTANCE;
 
@@ -108,6 +111,7 @@ public class Main {
         fileManager.load();
 
         moduleManager.getModule(ClickGUIModule.class).createClickGui();
+        fontLoaders = new FontLoaders();
 
         //Crasher
         packetQueue = new ConcurrentLinkedQueue<>();

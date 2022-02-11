@@ -31,5 +31,8 @@
     "MixinRendererLivingEntity",
     "MixinS12PacketEntityVelocity",
     "MixinS27PacketExplosion"
+  ],
+  "client": [
+    "IAccessorFontRenderer"
   ]
 }

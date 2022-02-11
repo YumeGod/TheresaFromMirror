@@ -2,16 +2,12 @@
 
 package cn.loli.client.notifications;
 
+import cn.loli.client.Main;
 import cn.loli.client.utils.AnimationUtils;
 import cn.loli.client.utils.RenderUtils;
-import cn.loli.client.utils.fontRenderer.GlyphPageFontRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
@@ -86,7 +82,6 @@ public class Notification {
 //            int i = Math.max(0, Math.min(255, (int) (Math.sin(time / 100.0) * 255.0 / 2 + 127.5)));
         }
 
-        FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
         double heightOffset = 20 + number * (height + 5);
         localHeightOffset = animationUtils.animate(heightOffset, localHeightOffset, 0.2, 10);
         heightOffset = localHeightOffset;
@@ -95,7 +90,8 @@ public class Notification {
         RenderUtils.drawRoundRect(res.getScaledWidth() - offset, res.getScaledHeight() - height - heightOffset, res.getScaledWidth() - offset + 2, res.getScaledHeight() - 10 - heightOffset, 2, ribbonColor.getRGB());
 
 //        fontRenderer.drawString(title, ((int) (res.getScaledWidth() - offset + 8)), (int) ((res.getScaledHeight() - height - heightOffset)) - 3, -1);
-        RenderUtils.drawImage(new ResourceLocation("theresa/gui/info.png"), (int) (res.getScaledWidth() - offset) + 3, (int) (res.getScaledHeight() - height - heightOffset), 12, 12, 255);
-        fontRenderer.drawString(messsage, (int) (res.getScaledWidth() - offset + 22), (int) (res.getScaledHeight() - height - heightOffset) + 3, new Color(0, 0, 0).getRGB());
+
+        RenderUtils.drawImage(new ResourceLocation("/theresa/icons/" + type.name().toLowerCase(Locale.ROOT) + ".png"), (int) (res.getScaledWidth() - offset) + 3, (int) (res.getScaledHeight() - height - heightOffset) + 1, 12, 12, 255);
+        Main.fontLoaders.fonts.get("inter14").drawString(messsage, (int) (res.getScaledWidth() - offset + 22), (int) (res.getScaledHeight() - height - heightOffset) + 3, new Color(0, 0, 0).getRGB());
     }
 }
