@@ -2,14 +2,18 @@ package cn.loli.client.module.modules.misc;
 
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.events.UpdateEvent;
+import cn.loli.client.injection.mixins.IAccessorEntityPlayerSP;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import cn.loli.client.utils.ChatUtils;
 import cn.loli.client.value.BooleanValue;
 import com.darkmagician6.eventapi.EventTarget;
+import net.minecraft.entity.player.PlayerCapabilities;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.*;
+import net.minecraft.network.play.server.*;
 import net.minecraft.util.BlockPos;
 
 public class Abuser extends Module {

@@ -6,8 +6,7 @@ import cn.loli.client.Main;
 import cn.loli.client.events.Render3DEvent;
 import cn.loli.client.events.RenderEvent;
 import cn.loli.client.events.RenderWorldLastEvent;
-import cn.loli.client.module.ModuleManager;
-import cn.loli.client.module.modules.movement.NoJumpDelay;
+import cn.loli.client.module.modules.combat.KeepSprint;
 import cn.loli.client.module.modules.render.NoFov;
 import cn.loli.client.module.modules.render.ViewClip;
 import com.darkmagician6.eventapi.EventManager;
@@ -24,7 +23,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(EntityRenderer.class)
 public class MixinEntityRenderer {
 
-    @Shadow private float fovModifierHand;
+    @Shadow
+    private float fovModifierHand;
 
     @Inject(method = "renderWorldPass", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/ForgeHooksClient;dispatchRenderLast(Lnet/minecraft/client/renderer/RenderGlobal;F)V"))
     private void onRenderWorldPass(int pass, float partialTicks, long finishTimeNano, CallbackInfo ci) {
@@ -48,14 +48,19 @@ public class MixinEntityRenderer {
     private void updateFovModifierHand(CallbackInfo callbackInfo) {
         if (Main.INSTANCE.moduleManager.getModule(NoFov.class).getState())
             fovModifierHand = 1;
+
+        if (Main.INSTANCE.moduleManager.getModule(KeepSprint.class).modify) {
+            fovModifierHand *= 0.9f;
+            Main.INSTANCE.moduleManager.getModule(KeepSprint.class).modify = false;
+        }
     }
 
-    @ModifyVariable(method = { "orientCamera" },  ordinal = 3,  at = @At(value = "STORE",  ordinal = -1),  require = 1)
+    @ModifyVariable(method = {"orientCamera"}, ordinal = 3, at = @At(value = "STORE", ordinal = -1), require = 1)
     private double view(double value) {
         return (Main.INSTANCE.moduleManager.getModule(ViewClip.class).getState() && Main.INSTANCE.moduleManager.getModule(ViewClip.class).extend.getObject()) ? Main.INSTANCE.moduleManager.getModule(ViewClip.class).dis.getObject() : value;
     }
 
-    @ModifyVariable(method = { "orientCamera" },  ordinal = 7,  at = @At(value = "STORE",  ordinal = -1),  require = 1)
+    @ModifyVariable(method = {"orientCamera"}, ordinal = 7, at = @At(value = "STORE", ordinal = -1), require = 1)
     private double viewport(double value) {
         return (Main.INSTANCE.moduleManager.getModule(ViewClip.class).getState() && Main.INSTANCE.moduleManager.getModule(ViewClip.class).extend.getObject()) ? Main.INSTANCE.moduleManager.getModule(ViewClip.class).dis.getObject() : (Main.INSTANCE.moduleManager.getModule(ViewClip.class).getState() && !Main.INSTANCE.moduleManager.getModule(ViewClip.class).extend.getObject()) ? 4.0 : value;
     }

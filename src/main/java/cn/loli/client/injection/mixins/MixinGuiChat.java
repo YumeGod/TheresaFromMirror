@@ -3,6 +3,7 @@
 package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
+import cn.loli.client.module.modules.misc.IgnoreCommands;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -26,9 +27,10 @@ public abstract class MixinGuiChat {
     private void autocomplete(String cmd, String p_146405_2_, @NotNull CallbackInfo ci) {
         if (cmd.startsWith(".")) {
             String[] ls = Main.INSTANCE.commandManager.autoComplete(cmd).toArray(new String[0]);
-            if (ls.length == 0 || cmd.toLowerCase().endsWith(ls[ls.length - 1].toLowerCase())) {
+
+            if (ls.length == 0 || cmd.toLowerCase().endsWith(ls[ls.length - 1].toLowerCase()))
                 return;
-            }
+
             waitingOnAutocomplete = true;
             onAutocompleteResponse(ls);
             ci.cancel();

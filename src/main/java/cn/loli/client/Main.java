@@ -12,11 +12,13 @@ import cn.loli.client.module.modules.misc.ClickGUIModule;
 import cn.loli.client.protection.ProtectionThread;
 import cn.loli.client.utils.*;
 import cn.loli.client.value.ValueManager;
+import com.Kernel32;
 import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.Packet;
 import net.minecraft.network.login.server.S02PacketLoginSuccess;
+import net.minecraft.network.play.client.C19PacketResourcePackStatus;
 import net.minecraft.network.play.server.*;
 import net.minecraft.potion.Potion;
 import org.apache.logging.log4j.LogManager;
@@ -24,14 +26,20 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
+import javax.sound.sampled.*;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import static java.lang.System.getProperty;
+
 
 public class Main {
     @NotNull
@@ -69,16 +77,23 @@ public class Main {
     public void startClient() {
         logger = LogManager.getLogger();
 
-        if (Kernel32.INSTANCE.IsDebuggerPresent()){
-            println("Dont be a sily gay");
-            doCrash();
-            return;
+
+        if (getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")){
+            if (Kernel32.INSTANCE.IsDebuggerPresent()) {
+                println("Dont be a sily gay");
+                doCrash();
+                return;
+            }
+        } else {
+            println("Gay");
         }
 
         try {
             if (HttpUtil.performGetRequest
-                    (new URL("https://pastebin.com/raw/uKwMHzW0")).contains("i am alive"))
+                    (new URL("https://pastebin.com/raw/T0XipKMF")).contains("i am a man"))
                 println("无论前方艰险如何 我都会在你身边");
+            else
+                doCrash();
         } catch (IOException e) {
             doCrash();
         }
@@ -112,7 +127,7 @@ public class Main {
     }
 
     @EventTarget
-    private void onMisc(UpdateEvent e){
+    private void onMisc(UpdateEvent e) {
         if (Minecraft.getMinecraft().thePlayer.isPotionActive(Potion.blindness)) {
             Minecraft.getMinecraft().thePlayer.removePotionEffect(Potion.blindness.id);
         }
@@ -136,6 +151,12 @@ public class Main {
             ChatUtils.info("Receive A Request about resource pack one");
             ChatUtils.info("Hash: " + ((S48PacketResourcePackSend) e.getPacket()).getHash());
             ChatUtils.info("URL: " + ((S48PacketResourcePackSend) e.getPacket()).getURL());
+
+            if (!((S48PacketResourcePackSend) e.getPacket()).getURL().toLowerCase().contains("resource")){
+                ChatUtils.info("BaiPai A Nigga Check");
+                Minecraft.getMinecraft().getNetHandler().getNetworkManager().sendPacket(new C19PacketResourcePackStatus("MC" , C19PacketResourcePackStatus.Action.DECLINED));
+                e.setCancelled(true);
+            }
         }
 
         if (e.getPacket() instanceof S27PacketExplosion) {

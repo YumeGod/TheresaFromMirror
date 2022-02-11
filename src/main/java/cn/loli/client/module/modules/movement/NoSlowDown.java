@@ -10,6 +10,8 @@ import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
+import net.minecraft.item.ItemBow;
+import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.server.S30PacketWindowItems;
@@ -19,8 +21,6 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class NoSlowDown extends Module {
-
-    private final BooleanValue slot = new BooleanValue("Switch", false);
     private final BooleanValue itemswitch = new BooleanValue("New", false);
 
     public NoSlowDown() {
@@ -33,17 +33,16 @@ public class NoSlowDown extends Module {
                 || mc.theWorld == null)
             return;
 
-        if (!mc.thePlayer.isUsingItem()) return;
+        if (!mc.thePlayer.isUsingItem() || (mc.thePlayer.getHeldItem().getItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemBow))
+            return;
 
-        if (event.getEventType() == EventType.PRE){
+        if (event.getEventType() == EventType.PRE) {
             final int curSlot = mc.thePlayer.inventory.currentItem;
             final int spoof = curSlot == 0 ? 1 : -1;
-            if (slot.getObject()){
-                if (itemswitch.getObject())
-                    mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot + spoof));
+            if (itemswitch.getObject())
+                mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot + spoof));
 
-                mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot));
-            }
+            mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot));
         }
 
         if (event.getEventType() == EventType.POST) {

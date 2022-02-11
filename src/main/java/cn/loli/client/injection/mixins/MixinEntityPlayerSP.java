@@ -5,13 +5,16 @@ package cn.loli.client.injection.mixins;
 import cn.loli.client.Main;
 import cn.loli.client.events.*;
 import cn.loli.client.module.modules.movement.NoSlowDown;
+import cn.loli.client.module.modules.render.BlockHit;
 import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.util.AxisAlignedBB;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityPlayerSP.class)
@@ -26,6 +29,9 @@ public class MixinEntityPlayerSP extends MixinEntity {
     private float cacheStrafe = 0.0F;
     private float cacheForward = 0.0F;
 
+    private boolean cacheGround;
+
+
     @Inject(method = "onUpdateWalkingPlayer", at = @At("HEAD"))
     private void onUpdateWalkingPlayerPre(CallbackInfo ci) {
         cachedX = posX;
@@ -34,6 +40,8 @@ public class MixinEntityPlayerSP extends MixinEntity {
 
         cachedRotationYaw = rotationYaw;
         cachedRotationPitch = rotationPitch;
+
+        cacheGround = onGround;
 
         MotionUpdateEvent event = new MotionUpdateEvent(EventType.PRE, posX, posY, posZ, rotationYaw, rotationPitch, onGround);
         EventManager.call(event);
@@ -44,6 +52,7 @@ public class MixinEntityPlayerSP extends MixinEntity {
 
         rotationYaw = event.getYaw();
         rotationPitch = event.getPitch();
+        onGround = event.isOnGround();
     }
 
 
@@ -56,8 +65,14 @@ public class MixinEntityPlayerSP extends MixinEntity {
         rotationYaw = cachedRotationYaw;
         rotationPitch = cachedRotationPitch;
 
+        onGround = cacheGround;
+
         EventManager.call(new MotionUpdateEvent(EventType.POST, posX, posY, posZ, rotationYaw, rotationPitch, onGround));
     }
+
+    @Redirect(method = "onUpdateWalkingPlayer", at = @At(value = "FIELD", target = "Lnet/minecraft/util/AxisAlignedBB;minY:D"))
+    private double posY(AxisAlignedBB instance) {return posY;}
+
 
     @Inject(method = "onUpdate", at = @At("RETURN"))
     private void onUpdate(CallbackInfo ci) {

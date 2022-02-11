@@ -10,4 +10,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface IAccessorEntityPlayerSP {
     @Accessor("sprintToggleTimer")
     void setSprintToggleTimer(int sprintToggleTimer);
+
+    @Accessor
+    double getLastReportedPosY();
 }

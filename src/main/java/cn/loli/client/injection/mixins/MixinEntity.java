@@ -6,6 +6,7 @@ import cn.loli.client.Main;
 import cn.loli.client.events.PlayerMoveEvent;
 import cn.loli.client.events.SafeWalkEvent;
 import cn.loli.client.module.ModuleManager;
+import cn.loli.client.module.modules.combat.Velocity;
 import cn.loli.client.module.modules.movement.NoSlowDown;
 import cn.loli.client.module.modules.player.SafeWalk;
 import cn.loli.client.utils.ChatUtils;
@@ -56,8 +57,15 @@ public abstract class MixinEntity {
     private void onSafe(CallbackInfo callbackInfo) {
     }
 
+
+    @Redirect(method = {"moveEntity"}, at = @At(value = "FIELD", target = "Lnet/minecraft/entity/Entity;onGround:Z", ordinal = 0))
+    public boolean isOnGround(Entity entity) {
+        return entity.onGround || (entity.hurtResistantTime > 5 && Main.INSTANCE.moduleManager.getModule(Velocity.class).antifall.getObject());
+    }
+
     @Redirect(method = {"moveEntity"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;isSneaking()Z"))
     public boolean isSneaking(Entity entity) {
-        return Main.INSTANCE.moduleManager.getModule(SafeWalk.class).getState() || entity.isSneaking();
+        return Main.INSTANCE.moduleManager.getModule(SafeWalk.class).getState() || entity.isSneaking() ||
+                (Main.INSTANCE.moduleManager.getModule(Velocity.class).getState() && (entity.hurtResistantTime > 5 && Main.INSTANCE.moduleManager.getModule(Velocity.class).antifall.getObject()));
     }
 }

@@ -53,11 +53,14 @@ public class BaffleSpeed extends Module {
                     else
                         mc.thePlayer.jump();
                 }
+
             } else {
                 if (wasObstacle)
                     wasObstacle = false;
             }
+
         } else {
+
             wasObstacle = false;
         }
     }
