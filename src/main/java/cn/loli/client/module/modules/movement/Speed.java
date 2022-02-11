@@ -13,6 +13,7 @@ import cn.loli.client.module.modules.combat.Aura;
 import cn.loli.client.utils.ChatUtils;
 import cn.loli.client.utils.MoveUtils;
 import cn.loli.client.utils.PlayerUtils;
+import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
@@ -25,8 +26,11 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Speed extends Module {
 
     private final ModeValue modes = new ModeValue("Mode", "Mini", "PacketAbusing", "Mini");
-    private final NumberValue<Float> multiply = new NumberValue<>("Multiply", 1f, 1f, 2f);
+    private final NumberValue<Float> multiply = new NumberValue<>("Multiply", 1f, 1f, 2.2f);
 
+    private final BooleanValue crit = new BooleanValue("Fall Damage", true);
+
+    double distance;
 
     public Speed() {
         super("Speed", "Just You Speed Boost", ModuleCategory.MOVEMENT);
@@ -43,6 +47,7 @@ public class Speed extends Module {
         if (mc.thePlayer != null && mc.theWorld != null) {
             ((IAccessorMinecraft) mc).getTimer().timerSpeed = 1.0F;
             ((IAccessorEntityPlayer) mc.thePlayer).setSpeedInAir(0.02F);
+            distance = 0;
         }
     }
 
@@ -162,12 +167,31 @@ public class Speed extends Module {
             switch (modes.getCurrentMode()) {
                 case "Mini": {
                     if (PlayerUtils.isMoving2()) {
-                        if (PlayerUtils.isInLiquid() ||
-                                mc.gameSettings.keyBindJump.isKeyDown())
+                        if (PlayerUtils.isInLiquid())
                             return;
 
-                        if (mc.thePlayer.onGround)
+                        if (mc.thePlayer.onGround) {
+                            if (Main.INSTANCE.moduleManager.getModule(Aura.class).target != null && crit.getObject()) {
+                                int ht = Main.INSTANCE.moduleManager.getModule(Aura.class).target.hurtResistantTime;
+                                switch (ht) {
+                                    case 18:
+                                    case 20: {
+                                        event.setOnGround(false);
+                                        event.setY(mc.thePlayer.posY + ThreadLocalRandom.current().nextDouble(0.0019, 0.0091921599284565));
+                                        break;
+                                    }
+                                    case 17:
+                                    case 19: {
+                                        event.setOnGround(false);
+                                        event.setY(mc.thePlayer.posY + ThreadLocalRandom.current().nextDouble(1.5E-4, 1.63166800276E-4));
+                                        break;
+                                    }
+                                }
+                            }
+
                             mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + (0.11D * multiply.getObject()), mc.thePlayer.posZ);
+                            distance += (0.11D * multiply.getObject());
+                        }
 
                     }
                     break;
