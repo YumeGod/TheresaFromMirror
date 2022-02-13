@@ -1,10 +1,12 @@
 package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
+import cn.loli.client.events.JumpEvent;
 import cn.loli.client.injection.implementations.IEntityPlayer;
 import cn.loli.client.module.modules.combat.KeepSprint;
 import cn.loli.client.module.modules.render.OldAnimations;
 import cn.loli.client.utils.ChatUtils;
+import com.darkmagician6.eventapi.EventManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -91,12 +93,12 @@ public abstract class MixinEntityPlayer extends EntityLivingBase implements IEnt
 
     @Inject(method = "attackTargetEntityWithCurrentItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/EntityPlayer;setSprinting(Z)V", shift = At.Shift.AFTER))
     private void attackEntity(Entity targetEntity, CallbackInfo ci) {
-        if (Main.INSTANCE.moduleManager.getModule(KeepSprint.class).getState()){
+        if (Main.INSTANCE.moduleManager.getModule(KeepSprint.class).getState()) {
             this.motionX /= 0.6D;
             this.motionZ /= 0.6D;
             this.setSprinting(true);
 
-            if (Main.INSTANCE.moduleManager.getModule(KeepSprint.class).fake.getObject()){
+            if (Main.INSTANCE.moduleManager.getModule(KeepSprint.class).fake.getObject()) {
                 Main.INSTANCE.moduleManager.getModule(KeepSprint.class).modify = true;
             }
         }
@@ -107,4 +109,12 @@ public abstract class MixinEntityPlayer extends EntityLivingBase implements IEnt
         itemInUseCount = i;
     }
 
+
+    @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
+    public void onJump(CallbackInfo ci) {
+        JumpEvent jumpEvent = new JumpEvent();
+        EventManager.call(jumpEvent);
+
+        if (jumpEvent.isCancelled()) ci.cancel();
+    }
 }

@@ -1,6 +1,7 @@
 package cn.loli.client.module.modules.movement;
 
 import cn.loli.client.Main;
+import cn.loli.client.events.JumpEvent;
 import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PlayerMoveEvent;
 import cn.loli.client.events.UpdateEvent;
@@ -26,7 +27,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Speed extends Module {
 
     private final ModeValue modes = new ModeValue("Mode", "Mini", "PacketAbusing", "Mini");
-    private final NumberValue<Float> multiply = new NumberValue<>("Multiply", 1f, 1f, 2.2f);
+    private final NumberValue<Float> multiply = new NumberValue<>("Multiply", 1f, 1f, 2f);
 
     private final BooleanValue crit = new BooleanValue("Fall Damage", true);
 
@@ -173,17 +174,29 @@ public class Speed extends Module {
                         if (mc.thePlayer.onGround) {
                             if (Main.INSTANCE.moduleManager.getModule(Aura.class).target != null && crit.getObject()) {
                                 int ht = Main.INSTANCE.moduleManager.getModule(Aura.class).target.hurtResistantTime;
+                                ChatUtils.info(String.valueOf(ht));
+                                double var1 = ThreadLocalRandom.current().nextDouble(0.00119, 0.0041921599284565),
+                                        var2 = ThreadLocalRandom.current().nextDouble(0.00195542334, 0.025542334),
+                                        var3 = ThreadLocalRandom.current().nextDouble(1.5E-4, 1.63166800276E-4);
                                 switch (ht) {
-                                    case 18:
                                     case 20: {
                                         event.setOnGround(false);
-                                        event.setY(mc.thePlayer.posY + ThreadLocalRandom.current().nextDouble(0.0019, 0.0091921599284565));
+                                        event.setY(mc.thePlayer.posY + var1);
                                         break;
                                     }
-                                    case 17:
                                     case 19: {
                                         event.setOnGround(false);
-                                        event.setY(mc.thePlayer.posY + ThreadLocalRandom.current().nextDouble(1.5E-4, 1.63166800276E-4));
+                                        event.setY(mc.thePlayer.posY + var2);
+                                        break;
+                                    }
+                                    case 18: {
+                                        event.setOnGround(false);
+                                        event.setY(mc.thePlayer.posY + var1 * 1.2 - var3);
+                                        break;
+                                    }
+                                    case 17: {
+                                        event.setOnGround(false);
+                                        event.setY(mc.thePlayer.posY + var2 * 1.2 - var3);
                                         break;
                                     }
                                 }
@@ -200,6 +213,11 @@ public class Speed extends Module {
         }
 
 
+    }
+
+    @EventTarget
+    private void onJump(JumpEvent event) {
+        event.setCancelled(true);
     }
 
 }
