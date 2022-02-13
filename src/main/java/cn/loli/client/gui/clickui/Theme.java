@@ -4,7 +4,7 @@ package cn.loli.client.gui.clickui;
 import java.awt.*;
 
 public class Theme {
-    public Color bg = new Color(243, 243, 243);
+    public Color bg = new Color(244, 244, 244);
     public Color title = new Color(255, 255, 255);
     public Color left = new Color(255, 255, 255);
     public Color themeColor = new Color(52, 141, 255);
@@ -21,4 +21,5 @@ public class Theme {
     public Color desc_sel = new Color(148, 148, 148);
     public Color desc_unsel =new Color(204, 204, 204);
 
+    public Color slider = new Color(244,244,244);
 }

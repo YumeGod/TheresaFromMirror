@@ -1,5 +1,6 @@
 package cn.loli.client.gui.ttfr;
 
+import cn.loli.client.utils.RenderUtils;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -467,7 +468,7 @@ public class HStringCache {
         return renderString2(str,startX,startY,initialColor,false);
     }
     public int renderString2(String str, float startX, float startY, int initialColor, boolean shadowFlag) {
-
+        RenderUtils.drawRect(0,0,0,0,0);
         /* Check for invalid arguments */
         if (str == null || str.isEmpty()) {
             return 0;

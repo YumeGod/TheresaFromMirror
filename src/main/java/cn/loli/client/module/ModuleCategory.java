@@ -3,18 +3,20 @@
 package cn.loli.client.module;
 
 public enum ModuleCategory {
+    COMBAT("Combat"),
     RENDER("Render"),
     MOVEMENT("Movement"),
-    COMBAT("Combat"),
-    MISC("Misc"),
     PLAYER("Player"),
-    WORLD("World");
+    WORLD("World"),
+    MISC("Misc");
 
     private final String name;
 
     ModuleCategory(String name) {
         this.name = name;
     }
+
+
 
     @Override
     public String toString() {

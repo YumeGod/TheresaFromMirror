@@ -19,22 +19,22 @@ public class FontLoaders {
         System.setProperty("java.awt.headless", "true");
 
         long time = System.currentTimeMillis();
-        for (int i = 12; i < 16; ++i) {
+        for (int i = 12; i <= 16; ++i) {
             fonts.put("inter" + i, getFont("inter", i));
         }
-        for (int i = 12; i < 16; ++i) {
+        for (int i = 12; i <= 16; ++i) {
             fonts.put("nunito" + i, getFont("nunito", i));
         }
-        for (int i = 12; i < 16; ++i) {
+        for (int i = 12; i <= 16; ++i) {
             fonts.put("opensans" + i, getFont("opensans", i));
         }
-        for (int i = 12; i < 18; ++i) {
+        for (int i = 12; i <= 24; ++i) {
             fonts.put("roboto" + i, getFont("roboto", i));
         }
-        for (int i = 12; i < 16; ++i) {
+        for (int i = 12; i <= 16; ++i) {
             fonts.put("ubuntu" + i, getFont("ubuntu", i));
         }
-        for (int i = 12; i < 18; ++i) {
+        for (int i = 12; i <= 18; ++i) {
             fonts.put("wqy_microhei" + i, getFont("wqy_microhei", i));
         }
         System.out.println("Fonts loading used " + (System.currentTimeMillis() - time) / 1000d + " seconds");
