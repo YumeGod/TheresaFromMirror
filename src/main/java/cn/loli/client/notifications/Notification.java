@@ -58,7 +58,7 @@ public class Notification {
     public void render(short number) {
         ScaledResolution res = new ScaledResolution(mc);
         double offset;
-        int width = Math.max(Minecraft.getMinecraft().fontRendererObj.getStringWidth(messsage) + 35, Minecraft.getMinecraft().fontRendererObj.getStringWidth(title) * 2 + 35);
+        int width = Math.max(Minecraft.getMinecraft().fontRendererObj.getStringWidth(messsage) + 30, Minecraft.getMinecraft().fontRendererObj.getStringWidth(title) * 2 + 30);
         int height = 25;
         long time = getTime();
 
@@ -91,7 +91,7 @@ public class Notification {
 
 //        fontRenderer.drawString(title, ((int) (res.getScaledWidth() - offset + 8)), (int) ((res.getScaledHeight() - height - heightOffset)) - 3, -1);
 
-        RenderUtils.drawImage(new ResourceLocation("/theresa/icons/" + type.name().toLowerCase(Locale.ROOT) + ".png"), (int) (res.getScaledWidth() - offset) + 3, (int) (res.getScaledHeight() - height - heightOffset) + 1, 12, 12, 255);
+        RenderUtils.drawImage(new ResourceLocation("/theresa/icons/" + type.name().toLowerCase(Locale.ROOT) + ".png"), (int) (res.getScaledWidth() - offset) + 4, (int) (res.getScaledHeight() - height - heightOffset) + 2, 10, 10, 255);
         Main.fontLoaders.fonts.get("inter14").drawString(messsage, (int) (res.getScaledWidth() - offset + 22), (int) (res.getScaledHeight() - height - heightOffset) + 3, new Color(0, 0, 0).getRGB());
     }
 }
