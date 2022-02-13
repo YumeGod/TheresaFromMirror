@@ -718,4 +718,7 @@ public class HFontRenderer implements IResourceManagerReloadListener {
         return drawString(text, x - (this.getStringWidth(text) / 2f), y, color);
     }
 
+    public float getHeight() {
+        return 8;
+    }
 }

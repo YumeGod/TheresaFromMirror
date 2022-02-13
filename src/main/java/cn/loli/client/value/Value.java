@@ -2,12 +2,15 @@
 
 package cn.loli.client.value;
 
+import cn.loli.client.utils.AnimationUtils;
 import com.google.gson.JsonObject;
 
 import java.util.function.Predicate;
 
 public abstract class Value<T> {
     private final String name;
+    public AnimationUtils clickgui_timer = new AnimationUtils();
+    public float clickgui_anim;
     private T object;
     private final T defaultVal;
     /**

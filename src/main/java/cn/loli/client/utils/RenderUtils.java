@@ -302,18 +302,135 @@ public class RenderUtils {
         glDisable(GL_BLEND);
         Gui.drawRect(0, 0, 0, 0, 0);
     }
-
-    public static void drawImage(ResourceLocation image, int x, int y, int width, int height, float alpha) {
-        glDisable(GL_DEPTH_TEST);
-        glEnable(GL_BLEND);
-        glDepthMask(false);
-        OpenGlHelper.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ZERO);
-        glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+    public static void drawImage(final ResourceLocation image, double x, double y, double width, double height) {
+        GL11.glDisable(2929);
+        GL11.glEnable(3042);
+        GL11.glDepthMask(false);
+        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         Minecraft.getMinecraft().getTextureManager().bindTexture(image);
-        Gui.drawModalRectWithCustomSizedTexture(x, y, 0, 0, width, height, width, height);
-        glDepthMask(true);
-        glDisable(GL_BLEND);
-        glEnable(GL_DEPTH_TEST);
+        drawModalRectWithCustomSizedTexture(x, y, 0.0f, 0.0f, width, height, width, height);
+        GL11.glDepthMask(true);
+        GL11.glDisable(3042);
+        GL11.glEnable(2929);
+    }
+
+    public static void drawImage(final ResourceLocation image, double x, double y, double width, double height, Color color) {
+        GL11.glDisable(2929);
+        GL11.glEnable(3042);
+        GL11.glDepthMask(false);
+        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+        GL11.glColor4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+        Minecraft.getMinecraft().getTextureManager().bindTexture(image);
+        drawModalRectWithCustomSizedTexture(x, y, 0.0f, 0.0f, width, height, width, height);
+        GL11.glDepthMask(true);
+        GL11.glDisable(3042);
+        GL11.glEnable(2929);
+    }
+
+    public static void drawModalRectWithCustomSizedTexture(double x, double y, double u, double v, double width, double height, double textureWidth, double textureHeight)
+    {
+        double f = 1.0F / textureWidth;
+        double f1 = 1.0F / textureHeight;
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
+        worldrenderer.pos((double)x, (double)(y + height), 0.0D).tex((double)(u * f), (double)((v + (float)height) * f1)).endVertex();
+        worldrenderer.pos((double)(x + width), (double)(y + height), 0.0D).tex((double)((u + (float)width) * f), (double)((v + (float)height) * f1)).endVertex();
+        worldrenderer.pos((double)(x + width), (double)y, 0.0D).tex((double)((u + (float)width) * f), (double)(v * f1)).endVertex();
+        worldrenderer.pos((double)x, (double)y, 0.0D).tex((double)(u * f), (double)(v * f1)).endVertex();
+        tessellator.draw();
+    }
+
+    public static void doGlScissor(float x, float y, float width, float height) {
+        Minecraft mc = Minecraft.getMinecraft();
+        int scaleFactor = 1;
+        int k = mc.gameSettings.guiScale;
+        if (k == 0) {
+            k = 1000;
+        }
+        while (scaleFactor < k && mc.displayWidth / (scaleFactor + 1) >= 320
+                && mc.displayHeight / (scaleFactor + 1) >= 240) {
+            ++scaleFactor;
+        }
+        GL11.glScissor((int) (x * scaleFactor), (int) (mc.displayHeight - (y + height) * scaleFactor),
+                (int) (width * scaleFactor), (int) (height * scaleFactor));
+
+    }
+
+    public static void drawGradientRect(float x, float y, float x1, float y1, int topColor, int bottomColor) {
+        enableGL2D();
+        GL11.glShadeModel(7425);
+        GL11.glBegin(7);
+        glColor(topColor);
+        GL11.glVertex2f(x, y1);
+        GL11.glVertex2f(x1, y1);
+        glColor(bottomColor);
+        GL11.glVertex2f(x1, y);
+        GL11.glVertex2f(x, y);
+        GL11.glEnd();
+        GL11.glShadeModel(7424);
+        disableGL2D();
+    }
+
+
+    public static void glColor(int hex) {
+        float alpha = (hex >> 24 & 0xFF) / 255.0F;
+        float red = (hex >> 16 & 0xFF) / 255.0F;
+        float green = (hex >> 8 & 0xFF) / 255.0F;
+        float blue = (hex & 0xFF) / 255.0F;
+        GL11.glColor4f(red, green, blue, alpha);
+    }
+
+
+    public static void enableGL2D() {
+        GL11.glDisable(2929);
+        GL11.glEnable(3042);
+        GL11.glDisable(3553);
+        GL11.glBlendFunc(770, 771);
+        GL11.glDepthMask(true);
+        GL11.glEnable(2848);
+        GL11.glHint(3154, 4354);
+        GL11.glHint(3155, 4354);
+    }
+
+    public static void disableGL2D() {
+        GL11.glEnable(3553);
+        GL11.glDisable(3042);
+        GL11.glEnable(2929);
+        GL11.glDisable(2848);
+        GL11.glHint(3154, 4352);
+        GL11.glHint(3155, 4352);
+    }
+
+    public static void drawGradientSideways(double left, double top, double right, double bottom, int col1, int col2) {
+        float f = (float) (col1 >> 24 & 255) / 255.0f;
+        float f1 = (float) (col1 >> 16 & 255) / 255.0f;
+        float f2 = (float) (col1 >> 8 & 255) / 255.0f;
+        float f3 = (float) (col1 & 255) / 255.0f;
+        float f4 = (float) (col2 >> 24 & 255) / 255.0f;
+        float f5 = (float) (col2 >> 16 & 255) / 255.0f;
+        float f6 = (float) (col2 >> 8 & 255) / 255.0f;
+        float f7 = (float) (col2 & 255) / 255.0f;
+        GL11.glEnable(3042);
+        GL11.glDisable(3553);
+        GL11.glBlendFunc(770, 771);
+        GL11.glEnable(2848);
+        GL11.glShadeModel(7425);
+        GL11.glPushMatrix();
+        GL11.glBegin(7);
+        GL11.glColor4f(f1, f2, f3, f);
+        GL11.glVertex2d(left, top);
+        GL11.glVertex2d(left, bottom);
+        GL11.glColor4f(f5, f6, f7, f4);
+        GL11.glVertex2d(right, bottom);
+        GL11.glVertex2d(right, top);
+        GL11.glEnd();
+        GL11.glPopMatrix();
+        GL11.glEnable(3553);
+        GL11.glDisable(3042);
+        GL11.glDisable(2848);
+        GL11.glShadeModel(7424);
     }
 
 }

@@ -79,7 +79,7 @@ public class ClickGUI extends GuiScreen {
                     settingPane.addComponent(new cn.loli.client.gui.clickgui.components.Label(renderer, ""));
                     cn.loli.client.gui.clickgui.components.Button b;
                     settingPane.addComponent(b = new cn.loli.client.gui.clickgui.components.Button(renderer, "Reset ClickGUI"));
-                    b.setOnClickListener(((ClickGUIModule) module)::resetClickGui);
+//                    b.setOnClickListener(((ClickGUIModule) module)::resetClickGui);
                 } else {
                     settingPane.addComponent(new cn.loli.client.gui.clickgui.components.Label(renderer, "State"));
                     CheckBox cb;

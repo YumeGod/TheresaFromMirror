@@ -22,6 +22,11 @@ public class ColorUtils {
                 Integer.valueOf(colorStr.substring(5, 7), 16));
     }
 
+    public static Color intToColor(int color) {
+        Color c1 = new Color(color);
+        return new Color(c1.getRed(),c1.getGreen(),c1.getBlue(),color >> 24 & 255);
+    }
+
     /**
      * Converts the hue, saturation and value color model to the red, green and
      * blue color model
@@ -126,6 +131,14 @@ public class ColorUtils {
      */
     public static void drawGradientRect(int left, int top, int right, int bottom, int coltl, int coltr, int colbl, int colbr) {
         drawGradientRect(left, top, right, bottom, coltl, coltr, colbl, colbr, 0);
+    }
+
+    public static int reAlpha(int color, float alpha) {
+        Color c = new Color(color);
+        float r = 0.003921569f * (float) c.getRed();
+        float g = 0.003921569f * (float) c.getGreen();
+        float b = 0.003921569f * (float) c.getBlue();
+        return new Color(r, g, b, alpha).getRGB();
     }
 
     /**

@@ -2,6 +2,7 @@
 
 package cn.loli.client.module.modules.misc;
 
+import cn.loli.client.gui.clickui.ClickGui;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
@@ -24,33 +25,33 @@ import java.util.Arrays;
 import static cn.loli.client.utils.Utils.getFileFromResourceAsStream;
 
 public class ClickGUIModule extends Module {
-    public ClickGUI clickGui;
-    private int oldGuiScale;
+//    public ClickGUI clickGui;
+//    private int oldGuiScale;
 
-    private final ModeValue font = new ModeValue("Font", "Roboto", Arrays.stream(Fonts.values()).map(Fonts::getName).toArray(String[]::new));
+//    private final ModeValue font = new ModeValue("Font", "Roboto", Arrays.stream(Fonts.values()).map(Fonts::getName).toArray(String[]::new));
 
     public ClickGUIModule() {
         super("ClickGUI", "GUI that allows you to toggle modules and change settings", ModuleCategory.MISC, true, false, Keyboard.KEY_RSHIFT);
 
-        font.setCallback((value) -> {
-            if (mc.thePlayer != null)
-                NotificationManager.show(new Notification(NotificationType.INFO, "Info", "ClickGUI font will be set after GUI is reset", 2));
-        });
+//        font.setCallback((value) -> {
+//            if (mc.thePlayer != null)
+//                NotificationManager.show(new Notification(NotificationType.INFO, "Info", "ClickGUI font will be set after GUI is reset", 2));
+//        });
     }
 
-    public void createClickGui() {
-        try {
-            clickGui = new ClickGUI(getFileFromResourceAsStream(Arrays.stream(Fonts.values()).filter(fonts -> fonts.getName()
-                    .equalsIgnoreCase(font.getCurrentMode())).map(Fonts::getPath).findFirst().orElse(Fonts.ROBOTO.getPath())), 16,
-                    Arrays.stream(Fonts.values()).filter(fonts -> fonts.getName().equalsIgnoreCase(font.getCurrentMode())).map(Fonts::getYOffset).findFirst().orElse(0f));
-        } catch (IOException | FontFormatException e) {
-            e.printStackTrace();
-        }
-    }
+//    public void createClickGui() {
+//        try {
+//            clickGui = new ClickGUI(getFileFromResourceAsStream(Arrays.stream(Fonts.values()).filter(fonts -> fonts.getName()
+//                    .equalsIgnoreCase(font.getCurrentMode())).map(Fonts::getPath).findFirst().orElse(Fonts.ROBOTO.getPath())), 16,
+//                    Arrays.stream(Fonts.values()).filter(fonts -> fonts.getName().equalsIgnoreCase(font.getCurrentMode())).map(Fonts::getYOffset).findFirst().orElse(0f));
+//        } catch (IOException | FontFormatException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     @Override
     protected void onEnable() {
-        mc.displayGuiScreen(clickGui);
+        mc.displayGuiScreen(new ClickGui(true));
         setState(false);
         EventManager.register(this);
     }
@@ -66,39 +67,39 @@ public class ClickGUIModule extends Module {
         }
     }
 
-    @EventTarget
-    public void onTick(TickEvent event) {
-        if (event.getEventType() != EventType.POST) return;
+//    @EventTarget
+//    public void onTick(TickEvent event) {
+//        if (event.getEventType() != EventType.POST) return;
+//
+//        if (mc.gameSettings.guiScale != oldGuiScale) {
+//            onResize();
+//            oldGuiScale = mc.gameSettings.guiScale;
+//        }
+//    }
 
-        if (mc.gameSettings.guiScale != oldGuiScale) {
-            onResize();
-            oldGuiScale = mc.gameSettings.guiScale;
-        }
-    }
+//    @EventTarget
+//    public void onWindowResize(WindowResizeEvent event) {
+//        onResize();
+//    }
+//
+//    private void onResize() {
+//        if (clickGui == null) {
+//            return;
+//        }
+//
+//        ScaledResolution sr = new ScaledResolution(mc);
+//
+//        clickGui.window.setWidth(sr.getScaleFactor() < 2 ? (mc.displayWidth - 50) : (mc.displayWidth - 50) / (sr.getScaleFactor() - 1));
+//        clickGui.window.setHeight(sr.getScaleFactor() < 2 ? (mc.displayHeight - 50) : (mc.displayHeight - 50) / (sr.getScaleFactor() - 1));
+//        clickGui.window.setX(mc.displayWidth / sr.getScaleFactor() - clickGui.window.getWidth() / 2);
+//        clickGui.window.setY(mc.displayHeight / sr.getScaleFactor() - clickGui.window.getHeight() / 2);
+//    }
 
-    @EventTarget
-    public void onWindowResize(WindowResizeEvent event) {
-        onResize();
-    }
-
-    private void onResize() {
-        if (clickGui == null) {
-            return;
-        }
-
-        ScaledResolution sr = new ScaledResolution(mc);
-
-        clickGui.window.setWidth(sr.getScaleFactor() < 2 ? (mc.displayWidth - 50) : (mc.displayWidth - 50) / (sr.getScaleFactor() - 1));
-        clickGui.window.setHeight(sr.getScaleFactor() < 2 ? (mc.displayHeight - 50) : (mc.displayHeight - 50) / (sr.getScaleFactor() - 1));
-        clickGui.window.setX(mc.displayWidth / sr.getScaleFactor() - clickGui.window.getWidth() / 2);
-        clickGui.window.setY(mc.displayHeight / sr.getScaleFactor() - clickGui.window.getHeight() / 2);
-    }
-
-    public void resetClickGui() {
-        createClickGui();
-        onResize();
-        mc.displayGuiScreen(clickGui);
-    }
+//    public void resetClickGui() {
+//        createClickGui();
+//        onResize();
+//        mc.displayGuiScreen(clickGui);
+//    }
 
     private enum Fonts {
         INTER("Inter", "theresa/font/inter.ttf", 0),

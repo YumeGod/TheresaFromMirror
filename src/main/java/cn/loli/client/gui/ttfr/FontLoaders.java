@@ -28,16 +28,30 @@ public class FontLoaders {
         for (int i = 12; i < 16; ++i) {
             fonts.put("opensans" + i, getFont("opensans", i));
         }
-        for (int i = 12; i < 16; ++i) {
+        for (int i = 12; i < 18; ++i) {
             fonts.put("roboto" + i, getFont("roboto", i));
         }
         for (int i = 12; i < 16; ++i) {
             fonts.put("ubuntu" + i, getFont("ubuntu", i));
         }
-        for (int i = 12; i < 16; ++i) {
+        for (int i = 12; i < 18; ++i) {
             fonts.put("wqy_microhei" + i, getFont("wqy_microhei", i));
         }
         System.out.println("Fonts loading used " + (System.currentTimeMillis() - time) / 1000d + " seconds");
+    }
+
+    public HFontRenderer get(String name, int size) {
+        if (fonts.get(name + size) == null) {
+            return fonts.get("wqy_microhei14");
+        }
+        return fonts.get(name + size);
+    }
+
+    public HFontRenderer get(String name) {
+        if (fonts.get(name) == null) {
+            return fonts.get("wqy_microhei14");
+        }
+        return fonts.get(name);
     }
 
     private HFontRenderer getFont(String name, int size) {

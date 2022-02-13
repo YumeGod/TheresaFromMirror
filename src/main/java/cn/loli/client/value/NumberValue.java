@@ -14,6 +14,7 @@ import java.util.function.Predicate;
 public class NumberValue<T extends Number> extends Value<T> {
     private final T min;
     private final T max;
+    public boolean clickgui_drag;
 
     public NumberValue(String name, T defaultVal, @NotNull T min, @NotNull T max) {
         this(name, defaultVal, min, max, null);

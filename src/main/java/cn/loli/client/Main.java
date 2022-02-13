@@ -110,7 +110,7 @@ public class Main {
         moduleManager.addModules();
         fileManager.load();
 
-        moduleManager.getModule(ClickGUIModule.class).createClickGui();
+//        moduleManager.getModule(ClickGUIModule.class).createClickGui();
         fontLoaders = new FontLoaders();
 
         //Crasher

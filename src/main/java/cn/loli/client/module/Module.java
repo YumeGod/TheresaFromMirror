@@ -7,6 +7,7 @@ import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
 import cn.loli.client.Main;
+import cn.loli.client.utils.AnimationUtils;
 import com.darkmagician6.eventapi.EventManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
@@ -23,6 +24,10 @@ public abstract class Module {
     private final ModuleCategory category;
     private final boolean canBeEnabled;
     private final boolean hidden;
+    public float clickgui_animY;
+    public AnimationUtils clickgui_animY_timer = new AnimationUtils();
+    public AnimationUtils clickgui_animX_timer = new AnimationUtils();
+    public float clickgui_animX;
     private int keybind;
     protected boolean state;
 
