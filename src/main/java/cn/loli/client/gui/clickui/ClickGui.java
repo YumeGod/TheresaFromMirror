@@ -9,6 +9,7 @@ import cn.loli.client.utils.RenderUtils;
 import cn.loli.client.value.*;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
@@ -37,6 +38,9 @@ public class ClickGui extends GuiScreen {
     private static String search_context;
     private boolean search_hover;
     private float gui_anim, list_anim;
+    private AnimationUtils list_anim_timer = new AnimationUtils();
+    private AnimationUtils gui_anim_timer = new AnimationUtils();
+
 
     public ClickGui(boolean doesGuiPauseGame) {
         this.doesGuiPauseGame = doesGuiPauseGame;
@@ -65,6 +69,10 @@ public class ClickGui extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 //        width = 600;
         super.drawScreen(mouseX, mouseY, partialTicks);
+        if (gui_anim != 2) {
+            gui_anim = gui_anim_timer.animate(2, gui_anim, 0.2f, 20);
+        }
+        GlStateManager.ortho(0.0D, gui_anim, 0.0, gui_anim, -10, 10);
         leftMenuWidth = Math.max(Math.min(width * 0.25f, 150), 120);
         slider.update();
         if (!Mouse.isButtonDown(0)) {
@@ -108,18 +116,21 @@ public class ClickGui extends GuiScreen {
         RenderUtils.doGlScissor(x, y + 45, width, height - 65);
         RenderUtils.drawRoundRect(x + leftMenuWidth + 10, y + 45, x + width - 10 - showValueX, y + height - 20, 3, new Color(255, 255, 255).getRGB());
 
+        if (list_anim != 0) {
+            list_anim_timer.animate(0, list_anim, 0.2f, 20);
+        }
         float modsY = y + 50 + mods_whell;
         for (Module m : Main.INSTANCE.moduleManager.getModules()) {
             if (m.getCategory() == curType) {
+                //动画
+                GlStateManager.translate(list_anim, 0, 0);
+
                 if (modsY < (y + height - 20)) {
                     //获取一些颜色
                     int sc1 = m.getState() ? theme.sec_sel.getRGB() : theme.sec_unsel.getRGB();
                     int sc2 = m.getState() ? theme.desc_sel.getRGB() : theme.desc_unsel.getRGB();
-//                    int rc1 = m.getState() ? theme.module_sel.getRGB() : theme.module_unsel.getRGB();
                     int rc2 = m.getState() ? theme.option_on.getRGB() : theme.option_off.getRGB();
                     //绘制功能开关
-//                    RenderUtils.drawRoundRect(x + width - 50 - showValueX, modsY + 10, x + width - 25 - showValueX, modsY + 20, 3, theme.option_bg.getRGB());
-//                    RenderUtils.drawFilledCircle(x + width - 45 + m.clickgui_animX - showValueX, modsY + 15, 5, rc2, 5);
                     if (m.getState()) {
                         RenderUtils.drawImage(new ResourceLocation("theresa/icons/enabled.png"), x + leftMenuWidth + 20, modsY + 10, 8, 8, new Color(255, 255, 255, ((int) m.clickgui_animX)));
                     } else {
@@ -206,7 +217,9 @@ public class ClickGui extends GuiScreen {
                 }
 
                 modsY += 40;
+//                GlStateManager.ortho(0, width, height, 0, 0, 0);
             }
+
         }
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
         //mods列表滑动
@@ -260,6 +273,7 @@ public class ClickGui extends GuiScreen {
     @Override
     public void initGui() {
         super.initGui();
+        gui_anim = 1.6f;
         sr = new ScaledResolution(mc);
         theme = new Theme();
         if (width == 0 || height == 0) {
@@ -323,6 +337,8 @@ public class ClickGui extends GuiScreen {
                 mods_whelltemp = 0;
                 mods_whell = 0;
                 curType = m;
+                curModule = null;
+                list_anim = 10;
             }
             my += 30;
         }
