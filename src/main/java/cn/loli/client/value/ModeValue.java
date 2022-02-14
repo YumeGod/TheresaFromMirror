@@ -11,6 +11,7 @@ import java.util.function.Predicate;
 
 public class ModeValue extends Value<Integer> {
     private final String[] modes;
+    public boolean open;
 
     public ModeValue(String name, String defaultVal, String... modes) {
         this(name, defaultVal, null, modes);

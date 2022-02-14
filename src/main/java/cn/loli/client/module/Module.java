@@ -89,7 +89,7 @@ public abstract class Module {
             onDisable();
 
             if (mc.thePlayer != null && Main.INSTANCE.moduleManager.getModule(HUD.class).getState()) {
-                NotificationManager.show(new Notification(NotificationType.INFO, "Info", getName() + " was disabled", 1));
+                NotificationManager.show(new Notification(NotificationType.ERROR, "Info", getName() + " was disabled", 1));
             }
         }
 
@@ -104,5 +104,6 @@ public abstract class Module {
         EventManager.unregister(this);
     }
 
-    protected void onToggle() { }
+    protected void onToggle() {
+    }
 }

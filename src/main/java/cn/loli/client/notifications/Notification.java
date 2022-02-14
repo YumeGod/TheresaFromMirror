@@ -58,7 +58,7 @@ public class Notification {
     public void render(short number) {
         ScaledResolution res = new ScaledResolution(mc);
         double offset;
-        int width = Math.max(Minecraft.getMinecraft().fontRendererObj.getStringWidth(messsage) + 30, Minecraft.getMinecraft().fontRendererObj.getStringWidth(title) * 2 + 30);
+        int width = Math.max(Minecraft.getMinecraft().fontRendererObj.getStringWidth(messsage) + 20, Minecraft.getMinecraft().fontRendererObj.getStringWidth(title) * 2 + 20);
         int height = 25;
         long time = getTime();
 

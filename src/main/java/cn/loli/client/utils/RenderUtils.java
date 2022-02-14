@@ -250,10 +250,15 @@ public class RenderUtils {
         drawFilledCircle(xPosition + radius, (int) (yPosition + height - radius), radius, color, 2);
         drawFilledCircle((int) (xPosition + width - radius), yPosition + radius, radius, color, 3);
         drawFilledCircle((int) (xPosition + width - radius), (int) (yPosition + height - radius), radius, color, 4);
+        drawFilledCircle(xPosition + radius, yPosition + radius, radius, color, 1);
+        drawFilledCircle(xPosition + radius, (int) (yPosition + height - radius), radius, color, 2);
+        drawFilledCircle((int) (xPosition + width - radius), yPosition + radius, radius, color, 3);
+        drawFilledCircle((int) (xPosition + width - radius), (int) (yPosition + height - radius), radius, color, 4);
         Gui.drawRect(0, 0, 0, 0, 0);
     }
 
     public static void drawFilledCircle(double x, double y, double r, int c, int id) {
+        GL11.glEnable(GL_POLYGON_SMOOTH);
         float f = (float) (c >> 24 & 0xff) / 255F;
         float f1 = (float) (c >> 16 & 0xff) / 255F;
         float f2 = (float) (c >> 8 & 0xff) / 255F;
@@ -301,7 +306,9 @@ public class RenderUtils {
         glEnable(GL_TEXTURE_2D);
         glDisable(GL_BLEND);
         Gui.drawRect(0, 0, 0, 0, 0);
+        GL11.glDisable(GL_POLYGON_SMOOTH);
     }
+
     public static void drawImage(final ResourceLocation image, double x, double y, double width, double height) {
         GL11.glDisable(2929);
         GL11.glEnable(3042);
@@ -328,17 +335,16 @@ public class RenderUtils {
         GL11.glEnable(2929);
     }
 
-    public static void drawModalRectWithCustomSizedTexture(double x, double y, double u, double v, double width, double height, double textureWidth, double textureHeight)
-    {
+    public static void drawModalRectWithCustomSizedTexture(double x, double y, double u, double v, double width, double height, double textureWidth, double textureHeight) {
         double f = 1.0F / textureWidth;
         double f1 = 1.0F / textureHeight;
         Tessellator tessellator = Tessellator.getInstance();
         WorldRenderer worldrenderer = tessellator.getWorldRenderer();
         worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
-        worldrenderer.pos((double)x, (double)(y + height), 0.0D).tex((double)(u * f), (double)((v + (float)height) * f1)).endVertex();
-        worldrenderer.pos((double)(x + width), (double)(y + height), 0.0D).tex((double)((u + (float)width) * f), (double)((v + (float)height) * f1)).endVertex();
-        worldrenderer.pos((double)(x + width), (double)y, 0.0D).tex((double)((u + (float)width) * f), (double)(v * f1)).endVertex();
-        worldrenderer.pos((double)x, (double)y, 0.0D).tex((double)(u * f), (double)(v * f1)).endVertex();
+        worldrenderer.pos((double) x, (double) (y + height), 0.0D).tex((double) (u * f), (double) ((v + (float) height) * f1)).endVertex();
+        worldrenderer.pos((double) (x + width), (double) (y + height), 0.0D).tex((double) ((u + (float) width) * f), (double) ((v + (float) height) * f1)).endVertex();
+        worldrenderer.pos((double) (x + width), (double) y, 0.0D).tex((double) ((u + (float) width) * f), (double) (v * f1)).endVertex();
+        worldrenderer.pos((double) x, (double) y, 0.0D).tex((double) (u * f), (double) (v * f1)).endVertex();
         tessellator.draw();
     }
 
