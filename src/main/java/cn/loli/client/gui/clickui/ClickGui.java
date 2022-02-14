@@ -145,7 +145,6 @@ public class ClickGui extends GuiScreen {
                     //获取一些颜色
                     int sc1 = m.getState() ? theme.sec_sel.getRGB() : theme.sec_unsel.getRGB();
                     int sc2 = m.getState() ? theme.desc_sel.getRGB() : theme.desc_unsel.getRGB();
-                    int rc2 = m.getState() ? theme.option_on.getRGB() : theme.option_off.getRGB();
                     //绘制功能开关
                     if (m.getState()) {
                         RenderUtils.drawImage(new ResourceLocation("theresa/icons/enabled.png"), x + leftMenuWidth + 20, modsY + 10, 8, 8, new Color(255, 255, 255, ((int) m.clickgui_animX)));
@@ -179,7 +178,7 @@ public class ClickGui extends GuiScreen {
                                 v.clickgui_anim = v.clickgui_timer.animate(vX * (showValueX - 40), v.clickgui_anim, ANIMATION_SPEED, ANIMATION_DELAY);
                                 RenderUtils.drawRoundRect(x + width - showValueX + 10, valuesY + 14, x + width - showValueX + 10 + v.clickgui_anim, valuesY + 15, 2, theme.themeColor.getRGB());
                                 DecimalFormat df = new DecimalFormat("#.##");
-                                Main.fontLoaders.get("roboto15").drawString(((int) (((Number) v.getObject()).doubleValue() * 10)) / 10f + "", x + width - 30 - (showValueX - 10) / 2, valuesY + 11, theme.value_number_value.getRGB(), false);
+                                Main.fontLoaders.get("roboto15").drawString(df.format(v.getObject()), x + width - 30 - (showValueX - 10) / 2, valuesY + 11, theme.value_number_value.getRGB(), false);
                                 if (((NumberValue<?>) v).clickgui_drag && Mouse.isButtonDown(0) && valuesY > y && valuesY + 20 < y + height) {
                                     float v1 = (mouseX - (x + width - showValueX + 10)) / (showValueX - 40) * (((NumberValue<?>) v).getMax().floatValue() - ((NumberValue<?>) v).getMin().floatValue()) + ((NumberValue<?>) v).getMin().floatValue();
                                     if (Math.abs(v1 - ((Number) v.getObject()).floatValue()) >= ((Number) v.getObject()).floatValue() / 20) {
@@ -232,9 +231,7 @@ public class ClickGui extends GuiScreen {
                         }
                     }
                 }
-
                 modsY += 40;
-//                GlStateManager.ortho(0, width, height, 0, 0, 0);
             }
 
         }
@@ -418,9 +415,10 @@ public class ClickGui extends GuiScreen {
                 if (isHovered(x + leftMenuWidth + 10, Math.max(modsY, y + 35), x + width - 10 - showValueX, Math.min(modsY + 30, y + height), mouseX, mouseY) && mouseButton == 1) {
                     //打开功能values列表
                     if (curModule != m) {
-                        if (Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName())).size() > 0)
+                        if (Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName())).size() > 0) {
                             curModule = m;
-                        else
+                            values_whell = 0;
+                        } else
                             curModule = null;
                     } else {
                         curModule = null;
