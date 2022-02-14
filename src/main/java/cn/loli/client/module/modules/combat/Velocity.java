@@ -77,6 +77,8 @@ public class Velocity extends Module {
 
         if (event.getPacket() instanceof S27PacketExplosion && explosion.getObject()) {
             S27PacketExplosion packet = (S27PacketExplosion) event.getPacket();
+            if (kbAlert.getObject())
+                kbAlert(event);
             if (horizon.getObject() == 0 && vertical.getObject() == 0) {
                 event.setCancelled(true);
                 return;
@@ -95,9 +97,6 @@ public class Velocity extends Module {
                     addPackets(new TimestampedPacket(event.getPacket(), System.currentTimeMillis()), event);
                 }
             }
-
-            if (kbAlert.getObject())
-                kbAlert(event);
         }
 
         if (event.getPacket() instanceof S12PacketEntityVelocity) {
