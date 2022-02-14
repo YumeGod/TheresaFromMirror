@@ -70,9 +70,10 @@ public class ClickGui extends GuiScreen {
 //        width = 600;
         super.drawScreen(mouseX, mouseY, partialTicks);
         if (gui_anim != 2) {
-            gui_anim = gui_anim_timer.animate(2, gui_anim, 0.2f, 20);
+            gui_anim = gui_anim_timer.animate(0, gui_anim, 0.2f, 20);
         }
-        GlStateManager.ortho(0.0D, gui_anim, 0.0, gui_anim, -10, 10);
+//        GlStateManager.ortho(0.0D, gui_anim, 0.0, gui_anim, 0, 10);
+        GlStateManager.translate(gui_anim, 0, 0);
         leftMenuWidth = Math.max(Math.min(width * 0.25f, 150), 120);
         slider.update();
         if (!Mouse.isButtonDown(0)) {
@@ -117,7 +118,7 @@ public class ClickGui extends GuiScreen {
         RenderUtils.drawRoundRect(x + leftMenuWidth + 10, y + 45, x + width - 10 - showValueX, y + height - 20, 3, new Color(255, 255, 255).getRGB());
 
         if (list_anim != 0) {
-            list_anim_timer.animate(0, list_anim, 0.2f, 20);
+            list_anim = list_anim_timer.animate(0, list_anim, 0.1f, 20);
         }
         float modsY = y + 50 + mods_whell;
         for (Module m : Main.INSTANCE.moduleManager.getModules()) {
@@ -273,7 +274,7 @@ public class ClickGui extends GuiScreen {
     @Override
     public void initGui() {
         super.initGui();
-        gui_anim = 1.6f;
+        gui_anim = -150;
         sr = new ScaledResolution(mc);
         theme = new Theme();
         if (width == 0 || height == 0) {
@@ -338,7 +339,7 @@ public class ClickGui extends GuiScreen {
                 mods_whell = 0;
                 curType = m;
                 curModule = null;
-                list_anim = 10;
+                list_anim = 25;
             }
             my += 30;
         }
