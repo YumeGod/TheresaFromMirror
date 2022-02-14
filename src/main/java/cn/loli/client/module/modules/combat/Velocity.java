@@ -90,7 +90,7 @@ public class Velocity extends Module {
                 ChatUtils.info("Giga " + (Math.abs(packet.func_149149_c()) + Math.abs(packet.func_149144_d()) + Math.abs(packet.func_149147_e())) * 8000);
 
             if (!event.isCancelled()) {
-                if (choke.getObject() && (packet.func_149149_c() + Math.abs(packet.func_149144_d()) + packet.func_149147_e()) * 8000 < limit.getObject()) {
+                if (choke.getObject() && (Math.abs(packet.func_149149_c()) + Math.abs(packet.func_149144_d()) + Math.abs(packet.func_149147_e())) * 8000 < limit.getObject()) {
                     event.setCancelled(true);
                     addPackets(new TimestampedPacket(event.getPacket(), System.currentTimeMillis()), event);
                 }
