@@ -53,7 +53,7 @@ public class HUD extends Module {
         if (!getState()) return;
         ScaledResolution res = new ScaledResolution(mc);
         HFontRenderer font = Main.fontLoaders.fonts.get("roboto16");
-        int i = ArrayListYPos.getObject();
+        int i = ArrayListYPos.getObject().intValue();
         sort.sort(Comparator.comparingInt(m -> m.getName().length()));
         sort = reverse(sort);
         for (Module m : sort) {
