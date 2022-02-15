@@ -36,9 +36,6 @@ public class Velocity extends Module {
     private final NumberValue<Integer> limit = new NumberValue<>("Choke Limit", 8000, 0, 25000);
     private final BooleanValue debug = new BooleanValue("Debug", false);
 
-    private WorldClient lastWorld;
-    private final TimeHelper timeHelper = new TimeHelper();
-
 
     public Velocity() {
         super("Velocity", "Reduce your knock-back", ModuleCategory.COMBAT);
@@ -67,58 +64,83 @@ public class Velocity extends Module {
 
     @EventTarget
     private void onPacket(PacketEvent event) {
-        float hor = horizon.getObject() / 100f;
-        float ver = vertical.getObject() / 100f;
+        //计算水平和垂直的数值
+        float hor = horizon.getObject().floatValue() / 100;
+        float ver = vertical.getObject().floatValue() / 100;
 
         if (reverseHorizon.getObject()) hor = -hor;
 
-        if (legit.getObject())
-            return;
+        if (legit.getObject()) return; //如果是Legit就不执行操作行为
 
         if (event.getPacket() instanceof S27PacketExplosion && explosion.getObject()) {
             S27PacketExplosion packet = (S27PacketExplosion) event.getPacket();
-            if (kbAlert.getObject())
-                kbAlert(event);
+
+            if (kbAlert.getObject()) kbAlert(event);
+
             if (horizon.getObject() == 0 && vertical.getObject() == 0) {
                 event.setCancelled(true);
                 return;
             }
 
+            //Editing
             ((IS27PacketExplosion) packet).setX(packet.func_149149_c() * hor);
             ((IS27PacketExplosion) packet).setY(packet.func_149144_d() * ver);
             ((IS27PacketExplosion) packet).setZ(packet.func_149147_e() * hor);
 
+            //调试输出
             if (debug.getObject())
                 ChatUtils.info("Giga " + (Math.abs(packet.func_149149_c()) + Math.abs(packet.func_149144_d()) + Math.abs(packet.func_149147_e())) * 8000);
 
-            if (!event.isCancelled()) {
-                if (choke.getObject() && (Math.abs(packet.func_149149_c()) + Math.abs(packet.func_149144_d()) + Math.abs(packet.func_149147_e())) * 8000 < limit.getObject()) {
+
+            if (!event.isCancelled()) {   //是否被取消 如果没有进行Choke处理
+                if (choke.getObject() && //数值限定
+                        (Math.abs(packet.func_149149_c()) + Math.abs(packet.func_149144_d()) + Math.abs(packet.func_149147_e())) * 8000 < limit.getObject()) {
+                    //取消这个包的效果
                     event.setCancelled(true);
+
+                    //增加这个的Packet
                     addPackets(new TimestampedPacket(event.getPacket(), System.currentTimeMillis()), event);
+
                 }
             }
         }
 
         if (event.getPacket() instanceof S12PacketEntityVelocity) {
             S12PacketEntityVelocity packet = (S12PacketEntityVelocity) event.getPacket();
+            //检查是否是属于自己的击退包
             if (packet.getEntityID() == mc.thePlayer.getEntityId()) {
-                // ChatUtils.send("Received A KB Packet");
 
-                if (horizon.getObject() == 0 && vertical.getObject() == 0) {
-                    event.setCancelled(true);
-                }
+                //获取并修改倍率
+                double x = packet.getMotionX() * hor, y = packet.getMotionY() * ver, z = packet.getMotionZ() * hor;
 
+                ChatUtils.info(packet.getMotionX() + " " + packet.getMotionY() + " " + packet.getMotionZ());
+
+                ChatUtils.info(x + " " + y + " " + z);
+                if (kbAlert.getObject()) kbAlert(event);
+
+                //移除该包效果 改为自定义
+                event.setCancelled(true);
+
+                //调试输出
                 if (debug.getObject())
                     ChatUtils.info(String.valueOf(Math.abs(packet.getMotionX()) + Math.abs(packet.getMotionZ()) + Math.abs(packet.getMotionY())));
 
-                if (choke.getObject() &&
+                if (choke.getObject() && //考虑Choke的情况以及是否应该进行Choke的行为(通过查看包原本倍率)
                         Math.abs(packet.getMotionX()) + Math.abs(packet.getMotionZ()) + Math.abs(packet.getMotionY()) < limit.getObject()) {
-                    addPackets(new TimestampedPacket(event.getPacket(), System.currentTimeMillis()), event);
+                    //取消这个包的效果
                     event.setCancelled(true);
+
+                    //重新定义Packet
+                    event.setPacket(new S12PacketEntityVelocity(mc.thePlayer.getEntityId(), x / 8000, y / 8000, z / 8000));
+                    //增加这个定义后的Packet
+                    addPackets(new TimestampedPacket(event.getPacket(), System.currentTimeMillis()), event);
+
+                } else {
+                    //设置KnockBack
+                    mc.thePlayer.setVelocity(x / 8000, y / 8000, z / 8000);
                 }
 
-                if (kbAlert.getObject())
-                    kbAlert(event);
+
             }
         }
     }
