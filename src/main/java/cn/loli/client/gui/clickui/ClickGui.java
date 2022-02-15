@@ -154,7 +154,7 @@ public class ClickGui extends GuiScreen {
                     //绘制功能名和描述
                     Main.fontLoaders.get("roboto18").drawString(m.getName(), x + leftMenuWidth + 35, modsY + 15 - Main.fontLoaders.get("roboto15").getHeight() / 2f, sc1);
                     float w1 = Main.fontLoaders.get("roboto18").getStringWidth(m.getName());
-                    Main.fontLoaders.get("roboto18").drawString(Main.fontLoaders.get("roboto18").trimStringToWidth(m.getDescription(), (int) (width - showValueX - leftMenuWidth - 100 - Main.fontLoaders.get("roboto18").getStringWidth(m.getName()))) + "..", x + leftMenuWidth + 40 + w1, modsY + 15 - 8 / 2f, sc2);
+                    Main.fontLoaders.get("roboto18").drawString(Main.fontLoaders.get("roboto18").trimStringToWidth(m.getDescription(), (int) (width - showValueX - leftMenuWidth - 85 - Main.fontLoaders.get("roboto18").getStringWidth(m.getName()))) + "..", x + leftMenuWidth + 40 + w1, modsY + 15 - 8 / 2f, sc2);
 
                     m.clickgui_animX = m.clickgui_animX_timer.animate(m.getState() ? 255 : 0, m.clickgui_animX, ANIMATION_SPEED / 2, ANIMATION_DELAY);
                     RenderUtils.drawRect(x + leftMenuWidth + 10, modsY + 30, x + width - 10 - showValueX, modsY + 31, theme.module_list_line.getRGB());
@@ -181,9 +181,10 @@ public class ClickGui extends GuiScreen {
                                 Main.fontLoaders.get("roboto15").drawString(df.format(v.getObject()), x + width - 30 - (showValueX - 10) / 2, valuesY + 11, theme.value_number_value.getRGB(), false);
                                 if (((NumberValue<?>) v).clickgui_drag && Mouse.isButtonDown(0) && valuesY > y && valuesY + 20 < y + height) {
                                     float v1 = (mouseX - (x + width - showValueX + 10)) / (showValueX - 40) * (((NumberValue<?>) v).getMax().floatValue() - ((NumberValue<?>) v).getMin().floatValue()) + ((NumberValue<?>) v).getMin().floatValue();
-                                    if (Math.abs(v1 - ((Number) v.getObject()).floatValue()) >= ((Number) v.getObject()).floatValue() / 20) {
-                                        v.setObject(((Number) v.getObject()).floatValue() + (v1 > ((Number) v.getObject()).floatValue() ? ((Number) v.getObject()).floatValue() / 20 : -((Number) v.getObject()).floatValue() / 20));
-                                    }
+                                    v.setObject(v1);
+//                                    if (Math.abs(v1 - ((Number) v.getObject()).floatValue()) >= ((Number) v.getObject()).floatValue() / 20) {
+//                                        v.setObject(((Number) v.getObject()).floatValue() + (v1 > ((Number) v.getObject()).floatValue() ? ((Number) v.getObject()).floatValue() / 20 : -((Number) v.getObject()).floatValue() / 20));
+//                                    }
                                     if (v1 <= ((NumberValue<?>) v).getMin().floatValue()) {
                                         v.setObject(((NumberValue<?>) v).getMin().floatValue());
                                     }

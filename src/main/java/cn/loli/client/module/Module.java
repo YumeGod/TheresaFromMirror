@@ -24,12 +24,18 @@ public abstract class Module {
     private final ModuleCategory category;
     private final boolean canBeEnabled;
     private final boolean hidden;
-    public float clickgui_animY;
-    public AnimationUtils clickgui_animY_timer = new AnimationUtils();
-    public AnimationUtils clickgui_animX_timer = new AnimationUtils();
-    public float clickgui_animX;
     private int keybind;
     protected boolean state;
+
+    //Animations
+    public float clickgui_animY;
+    public float clickgui_animX;
+    public AnimationUtils clickgui_animY_timer = new AnimationUtils();
+    public AnimationUtils clickgui_animX_timer = new AnimationUtils();
+    public float arraylist_animX;
+    public AnimationUtils arraylist_animX_timer = new AnimationUtils();
+    public float arraylist_animY;
+    public AnimationUtils arraylist_animY_timer = new AnimationUtils();
 
     protected Module(String name, String description, ModuleCategory moduleCategory) {
         this(name, description, moduleCategory, true, false, Keyboard.KEY_NONE);
@@ -80,14 +86,14 @@ public abstract class Module {
         if (state) {
             this.state = true;
             onEnable();
-
+            arraylist_animX = 0;
+            arraylist_animY -= 16;
             if (mc.thePlayer != null && Main.INSTANCE.moduleManager.getModule(HUD.class).getState()) {
                 NotificationManager.show(new Notification(NotificationType.INFO, "Info", getName() + " was enabled", 1));
             }
         } else {
             this.state = false;
             onDisable();
-
             if (mc.thePlayer != null && Main.INSTANCE.moduleManager.getModule(HUD.class).getState()) {
                 NotificationManager.show(new Notification(NotificationType.ERROR, "Info", getName() + " was disabled", 1));
             }
