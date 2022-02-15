@@ -37,6 +37,8 @@ public class HUD extends Module {
         super("HUD", "The heads up display overlay", ModuleCategory.MISC);
         setState(true);
         sort = Main.INSTANCE.moduleManager.getModules();
+        sort.sort(Comparator.comparingInt(m -> m.getName().length()));
+        sort = reverse(sort);
     }
 
     //反转ArrayList
@@ -54,13 +56,11 @@ public class HUD extends Module {
         ScaledResolution res = new ScaledResolution(mc);
         HFontRenderer font = Main.fontLoaders.fonts.get("roboto16");
         int i = ArrayListYPos.getObject().intValue();
-        sort.sort(Comparator.comparingInt(m -> m.getName().length()));
-        sort = reverse(sort);
         for (Module m : sort) {
             if (m.getState()) {
                 String s = m.getName();
                 font.drawString(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, -1);
-                m.arraylist_animY = m.arraylist_animY_timer.animate(i, m.arraylist_animY +  ArrayListYPos.getObject().intValue(), 0.2f, 20);
+                m.arraylist_animY = m.arraylist_animY_timer.animate(i + ArrayListYPos.getObject().intValue(), m.arraylist_animY, 0.2f, 20);
                 m.arraylist_animX = m.arraylist_animX_timer.animate(font.getStringWidth(s) + ArrayListXPos.getObject().intValue(), m.arraylist_animX, 0.2f, 20);
                 i += 16;
             }
