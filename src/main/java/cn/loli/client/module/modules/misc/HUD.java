@@ -31,13 +31,14 @@ public class HUD extends Module {
 
     private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
-    List<Module> sort = new ArrayList<>();
+    List<Module> sort;
 
     public HUD() {
         super("HUD", "The heads up display overlay", ModuleCategory.MISC);
         setState(true);
         sort = Main.INSTANCE.moduleManager.getModules();
-        sort.sort(Comparator.comparingInt(m -> m.getName().length()));
+        HFontRenderer font = Main.fontLoaders.fonts.get("roboto16");
+        sort.sort(Comparator.comparingInt(m -> font.getStringWidth(m.getName())));
         sort = reverse(sort);
     }
 
@@ -58,6 +59,7 @@ public class HUD extends Module {
         int i = ArrayListYPos.getObject().intValue();
         for (Module m : sort) {
             if (m.getState()) {
+                System.out.println(font.getStringWidth(m.getName()));
                 String s = m.getName();
                 font.drawString(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, -1);
                 m.arraylist_animY = m.arraylist_animY_timer.animate(i + ArrayListYPos.getObject().intValue(), m.arraylist_animY, 0.2f, 20);

@@ -194,9 +194,6 @@ public class ClickGui extends GuiScreen {
                                     }else if (((NumberValue<?>) v).getMax() instanceof Long) {
                                         v.setObject((long) v1);
                                     }
-//                                    if (Math.abs(v1 - ((Number) v.getObject()).floatValue()) >= ((Number) v.getObject()).floatValue() / 20) {
-//                                        v.setObject(((Number) v.getObject()).floatValue() + (v1 > ((Number) v.getObject()).floatValue() ? ((Number) v.getObject()).floatValue() / 20 : -((Number) v.getObject()).floatValue() / 20));
-//                                    }
                                     if (v1 <= ((NumberValue<?>) v).getMin().floatValue()) {
                                         v.setObject(((NumberValue<?>) v).getMin().floatValue());
                                     }
