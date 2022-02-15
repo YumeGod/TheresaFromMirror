@@ -25,13 +25,14 @@ public class HUD extends Module {
     private final BooleanValue showClientInfo = new BooleanValue("ClientInfo", true);
     private final BooleanValue showArrayList = new BooleanValue("ArrayList", true);
     private final BooleanValue showNotifications = new BooleanValue("Notifications", true);
-    private NumberValue<Integer> ArrayListXPos = new NumberValue<>("ArrayListXPos", 0, 0, 15);
-    private NumberValue<Integer> ArrayListYPos = new NumberValue<>("ArrayListYPos", 0, 0, 15);
+    private NumberValue<Number> ArrayListXPos = new NumberValue<>("ArrayListXPos", 0, 0, 15);
+    private NumberValue<Number> ArrayListYPos = new NumberValue<>("ArrayListYPos", 0, 0, 15);
     public static ModeValue mode = new ModeValue("Mode", "Normal", "Normal");
 
     private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
     List<Module> sort = new ArrayList<>();
+
     public HUD() {
         super("HUD", "The heads up display overlay", ModuleCategory.MISC);
         setState(true);
@@ -58,9 +59,9 @@ public class HUD extends Module {
         for (Module m : sort) {
             if (m.getState()) {
                 String s = m.getName();
-                font.drawString(s, res.getScaledWidth() - m.arraylist_animX - ArrayListXPos.getObject(), m.arraylist_animY, -1);
-                m.arraylist_animY = m.arraylist_animY_timer.animate(i, m.arraylist_animY, 0.2f, 20);
-                m.arraylist_animX = m.arraylist_animX_timer.animate(font.getStringWidth(s), m.arraylist_animX, 0.2f, 20);
+                font.drawString(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, -1);
+                m.arraylist_animY = m.arraylist_animY_timer.animate(i, m.arraylist_animY +  ArrayListYPos.getObject().intValue(), 0.2f, 20);
+                m.arraylist_animX = m.arraylist_animX_timer.animate(font.getStringWidth(s) + ArrayListXPos.getObject().intValue(), m.arraylist_animX, 0.2f, 20);
                 i += 16;
             }
         }
