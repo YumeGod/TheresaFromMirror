@@ -47,7 +47,7 @@ public class ClickGui extends GuiScreen {
 
     private final AnimationUtils list_anim_timer = new AnimationUtils();//功能列表的缓动
     private final AnimationUtils gui_anim_timer = new AnimationUtils();//主界面的缓动
-    private float gui_anim, list_anim;
+    private static float gui_anim, list_anim;
 
     //搜索框
     private static String search_context;
@@ -181,7 +181,15 @@ public class ClickGui extends GuiScreen {
                                 Main.fontLoaders.get("roboto15").drawString(df.format(v.getObject()), x + width - 30 - (showValueX - 10) / 2, valuesY + 11, theme.value_number_value.getRGB(), false);
                                 if (((NumberValue<?>) v).clickgui_drag && Mouse.isButtonDown(0) && valuesY > y && valuesY + 20 < y + height) {
                                     float v1 = (mouseX - (x + width - showValueX + 10)) / (showValueX - 40) * (((NumberValue<?>) v).getMax().floatValue() - ((NumberValue<?>) v).getMin().floatValue()) + ((NumberValue<?>) v).getMin().floatValue();
-                                    v.setObject(v1);
+                                    if(((NumberValue<?>) v).getMax() instanceof Integer) {
+                                        v.setObject((int) v1);
+                                    }else if (((NumberValue<?>) v).getMax() instanceof Float) {
+                                        v.setObject(v1);
+                                    }else if (((NumberValue<?>) v).getMax() instanceof Double) {
+                                        v.setObject(((double) v1));
+                                    }else if (((NumberValue<?>) v).getMax() instanceof Long) {
+                                        v.setObject((long) v1);
+                                    }
 //                                    if (Math.abs(v1 - ((Number) v.getObject()).floatValue()) >= ((Number) v.getObject()).floatValue() / 20) {
 //                                        v.setObject(((Number) v.getObject()).floatValue() + (v1 > ((Number) v.getObject()).floatValue() ? ((Number) v.getObject()).floatValue() / 20 : -((Number) v.getObject()).floatValue() / 20));
 //                                    }
@@ -418,12 +426,12 @@ public class ClickGui extends GuiScreen {
                     if (curModule != m) {
                         if (Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName())).size() > 0) {
                             curModule = m;
-                            values_whell = 0;
                         } else
                             curModule = null;
                     } else {
                         curModule = null;
                     }
+                    values_whell = 0;
                 }
                 modsY += 40;
             }
