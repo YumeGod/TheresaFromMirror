@@ -34,8 +34,12 @@ public class BindCommand extends Command {
         if (args.length == 0) {
             throw new CommandException("Usage: ." + alias + " <module> [<none/show>]");
         }
-
-        Module mod = Main.INSTANCE.moduleManager.getModule(args[0], false);
+        Module mod = null;
+        for (Module m : Main.INSTANCE.moduleManager.getModules()){
+            if(m.getName().replaceAll(" ", "").equalsIgnoreCase(args[0])){
+                mod = m;
+            }
+        }
 
         if (mod == null) throw new CommandException("The module '" + args[0] + "' does not exist");
 
