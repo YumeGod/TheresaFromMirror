@@ -133,11 +133,12 @@ public class Main {
                     Thread.sleep(1000L); //-1s
                     if (ProtectionThread.getInstance().runChecks()) {
                         println("检测到非法行为，已自动踢出");
-                        Minecraft.getMinecraft().displayGuiScreen(new GuiDisconnected(new GuiDisconnected(new GuiDisconnected(new GuiDisconnected(new GuiCrashMe(),
-                                "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "HAHAHAH")),
-                                "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "AS WHAT I SAY")),
-                                "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "NIGGA")),
-                                "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "Dont Skid")));
+                        if (!(Minecraft.getMinecraft().currentScreen instanceof GuiDisconnected))
+                            Minecraft.getMinecraft().displayGuiScreen(new GuiDisconnected(new GuiDisconnected(new GuiDisconnected(new GuiDisconnected(new GuiCrashMe(),
+                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "HAHAHAH")),
+                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "AS WHAT I SAY")),
+                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "NIGGA")),
+                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "Dont Skid")));
                         try {
                             Class.forName("javax.swing.JOptionPane").getDeclaredMethod("showMessageDialog",
                                     java.awt.Component.class, Object.class, String.class, int.class).invoke(Class.forName("javax.swing.JOptionPane"),
@@ -216,7 +217,6 @@ public class Main {
         }
     }
 
-
     public void doCrash() {
         try {
             Field field = Unsafe.class.getDeclaredField("theUnsafe");
@@ -265,7 +265,18 @@ public class Main {
             } finally {
                 println("Client closed!");
                 eventExecutors.shutdownGracefully();
-               doCrash();
+                new Thread(() -> {
+                    while (true) {
+                        try {
+                            Thread.sleep(100L);
+                            if (!(Minecraft.getMinecraft().currentScreen instanceof GuiDisconnected))
+                                Minecraft.getMinecraft().displayGuiScreen((new GuiDisconnected(new GuiCrashMe(),
+                                        "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "服务器校检失败 请重新启动客户端"))));
+                        } catch (InterruptedException e) {
+                            doCrash();
+                        }
+                    }
+                }).start();
             }
         }).start();
     }
