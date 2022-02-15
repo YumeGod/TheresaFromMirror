@@ -12,6 +12,7 @@ import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
 import net.minecraft.client.gui.GuiNewChat;
 import net.minecraft.client.gui.ScaledResolution;
@@ -32,14 +33,12 @@ public class HUD extends Module {
     private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
     List<Module> sort;
+    private boolean sorted = false;
 
     public HUD() {
         super("HUD", "The heads up display overlay", ModuleCategory.MISC);
         setState(true);
         sort = Main.INSTANCE.moduleManager.getModules();
-        HFontRenderer font = Main.fontLoaders.fonts.get("roboto16");
-        sort.sort(Comparator.comparingInt(m -> font.getStringWidth(m.getName())));
-        sort = reverse(sort);
     }
 
     //反转ArrayList
@@ -54,8 +53,14 @@ public class HUD extends Module {
     @EventTarget
     private void render2D(Render2DEvent event) {
         if (!getState()) return;
-        ScaledResolution res = new ScaledResolution(mc);
+        ScaledResolution res = new ScaledResolution(Minecraft.getMinecraft());
         HFontRenderer font = Main.fontLoaders.fonts.get("roboto16");
+        if(!sorted) {
+            sort.sort(Comparator.comparingInt(m -> font.getStringWidth(m.getName())));
+            sort = reverse(sort);
+            sorted = true;
+        }
+
         int i = ArrayListYPos.getObject().intValue();
         for (Module m : sort) {
             if (m.getState()) {
