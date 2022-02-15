@@ -132,13 +132,7 @@ public class Main {
 
     @EventTarget
     private void onMisc(UpdateEvent e) {
-        if (Minecraft.getMinecraft().thePlayer.isPotionActive(Potion.blindness)) {
-            Minecraft.getMinecraft().thePlayer.removePotionEffect(Potion.blindness.id);
-        }
-
-        if (Minecraft.getMinecraft().thePlayer.isPotionActive(Potion.confusion)) {
-            Minecraft.getMinecraft().thePlayer.removePotionEffect(Potion.confusion.id);
-        }
+        new ExploitFix(null);
     }
 
     @EventTarget
