@@ -148,38 +148,10 @@ public class Main {
             ms.reset();
         }
 
-        if (e.getPacket() instanceof S02PacketLoginSuccess)
-            ProtectionThread.getInstance().runChecks();
+    //    if (e.getPacket() instanceof S02PacketLoginSuccess)
+    //        ProtectionThread.getInstance().runChecks();
 
-        if (e.getPacket() instanceof S48PacketResourcePackSend) {
-            ChatUtils.info("Receive A Request about resource pack one");
-            ChatUtils.info("Hash: " + ((S48PacketResourcePackSend) e.getPacket()).getHash());
-            ChatUtils.info("URL: " + ((S48PacketResourcePackSend) e.getPacket()).getURL());
-
-            if (!((S48PacketResourcePackSend) e.getPacket()).getURL().toLowerCase().contains("resource")){
-                ChatUtils.info("BaiPai A Nigga Check");
-                Minecraft.getMinecraft().getNetHandler().getNetworkManager().sendPacket(new C19PacketResourcePackStatus("MC" , C19PacketResourcePackStatus.Action.DECLINED));
-                e.setCancelled(true);
-            }
-        }
-
-        if (e.getPacket() instanceof S27PacketExplosion) {
-            if (Math.abs(((S27PacketExplosion) e.getPacket()).getStrength()) > 99 ||
-                    Math.abs(((S27PacketExplosion) e.getPacket()).getX()) > 99
-                    || Math.abs(((S27PacketExplosion) e.getPacket()).getY()) > 99
-                    || Math.abs(((S27PacketExplosion) e.getPacket()).getZ()) > 99) {
-                e.setCancelled(true);
-            }
-        }
-
-        if (e.getPacket() instanceof S2APacketParticles) {
-            if (Math.abs(((S2APacketParticles) e.getPacket()).getParticleSpeed()) > 10) {
-                e.setCancelled(true);
-            }
-            if (((S2APacketParticles) e.getPacket()).getParticleCount() > 500) {
-                e.setCancelled(true);
-            }
-        }
+        new ExploitFix(e);
     }
 
     @EventTarget
