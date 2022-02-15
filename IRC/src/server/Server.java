@@ -16,8 +16,17 @@ import java.util.concurrent.TimeUnit;
 
 public class Server {
     public static ChannelFuture cf;
+    public static int port;
+    public static String datebase;
+    public static String datebaseUserName;
+    public static String datebasePassword;
+
 
     public static void main(String[] args) {
+        port = Integer.parseInt(args[0]);
+        datebase = args[1];
+        datebasePassword = args[2];
+
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -32,13 +41,11 @@ public class Server {
                             socketChannel.pipeline().addLast("encoder",new StringEncoder());
                             socketChannel.pipeline().addLast(new IdleStateHandler(10,20,25, TimeUnit.SECONDS));
                             socketChannel.pipeline().addLast(new NettyServerHandler());
-
-
                         }
                     });
 
             try {
-                cf = bootstrap.bind(6668).sync();
+                cf = bootstrap.bind(port).sync();
                 System.out.println("Server started!");
                 cf.channel().closeFuture().sync();
             } catch (InterruptedException e) {

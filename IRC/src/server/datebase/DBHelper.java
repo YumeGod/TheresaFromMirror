@@ -1,5 +1,7 @@
 package server.datebase;
 
+import server.Server;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -8,9 +10,9 @@ public class DBHelper {
 
     private static Connection Conn;
 
-    private static String URL = "jdbc:mysql://localhost:3306/fpsmaster";
-    private static String UserName = "FPSMaster";
-    private static String Password = "DaG7mySiEWAXYHGk";
+    private static String URL = "jdbc:mysql://localhost:3306/"+ Server.datebase;
+    private static String UserName = Server.datebaseUserName;
+    private static String Password = Server.datebasePassword;
 
     public static Connection getConnection() {
 
