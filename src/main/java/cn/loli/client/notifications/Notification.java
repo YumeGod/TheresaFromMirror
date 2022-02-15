@@ -90,8 +90,7 @@ public class Notification {
         RenderUtils.drawRoundRect(res.getScaledWidth() - offset, res.getScaledHeight() - height - heightOffset, res.getScaledWidth() - offset + 2, res.getScaledHeight() - 10 - heightOffset, 2, ribbonColor.getRGB());
 
 //        fontRenderer.drawString(title, ((int) (res.getScaledWidth() - offset + 8)), (int) ((res.getScaledHeight() - height - heightOffset)) - 3, -1);
-
-        RenderUtils.drawImage(new ResourceLocation("/theresa/icons/" + type.name().toLowerCase(Locale.ROOT) + ".png"), (int) (res.getScaledWidth() - offset) + 4, (int) (res.getScaledHeight() - height - heightOffset) + 2, 10, 10);
+        RenderUtils.drawImage(new ResourceLocation("theresa/icons/" + type.name().toLowerCase(Locale.ROOT) + ".png"), (int) (res.getScaledWidth() - offset) + 4, (int) (res.getScaledHeight() - height - heightOffset) + 2, 10, 10);
         Main.fontLoaders.fonts.get("inter14").drawString(messsage, (int) (res.getScaledWidth() - offset + 22), (int) (res.getScaledHeight() - height - heightOffset) + 3, new Color(0, 0, 0).getRGB());
     }
 }
