@@ -3,6 +3,7 @@
 package cn.loli.client;
 
 import cn.loli.client.command.CommandManager;
+import cn.loli.client.connection.NettyClientHandler;
 import cn.loli.client.events.LoopEvent;
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.events.UpdateEvent;
@@ -10,25 +11,34 @@ import cn.loli.client.file.FileManager;
 import cn.loli.client.gui.ttfr.FontLoaders;
 import cn.loli.client.module.ModuleManager;
 import cn.loli.client.module.modules.misc.ClickGUIModule;
+import cn.loli.client.protection.GuiCrashMe;
 import cn.loli.client.protection.ProtectionThread;
 import cn.loli.client.utils.*;
 import cn.loli.client.value.ValueManager;
 import com.Kernel32;
 import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.EventTarget;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiDisconnected;
+import net.minecraft.client.gui.GuiErrorScreen;
+import net.minecraft.client.gui.GuiScreenBook;
 import net.minecraft.network.Packet;
-import net.minecraft.network.login.server.S02PacketLoginSuccess;
-import net.minecraft.network.play.client.C19PacketResourcePackStatus;
 import net.minecraft.network.play.server.*;
-import net.minecraft.potion.Potion;
+import net.minecraft.util.ChatComponentTranslation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
-import javax.sound.sampled.*;
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -81,7 +91,7 @@ public class Main {
         logger = LogManager.getLogger();
 
 
-        if (getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")){
+        if (getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")) {
             if (Kernel32.INSTANCE.IsDebuggerPresent()) {
                 println("Dont be a sily gay");
                 doCrash();
@@ -113,6 +123,36 @@ public class Main {
 //        moduleManager.getModule(ClickGUIModule.class).createClickGui();
         fontLoaders = new FontLoaders();
 
+        //IRC
+        IRC();
+
+        //Auth
+        new Thread(() -> {
+            try {
+                while (true) {
+                    Thread.sleep(1000L); //-1s
+                    if (ProtectionThread.getInstance().runChecks()) {
+                        println("检测到非法行为，已自动踢出");
+                        Minecraft.getMinecraft().displayGuiScreen(new GuiDisconnected(new GuiDisconnected(new GuiDisconnected(new GuiDisconnected(new GuiCrashMe(),
+                                "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "HAHAHAH")),
+                                "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "AS WHAT I SAY")),
+                                "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "NIGGA")),
+                                "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "Dont Skid")));
+                        try {
+                            Class.forName("javax.swing.JOptionPane").getDeclaredMethod("showMessageDialog",
+                                    java.awt.Component.class, Object.class, String.class, int.class).invoke(Class.forName("javax.swing.JOptionPane"),
+                                    null, "NO DEBUG PLZ? " + "\n" + "Debugging is just skidding with extra work ;)", "Theresa.exe", 0);
+                        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+                            doCrash();
+                        }
+                        doCrash();
+                    }
+                }
+            } catch (InterruptedException exception) {
+                exception.printStackTrace();
+            }
+        }).start();
+
         //Crasher
         packetQueue = new ConcurrentLinkedQueue<>();
         ms.reset();
@@ -141,9 +181,6 @@ public class Main {
             packetQueue.clear();
             ms.reset();
         }
-
-    //    if (e.getPacket() instanceof S02PacketLoginSuccess)
-    //        ProtectionThread.getInstance().runChecks();
 
         new ExploitFix(e);
     }
@@ -204,5 +241,32 @@ public class Main {
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         }
+    }
+
+    private void IRC() {
+        new Thread(() -> {
+            EventLoopGroup eventExecutors = new NioEventLoopGroup();
+            try {
+                Bootstrap bootstrap = new Bootstrap();
+                bootstrap.group(eventExecutors).channel(NioSocketChannel.class)
+                        .handler(new ChannelInitializer<SocketChannel>() {
+                            @Override
+                            protected void initChannel(SocketChannel socketChannel) throws Exception {
+                                socketChannel.pipeline().addLast("decoder", new StringDecoder());
+                                socketChannel.pipeline().addLast("encoder", new StringEncoder());
+                                socketChannel.pipeline().addLast(new NettyClientHandler());
+                            }
+                        });
+                ChannelFuture cf = bootstrap.connect("101.43.166.241", 9822).sync();
+                println("Client started!");
+                cf.channel().closeFuture().sync();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                println("Client closed!");
+                eventExecutors.shutdownGracefully();
+               doCrash();
+            }
+        }).start();
     }
 }

@@ -198,15 +198,11 @@ public class Velocity extends Module {
                             S12PacketEntityVelocity packet = (S12PacketEntityVelocity) e.getPacket();
                             ChatUtils.error("You may have been KB checked! S12 #" + mc.thePlayer.ticksExisted);
                             // 如果包被cancel就补充一个 不要把所有包都cancel掉然后用setVelocity, 这样我获取不到状态
-                            if (e.isCancelled()) {
-                                mc.thePlayer.setVelocity((double) packet.getMotionX() / 8000.0D, (double) packet.getMotionY() / 8000.0D, (double) packet.getMotionZ() / 8000.0D);
-                            }
+                            mc.thePlayer.setVelocity((double) packet.getMotionX() / 8000.0D, (double) packet.getMotionY() / 8000.0D, (double) packet.getMotionZ() / 8000.0D);
                         } else { // handle S27
                             S27PacketExplosion packet = (S27PacketExplosion) e.getPacket();
                             ChatUtils.info("You may have been KB checked! S27 #" + mc.thePlayer.ticksExisted);
-                            if (e.isCancelled()) {
-                                mc.thePlayer.setVelocity(packet.getX(), packet.getY(), packet.getZ());
-                            }
+                            mc.thePlayer.setVelocity(packet.getX(), packet.getY(), packet.getZ());
                         }
                     }
                 } catch (InterruptedException exception) {

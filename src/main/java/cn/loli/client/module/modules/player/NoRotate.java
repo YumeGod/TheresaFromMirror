@@ -17,8 +17,51 @@ public class NoRotate extends Module {
     public void onPacket(PacketEvent event) {
         if (event.getPacket() instanceof S08PacketPlayerPosLook) {
             if (mc.thePlayer != null && mc.theWorld != null && mc.thePlayer.rotationYaw != -180.0f && mc.thePlayer.rotationPitch != 0.0f) {
-                mc.thePlayer.setPositionAndRotation(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(), ((S08PacketPlayerPosLook) event.getPacket()).getZ(),
-                        mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
+                double d0 = ((S08PacketPlayerPosLook) event.getPacket()).getX();
+                double d1 = ((S08PacketPlayerPosLook) event.getPacket()).getY();
+                double d2 = ((S08PacketPlayerPosLook) event.getPacket()).getZ();
+                float f = ((S08PacketPlayerPosLook) event.getPacket()).getYaw();
+                float f1 = ((S08PacketPlayerPosLook) event.getPacket()).getPitch();
+
+                if (((S08PacketPlayerPosLook) event.getPacket()).func_179834_f().contains(S08PacketPlayerPosLook.EnumFlags.X))
+                {
+                    d0 += mc.thePlayer.posX;
+                }
+                else
+                {
+                    mc.thePlayer.motionX = 0.0D;
+                }
+
+                if (((S08PacketPlayerPosLook) event.getPacket()).func_179834_f().contains(S08PacketPlayerPosLook.EnumFlags.Y))
+                {
+                    d1 += mc.thePlayer.posY;
+                }
+                else
+                {
+                    mc.thePlayer.motionY = 0.0D;
+                }
+
+                if (((S08PacketPlayerPosLook) event.getPacket()).func_179834_f().contains(S08PacketPlayerPosLook.EnumFlags.Z))
+                {
+                    d2 += mc.thePlayer.posZ;
+                }
+                else
+                {
+                    mc.thePlayer.motionZ = 0.0D;
+                }
+
+                if (((S08PacketPlayerPosLook) event.getPacket()).func_179834_f().contains(S08PacketPlayerPosLook.EnumFlags.X_ROT))
+                {
+                    f1 += mc.thePlayer.rotationPitch;
+                }
+
+                if (((S08PacketPlayerPosLook) event.getPacket()).func_179834_f().contains(S08PacketPlayerPosLook.EnumFlags.Y_ROT))
+                {
+                    f += mc.thePlayer.rotationYaw;
+                }
+
+                mc.thePlayer.setPositionAndRotation(d0, d1, d2, f, f1);
+                
                 mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
                         ((S08PacketPlayerPosLook) event.getPacket()).getZ(), ((S08PacketPlayerPosLook) event.getPacket()).getYaw(), ((S08PacketPlayerPosLook) event.getPacket()).getPitch(), false));
                 event.setCancelled(true);

@@ -37,7 +37,7 @@ public class FontLoaders {
         for (int i = 12; i <= 18; ++i) {
             fonts.put("wqy_microhei" + i, getFont("wqy_microhei", i));
         }
-        System.out.println("Fonts loading used " + (System.currentTimeMillis() - time) / 1000d + " seconds");
+        Main.INSTANCE.println("Fonts loading used " + (System.currentTimeMillis() - time) / 1000d + " seconds");
     }
 
     public HFontRenderer get(String name, int size) {
@@ -62,7 +62,7 @@ public class FontLoaders {
             font = font.deriveFont(0, size);
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.out.println("Error loading font");
+            Main.INSTANCE.println("Error loading font");
             font = new Font("default", 0, size);
         }
 

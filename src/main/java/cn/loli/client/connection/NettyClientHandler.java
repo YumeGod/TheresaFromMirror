@@ -13,7 +13,7 @@ import java.util.Objects;
 public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        System.out.println("Client connected!");
+        Main.INSTANCE.println("Client connected!");
         ctx.channel().writeAndFlush(Unpooled.copiedBuffer("LOGIN@SKID@" + Main.CLIENT_NAME + "|" + Main.CLIENT_VERSION, CharsetUtil.UTF_8));
         new Thread(() -> {
             while (true) {
@@ -28,13 +28,12 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
     }
 
 
-
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, String s) {
         Packet p = PacketUtil.unpack(s);
         String result = "";
         if (p != null) {
-            System.out.println("[DEBUG]" + p.type.name() + "  -  " + p.content);
+            Main.INSTANCE.println("[DEBUG]" + p.type.name() + "  -  " + p.content);
             switch (p.type) {
                 case LOGIN:
                     result = s;
