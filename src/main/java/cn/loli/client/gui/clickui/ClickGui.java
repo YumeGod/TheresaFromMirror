@@ -103,9 +103,13 @@ public class ClickGui extends GuiScreen {
         float w = mouseX + sizeDragX - x;
         float h = mouseY + sizeDragY - y;
         //设置窗口大小
-        if (sizeDrag && ((width > WINDOW_MAX_WIDTH && height > WINDOW_MAX_HEIGHT) || (w > width && h > height))) {
-            width = w;
-            height = h;
+        if (sizeDrag) {
+            if(w > WINDOW_MAX_WIDTH) {
+                width = w;
+            }
+            if(h > WINDOW_MAX_HEIGHT) {
+                height = h;
+            }
         }
         //绘制主窗体
         RenderUtils.drawRoundRect(x, y, x + width, y + height, 2, theme.bg.getRGB());//背景
