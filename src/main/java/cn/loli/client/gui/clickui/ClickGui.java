@@ -424,6 +424,8 @@ public class ClickGui extends GuiScreen {
                 }
                 if (isHovered(x + leftMenuWidth + 10, Math.max(modsY, y + 35), x + width - 10 - showValueX, Math.min(modsY + 30, y + height), mouseX, mouseY) && mouseButton == 1) {
                     //打开功能values列表
+                    values_whell = 0;
+                    values_whelltemp = 0;
                     if (curModule != m) {
                         if (Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName())).size() > 0) {
                             curModule = m;
@@ -432,7 +434,6 @@ public class ClickGui extends GuiScreen {
                     } else {
                         curModule = null;
                     }
-                    values_whell = 0;
                 }
                 modsY += 40;
             }

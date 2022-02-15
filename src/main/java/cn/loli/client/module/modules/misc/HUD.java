@@ -64,7 +64,6 @@ public class HUD extends Module {
         int i = ArrayListYPos.getObject().intValue();
         for (Module m : sort) {
             if (m.getState()) {
-                System.out.println(font.getStringWidth(m.getName()));
                 String s = m.getName();
                 font.drawString(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, -1);
                 m.arraylist_animY = m.arraylist_animY_timer.animate(i + ArrayListYPos.getObject().intValue(), m.arraylist_animY, 0.2f, 20);

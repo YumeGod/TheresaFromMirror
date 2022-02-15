@@ -37,13 +37,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String o) throws Exception {
         Channel channel = ctx.channel();
-        channelGroup.forEach(channel1 -> {
-            if (channel1 != channel) {
-                channel.writeAndFlush(o);
-            } else {
-                channel.writeAndFlush(o);
-            }
-        });
 //        System.out.println("[DEBUG]"+o);
         Packet p = unpack(o);
         if (p != null) {
@@ -60,19 +53,30 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                     break;
                 case HEARTBEAT:
                     if (Objects.equals(p.content, "PING!")) {
-//                        ctx.writeAndFlush("PONG!");
                         ctx.channel().pipeline().writeAndFlush("PONG!");
                     }
                     break;
                 case EXIT:
+                    channelGroup.forEach(channel1 -> {
+                        if (channel1 != channel) {
+                            channel.writeAndFlush(o);
+                        } else {
+                            channel.writeAndFlush(o);
+                        }
+                    });
                     break;
                 case MESSAGE:
+                    channelGroup.forEach(channel1 -> {
+                        if (channel1 != channel) {
+                            channel.writeAndFlush(o);
+                        } else {
+                            channel.writeAndFlush(o);
+                        }
+                    });
                     break;
             }
-
-
         } else {
-            System.out.println("[Packet Exception]" + ctx.channel().remoteAddress() + "    " + o);
+            System.out.println("[NullPacket]" + ctx.channel().remoteAddress() + "    " + o);
             ctx.close();
         }
     }

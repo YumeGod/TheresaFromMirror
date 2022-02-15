@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" inherit-compiler-output="true">
+  <component name="NewModuleRootManager">
+    <output url="file:///production/IRC" />
+    <output-test url="file:///test/IRC" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/IRC">
       <sourceFolder url="file://$MODULE_DIR$/IRC/src" isTestSource="false" />
