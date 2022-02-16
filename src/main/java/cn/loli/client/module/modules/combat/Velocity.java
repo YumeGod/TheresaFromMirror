@@ -77,10 +77,7 @@ public class Velocity extends Module {
 
             if (kbAlert.getObject()) kbAlert(event);
 
-            if (horizon.getObject() == 0 && vertical.getObject() == 0) {
-                event.setCancelled(true);
-                return;
-            }
+            event.setCancelled(horizon.getObject() == 0 && vertical.getObject() == 0);
 
             //Editing
             ((IS27PacketExplosion) packet).setX(packet.func_149149_c() * hor);

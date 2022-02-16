@@ -179,20 +179,18 @@ public class CrashUtils {
                 builder.append("text:").append(sign).append("}");
                 break;
             case 1:
-                builder.append("{");
                 for (int size = 0; size < bookvalue; ++size) {
-                    builder.append("translate:chat.type.text,with:[");
+                    builder.append("{translate:chat.type.text,with:[");
                 }
-                builder.append("text:").append(sign);
+                builder.append("{").append("text:").append(sign);
                 for (int size = 0; size < bookvalue; ++size) {
-                    builder.append("}],");
+                    builder.append("}]");
                 }
                 builder.append("}");
                 break;
             case 2:
                 for (int size = 0; size < bookvalue; ++size)
                     builder.append(sign);
-                break;
         }
 
 

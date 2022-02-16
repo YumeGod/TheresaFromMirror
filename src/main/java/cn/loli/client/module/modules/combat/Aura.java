@@ -137,7 +137,8 @@ public class Aura extends Module {
             attacktimer.reset();
         }
 
-        if (target != null) {
+
+        if (target != null && show.getObject()) {
             EntityLivingBase entity = target;
 
             double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * ((IAccessorMinecraft) mc).getTimer().renderPartialTicks
@@ -147,7 +148,7 @@ public class Aura extends Module {
             double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * ((IAccessorMinecraft) mc).getTimer().renderPartialTicks
                     - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosZ();
 
-            if (entity.hurtTime > 0)
+            if (entity.hurtTime > 6)
                 RenderUtils.drawWolframEntityESP(entity, (new Color(255, 102, 113)).getRGB(), x, y, z);
             else
                 RenderUtils.drawWolframEntityESP(entity, espColor.getObject().getRGB(), x, y, z);

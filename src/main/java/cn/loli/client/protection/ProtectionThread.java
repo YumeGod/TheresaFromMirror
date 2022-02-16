@@ -61,8 +61,7 @@ public final class ProtectionThread {
             "fiddler",
             "joeboxserver.exe",
             "joeboxcontrol.exe",
-            "blnsvr.exe",
-            "pakkit.exe"
+            "blnsvr.exe"
     };
 
     // Note: WHEN DEBUGGING IN CLIENT, REMOVE -javaagent

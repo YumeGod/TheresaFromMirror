@@ -124,7 +124,7 @@ public class Main {
         fontLoaders = new FontLoaders();
 
         //IRC
-        IRC();
+//        IRC();
 
         //Auth
         new Thread(() -> {
