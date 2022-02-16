@@ -185,6 +185,13 @@ public class ClickGui extends GuiScreen {
                                 Main.fontLoaders.get("roboto15").drawString(df.format(v.getObject()), x + width - 30 - (showValueX - 10) / 2, valuesY + 11, theme.value_number_value.getRGB(), false);
                                 if (((NumberValue<?>) v).clickgui_drag && Mouse.isButtonDown(0) && valuesY > y && valuesY + 20 < y + height) {
                                     float v1 = (mouseX - (x + width - showValueX + 10)) / (showValueX - 40) * (((NumberValue<?>) v).getMax().floatValue() - ((NumberValue<?>) v).getMin().floatValue()) + ((NumberValue<?>) v).getMin().floatValue();
+                                    if (v1 <= ((NumberValue<?>) v).getMin().floatValue()) {
+                                        v1 = (((NumberValue<?>) v).getMin().floatValue());
+                                    }
+
+                                    if (v1 >= ((NumberValue<?>) v).getMax().floatValue()) {
+                                        v1 = (((NumberValue<?>) v).getMax().floatValue());
+                                    }
                                     if(((NumberValue<?>) v).getMax() instanceof Integer) {
                                         v.setObject((int) v1);
                                     }else if (((NumberValue<?>) v).getMax() instanceof Float) {
@@ -193,13 +200,6 @@ public class ClickGui extends GuiScreen {
                                         v.setObject(((double) v1));
                                     }else if (((NumberValue<?>) v).getMax() instanceof Long) {
                                         v.setObject((long) v1);
-                                    }
-                                    if (v1 <= ((NumberValue<?>) v).getMin().floatValue()) {
-                                        v.setObject(((NumberValue<?>) v).getMin().floatValue());
-                                    }
-
-                                    if (v1 >= ((NumberValue<?>) v).getMax().floatValue()) {
-                                        v.setObject(((NumberValue<?>) v).getMax().floatValue());
                                     }
                                 } else {
                                     ((NumberValue<?>) v).clickgui_drag = false;
