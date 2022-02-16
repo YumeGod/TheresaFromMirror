@@ -11,6 +11,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
+import org.apache.commons.lang3.StringUtils;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
@@ -123,7 +124,8 @@ public class ClickGui extends GuiScreen {
         float my = y + 60;
         RenderUtils.drawRect(x, y + slider.top - 5, x + leftMenuWidth, y + slider.top + 25, theme.slider.getRGB());//滑块条
         for (ModuleCategory m : ModuleCategory.values()) {
-            Main.fontLoaders.get("roboto20").drawString(m.name(), x + leftMenuWidth / 2 - 20, my, curType == m ? theme.cate_sel.getRGB() : theme.cate_unsel.getRGB());
+            //capitalize方法: 把全部小写的一串字母转换成开头大写
+            Main.fontLoaders.get("roboto20").drawString(StringUtils.capitalize(StringUtils.lowerCase(m.name())), x + leftMenuWidth / 2 - 20, my, curType == m ? theme.cate_sel.getRGB() : theme.cate_unsel.getRGB());
             RenderUtils.drawImage(new ResourceLocation("theresa/icons/" + m.name().toLowerCase() + ".png"), x + leftMenuWidth / 2 - 35, my - 2, 8, 8);
             my += 30;
         }

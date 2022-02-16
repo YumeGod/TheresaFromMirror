@@ -6,6 +6,7 @@ import cn.loli.client.Main;
 import cn.loli.client.events.*;
 import cn.loli.client.module.modules.movement.NoSlowDown;
 import cn.loli.client.module.modules.render.BlockHit;
+import cn.loli.client.module.modules.render.ViewClip;
 import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.client.Minecraft;
@@ -13,13 +14,16 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.AxisAlignedBB;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityPlayerSP.class)
 public class MixinEntityPlayerSP extends MixinEntity {
+    @Shadow public float timeInPortal;
     private double cachedX;
     private double cachedY;
     private double cachedZ;

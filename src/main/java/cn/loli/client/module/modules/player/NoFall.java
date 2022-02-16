@@ -17,7 +17,7 @@ import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.network.play.client.C03PacketPlayer;
 
 public class NoFall extends Module {
-    private final ModeValue mode = new ModeValue("Mode", "Packet", "Packet","Vulcan");
+    private final ModeValue mode = new ModeValue("Mode", "Packet", "Packet", "Vulcan");
 
     public NoFall() {
         super("NoFall", "Negates fall damage.", ModuleCategory.PLAYER);
@@ -25,8 +25,8 @@ public class NoFall extends Module {
 
     @EventTarget
     public void onUpdate(MotionUpdateEvent event) {
-        if (mc.thePlayer == null || mc.theWorld == null && mc.thePlayer.capabilities.isFlying || mc.thePlayer.capabilities.disableDamage
-                || mc.thePlayer.motionY >= 0.0d || !(mc.thePlayer.posY > 0) || event.getEventType() == EventType.POST)
+        if (mc.thePlayer == null || mc.theWorld == null || mc.thePlayer.capabilities.isFlying || mc.thePlayer.capabilities.disableDamage
+                || mc.thePlayer.motionY >= 0.0d || mc.thePlayer.posY <= 0 || event.getEventType() == EventType.POST)
             return;
 
         if (mode.getCurrentMode().equalsIgnoreCase("Packet")) {
@@ -36,7 +36,7 @@ public class NoFall extends Module {
         } else if (mode.getCurrentMode().equalsIgnoreCase("Vulcan")) {
             // 随手写的，可以bypass, 如果不重置motionY会爆vClip flag.
             if (mc.thePlayer.fallDistance > 2F) {
-                double lastReportedY = ((IAccessorEntityPlayerSP)mc.thePlayer).getLastReportedPosY();
+                double lastReportedY = ((IAccessorEntityPlayerSP) mc.thePlayer).getLastReportedPosY();
                 if (lastReportedY - Math.floor(lastReportedY) < 0.8F) {
                     event.setY(Math.floor(lastReportedY));
                     event.setOnGround(true);
@@ -44,8 +44,7 @@ public class NoFall extends Module {
                     mc.thePlayer.motionY = -0.0784000015258789;
                 }
             }
-        }
-        else {
+        } else {
             NotificationManager.show(new Notification(NotificationType.WARNING, this.getName(), "Invalid mode: " + mode.getCurrentMode(), 2));
         }
     }

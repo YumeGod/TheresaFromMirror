@@ -117,7 +117,8 @@ public class DamnBridge extends Module {
                             if (place) {
                                 mc.thePlayer.rotationYaw = angles[0];
                                 mc.thePlayer.rotationPitch = angles[1];
-                                mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getCurrentEquippedItem(), neighbor, side2, hitVec);
+                                KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), true);
+                                KeyBinding.setKeyBindState(mc.gameSettings.keyBindBack.getKeyCode(), false);
                                 lastBlock = pos;
                             }
                             return true;
