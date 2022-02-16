@@ -11,9 +11,11 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
+import me.superskidder.datebase.VisitMySql;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 public class Server {
@@ -34,34 +36,52 @@ public class Server {
             ranks.put(r.split(",")[0], r.split(",")[1]);
         }
 
-        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
-        try {
-            ServerBootstrap bootstrap = new ServerBootstrap();
-            bootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
-                    .option(ChannelOption.SO_BACKLOG, 128)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true)
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast("decoder", new StringDecoder());
-                            socketChannel.pipeline().addLast("encoder", new StringEncoder());
-                            socketChannel.pipeline().addLast(new IdleStateHandler(10, 20, 25, TimeUnit.SECONDS));
-                            socketChannel.pipeline().addLast(new NettyServerHandler());
-                        }
-                    });
-
+        Thread thread = new Thread(() -> {
+            EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+            EventLoopGroup workerGroup = new NioEventLoopGroup();
             try {
-                cf = bootstrap.bind(port).sync();
-                System.out.println("Server started!");
-                cf.channel().closeFuture().sync();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                ServerBootstrap bootstrap = new ServerBootstrap();
+                bootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
+                        .option(ChannelOption.SO_BACKLOG, 128)
+                        .childOption(ChannelOption.SO_KEEPALIVE, true)
+                        .childHandler(new ChannelInitializer<SocketChannel>() {
+                            @Override
+                            protected void initChannel(SocketChannel socketChannel) throws Exception {
+                                socketChannel.pipeline().addLast("decoder", new StringDecoder());
+                                socketChannel.pipeline().addLast("encoder", new StringEncoder());
+                                socketChannel.pipeline().addLast(new IdleStateHandler(10, 20, 25, TimeUnit.SECONDS));
+                                socketChannel.pipeline().addLast(new NettyServerHandler());
+                            }
+                        });
+
+                try {
+                    cf = bootstrap.bind(port).sync();
+                    System.out.println("Server started!");
+                    cf.channel().closeFuture().sync();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } finally {
+                System.out.println("Server closed!");
+                bossGroup.shutdownGracefully();
+                workerGroup.shutdownGracefully();
             }
-        } finally {
-            System.out.println("Server closed!");
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
+        });
+        thread.start();
+        Scanner sc = new Scanner(System.in);
+        while (sc.hasNext()) {
+            String s = sc.nextLine();
+            if (s.equals("stop")) {
+                System.exit(0);
+            }
+            if (s.startsWith("register ")) {
+                String[] ss = s.split(" ");
+                if (ss.length != 3) {
+                    System.out.println("Invalid args!");
+                } else {
+                    VisitMySql.register(ss[1], ss[2]);
+                }
+            }
         }
     }
 }
