@@ -6,6 +6,8 @@ import cn.loli.client.events.PacketEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.ChatUtils;
+import cn.loli.client.utils.MoveUtils;
+import cn.loli.client.utils.PlayerUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import com.darkmagician6.eventapi.EventTarget;
@@ -22,6 +24,7 @@ import java.util.Random;
 
 public class NoSlowDown extends Module {
     private final BooleanValue itemswitch = new BooleanValue("New", false);
+    private final BooleanValue onlyOnMove = new BooleanValue("Only on move", false);
 
     public NoSlowDown() {
         super("NoSlowDown", "You wont get slowdown when you hold or eating", ModuleCategory.MOVEMENT);
@@ -33,7 +36,7 @@ public class NoSlowDown extends Module {
                 || mc.theWorld == null)
             return;
 
-        if (!mc.thePlayer.isUsingItem() || (mc.thePlayer.getHeldItem().getItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemBow))
+        if (!mc.thePlayer.isUsingItem() || (mc.thePlayer.getHeldItem().getItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemBow) || (onlyOnMove.getObject() && !PlayerUtils.isMoving()))
             return;
 
         if (event.getEventType() == EventType.PRE) {
