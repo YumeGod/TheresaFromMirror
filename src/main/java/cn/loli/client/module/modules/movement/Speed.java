@@ -174,29 +174,28 @@ public class Speed extends Module {
                         if (mc.thePlayer.onGround) {
                             if (Main.INSTANCE.moduleManager.getModule(Aura.class).target != null && crit.getObject()) {
                                 int ht = Main.INSTANCE.moduleManager.getModule(Aura.class).target.hurtResistantTime;
-                                ChatUtils.info(String.valueOf(ht));
-                                double var1 = ThreadLocalRandom.current().nextDouble(0.00119, 0.0041921599284565),
-                                        var2 = ThreadLocalRandom.current().nextDouble(0.00195542334, 0.025542334),
-                                        var3 = ThreadLocalRandom.current().nextDouble(1.5E-4, 1.63166800276E-4);
+                                double var1 = ThreadLocalRandom.current().nextDouble(0.01435, 0.01439),
+                                        var2 = ThreadLocalRandom.current().nextDouble(0.000468, 0.000470),
+                                        var3 = ThreadLocalRandom.current().nextDouble(1.5E-7, 1.63166800276E-7);
                                 switch (ht) {
                                     case 20: {
                                         event.setOnGround(false);
                                         event.setY(mc.thePlayer.posY + var1);
                                         break;
                                     }
-                                    case 19: {
-                                        event.setOnGround(false);
-                                        event.setY(mc.thePlayer.posY + var2);
-                                        break;
-                                    }
                                     case 18: {
                                         event.setOnGround(false);
-                                        event.setY(mc.thePlayer.posY + var1 * 1.2 - var3);
+                                        event.setY(mc.thePlayer.posY + var2 + var3);
+                                        break;
+                                    }
+                                    case 19: {
+                                        event.setOnGround(false);
+                                        event.setY(mc.thePlayer.posY + var1 - var3);
                                         break;
                                     }
                                     case 17: {
                                         event.setOnGround(false);
-                                        event.setY(mc.thePlayer.posY + var2 * 1.2 - var3);
+                                        event.setY(mc.thePlayer.posY + var2);
                                         break;
                                     }
                                 }

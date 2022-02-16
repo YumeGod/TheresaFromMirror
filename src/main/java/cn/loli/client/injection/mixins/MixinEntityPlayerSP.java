@@ -11,6 +11,7 @@ import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.AxisAlignedBB;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -72,7 +73,6 @@ public class MixinEntityPlayerSP extends MixinEntity {
 
     @Redirect(method = "onUpdateWalkingPlayer", at = @At(value = "FIELD", target = "Lnet/minecraft/util/AxisAlignedBB;minY:D"))
     private double posY(AxisAlignedBB instance) {return posY;}
-
 
     @Inject(method = "onUpdate", at = @At("RETURN"))
     private void onUpdate(CallbackInfo ci) {
