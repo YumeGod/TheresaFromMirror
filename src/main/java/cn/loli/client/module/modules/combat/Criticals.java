@@ -94,22 +94,22 @@ public class Criticals extends Module {
                                 var2 = ThreadLocalRandom.current().nextDouble(0.000468, 0.000470),
                                 var3 = ThreadLocalRandom.current().nextDouble(1.5E-7, 1.63166800276E-7);
                         switch (ht) {
-                            case 19: {
+                            case 20: {
                                 e.setOnGround(false);
                                 e.setY(mc.thePlayer.posY + var1);
                                 break;
                             }
-                            case 18: {
+                            case 19: {
                                 e.setOnGround(false);
                                 e.setY(mc.thePlayer.posY + var2 + var3);
                                 break;
                             }
-                            case 17: {
+                            case 18: {
                                 e.setOnGround(false);
                                 e.setY(mc.thePlayer.posY + var1 - var3);
                                 break;
                             }
-                            case 16: {
+                            case 17: {
                                 e.setOnGround(false);
                                 e.setY(mc.thePlayer.posY + var2);
                                 break;

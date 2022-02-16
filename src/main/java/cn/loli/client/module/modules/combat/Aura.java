@@ -356,7 +356,7 @@ public class Aura extends Module {
 
 
     private static long randomClickDelay(final double minCPS, final double maxCPS) {
-        return (long) ((Math.random() * (1000 / minCPS - 1000 / maxCPS + 1)) + 1000 / maxCPS);
+        return (long) ((Math.random() * (1000 / minCPS - 1000 / maxCPS) + 1) + 1000 / maxCPS);
     }
 
     public static Vec3 getLocation(AxisAlignedBB bb, int reverseValue, int mistakeValue, boolean Hres, boolean Vres, double pitchoffset) {
