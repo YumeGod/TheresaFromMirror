@@ -16,6 +16,10 @@ public class PlayerUtils {
         mc = Minecraft.getMinecraft();
     }
 
+    public static boolean isMoving() {
+        return (mc.gameSettings.keyBindForward.isKeyDown() || mc.gameSettings.keyBindBack.isKeyDown() || mc.gameSettings.keyBindLeft.isKeyDown() || mc.gameSettings.keyBindRight.isKeyDown());
+    }
+
     public static boolean isMoving2() {
         return ((mc.thePlayer.moveForward != 0.0F || mc.thePlayer.moveStrafing != 0.0F));
     }
