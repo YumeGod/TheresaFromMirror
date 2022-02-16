@@ -1,6 +1,6 @@
-package server.datebase;
+package me.superskidder.datebase;
 
-import server.Server;
+import me.superskidder.Server;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

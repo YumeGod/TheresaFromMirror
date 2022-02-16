@@ -104,10 +104,10 @@ public class ClickGui extends GuiScreen {
         float h = mouseY + sizeDragY - y;
         //设置窗口大小
         if (sizeDrag) {
-            if(w > WINDOW_MAX_WIDTH) {
+            if (w > WINDOW_MAX_WIDTH) {
                 width = w;
             }
-            if(h > WINDOW_MAX_HEIGHT) {
+            if (h > WINDOW_MAX_HEIGHT) {
                 height = h;
             }
         }
@@ -192,13 +192,13 @@ public class ClickGui extends GuiScreen {
                                     if (v1 >= ((NumberValue<?>) v).getMax().floatValue()) {
                                         v1 = (((NumberValue<?>) v).getMax().floatValue());
                                     }
-                                    if(((NumberValue<?>) v).getMax() instanceof Integer) {
+                                    if (((NumberValue<?>) v).getMax() instanceof Integer) {
                                         v.setObject((int) v1);
-                                    }else if (((NumberValue<?>) v).getMax() instanceof Float) {
+                                    } else if (((NumberValue<?>) v).getMax() instanceof Float) {
                                         v.setObject(v1);
-                                    }else if (((NumberValue<?>) v).getMax() instanceof Double) {
+                                    } else if (((NumberValue<?>) v).getMax() instanceof Double) {
                                         v.setObject(((double) v1));
-                                    }else if (((NumberValue<?>) v).getMax() instanceof Long) {
+                                    } else if (((NumberValue<?>) v).getMax() instanceof Long) {
                                         v.setObject((long) v1);
                                     }
                                 } else {

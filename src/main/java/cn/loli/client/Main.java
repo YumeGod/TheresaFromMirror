@@ -39,6 +39,7 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -66,6 +67,7 @@ public class Main {
     public static FontLoaders fontLoaders;
 
     public static Main INSTANCE;
+    public static String name,password;
 
     public Logger logger;
     public ModuleManager moduleManager;
@@ -81,6 +83,7 @@ public class Main {
     public int realPosX;
     public int realPosY;
     public int realPosZ;
+    public static ChannelFuture cf;
 
     public Main() {
         INSTANCE = this;
@@ -124,7 +127,7 @@ public class Main {
         fontLoaders = new FontLoaders();
 
         //IRC
-//        IRC();
+        IRC();
 
         //Auth
         new Thread(() -> {
@@ -244,6 +247,8 @@ public class Main {
     }
 
     private void IRC() {
+        name = JOptionPane.showInputDialog(null,"请输入用户名", "用户名");
+        password = JOptionPane.showInputDialog(null,"请输入密码", "密码");
         new Thread(() -> {
             EventLoopGroup eventExecutors = new NioEventLoopGroup();
             try {
@@ -258,6 +263,7 @@ public class Main {
                             }
                         });
                 ChannelFuture cf = bootstrap.connect("101.43.166.241", 9822).sync();
+//                cf = bootstrap.connect("127.0.0.1", 9822).sync();
                 println("Client started!");
                 cf.channel().closeFuture().sync();
             } catch (InterruptedException e) {

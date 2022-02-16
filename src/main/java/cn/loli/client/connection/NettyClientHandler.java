@@ -1,6 +1,7 @@
 package cn.loli.client.connection;
 
 import cn.loli.client.Main;
+import cn.loli.client.utils.HWIDUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -11,10 +12,11 @@ import net.minecraft.util.ChatComponentText;
 import java.util.Objects;
 
 public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         Main.INSTANCE.println("Client connected!");
-        ctx.channel().writeAndFlush(Unpooled.copiedBuffer("LOGIN@SKID@" + Main.CLIENT_NAME + "|" + Main.CLIENT_VERSION, CharsetUtil.UTF_8));
+        ctx.channel().writeAndFlush(new Packet(PacketUtil.Type.LOGIN, Main.name + "|" + Main.password + "|" + HWIDUtil.getHWID()).pack());
         new Thread(() -> {
             while (true) {
                 try {
@@ -22,7 +24,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                ctx.channel().writeAndFlush(Unpooled.copiedBuffer("HEARTBEAT@SKID@PING!", CharsetUtil.UTF_8));
+                ctx.channel().writeAndFlush(new Packet(PacketUtil.Type.HEARTBEAT, "PING!").pack());
             }
         }).start();
     }
@@ -33,26 +35,22 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
         Packet p = PacketUtil.unpack(s);
         String result = "";
         if (p != null) {
-            Main.INSTANCE.println("[DEBUG]" + p.type.name() + "  -  " + p.content);
+//            Main.INSTANCE.println("[DEBUG]" + p.type.name() + "  -  " + p.content);
+            result = p.content;
             switch (p.type) {
                 case LOGIN:
-                    result = s;
                     break;
                 case COMMAND:
                     break;
                 case HEARTBEAT:
-                    if (Objects.equals(p.content, "PING!")) {
-                        channelHandlerContext.writeAndFlush("PONG!");
-                    }
                     break;
                 case EXIT:
                     break;
                 case MESSAGE:
+                    if (Minecraft.getMinecraft().thePlayer != null) {
+                        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(result));
+                    }
                     break;
-            }
-
-            if (Minecraft.getMinecraft().thePlayer != null) {
-                Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(result));
             }
         }
     }

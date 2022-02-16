@@ -11,7 +11,7 @@ public class PacketUtil {
     }
 
 
-    enum Type {
+    public enum Type {
         LOGIN,
         HEARTBEAT,
         EXIT,

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager">
-    <output url="file:///production/IRC" />
-    <output-test url="file:///test/IRC" />
+    <output url="file://$MODULE_DIR$/IRC/bin" />
+    <output-test url="file://$MODULE_DIR$/IRC/bin/test" />
     <exclude-output />
     <content url="file://$MODULE_DIR$/IRC">
       <sourceFolder url="file://$MODULE_DIR$/IRC/src" isTestSource="false" />
@@ -13,6 +13,15 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../../librarys/1.8librarys/netty-all-4.0.23.Final.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../librarys/mysql-connector-java-8.0.28.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

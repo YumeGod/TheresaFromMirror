@@ -1,4 +1,4 @@
-package server;
+package me.superskidder;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -7,13 +7,13 @@ import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.concurrent.GlobalEventExecutor;
-import server.datebase.VisitMySql;
+import me.superskidder.datebase.VisitMySql;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
 
-import static server.PacketUtil.unpack;
+import static me.superskidder.PacketUtil.unpack;
 
 public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
 
@@ -44,8 +44,16 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
             switch (p.type) {
                 case LOGIN:
                     String[] info = p.content.split("\\|");
-                    if (!VisitMySql.verify(info[0], info[1])) {
-                        System.out.println("Verify failed");
+                    System.out.println(info[0] + "  -  " + info[1] + "  -  " + info[2]);
+                    if (info.length == 3) {
+                        String infos = VisitMySql.verify(info[0], info[1], info[2]);
+                        System.out.println(infos);
+                        if (infos.contains("Failed")) {
+                            System.out.println(info[0] + " Verify failed");
+                            ctx.writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + "Sorry, " + infos).pack());
+                            ctx.close();
+                        }
+                    } else {
                         ctx.close();
                     }
                     break;
@@ -53,31 +61,21 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                     break;
                 case HEARTBEAT:
                     if (Objects.equals(p.content, "PING!")) {
-                        ctx.channel().pipeline().writeAndFlush("PONG!");
+                        ctx.channel().pipeline().writeAndFlush(new Packet(PacketUtil.Type.HEARTBEAT, "PONG!").pack());
                     }
                     break;
                 case EXIT:
-                    channelGroup.forEach(channel1 -> {
-                        if (channel1 != channel) {
-                            channel.writeAndFlush(o);
-                        } else {
-                            channel.writeAndFlush(o);
-                        }
-                    });
                     break;
                 case MESSAGE:
                     channelGroup.forEach(channel1 -> {
                         if (channel1 != channel) {
-                            channel.writeAndFlush(o);
+                            channel.writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + p.content).pack());
                         } else {
-                            channel.writeAndFlush(o);
+                            channel.writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\2472" + p.content).pack());
                         }
                     });
                     break;
             }
-        } else {
-            System.out.println("[NullPacket]" + ctx.channel().remoteAddress() + "    " + o);
-            ctx.close();
         }
     }
 
