@@ -43,10 +43,10 @@ public class MoveUtils {
     }
 
     public static double getBaseMoveSpeed() {
-        double baseSpeed = 0.295d;
+        double baseSpeed = 0.31d;
         if (Minecraft.getMinecraft().thePlayer.isPotionActive(Potion.moveSpeed)) {
             int amplifier = Minecraft.getMinecraft().thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier();
-            baseSpeed *= 1.0 + 0.25 * (amplifier + 1);
+            baseSpeed *= 1.0 + 0.195 * (amplifier + 1);
         }
         return baseSpeed;
     }

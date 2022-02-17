@@ -9,6 +9,8 @@ import cn.loli.client.events.Render2DEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.AnimationUtils;
+import cn.loli.client.utils.MoveUtils;
+import cn.loli.client.utils.PlayerUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
@@ -63,6 +65,14 @@ public class HUD extends Module {
         }
 
         int i = ArrayListYPos.getObject().intValue();
+
+
+        double currSpeed = Math.sqrt(mc.thePlayer.motionX * mc.thePlayer.motionX + mc.thePlayer.motionZ * mc.thePlayer.motionZ);
+
+        int fpsWidth = mc.fontRendererObj.drawString("FPS: " + Minecraft.getDebugFPS(), 2, res.getScaledHeight() - mc.fontRendererObj.FONT_HEIGHT - 2, -1, true);
+        fpsWidth = Math.max(fpsWidth, mc.fontRendererObj.drawString(String.format("BPS: %.2f", currSpeed),  2, res.getScaledHeight() - mc.fontRendererObj.FONT_HEIGHT * 2 - 2, -1, true));
+        fpsWidth = Math.max(fpsWidth, mc.fontRendererObj.drawString(String.format("User: " + Main.INSTANCE.name, currSpeed), (float) (res.getScaledWidth() - mc.fontRendererObj.getStringWidth(String.format("User: " + Main.INSTANCE.name, currSpeed))), res.getScaledHeight() - mc.fontRendererObj.FONT_HEIGHT - 2, -1, true));
+
         for (Module m : sort) {
             if (m.getState()) {
                 String s = m.getName();

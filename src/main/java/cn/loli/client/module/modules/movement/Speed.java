@@ -174,9 +174,12 @@ public class Speed extends Module {
                         speed = getHypixelSpeed(stage) * 0.96;
                         if (stage < 0) speed = MoveUtils.getBaseMoveSpeed();
                         if (lessSlow) speed *= .97;
+                        if (speed < MoveUtils.getBaseMoveSpeed()) speed = MoveUtils.getBaseMoveSpeed();
+
                     } else {
                         speed = MoveUtils.getBaseMoveSpeed();
                     }
+                    ChatUtils.info(speed + " " + stage);
                     MoveUtils.setMotion(event, speed);
                     stage++;
                 }
@@ -197,7 +200,7 @@ public class Speed extends Module {
 
                         if (mc.thePlayer.onGround) {
                             mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + (0.11D * multiply.getObject()), mc.thePlayer.posZ);
-                            if (stage >= 50) stage = 0;
+                            if (stage >= 75) stage = 0;
                             distance += (0.11D * multiply.getObject());
                         }
 
@@ -219,14 +222,11 @@ public class Speed extends Module {
     private double getHypixelSpeed(int stage) {
         double base = 0;
 
-        final double firstly = 0.4145 + (double) MoveUtils.getSpeedEffect() / 7.5;
-        final double secondly = 0.4045 + (double) MoveUtils.getSpeedEffect() / 12.5;
-        final double slowDown = (double) stage / 500.0 * 3.0;
+        final double init = MoveUtils.getBaseMoveSpeed() + (MoveUtils.getSpeedEffect() * 0.075);
+        final double slowDown = init - (double) stage / 500.0 * 3;
 
-        if (stage == 0) base = MoveUtils.getBaseMoveSpeed() + 0.25 * (double) MoveUtils.getSpeedEffect() + (double) MoveUtils.getSpeedEffect() / 15.0;
-         else if (stage == 1) base = firstly;
-        else if (stage == 2) base = secondly;
-        else if (stage >= 3) base = 0.4045 - slowDown;
+        if (stage == 0) base = init;
+        else if (stage >= 1) base = slowDown;
 
         if (mc.thePlayer.isCollidedHorizontally) {
             base = 0.2;
@@ -235,6 +235,6 @@ public class Speed extends Module {
             }
         }
 
-        return Math.max(base, (MoveUtils.getBaseMoveSpeed() + 0.028 * (double) MoveUtils.getSpeedEffect()));
+        return Math.max(base, (MoveUtils.getBaseMoveSpeed() + 0.014 * (double) MoveUtils.getSpeedEffect()));
     }
 }
