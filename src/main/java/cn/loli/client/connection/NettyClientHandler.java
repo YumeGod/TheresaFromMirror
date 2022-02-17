@@ -18,7 +18,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         Main.INSTANCE.println("Client connected!");
-        ctx.channel().writeAndFlush(new String(new Packet(PacketUtil.Type.LOGIN, Main.name + "|" + Main.password + "|" + HWIDUtil.getHWID()).pack().getBytes(), StandardCharsets.UTF_8));
+        ctx.channel().writeAndFlush(new String(new Packet(PacketUtil.Type.LOGIN, Main.INSTANCE.name + "|" + Main.INSTANCE.password + "|" + HWIDUtil.getHWID()).pack().getBytes(), StandardCharsets.UTF_8));
         new Thread(() -> {
             while (true) {
                 try {
@@ -37,7 +37,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
         Packet p = PacketUtil.unpack(s);
         String result = "";
         if (p != null) {
-            Main.INSTANCE.println("[DEBUG]" + p.type.name() + "  -  " + p.content);
+         //   Main.INSTANCE.println("[DEBUG]" + p.type.name() + "  -  " + p.content);
             result = p.content;
             switch (p.type) {
                 case LOGIN:
