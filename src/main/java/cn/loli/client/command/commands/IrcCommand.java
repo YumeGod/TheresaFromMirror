@@ -18,6 +18,7 @@ public class IrcCommand extends Command {
     public void run(String alias, @NotNull String[] args) {
         if (args.length == 0) {
             System.out.println("Usage: .irc <content>");
+            return;
         }
 
         Main.cf.channel().writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, Main.INSTANCE.name + ChatFormatting.WHITE + ": " + ChatFormatting.GRAY + args[0]).pack());

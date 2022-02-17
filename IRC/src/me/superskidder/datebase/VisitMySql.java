@@ -70,7 +70,7 @@ public class VisitMySql {
                     stt = conn.createStatement();
                     set = stt.executeQuery(Sql);
                     while (set.next()) {
-                        if ((System.currentTimeMillis() - set.getInt(4)) > 1000 * 60 * 60 * 24 * 14) {
+                        if ((System.currentTimeMillis() - set.getInt(6)) > 1000 * 60 * 60 * 24 * 14) {
                             Sql = "UPDATE user SET hwid='" + hwid + "' WHERE name='" + name + "'";
                             stt = conn.createStatement();
                             stt.execute(Sql);
