@@ -19,6 +19,7 @@ import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
+import ibxm.Player;
 import net.minecraft.util.BlockPos;
 import org.lwjgl.Sys;
 
@@ -28,10 +29,13 @@ public class Speed extends Module {
 
     private final ModeValue modes = new ModeValue("Mode", "Mini", "PacketAbusing", "Mini");
     private final NumberValue<Float> multiply = new NumberValue<>("Multiply", 1f, 1f, 2f);
+    private final BooleanValue boost = new BooleanValue("Boost", true);
 
-    private final BooleanValue crit = new BooleanValue("Fall Damage", true);
 
     double distance;
+    private int stage;
+    private double speed, less;
+    private boolean lessSlow;
 
     public Speed() {
         super("Speed", "Just You Speed Boost", ModuleCategory.MOVEMENT);
@@ -48,6 +52,10 @@ public class Speed extends Module {
         if (mc.thePlayer != null && mc.theWorld != null) {
             ((IAccessorMinecraft) mc).getTimer().timerSpeed = 1.0F;
             ((IAccessorEntityPlayer) mc.thePlayer).setSpeedInAir(0.02F);
+            stage = 0;
+            speed = 0;
+            less = 0;
+            lessSlow = false;
             distance = 0;
         }
     }
@@ -151,10 +159,26 @@ public class Speed extends Module {
         switch (modes.getCurrentMode()) {
             case "Mini": {
                 if (PlayerUtils.isMoving2()) {
-                    if (PlayerUtils.isInLiquid())
-                        return;
+                    if (PlayerUtils.isInLiquid()) return;
+                    if (boost.getObject()){
+                        if (mc.thePlayer.isCollidedHorizontally) stage = -1;
+                        less = Math.max(less - (less > 1 ? .12 : .11), 0);
 
-                    MoveUtils.setMotion(event, MoveUtils.getBaseMoveSpeed());
+                        if (PlayerUtils.isOnGround(0.01)) {
+                            if (stage >= 0 || mc.thePlayer.isCollidedHorizontally) {
+                                lessSlow = less++ > 1 && !lessSlow;
+                                less = Math.min(less, 1.12);
+                                stage = 0;
+                            }
+                        }
+                        speed = getHypixelSpeed(stage) * 0.96;
+                        if (stage < 0) speed = MoveUtils.getBaseMoveSpeed();
+                        if (lessSlow) speed *= .97;
+                    } else {
+                        speed = MoveUtils.getBaseMoveSpeed();
+                    }
+                    MoveUtils.setMotion(event, speed);
+                    stage++;
                 }
                 break;
             }
@@ -172,36 +196,8 @@ public class Speed extends Module {
                             return;
 
                         if (mc.thePlayer.onGround) {
-                            if (Main.INSTANCE.moduleManager.getModule(Aura.class).target != null && crit.getObject()) {
-                                int ht = Main.INSTANCE.moduleManager.getModule(Aura.class).target.hurtResistantTime;
-                                double var1 = ThreadLocalRandom.current().nextDouble(0.01435, 0.01439),
-                                        var2 = ThreadLocalRandom.current().nextDouble(0.000468, 0.000470),
-                                        var3 = ThreadLocalRandom.current().nextDouble(1.5E-7, 1.63166800276E-7);
-                                switch (ht) {
-                                    case 20: {
-                                        event.setOnGround(false);
-                                        event.setY(mc.thePlayer.posY + var1);
-                                        break;
-                                    }
-                                    case 18: {
-                                        event.setOnGround(false);
-                                        event.setY(mc.thePlayer.posY + var2 + var3);
-                                        break;
-                                    }
-                                    case 19: {
-                                        event.setOnGround(false);
-                                        event.setY(mc.thePlayer.posY + var1 - var3);
-                                        break;
-                                    }
-                                    case 17: {
-                                        event.setOnGround(false);
-                                        event.setY(mc.thePlayer.posY + var2);
-                                        break;
-                                    }
-                                }
-                            }
-
                             mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + (0.11D * multiply.getObject()), mc.thePlayer.posZ);
+                            if (stage >= 50) stage = 0;
                             distance += (0.11D * multiply.getObject());
                         }
 
@@ -219,4 +215,26 @@ public class Speed extends Module {
         event.setCancelled(true);
     }
 
+
+    private double getHypixelSpeed(int stage) {
+        double base = 0;
+
+        final double firstly = 0.4145 + (double) MoveUtils.getSpeedEffect() / 7.5;
+        final double secondly = 0.4045 + (double) MoveUtils.getSpeedEffect() / 12.5;
+        final double slowDown = (double) stage / 500.0 * 3.0;
+
+        if (stage == 0) base = MoveUtils.getBaseMoveSpeed() + 0.25 * (double) MoveUtils.getSpeedEffect() + (double) MoveUtils.getSpeedEffect() / 15.0;
+         else if (stage == 1) base = firstly;
+        else if (stage == 2) base = secondly;
+        else if (stage >= 3) base = 0.4045 - slowDown;
+
+        if (mc.thePlayer.isCollidedHorizontally) {
+            base = 0.2;
+            if (stage == 0) {
+                base = 0.0;
+            }
+        }
+
+        return Math.max(base, (MoveUtils.getBaseMoveSpeed() + 0.028 * (double) MoveUtils.getSpeedEffect()));
+    }
 }

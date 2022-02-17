@@ -5,11 +5,10 @@ import cn.loli.client.utils.AnimationUtils;
 public class Slider {
     public float top, top1;
 
-    AnimationUtils a1 = new AnimationUtils();
     float s1;
 
     public void update() {
-        top = a1.animate(top1, top, s1, 30);
+        top = AnimationUtils.smoothAnimation(top, top1, 50f, s1);
     }
 
     public void change(float newTop) {

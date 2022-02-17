@@ -30,12 +30,8 @@ public abstract class Module {
     //Animations
     public float clickgui_animY;
     public float clickgui_animX;
-    public AnimationUtils clickgui_animY_timer = new AnimationUtils();
-    public AnimationUtils clickgui_animX_timer = new AnimationUtils();
     public float arraylist_animX;
-    public AnimationUtils arraylist_animX_timer = new AnimationUtils();
     public float arraylist_animY;
-    public AnimationUtils arraylist_animY_timer = new AnimationUtils();
 
     protected Module(String name, String description, ModuleCategory moduleCategory) {
         this(name, description, moduleCategory, true, false, Keyboard.KEY_NONE);

@@ -69,16 +69,25 @@ public class ColorValue extends Value<Color> {
             alpha = (getObject().getRGB() >> 24 & 255) / 255f;
         }
         // Saturation
-        RenderUtils.drawGradientSideways(x, y, x + width, y + height, -1, Color.HSBtoRGB(hue, 1, 1));
+        RenderUtils.drawGradientSideways(x, y, x + width, y + height, 0x00ffffff, Color.HSBtoRGB(1 - hue, 1, 1));
+
         // Brightness
-        RenderUtils.drawGradientRect(x, y, x + width, y + height, new Color(0, 0, 0, 255).getRGB(), new Color(255, 255, 255, 0).getRGB());
+        RenderUtils.drawGradientRect(x, y - 5, x + width, y + height, 0xff000000, 0x00ffffff);
 
         // hue
+        float barHeight = 40;
+        float hueSeg = barHeight / 5.0f;
+        float hueBarTop = y + height - 40;
         int i = 0;
         while (i < 5) {
-            RenderUtils.drawGradientRect(x + 42, y + height / 5 * i, x + 48, y + height / 5 * (i + 1), Color.HSBtoRGB(1 - 0.2f * (i + 1), 1, 1), Color.HSBtoRGB(1 - 0.2f * (i), 1, 1));
-            i++;
+            RenderUtils.drawGradientRect(x + 42, hueBarTop, x + 48, hueBarTop + hueSeg, Color.HSBtoRGB(1.0f - 0.2f * (i + 1), 1, 1), Color.HSBtoRGB(1.0f - 0.2f * (i), 1, 1));
+            if (i < 4) {
+                hueBarTop += hueSeg;
+            }
+            ++i;
         }
+
+        //RenderUtils.drawRect(x + 42, y + height - 40, x + 48, y + height, 0x88ff0000);
 
         // Alpha
         RenderUtils.drawRect(x + 50, y, x + 56, y + height, new Color(82, 82, 82, 255).getRGB());
@@ -107,10 +116,10 @@ public class ColorValue extends Value<Color> {
                 saturation = (mouseX - x) / width;
             }
             if (isHovered(x + 50, y, x + 56, y + height, ((int) mouseX), ((int) mouseY))) {
-                alpha = ((mouseY - y) / height);
+                alpha = (mouseY - y) / height;
             }
         }
-        this.setObject(ColorUtils.intToColor(ColorUtils.reAlpha(Color.HSBtoRGB(hue, saturation, brightness), alpha)));
+        this.setObject(ColorUtils.intToColor(ColorUtils.reAlpha(Color.HSBtoRGB(1 - hue, saturation, brightness), alpha)));
     }
 
     public static boolean isHovered(float x, float y, float x2, float y2, int mouseX, int mouseY) {

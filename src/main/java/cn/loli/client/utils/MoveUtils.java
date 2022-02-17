@@ -85,4 +85,8 @@ public class MoveUtils {
         mc.thePlayer.motionX -= (MathHelper.sin((float) Math.toRadians(yaw)) * speed);
         mc.thePlayer.motionZ += (MathHelper.cos((float) Math.toRadians(yaw)) * speed);
     }
+
+    public static int getSpeedEffect() {
+        return mc.thePlayer.isPotionActive(Potion.moveSpeed) ? mc.thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1 : 0;
+    }
 }

@@ -8,6 +8,7 @@ import cn.loli.client.events.LoopEvent;
 import cn.loli.client.events.TickEvent;
 import cn.loli.client.events.WindowResizeEvent;
 import cn.loli.client.module.modules.render.BlockHit;
+import cn.loli.client.utils.AnimationUtils;
 import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.client.Minecraft;
@@ -20,6 +21,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.Session;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -60,8 +62,16 @@ public abstract class MixinMinecraft {
         Main.INSTANCE.startClient();
     }
 
+    private long lastFrame;
+
+
     @Inject(method = "runGameLoop", at = @At("HEAD"))
     private void runGameLoop(CallbackInfo ci) {
+        final long currentTime = (Sys.getTime() * 1000) / Sys.getTimerResolution();
+        final double deltaTime = (int) (currentTime - lastFrame);
+        lastFrame = currentTime;
+        AnimationUtils.delta = deltaTime;
+
         EventManager.call(new LoopEvent());
     }
 

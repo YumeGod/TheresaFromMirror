@@ -110,13 +110,13 @@ public class Velocity extends Module {
                 //获取并修改倍率
                 double x = packet.getMotionX() * hor, y = packet.getMotionY() * ver, z = packet.getMotionZ() * hor;
 
-                ChatUtils.info(packet.getMotionX() + " " + packet.getMotionY() + " " + packet.getMotionZ());
 
-                ChatUtils.info(x + " " + y + " " + z);
                 if (kbAlert.getObject()) kbAlert(event);
 
                 //移除该包效果 改为自定义
                 event.setCancelled(true);
+
+                if (horizon.getObject() == 0 && vertical.getObject() == 0) return;
 
                 //调试输出
                 if (debug.getObject())
