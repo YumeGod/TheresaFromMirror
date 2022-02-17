@@ -40,7 +40,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
 //        System.out.println("[DEBUG]"+o);
         Packet p = unpack(o);
         if (p != null) {
-            System.out.println("[DEBUG]" + p.type.name() + "  -  " + p.content);
             switch (p.type) {
                 case LOGIN:
                     String[] info = p.content.split("\\|");
@@ -56,6 +55,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                     } else {
                         ctx.close();
                     }
+                    channelGroup.writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + info[0] + " login successfully").pack());
                     break;
                 case COMMAND:
                     break;
@@ -65,6 +65,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                     }
                     break;
                 case EXIT:
+                    channelGroup.writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + p.content).pack());
                     break;
                 case MESSAGE:
 //                    channelGroup.forEach(channel1 -> {
