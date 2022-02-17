@@ -42,6 +42,8 @@ import sun.misc.Unsafe;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
@@ -251,9 +253,7 @@ public class Main {
     }
 
     private void IRC() {
-        GuiLogin i = new GuiLogin();
-        i.init();
-
+        doLogin();
         new Thread(() -> {
             EventLoopGroup eventExecutors = new NioEventLoopGroup();
             try {
@@ -292,12 +292,14 @@ public class Main {
         }).start();
     }
 
-    public class GuiLogin extends JFrame {
+    public static class Login extends JFrame {
+        private static final long serialVersionUID = 1L;
+
         public void init() {
             setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             setAlwaysOnTop(true);
             // 设置顶部提示文字和主窗体的宽，高，x值，y值
-            setTitle(Main.CLIENT_NAME + ".exe " + "Verify");
+            setTitle("Theresa.exe - Verify");
             setBounds(0, 0, 275, 175);
             setLocationRelativeTo(null);
             Container cp = getContentPane(); // 添加一个cp容器
@@ -323,11 +325,14 @@ public class Main {
 
             // 确定按钮
             JButton jb = new JButton("确定"); // 添加一个确定按钮
-            // 为确定按钮添加监听事件
-            jb.addActionListener(arg0 -> {
-                Main.INSTANCE.name = name.getText();
-                Main.INSTANCE.password = new String(password.getPassword());
-                setVisible(false);
+            jb.addActionListener(new ActionListener() { // 为确定按钮添加监听事件
+
+                public void actionPerformed(ActionEvent arg0) {
+                   Main.INSTANCE.name = name.getText();
+                   Main.INSTANCE.password = (new String(password.getPassword()));
+
+                    setVisible(false);
+                }
             });
             jb.setBounds(10, 100, 250, 30); // 设置确定按钮的宽，高，x值，y值
             cp.add(jb); // 将确定按钮添加到cp容器中
@@ -346,5 +351,15 @@ public class Main {
         }
     }
 
+    public void doLogin() {
+        Login login = new Login();
+        login.init();
+        while (login.isVisible()) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
+        }
+    }
 
 }
