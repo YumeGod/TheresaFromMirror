@@ -179,7 +179,7 @@ public class Speed extends Module {
                     } else {
                         speed = MoveUtils.getBaseMoveSpeed();
                     }
-                    ChatUtils.info(speed + " " + stage);
+             //       ChatUtils.info(speed + " " + stage);
                     MoveUtils.setMotion(event, speed);
                     stage++;
                 }
