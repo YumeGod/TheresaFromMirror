@@ -67,13 +67,14 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                 case EXIT:
                     break;
                 case MESSAGE:
-                    channelGroup.forEach(channel1 -> {
+//                    channelGroup.forEach(channel1 -> {
 //                        if (channel1 != channel) {
-                        channel.writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + p.content).pack());
+                    channelGroup.writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + p.content).pack());
+
 //                        } else {
 //                            channel.writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\2472" + p.content).pack());
 //                        }
-                    });
+//                    });
                     break;
             }
         }
