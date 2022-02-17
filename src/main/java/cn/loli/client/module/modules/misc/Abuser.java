@@ -77,4 +77,12 @@ public class Abuser extends Module {
         }
     }
 
+    //来点色图
+
+
+
+
+
+
+
 }

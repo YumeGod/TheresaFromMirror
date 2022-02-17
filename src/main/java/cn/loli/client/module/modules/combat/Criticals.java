@@ -83,6 +83,9 @@ public class Criticals extends Module {
             mc.thePlayer.sendQueue.addToSendQueue(packet);
     }
 
+
+
+
     @EventTarget
     public void onEdit(MotionUpdateEvent e) {
         if (e.getEventType() == EventType.PRE) {
