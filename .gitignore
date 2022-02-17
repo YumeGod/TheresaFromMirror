@@ -1,6 +1,7 @@
 .gradle
 build
 run
+out
 Theresa.api.iml
 Theresa.iml
 Theresa.ipr
