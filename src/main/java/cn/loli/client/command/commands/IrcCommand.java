@@ -20,7 +20,7 @@ public class IrcCommand extends Command {
             System.out.println("Usage: .irc <content>");
         }
 
-        Main.cf.channel().writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, Main.name + ChatFormatting.WHITE + ": " + ChatFormatting.GRAY + args[0]).pack());
+        Main.cf.channel().writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, Main.INSTANCE.name + ChatFormatting.WHITE + ": " + ChatFormatting.GRAY + args[0]).pack());
     }
 
     @Override

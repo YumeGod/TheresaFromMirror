@@ -16,7 +16,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         Main.INSTANCE.println("Client connected!");
-        ctx.channel().writeAndFlush(new Packet(PacketUtil.Type.LOGIN, Main.name + "|" + Main.password + "|" + HWIDUtil.getHWID()).pack());
+        ctx.channel().writeAndFlush(new Packet(PacketUtil.Type.LOGIN, Main.INSTANCE.name + "|" + Main.INSTANCE.password + "|" + HWIDUtil.getHWID()).pack());
         new Thread(() -> {
             while (true) {
                 try {
