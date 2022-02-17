@@ -58,7 +58,7 @@ public class HUD extends Module {
         if (!getState()) return;
         ScaledResolution res = new ScaledResolution(Minecraft.getMinecraft());
         HFontRenderer font = Main.fontLoaders.fonts.get("roboto16");
-        if(!sorted) {
+        if (!sorted) {
             sort.sort(Comparator.comparingInt(m -> font.getStringWidth(m.getName())));
             sort = reverse(sort);
             sorted = true;
@@ -69,17 +69,21 @@ public class HUD extends Module {
 
         double currSpeed = Math.sqrt(mc.thePlayer.motionX * mc.thePlayer.motionX + mc.thePlayer.motionZ * mc.thePlayer.motionZ);
 
-        int fpsWidth = mc.fontRendererObj.drawString("FPS: " + Minecraft.getDebugFPS(), 2, res.getScaledHeight() - mc.fontRendererObj.FONT_HEIGHT - 2, -1, true);
-        fpsWidth = Math.max(fpsWidth, mc.fontRendererObj.drawString(String.format("BPS: %.2f", currSpeed),  2, res.getScaledHeight() - mc.fontRendererObj.FONT_HEIGHT * 2 - 2, -1, true));
-        fpsWidth = Math.max(fpsWidth, mc.fontRendererObj.drawString(String.format("User: " + Main.INSTANCE.name, currSpeed), (float) (res.getScaledWidth() - mc.fontRendererObj.getStringWidth(String.format("User: " + Main.INSTANCE.name, currSpeed))), res.getScaledHeight() - mc.fontRendererObj.FONT_HEIGHT - 2, -1, true));
+        if (showClientInfo.getObject()) {
+            int fpsWidth = mc.fontRendererObj.drawString("FPS: " + Minecraft.getDebugFPS(), 2, res.getScaledHeight() - mc.fontRendererObj.FONT_HEIGHT - 2, -1, true);
+            fpsWidth = Math.max(fpsWidth, mc.fontRendererObj.drawString(String.format("BPS: %.2f", currSpeed), 2, res.getScaledHeight() - mc.fontRendererObj.FONT_HEIGHT * 2 - 2, -1, true));
+            fpsWidth = Math.max(fpsWidth, mc.fontRendererObj.drawString(String.format("User: " + Main.INSTANCE.name, currSpeed), (float) (res.getScaledWidth() - mc.fontRendererObj.getStringWidth(String.format("User: " + Main.INSTANCE.name, currSpeed))), res.getScaledHeight() - mc.fontRendererObj.FONT_HEIGHT - 2, -1, true));
+        }
 
-        for (Module m : sort) {
-            if (m.getState()) {
-                String s = m.getName();
-                font.drawString(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, -1);
-                m.arraylist_animY = AnimationUtils.smoothAnimation(m.arraylist_animY, i + ArrayListYPos.getObject().intValue(), 50, .3f);
-                m.arraylist_animX = AnimationUtils.smoothAnimation(m.arraylist_animX, font.getStringWidth(s) + ArrayListXPos.getObject().intValue(), 50, .4f);
-                i += 16;
+        if (showArrayList.getObject()) {
+            for (Module m : sort) {
+                if (m.getState()) {
+                    String s = m.getName();
+                    font.drawString(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, -1);
+                    m.arraylist_animY = AnimationUtils.smoothAnimation(m.arraylist_animY, i + ArrayListYPos.getObject().intValue(), 50, .3f);
+                    m.arraylist_animX = AnimationUtils.smoothAnimation(m.arraylist_animX, font.getStringWidth(s) + ArrayListXPos.getObject().intValue(), 50, .4f);
+                    i += 16;
+                }
             }
         }
 
