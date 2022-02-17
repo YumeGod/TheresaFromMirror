@@ -488,7 +488,7 @@ public class ClickGui extends GuiScreen {
                         curModule = null;
                     }
                 }
-                modsY += 40;
+                modsY += 31;
             }
 
         }
