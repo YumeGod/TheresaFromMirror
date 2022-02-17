@@ -23,6 +23,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.INpc;
 import net.minecraft.entity.boss.EntityWither;
+import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
@@ -359,7 +360,8 @@ public class Aura extends Module {
         return (long) ((Math.random() * (1000 / minCPS - 1000 / maxCPS) + 1) + 1000 / maxCPS);
     }
 
-    public static Vec3 getLocation(AxisAlignedBB bb, int reverseValue, int mistakeValue, boolean Hres, boolean Vres, double pitchoffset) {
+    public static Vec3 getLocation(AxisAlignedBB bb, int reverseValue, int mistakeValue, boolean Hres, boolean Vres,
+                                   double pitchoffset) {
         Random rd1 = new Random();
         Random rd2 = new Random();
         double value = Math.random();

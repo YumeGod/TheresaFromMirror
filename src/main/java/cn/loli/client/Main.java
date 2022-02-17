@@ -45,6 +45,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Queue;
@@ -256,9 +258,10 @@ public class Main {
                 bootstrap.group(eventExecutors).channel(NioSocketChannel.class)
                         .handler(new ChannelInitializer<SocketChannel>() {
                             @Override
-                            protected void initChannel(SocketChannel socketChannel) throws Exception {
-                                socketChannel.pipeline().addLast("decoder", new StringDecoder());
-                                socketChannel.pipeline().addLast("encoder", new StringEncoder());
+                            protected void initChannel(SocketChannel socketChannel) {
+                                socketChannel.pipeline().addLast(new StringEncoder(StandardCharsets.UTF_8));
+                                socketChannel.pipeline().addLast(new StringDecoder(Charset.forName("GBK")));
+
                                 socketChannel.pipeline().addLast(new NettyClientHandler());
                             }
                         });

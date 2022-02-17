@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Main-Class: me.superskidder.Server
+Class-Path: netty-all-4.0.23.Final.jar mysql-connector-java-8.0.28.jar
+

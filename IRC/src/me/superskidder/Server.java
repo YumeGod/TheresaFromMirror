@@ -13,6 +13,8 @@ import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import me.superskidder.datebase.VisitMySql;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
@@ -47,8 +49,8 @@ public class Server {
                         .childHandler(new ChannelInitializer<SocketChannel>() {
                             @Override
                             protected void initChannel(SocketChannel socketChannel) throws Exception {
-                                socketChannel.pipeline().addLast("decoder", new StringDecoder());
-                                socketChannel.pipeline().addLast("encoder", new StringEncoder());
+                                socketChannel.pipeline().addLast(new StringEncoder(Charset.forName("GBK")));
+                                socketChannel.pipeline().addLast(new StringDecoder(StandardCharsets.UTF_8));
                                 socketChannel.pipeline().addLast(new IdleStateHandler(10, 20, 25, TimeUnit.SECONDS));
                                 socketChannel.pipeline().addLast(new NettyServerHandler());
                             }
