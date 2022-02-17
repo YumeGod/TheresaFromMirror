@@ -83,12 +83,15 @@ public class Criticals extends Module {
             mc.thePlayer.sendQueue.addToSendQueue(packet);
     }
 
+
+
+
     @EventTarget
     public void onEdit(MotionUpdateEvent e) {
         if (e.getEventType() == EventType.PRE) {
             switch (mode.getCurrentMode()) {
                 case "Hypixel": {
-                    if (mc.thePlayer.isCollidedVertically && mc.thePlayer.onGround && !Main.INSTANCE.moduleManager.getModule(Speed.class).getState()) {
+                    if (mc.thePlayer.isCollidedVertically && mc.thePlayer.onGround && !Main.INSTANCE.moduleManager.getModule(Speed.class).getState() && PlayerUtils.isMoving2()) {
                         int ht = Main.INSTANCE.moduleManager.getModule(Aura.class).target.hurtResistantTime;
                         double var1 = ThreadLocalRandom.current().nextDouble(0.01435, 0.01439),
                                 var2 = ThreadLocalRandom.current().nextDouble(0.000468, 0.000470),

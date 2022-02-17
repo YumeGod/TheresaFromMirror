@@ -5,12 +5,12 @@ package cn.loli.client.injection.mixins;
 import cn.loli.client.Main;
 import cn.loli.client.events.*;
 import cn.loli.client.module.modules.movement.NoSlowDown;
-import cn.loli.client.module.modules.render.BlockHit;
-import cn.loli.client.module.modules.render.ViewClip;
 import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.network.play.client.C03PacketPlayer;
+import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.util.AxisAlignedBB;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,7 +23,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityPlayerSP.class)
 public class MixinEntityPlayerSP extends MixinEntity {
-    @Shadow public float timeInPortal;
+    @Shadow
+    public float timeInPortal;
+    @Shadow
+    public float renderArmPitch;
+    @Shadow
+    public int sprintingTicksLeft;
     private double cachedX;
     private double cachedY;
     private double cachedZ;
@@ -75,8 +80,11 @@ public class MixinEntityPlayerSP extends MixinEntity {
         EventManager.call(new MotionUpdateEvent(EventType.POST, posX, posY, posZ, rotationYaw, rotationPitch, onGround));
     }
 
+
     @Redirect(method = "onUpdateWalkingPlayer", at = @At(value = "FIELD", target = "Lnet/minecraft/util/AxisAlignedBB;minY:D"))
-    private double posY(AxisAlignedBB instance) {return posY;}
+    private double posY(AxisAlignedBB instance) {
+        return posY;
+    }
 
     @Inject(method = "onUpdate", at = @At("RETURN"))
     private void onUpdate(CallbackInfo ci) {
@@ -95,6 +103,7 @@ public class MixinEntityPlayerSP extends MixinEntity {
             this.cacheForward = Minecraft.getMinecraft().thePlayer.movementInput.moveForward;
         }
     }
+
 
     @Inject(method = "onLivingUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;pushOutOfBlocks(DDD)Z", shift = At.Shift.BEFORE))
     public void onToggledTimerZero(CallbackInfo callbackInfo) {

@@ -34,12 +34,18 @@ import net.minecraft.client.gui.GuiScreenBook;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.*;
 import net.minecraft.util.ChatComponentTranslation;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -69,7 +75,7 @@ public class Main {
     public static FontLoaders fontLoaders;
 
     public static Main INSTANCE;
-    public static String name,password;
+    public String name,password;
 
     public Logger logger;
     public ModuleManager moduleManager;
@@ -249,8 +255,7 @@ public class Main {
     }
 
     private void IRC() {
-        name = JOptionPane.showInputDialog(null,"请输入用户名", "用户名");
-        password = JOptionPane.showInputDialog(null,"请输入密码", "密码");
+        doLogin();
         new Thread(() -> {
             EventLoopGroup eventExecutors = new NioEventLoopGroup();
             try {
@@ -289,4 +294,75 @@ public class Main {
             }
         }).start();
     }
+
+    public static class Login extends JFrame {
+        private static final long serialVersionUID = 1L;
+
+        public void init() {
+            setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            setAlwaysOnTop(true);
+            // 设置顶部提示文字和主窗体的宽，高，x值，y值
+            setTitle("Theresa.exe - Verify");
+            setBounds(0, 0, 275, 175);
+            setLocationRelativeTo(null);
+            Container cp = getContentPane(); // 添加一个cp容器
+            cp.setLayout(null); // 设置添加的cp容器为流布局管理器
+
+            // 设置左侧用户名文字
+            JLabel jl = new JLabel("用户名：");
+            jl.setBounds(30, 10, 200, 35);
+            final JTextField name = new JTextField(); // 用户名框
+            name.setBounds(100, 10, 150, 35); // 设置用户名框的宽，高，x值，y值
+
+            // 设置左侧密码文字
+            JLabel jl2 = new JLabel("密码：");
+            jl2.setBounds(30, 50, 200, 35);
+            final JPasswordField password = new JPasswordField(); // 密码框：为加密的***
+            password.setBounds(100, 50, 150, 35); // 设置密码框的宽，高，x值，y值
+
+            // 将jl、name、jl2、password添加到容器cp中
+            cp.add(jl);
+            cp.add(name);
+            cp.add(jl2);
+            cp.add(password);
+
+            // 确定按钮
+            JButton jb = new JButton("确定"); // 添加一个确定按钮
+            jb.addActionListener(new ActionListener() { // 为确定按钮添加监听事件
+
+                public void actionPerformed(ActionEvent arg0) {
+                   Main.INSTANCE.name = name.getText();
+                   Main.INSTANCE.password = (new String(password.getPassword()));
+
+                    setVisible(false);
+                }
+            });
+            jb.setBounds(10, 100, 250, 30); // 设置确定按钮的宽，高，x值，y值
+            cp.add(jb); // 将确定按钮添加到cp容器中
+
+            setResizable(false);
+
+            setVisible(true);
+
+            addWindowListener(new WindowAdapter() {
+
+                public void windowClosing(WindowEvent e) {
+                    FMLCommonHandler.instance().exitJava(0, true);
+                }
+
+            });
+        }
+    }
+
+    public void doLogin() {
+        Login login = new Login();
+        login.init();
+        while (login.isVisible()) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
+        }
+    }
+
 }
