@@ -32,6 +32,7 @@ public class NoFall extends Module {
         if (mode.getCurrentMode().equalsIgnoreCase("Packet")) {
             if (mc.thePlayer.fallDistance > 2F) {
                 mc.thePlayer.sendQueue.addToSendQueue(new C03PacketPlayer(true));
+                mc.thePlayer.fallDistance = 0F;
             }
         } else if (mode.getCurrentMode().equalsIgnoreCase("Vulcan")) {
             // 随手写的，可以bypass, 如果不重置motionY会爆vClip flag.

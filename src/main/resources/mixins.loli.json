@@ -33,6 +33,7 @@
     "MixinS27PacketExplosion"
   ],
   "client": [
-    "IAccessorFontRenderer"
+    "IAccessorFontRenderer",
+    "MixinNetHandlerPlayClient"
   ]
 }

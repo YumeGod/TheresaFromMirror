@@ -7,6 +7,8 @@ import cn.loli.client.utils.ChatUtils;
 import cn.loli.client.value.ModeValue;
 import com.darkmagician6.eventapi.EventTarget;
 import io.netty.buffer.Unpooled;
+import net.minecraft.client.ClientBrandRetriever;
+import net.minecraft.network.Packet;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.C17PacketCustomPayload;
 import net.minecraft.network.play.server.S3FPacketCustomPayload;
@@ -19,58 +21,29 @@ public class Spoofer extends Module {
         super("Spoofer", "Spoof Other Client", ModuleCategory.MISC);
     }
 
-    @Override
-    public void onEnable() {
-        super.onEnable();
-    }
 
-    @Override
-    public void onDisable() {
-        super.onDisable();
-    }
-
-    @EventTarget
-    private void onPacket(PacketEvent event) {
-        if (event.getPacket() instanceof S3FPacketCustomPayload) {
-            if (((S3FPacketCustomPayload) event.getPacket()).getChannelName().equalsIgnoreCase("REGISTER")) {
-                event.setCancelled(true);
+    public Packet getPacket() {
+        switch (modes.getCurrentMode()) {
+            case "Forge": {
+                return (new C17PacketCustomPayload("MC|Brand", (new PacketBuffer(Unpooled.buffer())).writeString("FML")));
             }
-
-            if (((S3FPacketCustomPayload) event.getPacket()).getChannelName().equalsIgnoreCase("MC|Brand")) {
-                switch (modes.getCurrentMode()) {
-                    case "Forge": {
-                        mc.getNetHandler().getNetworkManager()
-                                .sendPacket(new C17PacketCustomPayload("MC|Brand", (new PacketBuffer(Unpooled.buffer())).writeString("FML")));
-                        break;
-                    }
-                    case "Lunar": {
-                        mc.getNetHandler().getNetworkManager()
-                                .sendPacket(new C17PacketCustomPayload("REGISTER", (new PacketBuffer(Unpooled.buffer())).writeString("Lunar-Client")));
-                        break;
-                    }
-                    case "LabyMod": {
-                        mc.getNetHandler().getNetworkManager()
-                                .sendPacket(new C17PacketCustomPayload("MC|Brand", (new PacketBuffer(Unpooled.buffer())).writeString("LMC")));
-                        break;
-                    }
-                    case "PVP-L": {
-                        mc.getNetHandler().getNetworkManager()
-                                .sendPacket(new C17PacketCustomPayload("MC|Brand", (new PacketBuffer(Unpooled.buffer())).writeString("PLC18")));
-                        break;
-                    }
-                    case "C-B": {
-                        mc.getNetHandler().getNetworkManager()
-                                .sendPacket(new C17PacketCustomPayload("MC|Brand", (new PacketBuffer(Unpooled.buffer())).writeString("CB")));
-                        break;
-                    }
-                    case "Geyser": {
-                        mc.getNetHandler().getNetworkManager()
-                                .sendPacket(new C17PacketCustomPayload("MC|Brand", (new PacketBuffer(Unpooled.buffer())).writeString("Geyser")));
-                    }
-                }
-                ChatUtils.info("Succeed");
-                event.setCancelled(true);
+            case "Lunar": {
+                return (new C17PacketCustomPayload("REGISTER", (new PacketBuffer(Unpooled.buffer())).writeString("Lunar-Client")));
+            }
+            case "LabyMod": {
+                return (new C17PacketCustomPayload("MC|Brand", (new PacketBuffer(Unpooled.buffer())).writeString("LMC")));
+            }
+            case "PVP-L": {
+                return (new C17PacketCustomPayload("MC|Brand", (new PacketBuffer(Unpooled.buffer())).writeString("PLC18")));
+            }
+            case "C-B": {
+                return (new C17PacketCustomPayload("MC|Brand", (new PacketBuffer(Unpooled.buffer())).writeString("CB")));
+            }
+            case "Geyser": {
+                return (new C17PacketCustomPayload("MC|Brand", (new PacketBuffer(Unpooled.buffer())).writeString("Geyser")));
             }
         }
+
+        return new C17PacketCustomPayload("MC|Brand", (new PacketBuffer(Unpooled.buffer())).writeString(ClientBrandRetriever.getClientModName()));
     }
 }
