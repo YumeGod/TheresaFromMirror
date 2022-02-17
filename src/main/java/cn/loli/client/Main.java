@@ -112,7 +112,7 @@ public class Main {
             println("Gay");
         }
 
-        try {
+        /*try {
             if (HttpUtil.performGetRequest
                     (new URL("https://pastebin.com/raw/T0XipKMF")).contains("i am a man"))
                 println("无论前方艰险如何 我都会在你身边");
@@ -120,7 +120,7 @@ public class Main {
                 doCrash();
         } catch (IOException e) {
             doCrash();
-        }
+        }*/
 
         fileManager = new FileManager();
         valueManager = new ValueManager();

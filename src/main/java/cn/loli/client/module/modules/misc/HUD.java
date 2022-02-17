@@ -8,6 +8,7 @@ import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.events.Render2DEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import cn.loli.client.utils.AnimationUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
@@ -66,8 +67,8 @@ public class HUD extends Module {
             if (m.getState()) {
                 String s = m.getName();
                 font.drawString(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, -1);
-                m.arraylist_animY = m.arraylist_animY_timer.animate(i + ArrayListYPos.getObject().intValue(), m.arraylist_animY, 0.2f, 20);
-                m.arraylist_animX = m.arraylist_animX_timer.animate(font.getStringWidth(s) + ArrayListXPos.getObject().intValue(), m.arraylist_animX, 0.2f, 20);
+                m.arraylist_animY = AnimationUtils.smoothAnimation(m.arraylist_animY, i + ArrayListYPos.getObject().intValue(), 50, .3f);
+                m.arraylist_animX = AnimationUtils.smoothAnimation(m.arraylist_animX, font.getStringWidth(s) + ArrayListXPos.getObject().intValue(), 50, .4f);
                 i += 16;
             }
         }

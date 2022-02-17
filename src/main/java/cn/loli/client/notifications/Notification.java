@@ -6,10 +6,8 @@ import cn.loli.client.Main;
 import cn.loli.client.utils.AnimationUtils;
 import cn.loli.client.utils.RenderUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.util.Locale;
@@ -21,12 +19,11 @@ public class Notification {
     private final String messsage;
     private long start;
 
-    private double localHeightOffset;
+    private float localHeightOffset;
 
     private final long fadedIn;
     private final long fadeOut;
     private final long end;
-    private final AnimationUtils animationUtils = new AnimationUtils();
 
 
     public Notification(NotificationType type, String title, String messsage, int length) {
@@ -82,8 +79,8 @@ public class Notification {
 //            int i = Math.max(0, Math.min(255, (int) (Math.sin(time / 100.0) * 255.0 / 2 + 127.5)));
         }
 
-        double heightOffset = 20 + number * (height + 5);
-        localHeightOffset = animationUtils.animate(heightOffset, localHeightOffset, 0.2, 10);
+        float heightOffset = 20 + number * (height + 5);
+        localHeightOffset = AnimationUtils.smoothAnimation(localHeightOffset, heightOffset, 30, .3f);
         heightOffset = localHeightOffset;
 
         RenderUtils.drawRoundRect(res.getScaledWidth() - offset, res.getScaledHeight() - 5 - height - heightOffset, res.getScaledWidth() + 4, res.getScaledHeight() - 5 - heightOffset, 3, backgroundColor.getRGB());

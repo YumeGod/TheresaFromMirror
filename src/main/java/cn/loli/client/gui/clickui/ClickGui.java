@@ -7,6 +7,7 @@ import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.AnimationUtils;
 import cn.loli.client.utils.RenderUtils;
 import cn.loli.client.value.*;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
@@ -25,18 +26,21 @@ import static cn.loli.client.value.ColorValue.isHovered;
 public class ClickGui extends GuiScreen {
     //常量
     private static final float MS18HEIGHT = 12;//字体18号的高度
-    private static final int ANIMATION_DELAY = 20;//动画的延迟
-    private static final float ANIMATION_SPEED = 0.2f;//动画的速度
-    private static final float LEFTMENU_MIN_WIDTH = 120;//左侧类别列表的最小宽度
-    private static final float LEFTMENU_MAX_WIDTH = 150;//左侧类别列表的最大宽度
-    private static final float WINDOW_MAX_WIDTH = 400;//窗口最大宽度
-    private static final float WINDOW_MAX_HEIGHT = 250;//窗口最小宽度
 
+    private static final float ANIMATION_SCALE = .3f; //动画缩放
+    private static final float ANIMATION_SPEED = 50f; //动画速度
 
-    static float x = -1, y = -1, width = 0, height = 0;//坐标、宽高
-    Theme theme;//主题
-    private boolean drag;//主窗体是否被拖动
-    private float dragX, dragY;//拖动的位置
+    private static final float LEFTMENU_MIN_WIDTH = 120; //左侧类别列表的最小宽度
+    private static final float LEFTMENU_MAX_WIDTH = 150; //左侧类别列表的最大宽度
+
+    private static final float WINDOW_MIN_WIDTH = 400; //窗口最小宽度
+    private static final float WINDOW_MIN_HEIGHT = 250; //窗口最小高度
+
+    static float x = -1, y = -1, width = 0, height = 0;//坐标和宽高
+
+    Theme theme; //主题
+    private boolean drag; //主窗体是否被拖动
+    private float dragX, dragY; //拖动的位置
     ScaledResolution sr;
     static ModuleCategory curType = ModuleCategory.COMBAT;//选中的类别
     static Slider slider = new Slider();//功能分类滑块
@@ -44,16 +48,11 @@ public class ClickGui extends GuiScreen {
     private final boolean doesGuiPauseGame;//是否暂停游戏
     private static float leftMenuWidth = 0;//左侧类别栏的宽度
     private float showValueX;//右侧value的宽度
-    private final AnimationUtils valueXtimer = new AnimationUtils();//右侧value的缓动
-
-    private final AnimationUtils list_anim_timer = new AnimationUtils();//功能列表的缓动
-    private final AnimationUtils gui_anim_timer = new AnimationUtils();//主界面的缓动
     private static float gui_anim, list_anim;
 
     //搜索框
     private static String search_context;
     private boolean search_hover;
-
 
     public ClickGui(boolean doesGuiPauseGame) {
         this.doesGuiPauseGame = doesGuiPauseGame;
@@ -70,48 +69,59 @@ public class ClickGui extends GuiScreen {
 
     }
 
-    static float mods_whell; //用于滚动Module列表
-    static float mods_whelltemp; //用于缓动
-    AnimationUtils modsScrollAnimationUtils = new AnimationUtils();
+    static float mods_wheel; //用于滚动Module列表
+    static float mods_wheelTemp; //用于缓动
 
-    static float values_whell; //用于滚动Module列表
-    static float values_whelltemp; //用于缓动
-    AnimationUtils valuesScrollAnimationUtils = new AnimationUtils();
+    static float values_wheel; //用于滚动Module列表
+    static float values_wheelTemp; //用于缓动
+
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
+
         //缓动
-        if (gui_anim != 2) {
-            gui_anim = gui_anim_timer.animate(0, gui_anim, ANIMATION_SPEED, ANIMATION_DELAY);
+        if (gui_anim < 2) {
+            gui_anim = AnimationUtils.smoothAnimation(gui_anim, 2, ANIMATION_SPEED, ANIMATION_SCALE);
         }
+
         GlStateManager.translate(gui_anim, 0, 0);
+
         //取左侧列表宽度
         leftMenuWidth = Math.max(Math.min(width * 0.25f, LEFTMENU_MAX_WIDTH), LEFTMENU_MIN_WIDTH);
+
         //更新滑块
         slider.update();
+
         //取消拖动
         if (!Mouse.isButtonDown(0)) {
             drag = false;
             sizeDrag = false;
         }
+
         //拖动窗口
         if (drag) {
             x = mouseX - dragX;
             y = mouseY - dragY;
         }
-        //移动
-        float w = mouseX + sizeDragX - x;
-        float h = mouseY + sizeDragY - y;
+
         //设置窗口大小
         if (sizeDrag) {
-            if (w > WINDOW_MAX_WIDTH) {
-                width = w;
+            width += mouseX - sizeDragX;
+            if (width < WINDOW_MIN_WIDTH) {
+                width = WINDOW_MIN_WIDTH;
+            } else {
+                this.sizeDragX = mouseX;
             }
-            if (h > WINDOW_MAX_HEIGHT) {
-                height = h;
+
+            height += mouseY - sizeDragY;
+            if (height < WINDOW_MIN_HEIGHT) {
+                height = WINDOW_MIN_HEIGHT;
+            } else {
+                this.sizeDragY = mouseY;
             }
         }
+
         //绘制主窗体
         RenderUtils.drawRoundRect(x, y, x + width, y + height, 2, theme.bg.getRGB());//背景
         RenderUtils.drawRoundRect(x, y, x + leftMenuWidth, y + height, 2, theme.left.getRGB());//左侧列表
@@ -123,6 +133,7 @@ public class ClickGui extends GuiScreen {
         //绘制categories
         float my = y + 60;
         RenderUtils.drawRect(x, y + slider.top - 5, x + leftMenuWidth, y + slider.top + 25, theme.slider.getRGB());//滑块条
+
         for (ModuleCategory m : ModuleCategory.values()) {
             //capitalize方法: 把全部小写的一串字母转换成开头大写
             Main.fontLoaders.get("roboto20").drawString(StringUtils.capitalize(StringUtils.lowerCase(m.name())), x + leftMenuWidth / 2 - 20, my, curType == m ? theme.cate_sel.getRGB() : theme.cate_unsel.getRGB());
@@ -139,9 +150,12 @@ public class ClickGui extends GuiScreen {
         RenderUtils.drawRoundRect(x + leftMenuWidth + 10, y + 45, x + width - 10 - showValueX, y + height - 20, 3, theme.module_list_bg.getRGB());
 
         if (list_anim != 0) {
-            list_anim = list_anim_timer.animate(0, list_anim, ANIMATION_SPEED / 2, ANIMATION_DELAY);
+            list_anim = AnimationUtils.smoothAnimation(list_anim, 0, ANIMATION_SPEED, ANIMATION_SCALE);
         }
-        float modsY = y + 50 + mods_whell;
+
+        float modsY = y + 50 + mods_wheel;
+
+        float valuesY = 0;
         for (Module m : Main.INSTANCE.moduleManager.getModules()) {
             if (m.getCategory() == curType) {
                 //动画
@@ -151,42 +165,60 @@ public class ClickGui extends GuiScreen {
                     //获取一些颜色
                     int sc1 = m.getState() ? theme.sec_sel.getRGB() : theme.sec_unsel.getRGB();
                     int sc2 = m.getState() ? theme.desc_sel.getRGB() : theme.desc_unsel.getRGB();
-                    //绘制功能开关
-                    if (m.getState()) {
-                        RenderUtils.drawImage(new ResourceLocation("theresa/icons/enabled.png"), x + leftMenuWidth + 20, modsY + 10, 8, 8, new Color(255, 255, 255, ((int) m.clickgui_animX)));
-                    } else {
-                        RenderUtils.drawImage(new ResourceLocation("theresa/icons/disabled.png"), x + leftMenuWidth + 20, modsY + 10, 8, 8, new Color(255, 255, 255, ((int) (255 - m.clickgui_animX))));
-                    }
-                    //绘制功能名和描述
-                    Main.fontLoaders.get("roboto18").drawString(m.getName(), x + leftMenuWidth + 35, modsY + 15 - Main.fontLoaders.get("roboto15").getHeight() / 2f, sc1);
-                    float w1 = Main.fontLoaders.get("roboto18").getStringWidth(m.getName());
-                    Main.fontLoaders.get("roboto18").drawString(Main.fontLoaders.get("roboto18").trimStringToWidth(m.getDescription(), (int) (width - showValueX - leftMenuWidth - 85 - Main.fontLoaders.get("roboto18").getStringWidth(m.getName()))) + "..", x + leftMenuWidth + 40 + w1, modsY + 15 - 8 / 2f, sc2);
 
-                    m.clickgui_animX = m.clickgui_animX_timer.animate(m.getState() ? 255 : 0, m.clickgui_animX, ANIMATION_SPEED / 2, ANIMATION_DELAY);
+                    //绘制功能名和描述
+                    Main.fontLoaders.get("roboto18").drawString(m.getName(), x + leftMenuWidth + 35, modsY + 14 - Main.fontLoaders.get("roboto15").getHeight() / 2f, sc1);
+
+                    float w1 = Main.fontLoaders.get("roboto18").getStringWidth(m.getName());
+                    int trimWid = (int) (width - showValueX - leftMenuWidth - 85 - Main.fontLoaders.get("roboto18").getStringWidth(m.getName()));
+                    boolean fucked = Main.fontLoaders.get("roboto18").getStringWidth(m.getDescription()) > trimWid;
+                    Main.fontLoaders.get("roboto18").drawString(Main.fontLoaders.get("roboto18").trimStringToWidth(m.getDescription(), trimWid) + (fucked ? "..." : ""), x + leftMenuWidth + 40 + w1, modsY + 14 - 8 / 2f, sc2);
+
+                    m.clickgui_animX = AnimationUtils.smoothAnimation(m.clickgui_animX, m.getState() ? 255 : 0, 45f, ANIMATION_SCALE);
+
+                    //绘制功能开关
+                    RenderUtils.drawImage(new ResourceLocation("theresa/icons/disabled.png"), x + leftMenuWidth + 20, modsY + 10, 8, 8, new Color(255, 255, 255, ((int) (255 - m.clickgui_animX))));
+                    RenderUtils.drawImage(new ResourceLocation("theresa/icons/enabled.png"), x + leftMenuWidth + 20, modsY + 10, 8, 8, new Color(255, 255, 255, ((int) m.clickgui_animX)));
+
                     RenderUtils.drawRect(x + leftMenuWidth + 10, modsY + 30, x + width - 10 - showValueX, modsY + 31, theme.module_list_line.getRGB());
+
                     if (curModule == null) {
-                        showValueX = valueXtimer.animate(0, showValueX, ANIMATION_SPEED * 2, ANIMATION_DELAY);
-                        m.clickgui_animY = m.clickgui_animY_timer.animate(0, m.clickgui_animY, ANIMATION_SPEED, ANIMATION_DELAY);
+                        showValueX = AnimationUtils.smoothAnimation(showValueX, 0, ANIMATION_SPEED, ANIMATION_SCALE);
+                        m.clickgui_animY = AnimationUtils.smoothAnimation(m.clickgui_animY, 0, ANIMATION_SPEED, ANIMATION_SCALE);
                     } else if (m == curModule) {
                         RenderUtils.drawRoundRect(x + width - showValueX, y + 45, x + width - 10, y + height - 20, 3, -1);
-                        showValueX = valueXtimer.animate(width / 3, showValueX, ANIMATION_SPEED * 2, ANIMATION_DELAY);
-                        float valuesY = y + 60 + values_whell;
+                        showValueX = AnimationUtils.smoothAnimation(showValueX, width / 3, ANIMATION_SPEED * 2, ANIMATION_SCALE);
+                        valuesY = y + 55 + values_wheel;
                         // TODO: 2022/2/14 这里写的又臭又长，有时间分开写
+
                         for (Value v : Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName()))) {
-                            Main.fontLoaders.get("roboto18").drawString(v.getName(), x + width - showValueX + 5, valuesY, theme.value_name.getRGB());
+                            Main.fontLoaders.get("roboto18").drawString(v.getName(), x + width - showValueX + 5, valuesY + 1, theme.value_name.getRGB());
+
                             if (v instanceof BooleanValue) {
-                                RenderUtils.drawRoundRect(x + width - 50, valuesY, x + width - 25, valuesY + 10, 2, theme.option_bg.getRGB());
-                                v.clickgui_anim = v.clickgui_timer.animate(((boolean) v.getObject()) ? 15 : 0, v.clickgui_anim, ANIMATION_SPEED, ANIMATION_DELAY);
-                                RenderUtils.drawFilledCircle(x + width - 45 + v.clickgui_anim, valuesY + 5, 5, ((boolean) v.getObject()) ? theme.option_on.getRGB() : theme.option_off.getRGB(), 5);
+                                // Boolean value
+                                RenderUtils.drawRoundRect(x + width - 35, valuesY, x + width - 14, valuesY + 10, 5, theme.option_bg.getRGB());
+                                v.clickgui_anim = AnimationUtils.smoothAnimation(v.clickgui_anim, ((boolean) v.getObject()) ? 11 : 0, ANIMATION_SPEED, ANIMATION_SCALE);
+                                RenderUtils.drawFilledCircle(x + width - 30 + v.clickgui_anim, valuesY + 5, 5, ((boolean) v.getObject()) ? theme.option_on.getRGB() : theme.option_off.getRGB(), 5);
+
+                                //RenderUtils.drawRect(x + width - 35, valuesY, x + width - 14, valuesY + 10, 0x88ff0000);
                             } else if (v instanceof NumberValue) {
-                                RenderUtils.drawRoundRect(x + width - showValueX + 10, valuesY + 14, x + width - 30, valuesY + 15, 2, theme.option_bg.getRGB());
+                                // Number value
+                                RenderUtils.drawRoundRect(x + width - showValueX + 5, valuesY + 13, x + width - 14, valuesY + 19, 3, theme.option_bg.getRGB());
+
                                 float vX = (((Number) v.getObject()).floatValue() - ((NumberValue<?>) v).getMin().floatValue()) / (((NumberValue<?>) v).getMax().floatValue() - ((NumberValue<?>) v).getMin().floatValue());
-                                v.clickgui_anim = v.clickgui_timer.animate(vX * (showValueX - 40), v.clickgui_anim, ANIMATION_SPEED, ANIMATION_DELAY);
-                                RenderUtils.drawRoundRect(x + width - showValueX + 10, valuesY + 14, x + width - showValueX + 10 + v.clickgui_anim, valuesY + 15, 2, theme.themeColor.getRGB());
+
+                                v.clickgui_anim = sizeDrag ? vX * ((x + width - 19) - (x + width - showValueX + 5)) : AnimationUtils.smoothAnimation(v.clickgui_anim, vX * ((x + width - 19) - (x + width - showValueX + 5)), ANIMATION_SPEED, ANIMATION_SCALE);
+                                RenderUtils.drawRoundRect(x + width - showValueX + 5, valuesY + 13, x + width - showValueX + 10 + v.clickgui_anim, valuesY + 19, 3, theme.themeColor.getRGB());
+
+                                //RenderUtils.drawRect(x + width - showValueX + 5, valuesY + 13, x + width - 14, valuesY + 19, 0x88ff0000);
+
                                 DecimalFormat df = new DecimalFormat("#.##");
-                                Main.fontLoaders.get("roboto15").drawString(df.format(v.getObject()), x + width - 30 - (showValueX - 10) / 2, valuesY + 11, theme.value_number_value.getRGB(), false);
+
+                                String bs = df.format(v.getObject());
+                                Main.fontLoaders.get("roboto18").drawString(bs, x + width - 15 - (Main.fontLoaders.get("roboto16").getStringWidth(bs)) - 1, valuesY + 1, theme.value_number_value.getRGB(), false);
+
                                 if (((NumberValue<?>) v).clickgui_drag && Mouse.isButtonDown(0) && valuesY > y && valuesY + 20 < y + height) {
-                                    float v1 = (mouseX - (x + width - showValueX + 10)) / (showValueX - 40) * (((NumberValue<?>) v).getMax().floatValue() - ((NumberValue<?>) v).getMin().floatValue()) + ((NumberValue<?>) v).getMin().floatValue();
+                                    float v1 = (mouseX - (x + width - showValueX + 5)) / ((x + width - 19) - (x + width - showValueX + 5)) * (((NumberValue<?>) v).getMax().floatValue() - ((NumberValue<?>) v).getMin().floatValue()) + ((NumberValue<?>) v).getMin().floatValue();
                                     if (v1 <= ((NumberValue<?>) v).getMin().floatValue()) {
                                         v1 = (((NumberValue<?>) v).getMin().floatValue());
                                     }
@@ -206,36 +238,47 @@ public class ClickGui extends GuiScreen {
                                 } else {
                                     ((NumberValue<?>) v).clickgui_drag = false;
                                 }
-                                valuesY += 10;
+
+                                valuesY += 8;
                             } else if (v instanceof ModeValue) {
+                                // Mode value
                                 HFontRenderer font = Main.fontLoaders.get("roboto16");
                                 float width2 = 0;
+
                                 for (String mode : ((ModeValue) v).getModes()) {
                                     float temp = font.getStringWidth(mode);
                                     if (width2 < temp) width2 = temp;
                                 }
-                                RenderUtils.drawRoundRect(x + width - 30 - width2, valuesY - 2, x + width - 20, valuesY + 10 + v.clickgui_anim, 2, theme.option_bg.getRGB());
-                                font.drawCenteredString(((ModeValue) v).getCurrentMode(), x + width - 25 - width2 / 2, valuesY, theme.value_mode_current.getRGB());
+
+                                RenderUtils.drawRoundRect(x + width - 30 - width2, valuesY - 1, x + width - 15, valuesY + 11 + v.clickgui_anim, 2, theme.option_bg.getRGB());
+
+                                font.drawCenteredString(((ModeValue) v).getCurrentMode(), x + width - 23 - width2 / 2, valuesY + 1, theme.value_mode_current.getRGB());
+
                                 if (((ModeValue) v).open) {
-                                    v.clickgui_anim = v.clickgui_timer.animate(((ModeValue) v).getModes().length * 16, v.clickgui_anim, ANIMATION_SPEED, ANIMATION_DELAY);
+                                    v.clickgui_anim = AnimationUtils.smoothAnimation(v.clickgui_anim, ((ModeValue) v).getModes().length * 14, ANIMATION_SPEED, ANIMATION_SCALE);
                                 } else {
-                                    v.clickgui_anim = v.clickgui_timer.animate(0, v.clickgui_anim, ANIMATION_SPEED, ANIMATION_DELAY);
+                                    v.clickgui_anim = AnimationUtils.smoothAnimation(v.clickgui_anim, 0, ANIMATION_SPEED, ANIMATION_SCALE);
                                 }
 
                                 if (((ModeValue) v).open) {
-                                    float yy = valuesY + 16;
+                                    float yy = valuesY + 14;
                                     for (String mode : ((ModeValue) v).getModes()) {
-                                        font.drawCenteredString(mode, x + width - 25 - width2 / 2, yy, theme.value_mode_unsel.getRGB());
-                                        yy += 16;
+                                        if (valuesY + 18 + v.clickgui_anim >= yy + 14) {
+                                            font.drawCenteredString(mode, x + width - 23 - width2 / 2, yy, theme.value_mode_unsel.getRGB());
+                                        }
+
+                                        yy += 14;
                                     }
                                 }
                                 valuesY += v.clickgui_anim;
                             } else if (v instanceof ColorValue) {
+                                // Color
                                 if (isHovered(x, y, x + width, y + height - 20, mouseX, mouseY)) {
                                     ((ColorValue) v).draw(x + width - 70, valuesY + 1, 40, 40, mouseX, mouseY);
                                 } else {
                                     ((ColorValue) v).draw(x + width - 70, valuesY + 1, 40, 40, -1, -1);
                                 }
+
                                 valuesY += 30;
                             }
                             valuesY += 20;
@@ -243,32 +286,36 @@ public class ClickGui extends GuiScreen {
                         }
                     }
                 }
-                modsY += 40;
+                modsY += 31;
             }
-
         }
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
+
+        float mouseDWheel = Mouse.getDWheel() / 2f;
+
         //mods列表滚动
-        float mouseDwheel = Mouse.getDWheel();
         if (isHovered(x + leftMenuWidth + 10, y + 10, x + width - showValueX - 10, y + height - 20, mouseX, mouseY)) {
-            if (mouseDwheel > 0 && mods_whelltemp <= 0) {
-                mods_whelltemp += 16;
-                if (mods_whelltemp > 0) mods_whelltemp = 0;
-            } else if (mouseDwheel < 0 && modsY > y + height) {
-                mods_whelltemp -= 16;
+            if (mouseDWheel > 0 && mods_wheelTemp <= 0) {
+                mods_wheelTemp += 16;
+                if (mods_wheelTemp > 0) mods_wheelTemp = 0;
+            } else if (mouseDWheel < 0 && modsY > y + height) {
+                mods_wheelTemp -= 16;
             }
         }
-        mods_whell = modsScrollAnimationUtils.animate(mods_whelltemp, mods_whell, ANIMATION_SPEED, ANIMATION_DELAY);
+
+        mods_wheel = AnimationUtils.smoothAnimation(mods_wheel, mods_wheelTemp, ANIMATION_SPEED, ANIMATION_SCALE);
+
         //values列表滚动
         if (isHovered(x + width - showValueX, y + 10, x + width - 10, y + height - 20, mouseX, mouseY)) {
-            if (mouseDwheel > 0 && values_whelltemp <= 0) {
-                values_whelltemp += 16;
-                if (values_whelltemp > 0) values_whelltemp = 0;
-            } else if (mouseDwheel < 0 && modsY > y + height) {
-                values_whelltemp -= 16;
+            if (mouseDWheel > 0 && values_wheelTemp <= 0) {
+                values_wheelTemp += 16;
+                if (values_wheelTemp > 0) values_wheelTemp = 0;
+            } else if (mouseDWheel < 0 && valuesY > y + height) {
+                values_wheelTemp -= 16;
             }
         }
-        values_whell = valuesScrollAnimationUtils.animate(values_whelltemp, values_whell, ANIMATION_SPEED, ANIMATION_DELAY);
+
+        values_wheel = AnimationUtils.smoothAnimation(values_wheel, values_wheelTemp, ANIMATION_SPEED, ANIMATION_SCALE);
     }
 
     @Override
@@ -307,16 +354,18 @@ public class ClickGui extends GuiScreen {
             width = 500;
             height = 300;
         }
+
         if (x == -1 || y == -1) {
             x = (sr.getScaledWidth() - width) / 2;
             y = (sr.getScaledHeight() - height) / 2;
         }
+
         float my = y + 60;
         for (ModuleCategory m : ModuleCategory.values()) {
             if (m == curType) {
                 slider.change(my - 8 - y);
-                mods_whelltemp = 0;
-                mods_whell = 0;
+                mods_wheelTemp = 0;
+                mods_wheel = 0;
                 curType = m;
             }
             my += 30;
@@ -350,44 +399,44 @@ public class ClickGui extends GuiScreen {
             dragX = mouseX - x;
             dragY = mouseY - y;
         }
+
         if (mouseButton == 0 && isHovered(x + width - 20, y + height - 20, x + width - 4, y + height - 4, mouseX, mouseY)) {
             sizeDrag = true;
-            sizeDragX = (x + width) - mouseX;
-            sizeDragY = (y + height) - mouseY;
+            sizeDragX = mouseX;
+            sizeDragY = mouseY;
         }
-
 
         float my = y + 60;
         for (ModuleCategory m : ModuleCategory.values()) {
             if (isHovered(x + 0, my - 5, x + leftMenuWidth, my + MS18HEIGHT + 5, mouseX, mouseY)) {
                 slider.change(my - 8 - y);
-                mods_whelltemp = 0;
-                mods_whell = 0;
+                mods_wheelTemp = 0;
+                mods_wheel = 0;
                 curType = m;
                 curModule = null;
                 list_anim = 25;
             }
+
             my += 30;
         }
 
         //功能列表
-
-        float modsY = y + 50 + mods_whell;
+        float modsY = y + 50 + mods_wheel;
         for (Module m : Main.INSTANCE.moduleManager.getModules()) {
             if (m.getCategory() == curType) {
                 if (modsY < (y + height - 20)) {
                     if (m == curModule && isHovered(x + width - showValueX, y + 45, x + width - 10, y + height - 20, mouseX, mouseY)) {
-                        float valuesY = y + 60 + values_whell;
+                        float valuesY = y + 55 + values_wheel;
                         for (Value v : Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName()))) {
                             if (v instanceof BooleanValue) {
-                                if (isHovered(x + width - 45, valuesY, x + width - 30, valuesY + 10, mouseX, mouseY)) {
+                                if (isHovered(x + width - 35, valuesY, x + width - 14, valuesY + 10, mouseX, mouseY)) {
                                     v.setObject(!((BooleanValue) v).getObject());
                                 }
                             } else if (v instanceof NumberValue) {
-                                if (isHovered(x + width - showValueX + 10, valuesY + 12, x + width - 30, valuesY + 18, mouseX, mouseY)) {
+                                if (isHovered(x + width - showValueX + 5, valuesY + 13, x + width - 14, valuesY + 19, mouseX, mouseY)) {
                                     ((NumberValue<?>) v).clickgui_drag = true;
                                 }
-                                valuesY += 10;
+                                valuesY += 8;
                             } else if (v instanceof ModeValue) {
                                 HFontRenderer font = Main.fontLoaders.get("roboto16");
                                 float width2 = 0;
@@ -395,19 +444,21 @@ public class ClickGui extends GuiScreen {
                                     float temp = font.getStringWidth(mode);
                                     if (width2 < temp) width2 = temp;
                                 }
-                                if (isHovered(x + width - 30 - width2, valuesY - 2, x + width - 20, valuesY + 10, mouseX, mouseY)) {
+
+                                if (isHovered(x + width - 30 - width2, valuesY - 1, x + width - 15, valuesY + 11, mouseX, mouseY)) {
                                     ((ModeValue) v).open = !((ModeValue) v).open;
                                 }
+
                                 if (((ModeValue) v).open) {
-                                    float yy = valuesY + 16;
+                                    float yy = valuesY + 11;
                                     int i = 0;
                                     for (String mode : ((ModeValue) v).getModes()) {
-                                        if (isHovered(x + width - 30 - width2, yy, x + width - 20, yy + 16, mouseX, mouseY)) {
+                                        if (isHovered(x + width - 30 - width2, yy, x + width - 15, yy + 14, mouseX, mouseY)) {
                                             v.setObject(i);
                                             ((ModeValue) v).open = false;
                                         }
                                         i++;
-                                        yy += 16;
+                                        yy += 14;
                                     }
                                 }
                                 valuesY += v.clickgui_anim;
@@ -426,8 +477,8 @@ public class ClickGui extends GuiScreen {
                 }
                 if (isHovered(x + leftMenuWidth + 10, Math.max(modsY, y + 35), x + width - 10 - showValueX, Math.min(modsY + 30, y + height), mouseX, mouseY) && mouseButton == 1) {
                     //打开功能values列表
-                    values_whell = 0;
-                    values_whelltemp = 0;
+                    values_wheel = 0;
+                    values_wheelTemp = 0;
                     if (curModule != m) {
                         if (Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName())).size() > 0) {
                             curModule = m;
