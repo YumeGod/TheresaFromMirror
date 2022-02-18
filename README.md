@@ -1,5 +1,9 @@
 <h1 align="center">Theresa</h1>
-<h4 align="center">A mixin-based injection hacked client for Minecraft using the Forge</h4>
+<h4 align="center">基于Mixin的客户端</h4>
+
+## JVM参数
+
+    -Dfml.coreMods.load=cn.loli.client.injection.MixinLoader
 
 ### 导入与导出
 
