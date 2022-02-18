@@ -450,4 +450,141 @@ public class RenderUtils {
         GL11.glShadeModel(7424);
     }
 
+    public static void drawRectBound(float left, float top, float width, float height, int color) {
+        drawRect(left, top, left + width, top + height, color);
+    }
+
+    public static void roundedRect(float x, float y, float width, float height, float edgeRadius, int color, float borderWidth, int borderColor) {
+        if (edgeRadius < 0.0F) {
+            edgeRadius = 0.0F;
+        }
+
+        if (edgeRadius > width / 2.0F) {
+            edgeRadius = width / 2.0F;
+        }
+
+        if (edgeRadius > height / 2.0F) {
+            edgeRadius = height / 2.0F;
+        }
+
+        drawRectBound(x + edgeRadius, y + edgeRadius, width - edgeRadius * 2.0F, height - edgeRadius * 2.0F, color);
+        drawRectBound(x + edgeRadius, y, width - edgeRadius * 2.0F, edgeRadius, color);
+        drawRectBound(x + edgeRadius, y + height - edgeRadius, width - edgeRadius * 2.0F, edgeRadius, color);
+        drawRectBound(x, y + edgeRadius, edgeRadius, height - edgeRadius * 2.0F, color);
+        drawRectBound(x + width - edgeRadius, y + edgeRadius, edgeRadius, height - edgeRadius * 2.0F, color);
+        GlStateManager.enableBlend();
+        GlStateManager.enableCull();
+        GlStateManager.disableTexture2D();
+        GL11.glEnable(GL11.GL_LINE_SMOOTH);
+        GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_NICEST);
+        GL11.glHint(GL11.GL_POLYGON_SMOOTH_HINT, GL11.GL_NICEST);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glLineWidth(1.0F);
+
+        color(color);
+        GL11.glBegin(6);
+        float centerX = x + edgeRadius;
+        float centerY = y + edgeRadius;
+        GL11.glVertex2d(centerX, centerY);
+        int vertices = (int) Math.min(Math.max(edgeRadius, 10.0F), 90.0F);
+
+        int i;
+        double angleRadians;
+        for (i = 0; i < vertices + 1; ++i) {
+            angleRadians = 6.283185307179586D * (double) (i + 180) / (double) (vertices * 4);
+            GL11.glVertex2d((double) centerX + Math.sin(angleRadians) * (double) edgeRadius, (double) centerY + Math.cos(angleRadians) * (double) edgeRadius);
+        }
+
+        GL11.glEnd();
+        GL11.glBegin(6);
+        centerX = x + width - edgeRadius;
+        centerY = y + edgeRadius;
+        GL11.glVertex2d(centerX, centerY);
+        vertices = (int) Math.min(Math.max(edgeRadius, 10.0F), 90.0F);
+
+        for (i = 0; i < vertices + 1; ++i) {
+            angleRadians = 6.283185307179586D * (double) (i + 90) / (double) (vertices * 4);
+            GL11.glVertex2d((double) centerX + Math.sin(angleRadians) * (double) edgeRadius, (double) centerY + Math.cos(angleRadians) * (double) edgeRadius);
+        }
+
+        GL11.glEnd();
+        GL11.glBegin(6);
+        centerX = x + edgeRadius;
+        centerY = y + height - edgeRadius;
+        GL11.glVertex2d(centerX, centerY);
+        vertices = (int) Math.min(Math.max(edgeRadius, 10.0F), 90.0F);
+
+        for (i = 0; i < vertices + 1; ++i) {
+            angleRadians = 6.283185307179586D * (double) (i + 270) / (double) (vertices * 4);
+            GL11.glVertex2d((double) centerX + Math.sin(angleRadians) * (double) edgeRadius, (double) centerY + Math.cos(angleRadians) * (double) edgeRadius);
+        }
+        GL11.glEnd();
+
+        GL11.glBegin(6);
+        centerX = x + width - edgeRadius;
+        centerY = y + height - edgeRadius;
+        GL11.glVertex2d(centerX, centerY);
+        vertices = (int) Math.min(Math.max(edgeRadius, 10.0F), 90.0F);
+
+        for (i = 0; i < vertices + 1; ++i) {
+            angleRadians = 6.283185307179586D * (double) i / (double) (vertices * 4);
+            GL11.glVertex2d((double) centerX + Math.sin(angleRadians) * (double) edgeRadius, (double) centerY + Math.cos(angleRadians) * (double) edgeRadius);
+        }
+        GL11.glEnd();
+
+        RenderUtils.color(borderColor);
+        GL11.glLineWidth(borderWidth);
+        GL11.glBegin(3);
+        centerX = x + edgeRadius;
+        centerY = y + edgeRadius;
+        vertices = (int) Math.min(Math.max(edgeRadius, 10.0F), 90.0F);
+
+        for (i = vertices; i >= 0; --i) {
+            angleRadians = 6.283185307179586D * (double) (i + 180) / (double) (vertices * 4);
+            GL11.glVertex2d((double) centerX + Math.sin(angleRadians) * (double) edgeRadius, (double) centerY + Math.cos(angleRadians) * (double) edgeRadius);
+        }
+
+        GL11.glVertex2d(x + edgeRadius, y);
+        GL11.glVertex2d(x + width - edgeRadius, y);
+        centerX = x + width - edgeRadius;
+        centerY = y + edgeRadius;
+
+        for (i = vertices; i >= 0; --i) {
+            angleRadians = 6.283185307179586D * (double) (i + 90) / (double) (vertices * 4);
+            GL11.glVertex2d((double) centerX + Math.sin(angleRadians) * (double) edgeRadius, (double) centerY + Math.cos(angleRadians) * (double) edgeRadius);
+        }
+
+        GL11.glVertex2d(x + width, y + edgeRadius);
+        GL11.glVertex2d(x + width, y + height - edgeRadius);
+        centerX = x + width - edgeRadius;
+        centerY = y + height - edgeRadius;
+
+        for (i = vertices; i >= 0; --i) {
+            angleRadians = 6.283185307179586D * (double) i / (double) (vertices * 4);
+            GL11.glVertex2d((double) centerX + Math.sin(angleRadians) * (double) edgeRadius, (double) centerY + Math.cos(angleRadians) * (double) edgeRadius);
+        }
+
+        GL11.glVertex2d(x + width - edgeRadius, y + height);
+        GL11.glVertex2d(x + edgeRadius, y + height);
+        centerX = x + edgeRadius;
+        centerY = y + height - edgeRadius;
+
+        for (i = vertices; i >= 0; --i) {
+            angleRadians = 6.283185307179586D * (double) (i + 270) / (double) (vertices * 4);
+            GL11.glVertex2d((double) centerX + Math.sin(angleRadians) * (double) edgeRadius, (double) centerY + Math.cos(angleRadians) * (double) edgeRadius);
+        }
+
+        GL11.glVertex2d(x, y + height - edgeRadius);
+        GL11.glVertex2d(x, y + edgeRadius);
+        GL11.glEnd();
+
+        GlStateManager.disableBlend();
+        GlStateManager.enableCull();
+        GlStateManager.enableTexture2D();
+        GL11.glDisable(GL11.GL_LINE_SMOOTH);
+        GlStateManager.shadeModel(7424);
+
+        GlStateManager.resetColor();
+    }
+
 }
