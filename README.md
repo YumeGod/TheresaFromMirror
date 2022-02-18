@@ -1,7 +1,7 @@
 <h1 align="center">Theresa</h1>
 <h4 align="center">基于Mixin的客户端</h4>
 
-## JVM参数
+### JVM参数
 
     -Dfml.coreMods.load=cn.loli.client.injection.MixinLoader
 
