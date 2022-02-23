@@ -18,6 +18,7 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Cylinder;
 
+import javax.vecmath.Vector2d;
 import java.awt.*;
 
 import static org.lwjgl.opengl.GL11.*;
