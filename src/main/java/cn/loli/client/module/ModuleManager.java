@@ -40,9 +40,7 @@ public class ModuleManager {
         addModule(new Velocity());
 
         //Movement
-     //   addModule(new AntiFall());
         addModule(new BaffleSpeed());
-     //   addModule(new BunnyHop());
         addModule(new Speed());
         addModule(new FlagDetector());
         addModule(new Fly());
@@ -82,6 +80,7 @@ public class ModuleManager {
 
         //Other
         addModule(new Abuser());
+        addModule(new AntiVanish());
         addModule(new Spoofer());
         addModule(new IgnoreCommands());
         addModule(new HUD()); // Needs to be second last
