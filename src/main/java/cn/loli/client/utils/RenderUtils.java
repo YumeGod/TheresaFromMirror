@@ -1,7 +1,5 @@
 package cn.loli.client.utils;
 
-import cn.loli.client.injection.mixins.IAccessorMinecraft;
-import cn.loli.client.injection.mixins.IAccessorRenderManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
@@ -10,9 +8,7 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
@@ -452,83 +448,6 @@ public class RenderUtils {
         GL11.glDisable(3042);
         GL11.glDisable(2848);
         GL11.glShadeModel(7424);
-    }
-
-    public static int reAlpha(int color, float alpha) {
-        Color c = new Color(color);
-        float r = 0.003921569f * (float) c.getRed();
-        float g = 0.003921569f * (float) c.getGreen();
-        float b = 0.003921569f * (float) c.getBlue();
-        return new Color(r, g, b, alpha).getRGB();
-    }
-
-    public static void draw2DESP(EntityLivingBase entity, int color) {
-        GL11.glPushMatrix();
-        GL11.glEnable(3042);
-        GL11.glDisable(2929);
-        GL11.glNormal3f(0.0f, 1.0f, 0.0f);
-        GlStateManager.enableBlend();
-        GL11.glBlendFunc(770, 771);
-        GL11.glDisable(3553);
-        final float partialTicks = ((IAccessorMinecraft) mc).getTimer().renderPartialTicks;
-        final double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosX();
-        final double y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosY();
-        final double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosZ();
-        float SCALE = 0.035f;
-        SCALE /= 2.0f;
-        GlStateManager.translate((float) x, (float) y + entity.height + 0.5f - (entity.isChild() ? (entity.height / 2.0f) : 0.0f), (float) z);
-        GL11.glNormal3f(0.0f, 1.0f, 0.0f);
-        GlStateManager.rotate(-mc.getRenderManager().playerViewY, 0.0f, 1.0f, 0.0f);
-        GL11.glScalef(-SCALE, -SCALE, -SCALE);
-        final double xLeft = -30.0;
-        final double xRight = 30.0;
-        final double yUp = 15.0;
-        final double yDown = 140.0;
-        drawRect((float) xLeft, (float) yUp, (float) xRight, (float) yDown, color);
-        GL11.glEnable(3553);
-        GL11.glEnable(2929);
-        GlStateManager.disableBlend();
-        GL11.glDisable(3042);
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-        GL11.glNormal3f(1.0f, 1.0f, 1.0f);
-        GL11.glPopMatrix();
-    }
-
-    public static void renderBox(EntityLivingBase entity, int color) {
-        final float partialTicks = ((IAccessorMinecraft) mc).getTimer().renderPartialTicks;
-
-        double x = entity.lastTickPosX
-                + (entity.posX - entity.lastTickPosX) * partialTicks
-                - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosX();
-        double y = entity.lastTickPosY
-                + (entity.posY - entity.lastTickPosY) * partialTicks
-                - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosY();
-        double z = entity.lastTickPosZ
-                + (entity.posZ - entity.lastTickPosZ) * partialTicks
-                - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosZ();
-        double width = entity.getEntityBoundingBox().maxX - entity.getEntityBoundingBox().minX - 0.1;
-        double height = entity.getEntityBoundingBox().maxY - entity.getEntityBoundingBox().minY
-                + 0.25;
-
-        GL11.glPushMatrix();
-        GL11.glEnable(3042);
-        GL11.glBlendFunc(770, 771);
-        GL11.glDisable(3553);
-        GL11.glEnable(2848);
-        GL11.glDisable(2929);
-        GL11.glDepthMask(false);
-        color(entity.hurtTime > 1 ? reAlpha(new Color(199, 35, 35).getRGB(), 0.2f) : color);
-        drawBoundingBox(new AxisAlignedBB(x - width, y, z - width, x + width, y + height, z + width));
-        GL11.glLineWidth(1);
-        GL11.glColor4f(1f,
-                1f, 1f, 0);
-        drawOutlinedBoundingBox(new AxisAlignedBB(x - width, y, z - width, x + width, y + height, z + width));
-        GL11.glDisable(2848);
-        GL11.glEnable(3553);
-        GL11.glEnable(2929);
-        GL11.glDepthMask(true);
-        GL11.glDisable(3042);
-        GL11.glPopMatrix();
     }
 
 }

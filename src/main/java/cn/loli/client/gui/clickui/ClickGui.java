@@ -137,7 +137,7 @@ public class ClickGui extends GuiScreen {
         for (ModuleCategory m : ModuleCategory.values()) {
             //capitalize方法: 把全部小写的一串字母转换成开头大写
             Main.fontLoaders.get("roboto20").drawString(StringUtils.capitalize(StringUtils.lowerCase(m.name())), x + leftMenuWidth / 2 - 20, my, curType == m ? theme.cate_sel.getRGB() : theme.cate_unsel.getRGB());
-            RenderUtils.drawImage(new ResourceLocation("theresa/icons/" + m.name().toLowerCase() + ".png"), x + leftMenuWidth / 2 - 35, my - 2, 8, 8);
+            RenderUtils.drawImage(new ResourceLocation("theresa/icons/" + m.name().toLowerCase() + ".png"), x + leftMenuWidth / 2 - 35, my - 1, 8, 8);
             my += 30;
         }
 
@@ -208,7 +208,9 @@ public class ClickGui extends GuiScreen {
                                 float vX = (((Number) v.getObject()).floatValue() - ((NumberValue<?>) v).getMin().floatValue()) / (((NumberValue<?>) v).getMax().floatValue() - ((NumberValue<?>) v).getMin().floatValue());
 
                                 v.clickgui_anim = sizeDrag ? vX * ((x + width - 19) - (x + width - showValueX + 5)) : AnimationUtils.smoothAnimation(v.clickgui_anim, vX * ((x + width - 19) - (x + width - showValueX + 5)), ANIMATION_SPEED, ANIMATION_SCALE);
-                                RenderUtils.drawRoundRect(x + width - showValueX + 5, valuesY + 13, x + width - showValueX + 10 + v.clickgui_anim, valuesY + 19, 3, theme.themeColor.getRGB());
+                                //RenderUtils.drawRoundRect(x + width - showValueX + 5, valuesY + 13, x + width - showValueX + 10 + v.clickgui_anim, valuesY + 19, 3, theme.themeColor.getRGB());
+
+                                RenderUtils.roundedRect(x + width - showValueX + 5.5f, valuesY + 13, v.clickgui_anim + 5, 6, 3, theme.themeColor.getRGB(), .5f, theme.themeColor.getRGB());
 
                                 //RenderUtils.drawRect(x + width - showValueX + 5, valuesY + 13, x + width - 14, valuesY + 19, 0x88ff0000);
 
