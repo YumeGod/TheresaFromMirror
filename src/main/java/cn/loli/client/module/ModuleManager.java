@@ -53,6 +53,7 @@ public class ModuleManager {
         addModule(new AutoPlace());
         addModule(new AutoTools());
         addModule(new DamnBridge());
+        addModule(new MurderMystery());
         addModule(new NoFall());
         addModule(new NoRightClickDelay());
         addModule(new NoRotate());

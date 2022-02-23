@@ -8,6 +8,7 @@ import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.RenderUtils;
 import cn.loli.client.value.BooleanValue;
+import cn.loli.client.value.ColorValue;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.model.ModelPlayer;
@@ -48,6 +49,9 @@ public class ESP extends Module {
     private final BooleanValue healthbar = new BooleanValue("Health Bar", false);
     private final BooleanValue nametags = new BooleanValue("Name tags", false);
     private final BooleanValue invis = new BooleanValue("Ignore Invis", false);
+    public final BooleanValue chams = new BooleanValue("Chams", false);
+    public final ColorValue chamsColor = new ColorValue("Cham-Default-Color", new Color(187, 21, 21, 210));
+    public final ColorValue throughWallsColor = new ColorValue("Cham-ThroughWalls-Color", new Color(23, 74, 183, 210));
 
 
     public ESP() {
