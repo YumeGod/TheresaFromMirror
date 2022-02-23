@@ -2,6 +2,7 @@
 
 package cn.loli.client.utils.render;
 
+import cn.loli.client.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import org.jetbrains.annotations.NotNull;
@@ -12,14 +13,13 @@ import static org.lwjgl.opengl.GL20.*;
 /**
  * @author TheSlowly
  */
-public class Shader {
+public class Shader extends Utils {
     private static final String VERTEX_SHADER = "#version 130\n" +
             "\n" +
             "void main() {\n" +
             "    gl_TexCoord[0] = gl_MultiTexCoord0;\n" +
             "    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\n" +
             "}";
-    private final Minecraft mc = Minecraft.getMinecraft();
     private final int program;
     private final long startTime;
 

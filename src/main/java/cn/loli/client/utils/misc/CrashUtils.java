@@ -23,7 +23,6 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class CrashUtils {
 
-
     public String[] unicode = {"م",
             "⾟", "✈", "龜", "樓", "ᳱ", "ᳩ", "ᳫ", "ᳬ", "᳭", "ᳮ", "ᳯ", "ᳰ", "⿓", "⿕",
             "⿔", "\uD803\uDE60", "\uD803\uDE65", "ᮚ", "ꩶ", "꩷", "㉄", "Ὦ", "Ἇ", "ꬱ",

@@ -1,13 +1,12 @@
 package cn.loli.client.utils.player;
 
 import cn.loli.client.events.PlayerMoveEvent;
+import cn.loli.client.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;
 
-public class MoveUtils {
-
-    private static final Minecraft mc = Minecraft.getMinecraft();
+public class MoveUtils extends Utils {
 
     public static void setMotion(PlayerMoveEvent event, double speed) {
         double forward = mc.thePlayer.movementInput.moveForward;

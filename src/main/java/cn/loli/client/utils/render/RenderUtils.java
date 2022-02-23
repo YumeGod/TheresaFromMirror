@@ -2,6 +2,7 @@ package cn.loli.client.utils.render;
 
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.injection.mixins.IAccessorRenderManager;
+import cn.loli.client.utils.Utils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
@@ -20,8 +21,7 @@ import java.awt.*;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 
-public class RenderUtils {
-    static final Minecraft mc = Minecraft.getMinecraft();
+public class RenderUtils extends Utils {
 
     public static void drawWolframEntityESP(EntityLivingBase entity, int rgb, double posX, double posY, double posZ) {
         GL11.glPushMatrix();
