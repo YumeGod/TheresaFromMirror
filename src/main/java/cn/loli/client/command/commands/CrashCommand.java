@@ -27,7 +27,7 @@ public class CrashCommand extends Command {
     int bookType, bookvalue, redo, resolvebyte, json;
 
     public CrashCommand() {
-        super("crash", "c", "crash");
+        super("crash", "c", "rip");
     }
 
     @Override

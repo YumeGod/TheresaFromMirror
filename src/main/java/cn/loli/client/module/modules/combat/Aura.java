@@ -55,6 +55,7 @@ public class Aura extends Module {
 
 
     private final ModeValue mode = new ModeValue("Priority", "Angle", "Armor", "Range", "Fov", "Angle", "Health", "Hurt Time");
+    private final ModeValue esp = new ModeValue("Target ESP", "Box", "Box", "2D");
 
     private final BooleanValue autoBlock = new BooleanValue("AutoBlock", true);
     private static final BooleanValue invisibles = new BooleanValue("Invisibles", false);
@@ -142,17 +143,15 @@ public class Aura extends Module {
         if (target != null && show.getObject()) {
             EntityLivingBase entity = target;
 
-            double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * ((IAccessorMinecraft) mc).getTimer().renderPartialTicks
-                    - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosX();
-            double y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * ((IAccessorMinecraft) mc).getTimer().renderPartialTicks
-                    - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosY();
-            double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * ((IAccessorMinecraft) mc).getTimer().renderPartialTicks
-                    - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosZ();
+            switch (esp.getCurrentMode()) {
+                case "Box":
+                    RenderUtils.renderBox(entity, espColor.getObject().getRGB());
+                    break;
+                case "2D":
+                    RenderUtils.draw2DESP(entity, espColor.getObject().getRGB());
+                    break;
+            }
 
-            if (entity.hurtTime > 6)
-                RenderUtils.drawWolframEntityESP(entity, (new Color(255, 102, 113)).getRGB(), x, y, z);
-            else
-                RenderUtils.drawWolframEntityESP(entity, espColor.getObject().getRGB(), x, y, z);
         }
 
     }

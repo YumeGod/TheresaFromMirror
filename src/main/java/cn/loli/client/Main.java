@@ -6,6 +6,7 @@ import cn.loli.client.command.CommandManager;
 import cn.loli.client.connection.NettyClientHandler;
 import cn.loli.client.events.LoopEvent;
 import cn.loli.client.events.PacketEvent;
+import cn.loli.client.events.TextEvent;
 import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.file.FileManager;
 import cn.loli.client.gui.ttfr.FontLoaders;
@@ -35,12 +36,14 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.*;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
 import javax.swing.*;
+import javax.xml.soap.Text;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -66,16 +69,16 @@ public class Main {
     public static final String CLIENT_NAME = "theresa";
     @NotNull
     public static final String CLIENT_AUTHOR = "CuteMirror";
-    public static final double CLIENT_VERSION_NUMBER = -1;
+    public static final double CLIENT_VERSION_NUMBER = 1.0;
     @NotNull
-    public static final String CLIENT_VERSION = CLIENT_VERSION_NUMBER + "-BETA";
+    public static final String CLIENT_VERSION = CLIENT_VERSION_NUMBER + "";
     @NotNull
     public static final String CLIENT_INITIALS = "星";
 
     public static FontLoaders fontLoaders;
 
     public static Main INSTANCE;
-    public String name,password;
+    public String name, password;
 
     public Logger logger;
     public ModuleManager moduleManager;
@@ -209,6 +212,12 @@ public class Main {
         }
     }
 
+    @EventTarget
+    private void nameFix(TextEvent e) {
+        if (e.getText().contains("\247k"))
+            e.setText(StringUtils.replace(e.getText(), "\247k", ""));
+    }
+
     public void println(String obj) {
         Class<?> systemClass = null;
         try {
@@ -331,8 +340,8 @@ public class Main {
             jb.addActionListener(new ActionListener() { // 为确定按钮添加监听事件
 
                 public void actionPerformed(ActionEvent arg0) {
-                   Main.INSTANCE.name = name.getText();
-                   Main.INSTANCE.password = (new String(password.getPassword()));
+                    Main.INSTANCE.name = name.getText();
+                    Main.INSTANCE.password = (new String(password.getPassword()));
 
                     setVisible(false);
                 }

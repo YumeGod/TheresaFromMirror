@@ -26,6 +26,7 @@ public class CommandManager {
         addCommand(new CrashCommand());
         addCommand(new VClipCommand());
         addCommand(new IrcCommand());
+        addCommand(new MSLoginCommand());
     }
 
     private void addCommand(Command cmd) {

@@ -3,27 +3,20 @@ package cn.loli.client.module.modules.render;
 
 import cn.loli.client.events.Render2DEvent;
 import cn.loli.client.events.Render3DEvent;
-import cn.loli.client.events.RenderEvent;
-import cn.loli.client.events.RenderSREvent;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
-import cn.loli.client.injection.mixins.IAccessorRenderManager;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.RenderUtils;
 import cn.loli.client.value.BooleanValue;
 import com.darkmagician6.eventapi.EventTarget;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.model.ModelPlayer;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntityChest;
-import net.minecraft.tileentity.TileEntityLockable;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.Vec3;
@@ -40,12 +33,11 @@ import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
-import static net.minecraft.client.gui.Gui.*;
+import static net.minecraft.client.gui.Gui.drawRect;
 
 public class ESP extends Module {
 
     private final Map<EntityPlayer, float[]> entityPosMap = new HashMap<>();
-    private static Map<EntityPlayer, float[][]> entities = new HashMap<>();
 
     private final FloatBuffer windowPosition = BufferUtils.createFloatBuffer(4);
     private final IntBuffer viewport = GLAllocation.createDirectIntBuffer(16);
@@ -55,7 +47,7 @@ public class ESP extends Module {
     private final BooleanValue box = new BooleanValue("2D Box", false);
     private final BooleanValue healthbar = new BooleanValue("Health Bar", false);
     private final BooleanValue nametags = new BooleanValue("Name tags", false);
-    private final BooleanValue invis = new BooleanValue("Ignore Invis", true);
+    private final BooleanValue invis = new BooleanValue("Ignore Invis", false);
 
 
     public ESP() {
@@ -68,8 +60,6 @@ public class ESP extends Module {
         ScaledResolution res = new ScaledResolution(mc);
 
         for (EntityPlayer player : entityPosMap.keySet()) {
-            if (player.isInvisible() && invis.getObject())
-                return;
 
             GL11.glPushMatrix();
             mc.entityRenderer.setupOverlayRendering();
@@ -99,7 +89,7 @@ public class ESP extends Module {
                     endScissorBox();
             }
             if (nametags.getObject()) {
-                String text = "(" + EnumChatFormatting.GOLD + Math.round(mc.thePlayer.getDistanceToEntity(player)) + "m" + EnumChatFormatting.RESET + ")"+ player.getDisplayName().getUnformattedText();
+                String text = "(" + EnumChatFormatting.GOLD + Math.round(mc.thePlayer.getDistanceToEntity(player)) + "m" + EnumChatFormatting.RESET + ")" + player.getDisplayName().getUnformattedText();
                 float xDif = x2 - x;
                 float minScale = 0.65F;
                 float scale = Math.max(minScale,
@@ -134,16 +124,14 @@ public class ESP extends Module {
 
     @EventTarget
     private void onRender3D(Render3DEvent event) {
-        entities.keySet().removeIf(player -> !mc.theWorld.playerEntities.contains(player));
         ScaledResolution res = new ScaledResolution(mc);
-
         if (!entityPosMap.isEmpty())
             entityPosMap.clear();
 
         if (box.getObject() || healthbar.getObject() || nametags.getObject()) {
             int scaleFactor = res.getScaleFactor();
             for (EntityPlayer player : mc.theWorld.playerEntities) {
-                if (player.getDistanceToEntity(mc.thePlayer) < 1.0F)
+                if (player.getDistanceToEntity(mc.thePlayer) < 1.0F || (player.isInvisible() && invis.getObject()))
                     continue;
 
                 GL11.glPushMatrix();
@@ -215,18 +203,6 @@ public class ESP extends Module {
         return null;
     }
 
-    public static void addEntity(final EntityPlayer e, final ModelPlayer model) {
-        entities.put(e, new float[][]{
-                {model.bipedHead.rotateAngleX, model.bipedHead.rotateAngleY, model.bipedHead.rotateAngleZ},
-                {model.bipedRightArm.rotateAngleX, model.bipedRightArm.rotateAngleY,
-                        model.bipedRightArm.rotateAngleZ},
-                {model.bipedLeftArm.rotateAngleX, model.bipedLeftArm.rotateAngleY, model.bipedLeftArm.rotateAngleZ},
-                {model.bipedRightLeg.rotateAngleX, model.bipedRightLeg.rotateAngleY,
-                        model.bipedRightLeg.rotateAngleZ},
-                {model.bipedLeftLeg.rotateAngleX, model.bipedLeftLeg.rotateAngleY,
-                        model.bipedLeftLeg.rotateAngleZ}});
-    }
-
 
     private Vec3 getVec3(final EntityPlayer var0) {
         final float timer = ((IAccessorMinecraft) mc).getTimer().renderPartialTicks;
@@ -236,119 +212,11 @@ public class ESP extends Module {
         return new Vec3(x, y, z);
     }
 
-    private void startEnd(final boolean revert) {
-        if (revert) {
-            GlStateManager.pushMatrix();
-            GlStateManager.enableBlend();
-            GL11.glEnable(2848);
-            GlStateManager.disableDepth();
-            GL11.glDisable(GL11.GL_TEXTURE_2D);
-            GlStateManager.blendFunc(770, 771);
-            GL11.glHint(3154, 4354);
-        } else {
-            GlStateManager.disableBlend();
-            GL11.glEnable(GL11.GL_TEXTURE_2D);
-            GL11.glDisable(2848);
-            GlStateManager.enableDepth();
-            GlStateManager.popMatrix();
-        }
-        GlStateManager.depthMask(!revert);
-    }
 
     public static int getColorFromPercentage(float current, float max) {
         float percentage = (current / max) / 3;
         return Color.HSBtoRGB(percentage, 1.0F, 1.0F);
     }
-
-
-    public static void pre3D() {
-        GL11.glPushMatrix();
-        GL11.glEnable(3042);
-        GL11.glBlendFunc(770, 771);
-        GL11.glShadeModel(7425);
-        GL11.glDisable(3553);
-        GL11.glEnable(2848);
-        GL11.glDisable(2929);
-        GL11.glDisable(2896);
-        GL11.glDepthMask(false);
-        GL11.glHint(3154, 4354);
-    }
-
-    public static void post3D() {
-        GL11.glDepthMask(true);
-        GL11.glEnable(2929);
-        GL11.glDisable(2848);
-        GL11.glEnable(3553);
-        GL11.glDisable(3042);
-        GL11.glPopMatrix();
-        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    }
-
-    public static void drawFilledBoundingBox(final AxisAlignedBB box) {
-        final Tessellator tessellator = Tessellator.getInstance();
-        final WorldRenderer worldRenderer = tessellator.getWorldRenderer();
-        worldRenderer.begin(7, DefaultVertexFormats.OLDMODEL_POSITION_TEX_NORMAL);
-        worldRenderer.pos(box.minX, box.minY, box.minZ).endVertex();
-        worldRenderer.pos(box.minX, box.maxY, box.minZ).endVertex();
-        worldRenderer.pos(box.maxX, box.minY, box.minZ).endVertex();
-        worldRenderer.pos(box.maxX, box.maxY, box.minZ).endVertex();
-        worldRenderer.pos(box.maxX, box.minY, box.maxZ).endVertex();
-        worldRenderer.pos(box.maxX, box.maxY, box.maxZ).endVertex();
-        worldRenderer.pos(box.minX, box.minY, box.maxZ).endVertex();
-        worldRenderer.pos(box.minX, box.maxY, box.maxZ).endVertex();
-        tessellator.draw();
-        worldRenderer.begin(7, DefaultVertexFormats.OLDMODEL_POSITION_TEX_NORMAL);
-        worldRenderer.pos(box.maxX, box.maxY, box.minZ).endVertex();
-        worldRenderer.pos(box.maxX, box.minY, box.minZ).endVertex();
-        worldRenderer.pos(box.minX, box.maxY, box.minZ).endVertex();
-        worldRenderer.pos(box.minX, box.minY, box.minZ).endVertex();
-        worldRenderer.pos(box.minX, box.maxY, box.maxZ).endVertex();
-        worldRenderer.pos(box.minX, box.minY, box.maxZ).endVertex();
-        worldRenderer.pos(box.maxX, box.maxY, box.maxZ).endVertex();
-        worldRenderer.pos(box.maxX, box.minY, box.maxZ).endVertex();
-        tessellator.draw();
-        worldRenderer.begin(7, DefaultVertexFormats.OLDMODEL_POSITION_TEX_NORMAL);
-        worldRenderer.pos(box.minX, box.maxY, box.minZ).endVertex();
-        worldRenderer.pos(box.maxX, box.maxY, box.minZ).endVertex();
-        worldRenderer.pos(box.maxX, box.maxY, box.maxZ).endVertex();
-        worldRenderer.pos(box.minX, box.maxY, box.maxZ).endVertex();
-        worldRenderer.pos(box.minX, box.maxY, box.minZ).endVertex();
-        worldRenderer.pos(box.minX, box.maxY, box.maxZ).endVertex();
-        worldRenderer.pos(box.maxX, box.maxY, box.maxZ).endVertex();
-        worldRenderer.pos(box.maxX, box.maxY, box.minZ).endVertex();
-        tessellator.draw();
-        worldRenderer.begin(7, DefaultVertexFormats.OLDMODEL_POSITION_TEX_NORMAL);
-        worldRenderer.pos(box.minX, box.minY, box.minZ).endVertex();
-        worldRenderer.pos(box.maxX, box.minY, box.minZ).endVertex();
-        worldRenderer.pos(box.maxX, box.minY, box.maxZ).endVertex();
-        worldRenderer.pos(box.minX, box.minY, box.maxZ).endVertex();
-        worldRenderer.pos(box.minX, box.minY, box.minZ).endVertex();
-        worldRenderer.pos(box.minX, box.minY, box.maxZ).endVertex();
-        worldRenderer.pos(box.maxX, box.minY, box.maxZ).endVertex();
-        worldRenderer.pos(box.maxX, box.minY, box.minZ).endVertex();
-        tessellator.draw();
-        worldRenderer.begin(7, DefaultVertexFormats.OLDMODEL_POSITION_TEX_NORMAL);
-        worldRenderer.pos(box.minX, box.minY, box.minZ).endVertex();
-        worldRenderer.pos(box.minX, box.maxY, box.minZ).endVertex();
-        worldRenderer.pos(box.minX, box.minY, box.maxZ).endVertex();
-        worldRenderer.pos(box.minX, box.maxY, box.maxZ).endVertex();
-        worldRenderer.pos(box.maxX, box.minY, box.maxZ).endVertex();
-        worldRenderer.pos(box.maxX, box.maxY, box.maxZ).endVertex();
-        worldRenderer.pos(box.maxX, box.minY, box.minZ).endVertex();
-        worldRenderer.pos(box.maxX, box.maxY, box.minZ).endVertex();
-        tessellator.draw();
-        worldRenderer.begin(7, DefaultVertexFormats.OLDMODEL_POSITION_TEX_NORMAL);
-        worldRenderer.pos(box.minX, box.maxY, box.maxZ).endVertex();
-        worldRenderer.pos(box.minX, box.minY, box.maxZ).endVertex();
-        worldRenderer.pos(box.minX, box.maxY, box.minZ).endVertex();
-        worldRenderer.pos(box.minX, box.minY, box.minZ).endVertex();
-        worldRenderer.pos(box.maxX, box.maxY, box.minZ).endVertex();
-        worldRenderer.pos(box.maxX, box.minY, box.minZ).endVertex();
-        worldRenderer.pos(box.maxX, box.maxY, box.maxZ).endVertex();
-        worldRenderer.pos(box.maxX, box.minY, box.maxZ).endVertex();
-        tessellator.draw();
-    }
-
 
     @Override
     public void onEnable() {

@@ -34,6 +34,7 @@
   ],
   "client": [
     "IAccessorFontRenderer",
+    "MixinFontRenderer",
     "MixinNetHandlerPlayClient"
   ]
 }

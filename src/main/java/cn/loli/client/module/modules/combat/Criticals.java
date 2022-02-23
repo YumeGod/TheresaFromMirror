@@ -84,44 +84,21 @@ public class Criticals extends Module {
     }
 
 
-
-
     @EventTarget
     public void onEdit(MotionUpdateEvent e) {
-        if (e.getEventType() == EventType.PRE) {
-            switch (mode.getCurrentMode()) {
-                case "Hypixel": {
-                    if (mc.thePlayer.isCollidedVertically && mc.thePlayer.onGround && !Main.INSTANCE.moduleManager.getModule(Speed.class).getState() && PlayerUtils.isMoving2()) {
-                        int ht = Main.INSTANCE.moduleManager.getModule(Aura.class).target.hurtResistantTime;
-                        double var1 = ThreadLocalRandom.current().nextDouble(0.01435, 0.01439),
-                                var2 = ThreadLocalRandom.current().nextDouble(0.000468, 0.000470),
-                                var3 = ThreadLocalRandom.current().nextDouble(1.5E-7, 1.63166800276E-7);
-                        switch (ht) {
-                            case 20: {
-                                e.setOnGround(false);
-                                e.setY(mc.thePlayer.posY + var1);
-                                break;
-                            }
-                            case 19: {
-                                e.setOnGround(false);
-                                e.setY(mc.thePlayer.posY + var2 + var3);
-                                break;
-                            }
-                            case 18: {
-                                e.setOnGround(false);
-                                e.setY(mc.thePlayer.posY + var1 - var3);
-                                break;
-                            }
-                            case 17: {
-                                e.setOnGround(false);
-                                e.setY(mc.thePlayer.posY + var2);
-                                break;
-                            }
-                        }
+        if (e.getEventType() == EventType.PRE)
+            if ("Hypixel".equals(mode.getCurrentMode()))
+                if (PlayerUtils.isMoving2()) {
+                    Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
+                    if (entity == null) return;
+                    if (mc.thePlayer.onGround && entity.hurtResistantTime != 20) {
+                        e.setY(e.getY() + 0.003);
+                        if (mc.thePlayer.ticksExisted % 10 == 0)
+                            e.setY(e.getY() + 0.001);
+
+                        e.setOnGround(false);
                     }
                 }
-            }
-        }
     }
 }
 

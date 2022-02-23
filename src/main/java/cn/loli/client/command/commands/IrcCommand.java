@@ -11,7 +11,7 @@ import java.util.List;
 
 public class IrcCommand extends Command {
     public IrcCommand() {
-        super("irc", "irc", "irc");
+        super("irc", "chat", "ircchat");
     }
 
     @Override
@@ -21,7 +21,12 @@ public class IrcCommand extends Command {
             return;
         }
 
-        Main.cf.channel().writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, Main.INSTANCE.name + ChatFormatting.WHITE + ": " + ChatFormatting.GRAY + args[0]).pack());
+        StringBuilder sb = new StringBuilder();
+        for (String arg : args) {
+            sb.append(arg).append(" ");
+        }
+
+        Main.cf.channel().writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, Main.INSTANCE.name + ChatFormatting.WHITE + ": " + ChatFormatting.GRAY + sb).pack());
     }
 
     @Override
