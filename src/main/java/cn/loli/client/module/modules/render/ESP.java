@@ -49,6 +49,7 @@ public class ESP extends Module {
     private final BooleanValue healthbar = new BooleanValue("Health Bar", false);
     private final BooleanValue nametags = new BooleanValue("Name tags", false);
     private final BooleanValue invis = new BooleanValue("Ignore Invis", false);
+
     public final BooleanValue chams = new BooleanValue("Chams", false);
 
     public final ColorValue boxColor = new ColorValue("Box-Color", new Color(239, 235, 235, 210));

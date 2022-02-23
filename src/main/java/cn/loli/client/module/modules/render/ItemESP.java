@@ -70,7 +70,7 @@ public class ItemESP extends Module {
                         cylinder.setDrawStyle(GLU.GLU_LINE);
                         cylinder.setOrientation(GLU.GLU_INSIDE);
                         cylinder.draw(0.62f, 0.62f, entity.height, 8, 1);
-                        RenderUtils.color(RenderUtils.reAlpha(item.getObject().getRGB(), 0.7f));
+                        RenderUtils.color(RenderUtils.reAlpha(item.getObject().getRGB(), chest.getObject().getAlpha() / 255f));
                         cylinder.setDrawStyle(GLU.GLU_FILL);
                         cylinder.setOrientation(GLU.GLU_INSIDE);
                         cylinder.draw(0.62f, 0.65f, entity.height, 8, 1);
@@ -113,7 +113,7 @@ public class ItemESP extends Module {
                         cylinder.setOrientation(GLU.GLU_INSIDE);
                         cylinder.draw(0.62f, 0.62f, 0.9f, 8, 1);
 
-                        RenderUtils.color(RenderUtils.reAlpha(chest.getObject().getRGB(), 0.7f));
+                        RenderUtils.color(RenderUtils.reAlpha(chest.getObject().getRGB(), chest.getObject().getAlpha() / 255f));
 
                         cylinder.setDrawStyle(GLU.GLU_FILL);
                         cylinder.setOrientation(GLU.GLU_INSIDE);

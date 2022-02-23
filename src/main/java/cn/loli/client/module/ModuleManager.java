@@ -67,6 +67,7 @@ public class ModuleManager {
         //Render
         addModule(new BlockHit());
         addModule(new FullBright());
+        addModule(new ItemESP());
         addModule(new ItemRenderer());
         addModule(new ESP());
         addModule(new NoFov());

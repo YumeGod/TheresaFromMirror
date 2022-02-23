@@ -73,6 +73,7 @@ public class Aura extends Module {
     private final BooleanValue vresolver = new BooleanValue("V-Resolver", false);
 
     private final BooleanValue show = new BooleanValue("Show-Target", true);
+    private final BooleanValue targetHud = new BooleanValue("Target-Hud", false);
 
     private final ColorValue espColor = new ColorValue("ESP-Color", Color.BLUE);
 
@@ -158,6 +159,9 @@ public class Aura extends Module {
 
     @EventTarget
     public void onRender2D(Render2DEvent event) {
+        if (targetHud.getObject()){
+            
+        }
     }
 
 
