@@ -1,5 +1,7 @@
 package cn.loli.client.utils;
 
+import cn.loli.client.injection.mixins.IAccessorMinecraft;
+import cn.loli.client.injection.mixins.IAccessorRenderManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
@@ -8,7 +10,9 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
@@ -420,6 +424,84 @@ public class RenderUtils {
         GL11.glHint(3155, 4352);
     }
 
+
+    public static int reAlpha(int color, float alpha) {
+        Color c = new Color(color);
+        float r = 0.003921569f * (float) c.getRed();
+        float g = 0.003921569f * (float) c.getGreen();
+        float b = 0.003921569f * (float) c.getBlue();
+        return new Color(r, g, b, alpha).getRGB();
+    }
+
+    public static void draw2DESP(EntityLivingBase entity, int color) {
+        GL11.glPushMatrix();
+        GL11.glEnable(3042);
+        GL11.glDisable(2929);
+        GL11.glNormal3f(0.0f, 1.0f, 0.0f);
+        GlStateManager.enableBlend();
+        GL11.glBlendFunc(770, 771);
+        GL11.glDisable(3553);
+        final float partialTicks = ((IAccessorMinecraft) mc).getTimer().renderPartialTicks;
+        final double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosX();
+        final double y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosY();
+        final double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosZ();
+        float SCALE = 0.035f;
+        SCALE /= 2.0f;
+        GlStateManager.translate((float) x, (float) y + entity.height + 0.5f - (entity.isChild() ? (entity.height / 2.0f) : 0.0f), (float) z);
+        GL11.glNormal3f(0.0f, 1.0f, 0.0f);
+        GlStateManager.rotate(-mc.getRenderManager().playerViewY, 0.0f, 1.0f, 0.0f);
+        GL11.glScalef(-SCALE, -SCALE, -SCALE);
+        final double xLeft = -30.0;
+        final double xRight = 30.0;
+        final double yUp = 15.0;
+        final double yDown = 140.0;
+        drawRect((float) xLeft, (float) yUp, (float) xRight, (float) yDown, color);
+        GL11.glEnable(3553);
+        GL11.glEnable(2929);
+        GlStateManager.disableBlend();
+        GL11.glDisable(3042);
+        GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        GL11.glNormal3f(1.0f, 1.0f, 1.0f);
+        GL11.glPopMatrix();
+    }
+
+    public static void renderBox(EntityLivingBase entity, int color) {
+        final float partialTicks = ((IAccessorMinecraft) mc).getTimer().renderPartialTicks;
+
+        double x = entity.lastTickPosX
+                + (entity.posX - entity.lastTickPosX) * partialTicks
+                - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosX();
+        double y = entity.lastTickPosY
+                + (entity.posY - entity.lastTickPosY) * partialTicks
+                - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosY();
+        double z = entity.lastTickPosZ
+                + (entity.posZ - entity.lastTickPosZ) * partialTicks
+                - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosZ();
+        double width = entity.getEntityBoundingBox().maxX - entity.getEntityBoundingBox().minX - 0.1;
+        double height = entity.getEntityBoundingBox().maxY - entity.getEntityBoundingBox().minY
+                + 0.25;
+
+        GL11.glPushMatrix();
+        GL11.glEnable(3042);
+        GL11.glBlendFunc(770, 771);
+        GL11.glDisable(3553);
+        GL11.glEnable(2848);
+        GL11.glDisable(2929);
+        GL11.glDepthMask(false);
+        color(entity.hurtTime > 1 ? reAlpha(new Color(199, 35, 35).getRGB(), 0.2f) : color);
+        drawBoundingBox(new AxisAlignedBB(x - width, y, z - width, x + width, y + height, z + width));
+        GL11.glLineWidth(1);
+        GL11.glColor4f(1f,
+                1f, 1f, 0);
+        drawOutlinedBoundingBox(new AxisAlignedBB(x - width, y, z - width, x + width, y + height, z + width));
+        GL11.glDisable(2848);
+        GL11.glEnable(3553);
+        GL11.glEnable(2929);
+        GL11.glDepthMask(true);
+        GL11.glDisable(3042);
+        GL11.glPopMatrix();
+    }
+
     public static void drawGradientSideways(double left, double top, double right, double bottom, int col1, int col2) {
         float f = (float) (col1 >> 24 & 255) / 255.0f;
         float f1 = (float) (col1 >> 16 & 255) / 255.0f;
@@ -448,6 +530,143 @@ public class RenderUtils {
         GL11.glDisable(3042);
         GL11.glDisable(2848);
         GL11.glShadeModel(7424);
+    }
+
+    public static void drawRectBound(float left, float top, float width, float height, int color) {
+        drawRect(left, top, left + width, top + height, color);
+    }
+
+    public static void roundedRect(float x, float y, float width, float height, float edgeRadius, int color, float borderWidth, int borderColor) {
+        if (edgeRadius < 0.0F) {
+            edgeRadius = 0.0F;
+        }
+
+        if (edgeRadius > width / 2.0F) {
+            edgeRadius = width / 2.0F;
+        }
+
+        if (edgeRadius > height / 2.0F) {
+            edgeRadius = height / 2.0F;
+        }
+
+        drawRectBound(x + edgeRadius, y + edgeRadius, width - edgeRadius * 2.0F, height - edgeRadius * 2.0F, color);
+        drawRectBound(x + edgeRadius, y, width - edgeRadius * 2.0F, edgeRadius, color);
+        drawRectBound(x + edgeRadius, y + height - edgeRadius, width - edgeRadius * 2.0F, edgeRadius, color);
+        drawRectBound(x, y + edgeRadius, edgeRadius, height - edgeRadius * 2.0F, color);
+        drawRectBound(x + width - edgeRadius, y + edgeRadius, edgeRadius, height - edgeRadius * 2.0F, color);
+        GlStateManager.enableBlend();
+        GlStateManager.enableCull();
+        GlStateManager.disableTexture2D();
+        GL11.glEnable(GL11.GL_LINE_SMOOTH);
+        GL11.glHint(GL11.GL_LINE_SMOOTH_HINT, GL11.GL_NICEST);
+        GL11.glHint(GL11.GL_POLYGON_SMOOTH_HINT, GL11.GL_NICEST);
+        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GL11.glLineWidth(1.0F);
+
+        color(color);
+        GL11.glBegin(6);
+        float centerX = x + edgeRadius;
+        float centerY = y + edgeRadius;
+        GL11.glVertex2d(centerX, centerY);
+        int vertices = (int) Math.min(Math.max(edgeRadius, 10.0F), 90.0F);
+
+        int i;
+        double angleRadians;
+        for (i = 0; i < vertices + 1; ++i) {
+            angleRadians = 6.283185307179586D * (double) (i + 180) / (double) (vertices * 4);
+            GL11.glVertex2d((double) centerX + Math.sin(angleRadians) * (double) edgeRadius, (double) centerY + Math.cos(angleRadians) * (double) edgeRadius);
+        }
+
+        GL11.glEnd();
+        GL11.glBegin(6);
+        centerX = x + width - edgeRadius;
+        centerY = y + edgeRadius;
+        GL11.glVertex2d(centerX, centerY);
+        vertices = (int) Math.min(Math.max(edgeRadius, 10.0F), 90.0F);
+
+        for (i = 0; i < vertices + 1; ++i) {
+            angleRadians = 6.283185307179586D * (double) (i + 90) / (double) (vertices * 4);
+            GL11.glVertex2d((double) centerX + Math.sin(angleRadians) * (double) edgeRadius, (double) centerY + Math.cos(angleRadians) * (double) edgeRadius);
+        }
+
+        GL11.glEnd();
+        GL11.glBegin(6);
+        centerX = x + edgeRadius;
+        centerY = y + height - edgeRadius;
+        GL11.glVertex2d(centerX, centerY);
+        vertices = (int) Math.min(Math.max(edgeRadius, 10.0F), 90.0F);
+
+        for (i = 0; i < vertices + 1; ++i) {
+            angleRadians = 6.283185307179586D * (double) (i + 270) / (double) (vertices * 4);
+            GL11.glVertex2d((double) centerX + Math.sin(angleRadians) * (double) edgeRadius, (double) centerY + Math.cos(angleRadians) * (double) edgeRadius);
+        }
+        GL11.glEnd();
+
+        GL11.glBegin(6);
+        centerX = x + width - edgeRadius;
+        centerY = y + height - edgeRadius;
+        GL11.glVertex2d(centerX, centerY);
+        vertices = (int) Math.min(Math.max(edgeRadius, 10.0F), 90.0F);
+
+        for (i = 0; i < vertices + 1; ++i) {
+            angleRadians = 6.283185307179586D * (double) i / (double) (vertices * 4);
+            GL11.glVertex2d((double) centerX + Math.sin(angleRadians) * (double) edgeRadius, (double) centerY + Math.cos(angleRadians) * (double) edgeRadius);
+        }
+        GL11.glEnd();
+
+        RenderUtils.color(borderColor);
+        GL11.glLineWidth(borderWidth);
+        GL11.glBegin(3);
+        centerX = x + edgeRadius;
+        centerY = y + edgeRadius;
+        vertices = (int) Math.min(Math.max(edgeRadius, 10.0F), 90.0F);
+
+        for (i = vertices; i >= 0; --i) {
+            angleRadians = 6.283185307179586D * (double) (i + 180) / (double) (vertices * 4);
+            GL11.glVertex2d((double) centerX + Math.sin(angleRadians) * (double) edgeRadius, (double) centerY + Math.cos(angleRadians) * (double) edgeRadius);
+        }
+
+        GL11.glVertex2d(x + edgeRadius, y);
+        GL11.glVertex2d(x + width - edgeRadius, y);
+        centerX = x + width - edgeRadius;
+        centerY = y + edgeRadius;
+
+        for (i = vertices; i >= 0; --i) {
+            angleRadians = 6.283185307179586D * (double) (i + 90) / (double) (vertices * 4);
+            GL11.glVertex2d((double) centerX + Math.sin(angleRadians) * (double) edgeRadius, (double) centerY + Math.cos(angleRadians) * (double) edgeRadius);
+        }
+
+        GL11.glVertex2d(x + width, y + edgeRadius);
+        GL11.glVertex2d(x + width, y + height - edgeRadius);
+        centerX = x + width - edgeRadius;
+        centerY = y + height - edgeRadius;
+
+        for (i = vertices; i >= 0; --i) {
+            angleRadians = 6.283185307179586D * (double) i / (double) (vertices * 4);
+            GL11.glVertex2d((double) centerX + Math.sin(angleRadians) * (double) edgeRadius, (double) centerY + Math.cos(angleRadians) * (double) edgeRadius);
+        }
+
+        GL11.glVertex2d(x + width - edgeRadius, y + height);
+        GL11.glVertex2d(x + edgeRadius, y + height);
+        centerX = x + edgeRadius;
+        centerY = y + height - edgeRadius;
+
+        for (i = vertices; i >= 0; --i) {
+            angleRadians = 6.283185307179586D * (double) (i + 270) / (double) (vertices * 4);
+            GL11.glVertex2d((double) centerX + Math.sin(angleRadians) * (double) edgeRadius, (double) centerY + Math.cos(angleRadians) * (double) edgeRadius);
+        }
+
+        GL11.glVertex2d(x, y + height - edgeRadius);
+        GL11.glVertex2d(x, y + edgeRadius);
+        GL11.glEnd();
+
+        GlStateManager.disableBlend();
+        GlStateManager.enableCull();
+        GlStateManager.enableTexture2D();
+        GL11.glDisable(GL11.GL_LINE_SMOOTH);
+        GlStateManager.shadeModel(7424);
+
+        GlStateManager.resetColor();
     }
 
 }
