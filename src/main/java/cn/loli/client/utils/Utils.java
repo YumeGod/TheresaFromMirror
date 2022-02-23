@@ -22,6 +22,7 @@ import java.util.Random;
 
 public class Utils {
     private static final Random RANDOM = new Random();
+    static final Minecraft mc = Minecraft.getMinecraft();
 
     /**
      * This function returns a random value between min and max

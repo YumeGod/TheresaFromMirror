@@ -3,7 +3,7 @@ package cn.loli.client.module.modules.player;
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.utils.InvUtils;
+import cn.loli.client.utils.player.InvUtils;
 import cn.loli.client.value.BooleanValue;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.block.Block;

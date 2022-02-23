@@ -1,4 +1,4 @@
-package cn.loli.client.utils;
+package cn.loli.client.utils.misc;
 
 import java.util.Arrays;
 import java.util.List;

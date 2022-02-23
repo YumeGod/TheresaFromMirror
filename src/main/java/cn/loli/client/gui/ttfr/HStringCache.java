@@ -1,6 +1,6 @@
 package cn.loli.client.gui.ttfr;
 
-import cn.loli.client.utils.RenderUtils;
+import cn.loli.client.utils.render.RenderUtils;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;

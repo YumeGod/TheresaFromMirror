@@ -7,7 +7,7 @@ import cn.loli.client.Main;
 import cn.loli.client.command.Command;
 import cn.loli.client.events.KeyEvent;
 import cn.loli.client.module.Module;
-import cn.loli.client.utils.ChatUtils;
+import cn.loli.client.utils.misc.ChatUtils;
 import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.EventTarget;
 import org.jetbrains.annotations.NotNull;

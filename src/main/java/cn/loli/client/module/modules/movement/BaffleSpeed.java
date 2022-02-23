@@ -3,16 +3,13 @@ package cn.loli.client.module.modules.movement;
 import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.utils.MoveUtils;
-import cn.loli.client.utils.PlayerUtils;
+import cn.loli.client.utils.player.MoveUtils;
+import cn.loli.client.utils.player.PlayerUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.util.BlockPos;
 
 public class BaffleSpeed extends Module {

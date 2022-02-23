@@ -3,8 +3,7 @@ package cn.loli.client.command.commands;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.command.Command;
 import cn.loli.client.command.CommandException;
-import cn.loli.client.utils.ChatUtils;
-import cn.loli.client.utils.Utils;
+import cn.loli.client.utils.misc.ChatUtils;
 import me.ratsiel.auth.model.mojang.MinecraftAuthenticator;
 import me.ratsiel.auth.model.mojang.MinecraftToken;
 import me.ratsiel.auth.model.mojang.profile.MinecraftProfile;
@@ -12,7 +11,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.Session;
 import org.jetbrains.annotations.NotNull;
 
-import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 

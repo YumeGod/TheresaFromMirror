@@ -1,4 +1,4 @@
-package cn.loli.client.utils;
+package cn.loli.client.utils.player.rotation;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;

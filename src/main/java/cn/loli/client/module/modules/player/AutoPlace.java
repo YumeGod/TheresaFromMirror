@@ -5,7 +5,7 @@ import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.utils.Rotation;
+import cn.loli.client.utils.player.rotation.Rotation;
 import cn.loli.client.value.ModeValue;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.item.ItemBlock;

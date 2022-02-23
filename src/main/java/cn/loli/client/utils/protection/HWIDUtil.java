@@ -1,4 +1,4 @@
-package cn.loli.client.utils;
+package cn.loli.client.utils.protection;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jetbrains.annotations.NotNull;

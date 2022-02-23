@@ -1,24 +1,20 @@
-package cn.loli.client.utils;
+package cn.loli.client.utils.render;
 
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.injection.mixins.IAccessorRenderManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.glu.Cylinder;
 
-import javax.vecmath.Vector2d;
 import java.awt.*;
 
 import static org.lwjgl.opengl.GL11.*;

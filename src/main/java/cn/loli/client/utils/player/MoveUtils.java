@@ -1,4 +1,4 @@
-package cn.loli.client.utils;
+package cn.loli.client.utils.player;
 
 import cn.loli.client.events.PlayerMoveEvent;
 import net.minecraft.client.Minecraft;

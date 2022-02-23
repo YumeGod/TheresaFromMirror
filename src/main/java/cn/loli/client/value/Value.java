@@ -2,7 +2,6 @@
 
 package cn.loli.client.value;
 
-import cn.loli.client.utils.AnimationUtils;
 import com.google.gson.JsonObject;
 
 import java.util.function.Predicate;

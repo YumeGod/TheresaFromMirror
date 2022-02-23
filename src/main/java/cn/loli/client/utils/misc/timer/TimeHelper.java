@@ -1,6 +1,6 @@
 
 
-package cn.loli.client.utils;
+package cn.loli.client.utils.misc.timer;
 
 public class TimeHelper {
     private long lastMS;

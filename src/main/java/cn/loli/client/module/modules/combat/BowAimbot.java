@@ -3,31 +3,24 @@ package cn.loli.client.module.modules.combat;
 import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.utils.PlayerUtils;
-import cn.loli.client.utils.WorldUtil;
+import cn.loli.client.utils.player.PlayerUtils;
+import cn.loli.client.utils.misc.WorldUtil;
 import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.INpc;
-import net.minecraft.entity.boss.EntityWither;
 import net.minecraft.entity.item.EntityArmorStand;
-import net.minecraft.entity.monster.EntityGiantZombie;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBow;
-import net.minecraft.network.play.client.C07PacketPlayerDigging;
-import net.minecraft.network.play.client.C09PacketHeldItemChange;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 public class BowAimbot extends Module {

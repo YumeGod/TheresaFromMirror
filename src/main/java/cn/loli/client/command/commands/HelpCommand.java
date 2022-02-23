@@ -4,7 +4,7 @@ package cn.loli.client.command.commands;
 
 import cn.loli.client.Main;
 import cn.loli.client.command.Command;
-import cn.loli.client.utils.ChatUtils;
+import cn.loli.client.utils.misc.ChatUtils;
 
 import java.util.ArrayList;
 import java.util.List;

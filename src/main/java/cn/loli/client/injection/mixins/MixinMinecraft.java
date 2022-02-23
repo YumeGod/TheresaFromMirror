@@ -8,7 +8,7 @@ import cn.loli.client.events.LoopEvent;
 import cn.loli.client.events.TickEvent;
 import cn.loli.client.events.WindowResizeEvent;
 import cn.loli.client.module.modules.render.BlockHit;
-import cn.loli.client.utils.AnimationUtils;
+import cn.loli.client.utils.render.AnimationUtils;
 import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.client.Minecraft;

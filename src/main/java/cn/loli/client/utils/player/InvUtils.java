@@ -1,4 +1,4 @@
-package cn.loli.client.utils;
+package cn.loli.client.utils.player;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;

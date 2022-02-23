@@ -3,15 +3,14 @@
 package cn.loli.client.module.modules.combat;
 
 import cn.loli.client.events.MotionUpdateEvent;
-import cn.loli.client.events.PlayerMoveEvent;
 import cn.loli.client.events.Render2DEvent;
 import cn.loli.client.events.RenderEvent;
 import cn.loli.client.injection.implementations.IEntityPlayer;
-import cn.loli.client.injection.mixins.IAccessorMinecraft;
-import cn.loli.client.injection.mixins.IAccessorRenderManager;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.utils.*;
+import cn.loli.client.utils.misc.timer.TimeHelper;
+import cn.loli.client.utils.player.PlayerUtils;
+import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ColorValue;
 import cn.loli.client.value.ModeValue;
@@ -23,7 +22,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.INpc;
 import net.minecraft.entity.boss.EntityWither;
-import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
@@ -77,13 +75,10 @@ public class Aura extends Module {
 
     private final ColorValue espColor = new ColorValue("ESP-Color", Color.BLUE);
 
-
-    public static Rotation serverRotation = new Rotation(0, 0);
     public EntityLivingBase target;
     private final TimeHelper attacktimer = new TimeHelper();
 
     public static ArrayList<Entity> entities = new ArrayList<>();
-    public static ArrayList<Entity> sounds = new ArrayList<>();
     public static List<EntityLivingBase> targets = new ArrayList<>();
 
     int cps;
@@ -116,7 +111,6 @@ public class Aura extends Module {
         targets.clear();
         target = null; // 清空目标 (AutoBlock动画修复)
         entities.clear();
-        sounds.clear();
 
         if (isBlocking) {
             ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
@@ -140,7 +134,6 @@ public class Aura extends Module {
             attacktimer.reset();
         }
 
-
         if (target != null && show.getObject()) {
             EntityLivingBase entity = target;
 
@@ -159,8 +152,8 @@ public class Aura extends Module {
 
     @EventTarget
     public void onRender2D(Render2DEvent event) {
-        if (targetHud.getObject()){
-            
+        if (targetHud.getObject()) {
+
         }
     }
 
@@ -182,27 +175,6 @@ public class Aura extends Module {
                 return;
             }
 
-            //Sever-side
-            serverRotation.setYaw(rots[0]);
-            serverRotation.setPitch(rots[1]);
-
-            //Save the last rotation
-            float[] lastrots = rots;
-
-            rots = RotationUtils.convertBack(RotationUtils.limitAngleChange(RotationUtils.convert(lastrots),
-                    RotationUtils.convert(RotationUtils.getNeededRotations(getLocation(target.getEntityBoundingBox().expand(0.11, 0.11, 0.11),
-                                    0, 0, hresolver.getObject(), vresolver.getObject(), pitchoffset.getObject()),
-                            new Vec3(0, 0, 0), false, 0)), (turnspeed.getObject() * 180)));
-
-            //Set Rotation --> Event Pre Motion;
-
-            if (rotations.getObject()) {
-                yaw = rots[0];
-                pitch = rots[1];
-            } else {
-                yaw = mc.thePlayer.rotationYaw;
-                pitch = mc.thePlayer.rotationPitch;
-            }
 
             if (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() && isBlocking) {
@@ -220,25 +192,15 @@ public class Aura extends Module {
             }
 
             //Slient Rotation
-            event.setYaw(yaw);
-            event.setPitch(pitch);
-
         }
 
         if (event.getEventType() == EventType.POST) {
             if (target == null) return;
 
             //Nah Slient Rotation
-            if (!slient.getObject()) {
-                mc.thePlayer.rotationYaw = yaw;
-                mc.thePlayer.rotationPitch = pitch;
-            }
 
-            if (target != null && (mc.thePlayer.getHeldItem() != null &&
-                    mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() || mc.thePlayer.isBlocking())
-                    && !isBlocking) {
+            if ((mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() || mc.thePlayer.isBlocking()) && !isBlocking) {
                 ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
-
                 mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                 isBlocking = true;
             }
@@ -258,18 +220,18 @@ public class Aura extends Module {
             targets.removeIf(ent -> !canAttack(ent));
             targets = this.getTargets();
         } catch (Exception e) {
-            targets = this.getTargets();
             e.printStackTrace();
         }
 
         // 拿实体
-        if (targets.size() == 0) { // 实体数量为0停止攻击
+        if (targets.size() == 0)  // 实体数量为0停止攻击
             target = null;
-        } else {
+        else
             target = targets.get(0);// 设置攻击的Target
-        }
     }
 
+
+    //取实体
     private List<EntityLivingBase> getTargets() {
         Stream<EntityLivingBase> stream = mc.theWorld.loadedEntityList.stream()
                 .filter(entity -> entity instanceof EntityLivingBase)
@@ -310,15 +272,13 @@ public class Aura extends Module {
 
     }
 
-
-    public static float getDistanceBetweenAngles(float angle1, float angle2) {
-        float angle3 = Math.abs((angle1 - angle2)) % 360.0f;
-        if (angle3 > 180.0f) {
-            angle3 = 0.0f;
-        }
-        return angle3;
+    //计算CPS
+    private static long randomClickDelay(final double minCPS, final double maxCPS) {
+        return (long) ((Math.random() * (1000 / minCPS - 1000 / maxCPS) + 1) + 1000 / maxCPS);
     }
 
+
+    //限制
     private static boolean canAttack(EntityLivingBase target) {
         if (target instanceof EntityPlayer || target instanceof EntityAnimal || target instanceof EntityMob || target instanceof INpc) {
             if (target instanceof EntityPlayer && !players.getObject()) return false;
@@ -341,6 +301,16 @@ public class Aura extends Module {
         return (angleDiff > 0 && angleDiff < angle) || (-angle < angleDiff && angleDiff < 0);
     }
 
+
+    //优先级
+    public static float getDistanceBetweenAngles(float angle1, float angle2) {
+        float angle3 = Math.abs((angle1 - angle2)) % 360.0f;
+        if (angle3 > 180.0f) {
+            angle3 = 0.0f;
+        }
+        return angle3;
+    }
+
     private static float getAngleDifference(float dir, float yaw) {
         float f = Math.abs(yaw - dir) % 360F;
         return f > 180F ? 360F - f : f;
@@ -358,82 +328,6 @@ public class Aura extends Module {
         return new float[]{yaw, pitch};
     }
 
-
-    private static long randomClickDelay(final double minCPS, final double maxCPS) {
-        return (long) ((Math.random() * (1000 / minCPS - 1000 / maxCPS) + 1) + 1000 / maxCPS);
-    }
-
-    public static Vec3 getLocation(AxisAlignedBB bb, int reverseValue, int mistakeValue, boolean Hres, boolean Vres,
-                                   double pitchoffset) {
-        Random rd1 = new Random();
-        Random rd2 = new Random();
-        double value = Math.random();
-
-        boolean reverse = rd1.nextInt(100) < reverseValue;
-        boolean mistake = rd2.nextInt(100) < mistakeValue;
-
-        Vec3 resolve = null;
-
-        if (Vres || Hres) resolve = searchCenter(bb, true).getVec3();
-
-
-        double x = 0.5, z = 0.5;
-
-        double pitch = 0.5 + (pitchoffset / 2);
-
-
-        return new Vec3(Hres ? Objects.requireNonNull(resolve).xCoord : (bb.minX + (bb.maxX - bb.minX) * (reverse ? 1.0 - x : x)) * (mistake ? 1 + value * 0.1 : 1),
-                Vres ? Objects.requireNonNull(resolve).yCoord : bb.minY + (bb.maxY - bb.minY) * pitch, Hres ? Objects.requireNonNull(resolve).zCoord : bb.minZ + (bb.maxZ - bb.minZ) * (reverse ? 1.0 - z : z) * (mistake ? 1 + value * 0.1 : 1));
-    }
-
-    public static VecRotation searchCenter(final AxisAlignedBB bb, final boolean predict) {
-        VecRotation vecRotation = null;
-
-
-        for (double xSearch = 0.0D; xSearch < 1.0D; xSearch += 0.1) {
-            for (double ySearch = 0.0D; ySearch < 1.0D; ySearch += 0.1) {
-                for (double zSearch = 0.0D; zSearch < 1.0D; zSearch += 0.1) {
-                    final Vec3 vec3 = new Vec3(bb.minX + (bb.maxX - bb.minX) * xSearch,
-                            bb.minY + (bb.maxY - bb.minY) * ySearch, bb.minZ + (bb.maxZ - bb.minZ) * zSearch);
-                    final Rotation rotation = toRotation(vec3, predict);
-
-                    final VecRotation currentVec = new VecRotation(vec3, rotation);
-
-                    if (vecRotation == null || (getRotationDifference(currentVec.getRotation()) < getRotationDifference(vecRotation.getRotation())))
-                        vecRotation = currentVec;
-                }
-            }
-        }
-
-        return vecRotation;
-    }
-
-    public static double getRotationDifference(Rotation rotation) {
-        return getRotationDifference(rotation, serverRotation);
-    }
-
-
-    public static double getRotationDifference(Rotation a, Rotation b) {
-        return Math.hypot(getAngleDifference(a.getYaw(), b.getYaw()), (a.getPitch() - b.getPitch()));
-    }
-
-    public static Rotation toRotation(final Vec3 vec, final boolean predict) {
-        final Vec3 eyesPos = new Vec3(Minecraft.getMinecraft().thePlayer.posX, Minecraft.getMinecraft().thePlayer.getEntityBoundingBox().minY +
-                Minecraft.getMinecraft().thePlayer.getEyeHeight(), Minecraft.getMinecraft().thePlayer.posZ);
-
-        if (predict)
-            eyesPos.addVector(Minecraft.getMinecraft().thePlayer.motionX, Minecraft.getMinecraft().thePlayer.motionY, Minecraft.getMinecraft().thePlayer.motionZ);
-
-        final double diffX = vec.xCoord - eyesPos.xCoord;
-        final double diffY = vec.yCoord - eyesPos.yCoord;
-        final double diffZ = vec.zCoord - eyesPos.zCoord;
-
-        return new Rotation(MathHelper.wrapAngleTo180_float(
-                (float) Math.toDegrees(Math.atan2(diffZ, diffX)) - 90F
-        ), MathHelper.wrapAngleTo180_float(
-                (float) (-Math.toDegrees(Math.atan2(diffY, Math.sqrt(diffX * diffX + diffZ * diffZ))))
-        ));
-    }
 
     public static float[] getRotations(final Entity entity) {
         if (entity == null) {

@@ -1,6 +1,6 @@
 package cn.loli.client.gui.clickui;
 
-import cn.loli.client.utils.AnimationUtils;
+import cn.loli.client.utils.render.AnimationUtils;
 
 public class Slider {
     public float top, top1;

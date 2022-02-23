@@ -12,8 +12,8 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemAxe;
 import net.minecraft.item.ItemSword;
 
-import static cn.loli.client.utils.RotationUtils.getPitch;
-import static cn.loli.client.utils.RotationUtils.getYaw;
+import static cn.loli.client.utils.player.rotation.RotationUtils.getPitch;
+import static cn.loli.client.utils.player.rotation.RotationUtils.getYaw;
 
 public class AimBot extends Module {
     private final BooleanValue playersOnly = new BooleanValue("PlayersOnly", true);

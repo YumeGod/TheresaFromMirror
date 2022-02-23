@@ -1,13 +1,8 @@
 package cn.loli.client.module.modules.movement;
 
-import cn.loli.client.events.TickEvent;
 import cn.loli.client.events.UpdateEvent;
-import cn.loli.client.injection.mixins.IAccessorEntityPlayer;
-import cn.loli.client.injection.mixins.IAccessorEntityPlayerSP;
-import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.utils.ChatUtils;
 import cn.loli.client.value.BooleanValue;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.client.Minecraft;

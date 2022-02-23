@@ -1,4 +1,4 @@
-package cn.loli.client.utils;
+package cn.loli.client.utils.misc;
 
 import cn.loli.client.Main;
 import io.netty.buffer.Unpooled;

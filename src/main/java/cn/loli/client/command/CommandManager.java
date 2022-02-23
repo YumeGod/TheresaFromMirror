@@ -3,7 +3,7 @@
 package cn.loli.client.command;
 
 import cn.loli.client.command.commands.*;
-import cn.loli.client.utils.ChatUtils;
+import cn.loli.client.utils.misc.ChatUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

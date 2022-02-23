@@ -3,17 +3,10 @@
 package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
-import cn.loli.client.events.PlayerMoveEvent;
 import cn.loli.client.events.SafeWalkEvent;
-import cn.loli.client.module.ModuleManager;
 import cn.loli.client.module.modules.combat.Velocity;
-import cn.loli.client.module.modules.movement.NoSlowDown;
 import cn.loli.client.module.modules.player.SafeWalk;
-import cn.loli.client.utils.ChatUtils;
-import com.darkmagician6.eventapi.EventManager;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;

@@ -5,9 +5,9 @@ package cn.loli.client.module.modules.movement;
 import cn.loli.client.events.PlayerMoveEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.utils.MoveUtils;
-import cn.loli.client.utils.PlayerUtils;
-import cn.loli.client.utils.TimeHelper;
+import cn.loli.client.utils.player.MoveUtils;
+import cn.loli.client.utils.player.PlayerUtils;
+import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.value.ModeValue;
 import com.darkmagician6.eventapi.EventTarget;
 

@@ -1,6 +1,5 @@
 package cn.loli.client.module.modules.movement;
 
-import cn.loli.client.Main;
 import cn.loli.client.events.JumpEvent;
 import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PlayerMoveEvent;
@@ -10,20 +9,13 @@ import cn.loli.client.injection.mixins.IAccessorKeyBinding;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.module.modules.combat.Aura;
-import cn.loli.client.utils.ChatUtils;
-import cn.loli.client.utils.MoveUtils;
-import cn.loli.client.utils.PlayerUtils;
+import cn.loli.client.utils.player.MoveUtils;
+import cn.loli.client.utils.player.PlayerUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
-import ibxm.Player;
-import net.minecraft.util.BlockPos;
-import org.lwjgl.Sys;
-
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Speed extends Module {
 

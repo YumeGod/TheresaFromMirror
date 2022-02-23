@@ -1,4 +1,4 @@
-package cn.loli.client.utils;
+package cn.loli.client.utils.others;
 
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;

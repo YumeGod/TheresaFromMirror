@@ -1,4 +1,4 @@
-package cn.loli.client.utils;
+package cn.loli.client.utils.render;
 
 public class AnimationUtils {
     public static double delta = 1000 / 60d;

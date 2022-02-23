@@ -3,8 +3,8 @@
 package cn.loli.client.notifications;
 
 import cn.loli.client.Main;
-import cn.loli.client.utils.AnimationUtils;
-import cn.loli.client.utils.RenderUtils;
+import cn.loli.client.utils.render.AnimationUtils;
+import cn.loli.client.utils.render.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.ResourceLocation;

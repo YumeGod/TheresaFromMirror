@@ -4,14 +4,13 @@ package cn.loli.client.module.modules.combat;
 
 import cn.loli.client.Main;
 import cn.loli.client.events.MotionUpdateEvent;
-import cn.loli.client.module.modules.movement.Speed;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.utils.PlayerUtils;
+import cn.loli.client.utils.player.PlayerUtils;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;

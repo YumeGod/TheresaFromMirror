@@ -6,7 +6,7 @@ import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.injection.mixins.IAccessorRenderManager;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.utils.RenderUtils;
+import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ColorValue;
 import com.darkmagician6.eventapi.EventTarget;

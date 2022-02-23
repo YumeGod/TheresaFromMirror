@@ -1,4 +1,4 @@
-package cn.loli.client.utils;
+package cn.loli.client.utils.others;
 
 import javax.sound.sampled.*;
 import java.io.BufferedInputStream;

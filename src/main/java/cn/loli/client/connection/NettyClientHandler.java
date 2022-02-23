@@ -1,17 +1,13 @@
 package cn.loli.client.connection;
 
 import cn.loli.client.Main;
-import cn.loli.client.utils.HWIDUtil;
-import io.netty.buffer.Unpooled;
+import cn.loli.client.utils.protection.HWIDUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.util.CharsetUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
 
 public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
 

@@ -3,8 +3,8 @@
 package cn.loli.client.value;
 
 import cn.loli.client.gui.IColorPickerCallback;
-import cn.loli.client.utils.ColorUtils;
-import cn.loli.client.utils.RenderUtils;
+import cn.loli.client.utils.render.ColorUtils;
+import cn.loli.client.utils.render.RenderUtils;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;

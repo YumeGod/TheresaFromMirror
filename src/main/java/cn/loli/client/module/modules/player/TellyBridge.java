@@ -4,7 +4,7 @@ import cn.loli.client.events.Render3DEvent;
 import cn.loli.client.events.TickEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.utils.ChatUtils;
+import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.block.Block;

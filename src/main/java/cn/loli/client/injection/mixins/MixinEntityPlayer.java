@@ -5,7 +5,6 @@ import cn.loli.client.events.JumpEvent;
 import cn.loli.client.injection.implementations.IEntityPlayer;
 import cn.loli.client.module.modules.combat.KeepSprint;
 import cn.loli.client.module.modules.render.OldAnimations;
-import cn.loli.client.utils.ChatUtils;
 import com.darkmagician6.eventapi.EventManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;

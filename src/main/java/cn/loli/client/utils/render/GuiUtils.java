@@ -1,6 +1,6 @@
 
 
-package cn.loli.client.utils;
+package cn.loli.client.utils.render;
 
 import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Mouse;

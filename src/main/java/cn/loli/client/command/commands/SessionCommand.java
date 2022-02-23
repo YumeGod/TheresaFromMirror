@@ -5,7 +5,7 @@ package cn.loli.client.command.commands;
 import cn.loli.client.command.CommandException;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.command.Command;
-import cn.loli.client.utils.ChatUtils;
+import cn.loli.client.utils.misc.ChatUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Session;
 import org.jetbrains.annotations.NotNull;

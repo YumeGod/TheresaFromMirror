@@ -2,7 +2,7 @@
 
 package cn.loli.client.gui;
 
-import cn.loli.client.utils.ColorUtils;
+import cn.loli.client.utils.render.ColorUtils;
 import com.google.common.base.Predicate;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiButton;

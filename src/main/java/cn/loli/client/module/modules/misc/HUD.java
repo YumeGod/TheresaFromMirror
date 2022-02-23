@@ -8,16 +8,12 @@ import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.events.Render2DEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.utils.AnimationUtils;
-import cn.loli.client.utils.MoveUtils;
-import cn.loli.client.utils.PlayerUtils;
+import cn.loli.client.utils.render.AnimationUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiChat;
-import net.minecraft.client.gui.GuiNewChat;
 import net.minecraft.client.gui.ScaledResolution;
 
 import java.time.format.DateTimeFormatter;

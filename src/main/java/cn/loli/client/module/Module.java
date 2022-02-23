@@ -7,7 +7,6 @@ import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
 import cn.loli.client.Main;
-import cn.loli.client.utils.AnimationUtils;
 import com.darkmagician6.eventapi.EventManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
