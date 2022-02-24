@@ -6,10 +6,8 @@ import cn.loli.client.events.*;
 import cn.loli.client.injection.implementations.IEntityPlayer;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.player.PlayerUtils;
-import cn.loli.client.utils.player.rotation.RotationHook;
 import cn.loli.client.utils.player.rotation.RotationUtils;
 import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.BooleanValue;
@@ -82,7 +80,7 @@ public class Aura extends Module {
     private final BooleanValue rayCast = new BooleanValue("Ray Cast", false);
 
     private final BooleanValue mouseFix = new BooleanValue("Mouse Fix", true);
-    private final BooleanValue a3Fix = new BooleanValue("Mouse VL Fix", true);
+    private final BooleanValue mouse_vl_fix = new BooleanValue("Mouse VL Fix", true);
     private final BooleanValue random = new BooleanValue("Random", false);
     private final BooleanValue instant = new BooleanValue("Instant", false);
     private final BooleanValue prediction = new BooleanValue("Prediction", false);
@@ -143,9 +141,31 @@ public class Aura extends Module {
             e.printStackTrace();
         }
 
-        if (target != null && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() && attacktimer.hasReached(randomClickDelay(Math.min(minCps.getObject(), maxCps.getObject()), Math.max(minCps.getObject(), maxCps.getObject())))) {
+        /*
+         *  CPS 运算
+         */
+        if (target != null && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() &&
+                attacktimer.hasReached(randomClickDelay(Math.min(minCps.getObject(), maxCps.getObject()), Math.max(minCps.getObject(), maxCps.getObject())))) {
             cps++;
             attacktimer.reset();
+        }
+
+        /*
+         *  转头 运算
+         */
+
+        if (rotations.getObject()) {
+            if (target != null) {
+                float[] rots;
+                rots = utils.facePlayer(target, mouse_vl_fix.getObject(), random.getObject(), !instant.getObject(), prediction.getObject(), mouseFix.getObject()
+                        , bestVector.getObject(), inaccuracy.getObject(), clampYaw.getObject(), rotationSpeed.getObject(), range.getObject());
+
+                curYaw = rots[0];
+                curPitch = rots[1];
+            } else {
+                curYaw = mc.thePlayer.rotationYaw;
+                curPitch = mc.thePlayer.rotationPitch;
+            }
         }
 
         if (target != null && show.getObject()) {
@@ -167,20 +187,20 @@ public class Aura extends Module {
     @EventTarget
     public void onMoveFly(MoveFlyEvent event) {
         if (moveFix.getObject() && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() && target != null)
-            event.setYaw(RotationHook.yaw);
+            event.setYaw(curYaw);
     }
 
     @EventTarget
     public void onJump(JumpEvent event) {
         if (moveFix.getObject() && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() && target != null)
-            event.setYaw(RotationHook.pitch);
+            event.setYaw(curYaw);
     }
 
     @EventTarget
     public void onSlient(MovementStateEvent event) {
         if (moveFix.getObject() && target != null && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() && silentMoveFix.getObject()) {
             event.setSilentMoveFix(true);
-            event.setYaw(RotationHook.yaw);
+            event.setYaw(curYaw);
         }
     }
 
@@ -200,15 +220,8 @@ public class Aura extends Module {
                 return;
             }
 
-            float[] rots;
 
             if (rotations.getObject()) {
-                rots = utils.facePlayer(target, a3Fix.getObject(), random.getObject(), !instant.getObject(), prediction.getObject(), mouseFix.getObject()
-                        , bestVector.getObject(), inaccuracy.getObject(), clampYaw.getObject(), rotationSpeed.getObject(), range.getObject());
-
-                curYaw = rots[0];
-                curPitch = rots[1];
-
                 if (slient.getObject()) {
                     event.setYaw(mc.thePlayer.rotationYawHead = curYaw);
                     event.setPitch(curPitch);
@@ -235,7 +248,7 @@ public class Aura extends Module {
         if (event.getEventType() == EventType.POST) {
             if (target == null) return;
 
-            if (!slient.getObject()){
+            if (!slient.getObject()) {
                 mc.thePlayer.rotationYaw = curYaw;
                 mc.thePlayer.rotationPitch = curPitch;
             }
@@ -256,13 +269,13 @@ public class Aura extends Module {
         }
 
         if (rayCast.getObject())
-            entity = utils.rayCastedEntity(range.getObject(), RotationHook.yaw, RotationHook.pitch);
+            entity = utils.rayCastedEntity(range.getObject(), curYaw, curPitch);
 
         if (entity != null) {
             mc.thePlayer.swingItem();
             mc.playerController.attackEntity(mc.thePlayer, entity);
         } else {
-        //    ChatUtils.info("Miss");
+            //    ChatUtils.info("Miss");
             mc.thePlayer.swingItem();
         }
 
@@ -339,7 +352,8 @@ public class Aura extends Module {
         if (target instanceof EntityPlayer || target instanceof EntityAnimal || target instanceof EntityMob || target instanceof INpc) {
             if (target instanceof EntityPlayer && !players.getObject()) return false;
             if (target instanceof EntityAnimal && !animals.getObject()) return false;
-            if (target instanceof EntityWither && boss.getObject()) return true; // true
+            if (target instanceof EntityWither && boss.getObject())
+                return mc.thePlayer.getDistanceToEntity(target) <= range.getObject() + blockrange.getObject(); // true
             if (target instanceof EntityMob && !mobs.getObject()) return false;
             if (target instanceof INpc && !villagers.getObject()) return false;
         }
