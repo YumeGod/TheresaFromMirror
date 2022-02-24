@@ -46,9 +46,9 @@ public class Aura extends Module {
     private final NumberValue<Integer> maxCps = new NumberValue<>("MaxCPS", 12, 1, 20);
 
     private static final NumberValue<Integer> ticksExisted = new NumberValue<>("TicksExisted", 20, 0, 500);
-    private static final NumberValue<Float> fov = new NumberValue<>("FOV", 360f, 0f, 360f);
+    private static final NumberValue<Integer> fov = new NumberValue<>("FOV", 360, 0, 360);
     private static final NumberValue<Float> range = new NumberValue<>("Range", 3f, 1f, 6f);
-    private static final NumberValue<Float> blockrange = new NumberValue<>("BlockRange", 2f, 1f, 3f);
+    private static final NumberValue<Float> blockrange = new NumberValue<>("BlockRange", 2f, 0f, 3f);
 
     //   private static final NumberValue<Float> mouseSpeed = new NumberValue<>("Mouse Speed", 5f, 0f, 6f);
     private static final NumberValue<Float> inaccuracy = new NumberValue<>("Inaccuracy", 0f, 0f, 1f);
