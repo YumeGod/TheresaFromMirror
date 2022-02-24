@@ -9,12 +9,14 @@ import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.utils.render.AnimationUtils;
+import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -25,6 +27,7 @@ import java.util.List;
 
 public class HUD extends Module {
     private final BooleanValue showClientInfo = new BooleanValue("ClientInfo", true);
+    private final BooleanValue showLogo = new BooleanValue("Logo", true);
     private final BooleanValue showArrayList = new BooleanValue("ArrayList", true);
     private final BooleanValue showNotifications = new BooleanValue("Notifications", true);
     private final NumberValue<Number> ArrayListXPos = new NumberValue<>("ArrayListXPos", 0, 0, 15);
@@ -78,7 +81,7 @@ public class HUD extends Module {
             fpsWidth = Math.max(fpsWidth, mc.fontRendererObj.drawString(String.format("User: " + Main.INSTANCE.name, currSpeed), (float) (res.getScaledWidth() - mc.fontRendererObj.getStringWidth(String.format("User: " + Main.INSTANCE.name, currSpeed))), res.getScaledHeight() - mc.fontRendererObj.FONT_HEIGHT - 2, -1, true));
         }
 
-        if (showClientInfo.getObject()) {
+        if (showLogo.getObject()) {
             GL11.glScaled(2.0, 2.0, 2.0);
             int string = mc.fontRendererObj.drawString("朔夜观星", 2, 2, rainbow(0), true);
             GL11.glScaled(0.5, 0.5, 0.5);

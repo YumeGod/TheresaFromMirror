@@ -183,4 +183,9 @@ public class Utils {
         max -= min;
         return (Math.random() * (max)) + min;
     }
+
+   public static Color getRainbow(int offset, int speed, float saturation, float brightness) {
+        float hue = ((System.currentTimeMillis() + offset) % speed) / (float) speed;
+        return Color.getHSBColor(hue, saturation, brightness);
+    }
 }

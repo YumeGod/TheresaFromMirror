@@ -3,12 +3,14 @@ package cn.loli.client.utils.render;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.injection.mixins.IAccessorRenderManager;
 import cn.loli.client.utils.Utils;
+import cn.loli.client.utils.misc.timer.TimeHelper;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.ResourceLocation;
@@ -20,6 +22,8 @@ import java.awt.*;
 import static org.lwjgl.opengl.GL11.*;
 
 public class RenderUtils extends Utils {
+    static int animationX;
+    private static final TimeHelper animationTimer = new TimeHelper();
 
     public static void drawWolframEntityESP(EntityLivingBase entity, int rgb, double posX, double posY, double posZ) {
         GL11.glPushMatrix();
@@ -664,4 +668,58 @@ public class RenderUtils extends Utils {
         GlStateManager.resetColor();
     }
 
+    public static void drawIcarusESP(EntityLivingBase target, Color color , boolean rainbow) {
+        GL11.glPushMatrix();
+        GL11.glDisable(GL11.GL_TEXTURE_2D);
+        GL11.glDisable(GL11.GL_DEPTH_TEST);
+        GL11.glEnable(GL11.GL_LINE_SMOOTH);
+        float animationY = 0.0f;
+        float animationY2 = 0.0f;
+        int currentOffset = 0;
+        if (animationTimer.hasReached(10)) {
+            animationX++;
+            animationTimer.reset();
+        }
+
+        translateRotate(target);
+        GL11.glLineWidth(1f);
+        GL11.glBegin(GL11.GL_LINE_STRIP);
+
+        for (int i = animationX; i < 100 + animationX; i++) {
+            final double c = (2 * i * Math.PI / 100);
+            Color pick = rainbow ? getRainbow(currentOffset, 1000, (float) 0.8, 1f) : color;
+            GL11.glColor3d(pick.getRed() / 255f, pick.getGreen() / 255f, pick.getBlue() / 255f);
+            GL11.glVertex3d((Math.cos(c) * 0.5), animationY, (Math.sin(c) * 0.5));
+            animationY += target.height / 100;
+            currentOffset += 10;
+        }
+        GL11.glEnd();
+
+        GL11.glBegin(GL11.GL_LINE_STRIP);
+
+        for (int i = 50 + animationX; i < 150 + animationX; i++) {
+            final double c = (2 * i * Math.PI / 100);
+            Color pick = rainbow ? getRainbow(currentOffset, 1000, (float) 0.8, 1f) : color;
+            GL11.glColor3d(pick.getRed() / 255f, pick.getGreen() / 255f, pick.getBlue() / 255f);
+            GL11.glVertex3d((Math.cos(c) * 0.5), animationY2, (Math.sin(c) * 0.5));
+            animationY2 += target.height / 100;
+            currentOffset += 10;
+        }
+        GL11.glEnd();
+
+        GL11.glDisable(GL11.GL_LINE_SMOOTH);
+        GL11.glEnable(GL11.GL_DEPTH_TEST);
+        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        GL11.glPopMatrix();
+    }
+
+    private static void translateRotate(Entity entity) {
+        final float partialTicks = ((IAccessorMinecraft) mc).getTimer().renderPartialTicks;
+        final double x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosX();
+        final double y = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosY();
+        final double z = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosZ();
+        GL11.glTranslated(x, y, z);
+        GL11.glNormal3d(0.0, 1.0, 0.0);
+        GL11.glRotated(-mc.getRenderManager().playerViewY, 0.0, 1.0, 0.0);
+    }
 }

@@ -55,7 +55,7 @@ public class Aura extends Module {
 
 
     private final ModeValue mode = new ModeValue("Priority", "Angle", "Armor", "Range", "Fov", "Angle", "Health", "Hurt Time");
-    private final ModeValue esp = new ModeValue("Target ESP", "Box", "Box", "2D");
+    private final ModeValue esp = new ModeValue("Target ESP", "Box", "Box", "2D", "Icarus");
 
     private final BooleanValue autoBlock = new BooleanValue("AutoBlock", true);
     private static final BooleanValue invisibles = new BooleanValue("Invisibles", false);
@@ -93,8 +93,8 @@ public class Aura extends Module {
 
     private final ColorValue espColor = new ColorValue("ESP-Color", Color.BLUE);
 
-
     public EntityLivingBase target;
+
     private final TimeHelper attacktimer = new TimeHelper();
 
     public static ArrayList<Entity> entities = new ArrayList<>();
@@ -177,6 +177,9 @@ public class Aura extends Module {
                     break;
                 case "2D":
                     RenderUtils.draw2DESP(entity, espColor.getObject().getRGB());
+                    break;
+                case "Icarus":
+                    RenderUtils.drawIcarusESP(entity, espColor.getObject(), true);
                     break;
             }
 

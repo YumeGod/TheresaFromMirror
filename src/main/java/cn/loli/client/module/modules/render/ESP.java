@@ -44,10 +44,13 @@ public class ESP extends Module {
     private final BooleanValue healthbar = new BooleanValue("Health Bar", false);
     private final BooleanValue nametags = new BooleanValue("Name tags", false);
     private final BooleanValue invis = new BooleanValue("Ignore Invis", false);
+    private final BooleanValue icarus = new BooleanValue("Icarus", false);
 
     public final BooleanValue chams = new BooleanValue("Chams", false);
 
     public final ColorValue boxColor = new ColorValue("Box-Color", new Color(239, 235, 235, 210));
+    public final ColorValue icarusColor = new ColorValue("Icarus-Color", new Color(147, 144, 144, 210));
+
     public final ColorValue chamsColor = new ColorValue("Cham-Default-Color", new Color(187, 21, 21, 210));
     public final ColorValue throughWallsColor = new ColorValue("Cham-ThroughWalls-Color", new Color(23, 74, 183, 210));
 
@@ -121,6 +124,7 @@ public class ESP extends Module {
                 GL11.glEnable(GL11.GL_TEXTURE_2D);
             }
             GL11.glPopMatrix();
+
         }
     }
 
@@ -167,6 +171,10 @@ public class ESP extends Module {
 
                 GL11.glPopMatrix();
             }
+        }
+
+        for (EntityPlayer player : entityPosMap.keySet()) {
+            if (icarus.getObject()) RenderUtils.drawIcarusESP(player, icarusColor.getObject(), false);
         }
 
     }
