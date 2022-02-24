@@ -143,7 +143,7 @@ public class Aura extends Module {
             e.printStackTrace();
         }
 
-        if (target != null && attacktimer.hasReached(randomClickDelay(Math.min(minCps.getObject(), maxCps.getObject()), Math.max(minCps.getObject(), maxCps.getObject())))) {
+        if (target != null && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() && attacktimer.hasReached(randomClickDelay(Math.min(minCps.getObject(), maxCps.getObject()), Math.max(minCps.getObject(), maxCps.getObject())))) {
             cps++;
             attacktimer.reset();
         }
@@ -166,19 +166,19 @@ public class Aura extends Module {
 
     @EventTarget
     public void onMoveFly(MoveFlyEvent event) {
-        if (moveFix.getObject() && target != null)
+        if (moveFix.getObject() && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() && target != null)
             event.setYaw(RotationHook.yaw);
     }
 
     @EventTarget
     public void onJump(JumpEvent event) {
-        if (moveFix.getObject() && target != null)
+        if (moveFix.getObject() && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() && target != null)
             event.setYaw(RotationHook.pitch);
     }
 
     @EventTarget
     public void onSlient(MovementStateEvent event) {
-        if (moveFix.getObject() && target != null && silentMoveFix.getObject()) {
+        if (moveFix.getObject() && target != null && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() && silentMoveFix.getObject()) {
             event.setSilentMoveFix(true);
             event.setYaw(RotationHook.yaw);
         }
@@ -212,9 +212,6 @@ public class Aura extends Module {
                 if (slient.getObject()) {
                     event.setYaw(mc.thePlayer.rotationYawHead = curYaw);
                     event.setPitch(curPitch);
-                } else {
-                    mc.thePlayer.rotationYaw = curYaw;
-                    mc.thePlayer.rotationPitch = curPitch;
                 }
             }
 
@@ -237,6 +234,11 @@ public class Aura extends Module {
 
         if (event.getEventType() == EventType.POST) {
             if (target == null) return;
+
+            if (!slient.getObject()){
+                mc.thePlayer.rotationYaw = curYaw;
+                mc.thePlayer.rotationPitch = curPitch;
+            }
 
             if ((mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() || mc.thePlayer.isBlocking()) && !isBlocking) {
                 ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
