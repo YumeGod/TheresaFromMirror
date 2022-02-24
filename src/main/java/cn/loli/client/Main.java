@@ -67,7 +67,7 @@ public class Main {
     public static final String CLIENT_AUTHOR = "CuteMirror";
     public static final double CLIENT_VERSION_NUMBER = 1.0;
     @NotNull
-    public static final String CLIENT_VERSION = CLIENT_VERSION_NUMBER + "";
+    public static final String CLIENT_VERSION = CLIENT_VERSION_NUMBER + "- Release";
     @NotNull
     public static final String CLIENT_INITIALS = "星";
 
