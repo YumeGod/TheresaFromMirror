@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class SoundFxPlayer {
-    public void playSound(SoundType st,float volume) {
+    public void playSound(SoundType st, float volume) {
         new Thread(() -> {
             AudioInputStream as;
             try {
@@ -24,16 +24,19 @@ public class SoundFxPlayer {
             }
         }).start();
     }
-    public enum SoundType{
+
+    public enum SoundType {
         EDITION("ingame.wav"),
         VICTORY("victory.wav"),
         SPECIAL("spec.wav");
 
         final String name;
-        SoundType(String fileName){
+
+        SoundType(String fileName) {
             this.name = fileName;
         }
-        String getName(){
+
+        String getName() {
             return name;
         }
     }

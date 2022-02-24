@@ -6,7 +6,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
@@ -15,7 +14,6 @@ import net.minecraft.network.play.client.*;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import org.apache.commons.lang3.RandomStringUtils;
-import scala.collection.parallel.ParIterableLike;
 
 import java.util.Arrays;
 import java.util.Random;

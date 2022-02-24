@@ -19,15 +19,13 @@ public class MoveUtils extends Utils {
             if (forward != 0.0D) {
                 if (strafe > 0.0D) {
                     yaw += (forward > 0.0D ? -45 : 45);
-                } else
-                if (strafe < 0.0D) {
+                } else if (strafe < 0.0D) {
                     yaw += (forward > 0.0D ? 45 : -45);
                 }
                 strafe = 0.0D;
                 if (forward > 0.0D) {
                     forward = 1;
-                } else
-                if (forward < 0.0D) {
+                } else if (forward < 0.0D) {
                     forward = -1;
                 }
             }
@@ -53,7 +51,7 @@ public class MoveUtils extends Utils {
     public double[] getSpeed(double speed, float yaw, boolean direction) {
         final double motionX = -Math.sin(Math.toRadians(direction ? getDirection(yaw) : yaw)) * speed;
         final double motionZ = Math.cos(Math.toRadians(direction ? getDirection(yaw) : yaw)) * speed;
-        return new double[] {motionX, motionZ};
+        return new double[]{motionX, motionZ};
     }
 
     public static void setSpeed(double speed) {
@@ -70,11 +68,11 @@ public class MoveUtils extends Utils {
     }
 
     public static float getDirection(float rotationYaw) {
-        float left = Minecraft.getMinecraft().gameSettings.keyBindLeft.isPressed() ? 
+        float left = Minecraft.getMinecraft().gameSettings.keyBindLeft.isPressed() ?
                 mc.gameSettings.keyBindBack.isPressed() ? 45 : mc.gameSettings.keyBindForward.isPressed() ? -45 : -90 : 0;
         float right = Minecraft.getMinecraft().gameSettings.keyBindRight.isPressed() ?
                 mc.gameSettings.keyBindBack.isPressed() ? -45 : mc.gameSettings.keyBindForward.isPressed() ? 45 : 90 : 0;
-        float back = Minecraft.getMinecraft().gameSettings.keyBindBack.isPressed() ? + 180 : 0;
+        float back = Minecraft.getMinecraft().gameSettings.keyBindBack.isPressed() ? +180 : 0;
         float yaw = left + right + back;
         return rotationYaw + yaw;
     }

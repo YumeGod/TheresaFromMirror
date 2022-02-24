@@ -1,9 +1,6 @@
-
-
 package cn.loli.client.utils.render;
 
 import cn.loli.client.utils.Utils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import org.jetbrains.annotations.NotNull;
 

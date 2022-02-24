@@ -1,5 +1,3 @@
-
-
 package cn.loli.client.utils;
 
 import cn.loli.client.Main;
@@ -168,7 +166,7 @@ public class Utils {
         return (i >= minValueInclusive && i <= maxValueInclusive);
     }
 
-   public int randomInRange(int min, int max) {
+    public int randomInRange(int min, int max) {
         if (min > max) {
             System.err.println("The minimal value cannot be higher than the max value");
             return min;

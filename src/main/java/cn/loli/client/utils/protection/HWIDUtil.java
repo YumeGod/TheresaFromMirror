@@ -16,7 +16,7 @@ public class HWIDUtil {
             md.update(toEncrypt.getBytes());
             StringBuffer hexString = new StringBuffer();
 
-            byte byteData[] = md.digest();
+            byte[] byteData = md.digest();
 
             for (byte aByteData : byteData) {
                 String hex = Integer.toHexString(0xff & aByteData);

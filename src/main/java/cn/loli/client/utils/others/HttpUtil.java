@@ -3,14 +3,11 @@ package cn.loli.client.utils.others;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
-import sun.misc.Unsafe;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Map;
-import java.util.Set;
 
 public class HttpUtil {
 

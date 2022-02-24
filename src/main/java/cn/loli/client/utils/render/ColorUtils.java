@@ -1,5 +1,3 @@
-
-
 package cn.loli.client.utils.render;
 
 import net.minecraft.client.renderer.GlStateManager;
@@ -24,7 +22,7 @@ public class ColorUtils {
 
     public static Color intToColor(int color) {
         Color c1 = new Color(color);
-        return new Color(c1.getRed(),c1.getGreen(),c1.getBlue(),color >> 24 & 255);
+        return new Color(c1.getRed(), c1.getGreen(), c1.getBlue(), color >> 24 & 255);
     }
 
     /**

@@ -1,5 +1,3 @@
-
-
 package cn.loli.client.utils.misc;
 
 import cn.loli.client.Main;

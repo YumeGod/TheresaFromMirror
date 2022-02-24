@@ -3,7 +3,6 @@ package cn.loli.client.utils.render;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.injection.mixins.IAccessorRenderManager;
 import cn.loli.client.utils.Utils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -19,7 +18,6 @@ import org.lwjgl.util.glu.Cylinder;
 import java.awt.*;
 
 import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
 
 public class RenderUtils extends Utils {
 

@@ -1,5 +1,3 @@
-
-
 package cn.loli.client.utils.render;
 
 import net.minecraft.client.Minecraft;

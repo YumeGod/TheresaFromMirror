@@ -1,8 +1,5 @@
 package cn.loli.client.utils.misc;
 
-import java.util.Arrays;
-import java.util.List;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -10,6 +7,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityEnderChest;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by John on 2017/04/30.
