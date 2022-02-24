@@ -19,6 +19,7 @@ public class Runner implements Runnable {
     int radX;
     int radY;
     int radZ;
+
     public Runner(int radX, int radY, int radZ, long delay) {
         this.max = (radX + radX + 1) * (radY + radY + 1) * (radZ + radZ + 1);
         this.radX = radX;
@@ -27,10 +28,11 @@ public class Runner implements Runnable {
         this.delay = delay;
     }
 
-    public double getProcess(){
-        return (double)current / (double)max * 100.0D;
+    public double getProcess() {
+        return (double) current / (double) max * 100.0D;
     }
-    public String getProcessText(){
+
+    public String getProcessText() {
         return new DecimalFormat("0.00").format(getProcess());
     }
 
@@ -48,7 +50,6 @@ public class Runner implements Runnable {
                     if (!isRunning) break;
                     current++;
                     BlockPos currblock = new BlockPos(pos.getX() + cx, pos.getY() + cy, pos.getZ() + cz);
-                    // Block block = Minecraft.getMinecraft().player.world.getBlockState(currblock).getBlock();
 
                     C07PacketPlayerDigging packet = new C07PacketPlayerDigging(
                             C07PacketPlayerDigging.Action.START_DESTROY_BLOCK,
@@ -64,15 +65,13 @@ public class Runner implements Runnable {
                     conn.getNetworkManager().sendPacket(packet);
                     try {
                         Thread.sleep(delay);
-                    } catch (InterruptedException e) {
-                        //e.printStackTrace();
+                    } catch (InterruptedException ignored) {
+
                     }
                 }
             }
         }
         ChatUtils.info("§6[ §a！ §6] §fRefresh done.");
-//        Configuration.freeze = false;
-//        Controller.requestBlockFinder(true);
         done = true;
     }
 }
