@@ -2,13 +2,11 @@
 
 package cn.loli.client.module.modules.combat;
 
-import cn.loli.client.events.JumpEvent;
-import cn.loli.client.events.MotionUpdateEvent;
-import cn.loli.client.events.MoveFlyEvent;
-import cn.loli.client.events.RenderEvent;
+import cn.loli.client.events.*;
 import cn.loli.client.injection.implementations.IEntityPlayer;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.player.PlayerUtils;
 import cn.loli.client.utils.player.rotation.RotationHook;
@@ -79,6 +77,9 @@ public class Aura extends Module {
     private final BooleanValue clampYaw = new BooleanValue("Clamp", true);
 
     private final BooleanValue moveFix = new BooleanValue("Move Fix", false);
+    private final BooleanValue silentMoveFix = new BooleanValue("Slient Fix", false);
+
+    private final BooleanValue rayCast = new BooleanValue("Ray Cast", false);
 
     private final BooleanValue mouseFix = new BooleanValue("Mouse Fix", true);
     private final BooleanValue a3Fix = new BooleanValue("Mouse VL Fix", true);
@@ -176,6 +177,14 @@ public class Aura extends Module {
     }
 
     @EventTarget
+    public void onSlient(MovementStateEvent event) {
+        if (moveFix.getObject() && target != null && silentMoveFix.getObject()) {
+            event.setSilentMoveFix(true);
+            event.setYaw(RotationHook.yaw);
+        }
+    }
+
+    @EventTarget
     private void onMotionUpdate(MotionUpdateEvent event) {
         if (event.getEventType() == EventType.PRE) {
             if (target == null) {
@@ -190,13 +199,6 @@ public class Aura extends Module {
                 }
                 return;
             }
-
-            if (mc.currentScreen != null && noInv.getObject()) {
-                if (autoCloseInv.getObject())
-                    mc.thePlayer.closeScreen();
-                else return;
-            }
-
 
             float[] rots;
 
@@ -245,8 +247,23 @@ public class Aura extends Module {
     }
 
     private void attack(Entity entity) {
-        mc.thePlayer.swingItem();
-        mc.playerController.attackEntity(mc.thePlayer, entity);
+        if (mc.currentScreen != null && noInv.getObject()) {
+            if (autoCloseInv.getObject())
+                mc.thePlayer.closeScreen();
+            else return;
+        }
+
+        if (rayCast.getObject())
+            entity = utils.rayCastedEntity(range.getObject(), RotationHook.yaw, RotationHook.pitch);
+
+        if (entity != null) {
+            mc.thePlayer.swingItem();
+            mc.playerController.attackEntity(mc.thePlayer, entity);
+        } else {
+            ChatUtils.info("Miss");
+            mc.thePlayer.swingItem();
+        }
+
     }
 
 

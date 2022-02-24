@@ -36,6 +36,7 @@
     "IAccessorFontRenderer",
     "IAccessorNetHandlerPlayClient",
     "MixinFontRenderer",
+    "MixinMovementInputFromOptions",
     "MixinNetHandlerPlayClient"
   ]
 }
