@@ -5,19 +5,16 @@ package cn.loli.client.injection.mixins;
 import cn.loli.client.Main;
 import cn.loli.client.events.*;
 import cn.loli.client.module.modules.movement.NoSlowDown;
+import cn.loli.client.utils.player.rotation.RotationHook;
 import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.util.AxisAlignedBB;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -63,6 +60,11 @@ public class MixinEntityPlayerSP extends MixinEntity {
         rotationYaw = event.getYaw();
         rotationPitch = event.getPitch();
         onGround = event.isOnGround();
+
+        RotationHook.yaw = rotationYaw;
+        RotationHook.pitch = rotationPitch;
+        RotationHook.prevYaw = cachedRotationYaw;
+        RotationHook.prevPitch = cachedRotationPitch;
     }
 
 

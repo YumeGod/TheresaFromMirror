@@ -167,4 +167,22 @@ public class Utils {
     public static boolean between(int i, int minValueInclusive, int maxValueInclusive) {
         return (i >= minValueInclusive && i <= maxValueInclusive);
     }
+
+   public int randomInRange(int min, int max) {
+        if (min > max) {
+            System.err.println("The minimal value cannot be higher than the max value");
+            return min;
+        }
+        max -= min;
+        return (int) Math.round(Math.random() * (max)) + min;
+    }
+
+    public double randomInRange(double min, double max) {
+        if (min > max) {
+            System.err.println("The minimal value cannot be higher than the max value");
+            return min;
+        }
+        max -= min;
+        return (Math.random() * (max)) + min;
+    }
 }
