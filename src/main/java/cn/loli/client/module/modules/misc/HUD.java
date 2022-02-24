@@ -3,11 +3,11 @@
 package cn.loli.client.module.modules.misc;
 
 import cn.loli.client.Main;
-import cn.loli.client.gui.ttfr.HFontRenderer;
-import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.events.Render2DEvent;
+import cn.loli.client.gui.ttfr.HFontRenderer;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.utils.render.AnimationUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
@@ -15,7 +15,9 @@ import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
+import org.lwjgl.opengl.GL11;
 
+import java.awt.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -25,8 +27,11 @@ public class HUD extends Module {
     private final BooleanValue showClientInfo = new BooleanValue("ClientInfo", true);
     private final BooleanValue showArrayList = new BooleanValue("ArrayList", true);
     private final BooleanValue showNotifications = new BooleanValue("Notifications", true);
-    private NumberValue<Number> ArrayListXPos = new NumberValue<>("ArrayListXPos", 0, 0, 15);
-    private NumberValue<Number> ArrayListYPos = new NumberValue<>("ArrayListYPos", 0, 0, 15);
+    private final NumberValue<Number> ArrayListXPos = new NumberValue<>("ArrayListXPos", 0, 0, 15);
+    private final NumberValue<Number> ArrayListYPos = new NumberValue<>("ArrayListYPos", 0, 0, 15);
+    private final BooleanValue reverse = new BooleanValue("Sort Reverse", false);
+    private final BooleanValue mcfont = new BooleanValue("Mc Font", false);
+
     public static ModeValue mode = new ModeValue("Mode", "Normal", "Normal");
 
     private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -53,10 +58,12 @@ public class HUD extends Module {
     private void render2D(Render2DEvent event) {
         if (!getState()) return;
         ScaledResolution res = new ScaledResolution(Minecraft.getMinecraft());
-        HFontRenderer font = Main.fontLoaders.fonts.get("roboto16");
+        HFontRenderer font = Main.fontLoaders.fonts.get("ubuntu16");
         if (!sorted) {
-            sort.sort(Comparator.comparingInt(m -> font.getStringWidth(m.getName())));
-            sort = reverse(sort);
+            sort.sort(Comparator.comparingInt(m -> mcfont.getObject() ? mc.fontRendererObj.getStringWidth(m.getName())
+                    : font.getStringWidth(m.getName())));
+            if (!reverse.getObject())
+                sort = reverse(sort);
             sorted = true;
         }
 
@@ -71,14 +78,26 @@ public class HUD extends Module {
             fpsWidth = Math.max(fpsWidth, mc.fontRendererObj.drawString(String.format("User: " + Main.INSTANCE.name, currSpeed), (float) (res.getScaledWidth() - mc.fontRendererObj.getStringWidth(String.format("User: " + Main.INSTANCE.name, currSpeed))), res.getScaledHeight() - mc.fontRendererObj.FONT_HEIGHT - 2, -1, true));
         }
 
+        if (showClientInfo.getObject()) {
+            GL11.glScaled(2.0, 2.0, 2.0);
+            int string = mc.fontRendererObj.drawString("朔夜观星", 2, 2, rainbow(0), true);
+            GL11.glScaled(0.5, 0.5, 0.5);
+
+            mc.fontRendererObj.drawString(Main.CLIENT_VERSION, string * 2, mc.fontRendererObj.FONT_HEIGHT * 2 - 7, rainbow(100), true);
+            //   fontRenderer.drawString("by " + Main.CLIENT_AUTHOR, 4, fontRenderer.FONT_HEIGHT * 2 + 2, rainbow(200), true);
+        }
+
         if (showArrayList.getObject()) {
             for (Module m : sort) {
                 if (m.getState()) {
                     String s = m.getName();
-                    font.drawString(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, -1);
+                    if (mcfont.getObject())
+                        mc.fontRendererObj.drawStringWithShadow(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, rainbow(50));
+                    else
+                        font.drawStringWithShadow(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, rainbow(50) , 150);
                     m.arraylist_animY = AnimationUtils.smoothAnimation(m.arraylist_animY, i + ArrayListYPos.getObject().intValue(), 50, .3f);
-                    m.arraylist_animX = AnimationUtils.smoothAnimation(m.arraylist_animX, font.getStringWidth(s) + ArrayListXPos.getObject().intValue(), 50, .4f);
-                    i += 16;
+                    m.arraylist_animX = AnimationUtils.smoothAnimation(m.arraylist_animX, (mcfont.getObject() ? mc.fontRendererObj.getStringWidth(s) : font.getStringWidth(s)) + ArrayListXPos.getObject().intValue(), 50, .4f);
+                    i += 12;
                 }
             }
         }
@@ -86,5 +105,17 @@ public class HUD extends Module {
         if (showNotifications.getObject()) {
             NotificationManager.render();
         }
+    }
+
+    private static int rainbow(int delay) {
+        double rainbowState = Math.ceil((System.currentTimeMillis() + delay) / 20.0);
+        rainbowState %= 360;
+        return Color.getHSBColor((float) (rainbowState / 360.0f), 0.4f, 1.0f).getRGB();
+    }
+
+    @Override
+    public void onEnable() {
+        if (sorted) sorted = false;
+        super.onEnable();
     }
 }

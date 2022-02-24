@@ -262,7 +262,7 @@ public class Aura extends Module {
             mc.thePlayer.swingItem();
             mc.playerController.attackEntity(mc.thePlayer, entity);
         } else {
-            ChatUtils.info("Miss");
+        //    ChatUtils.info("Miss");
             mc.thePlayer.swingItem();
         }
 
