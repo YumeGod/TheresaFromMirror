@@ -109,11 +109,4 @@ public abstract class MixinEntityPlayer extends EntityLivingBase implements IEnt
     }
 
 
-    @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
-    public void onJump(CallbackInfo ci) {
-        JumpEvent jumpEvent = new JumpEvent();
-        EventManager.call(jumpEvent);
-
-        if (jumpEvent.isCancelled()) ci.cancel();
-    }
 }

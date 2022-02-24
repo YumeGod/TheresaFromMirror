@@ -1,16 +1,19 @@
 package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
+import cn.loli.client.events.JumpEvent;
 import cn.loli.client.module.modules.movement.NoJumpDelay;
+import com.darkmagician6.eventapi.EventManager;
 import net.minecraft.entity.EntityLivingBase;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityLivingBase.class)
-public class MixinEntityLivingBase {
+public class MixinEntityLivingBase extends MixinEntity{
     @Shadow
     private int jumpTicks;
 
@@ -20,4 +23,10 @@ public class MixinEntityLivingBase {
             jumpTicks = 0;
     }
 
+    @Redirect(method = "jump", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/EntityLivingBase;rotationYaw:F"))
+    public float onJump(EntityLivingBase instance) {
+        JumpEvent jumpEvent = new JumpEvent(rotationYaw);
+        EventManager.call(jumpEvent);
+        return jumpEvent.getYaw();
+    }
 }

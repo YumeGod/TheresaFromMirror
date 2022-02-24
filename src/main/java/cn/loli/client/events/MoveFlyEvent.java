@@ -1,11 +1,11 @@
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.callables.EventCancellable;
+import com.darkmagician6.eventapi.events.Event;
 
-public class JumpEvent extends EventCancellable {
+public class MoveFlyEvent implements Event {
     float yaw;
 
-    public JumpEvent(float yaw) {
+    public MoveFlyEvent(float yaw) {
         this.yaw = yaw;
     }
 
@@ -13,10 +13,7 @@ public class JumpEvent extends EventCancellable {
         return yaw;
     }
 
-
     public void setYaw(float yaw) {
         this.yaw = yaw;
     }
-
-
 }

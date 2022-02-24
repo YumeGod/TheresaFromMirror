@@ -14,6 +14,8 @@ import java.util.Random;
 
 public class RotationUtils extends Utils {
 
+    private static RotationUtils utils;
+
     public static float getYaw(Entity entity) {
         if (entity == null) return mc.thePlayer.rotationYaw;
 
@@ -133,7 +135,7 @@ public class RotationUtils extends Utils {
         return new float[]{endYaw, endPitch};
     }
 
-    public float[] facePlayer(Entity e, boolean a3, boolean heuristics, boolean smooth, boolean prediction, boolean mouseFix, double mouseFixSpeed, boolean bestVector, double inaccuracy, boolean clampYaw, float rotationSpeed, double range) {
+    public float[] facePlayer(Entity e, boolean a3, boolean heuristics, boolean smooth, boolean prediction, boolean mouseFix, boolean bestVector, double inaccuracy, boolean clampYaw, float rotationSpeed, double range) {
         final RandomUtil randomUtil = RandomUtil.getInstance();
 
         final double eyeX = (mc.thePlayer.getEntityBoundingBox().minX + mc.thePlayer.getEntityBoundingBox().maxX) / 2;
@@ -332,4 +334,10 @@ public class RotationUtils extends Utils {
         return null;
     }
 
+    public static RotationUtils getInstance() {
+        if (utils == null) {
+            utils = new RotationUtils();
+        }
+        return utils;
+    }
 }
