@@ -71,7 +71,7 @@ public class Runner implements Runnable {
                 }
             }
         }
-        ChatUtils.info("§6[ §a！ §6] §fRefresh done.");
+        ChatUtils.info("§fRefresh done.");
         done = true;
     }
 }
