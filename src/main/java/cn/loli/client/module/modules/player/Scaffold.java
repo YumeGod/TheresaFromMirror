@@ -5,7 +5,6 @@ import cn.loli.client.injection.mixins.IAccessorKeyBinding;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.ChatUtils;
-import cn.loli.client.utils.misc.RandomUtil;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.player.MoveUtils;
 import cn.loli.client.utils.player.PlayerUtils;
@@ -19,6 +18,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -47,19 +47,20 @@ public class Scaffold extends Module {
     private final BooleanValue rotation = new BooleanValue("Rotation", false);
     private final BooleanValue keeprotation = new BooleanValue("Keep Rotation", false);
 
-    private final BooleanValue randomizeYaw = new BooleanValue("Randomize Yaw", false);
+    private final BooleanValue dynamicYaw = new BooleanValue("Dynamic Yaw", false);
     private final BooleanValue randomizePitch = new BooleanValue("Randomize Pitch", false);
 
     private final BooleanValue staticPitch = new BooleanValue("Static Pitch", false);
-    private final NumberValue<Integer> pitch = new NumberValue<>("Delay", 80, 70, 90);
+    private final NumberValue<Integer> pitch = new NumberValue<>("Static Pitch Range", 80, 70, 90);
+    private final NumberValue<Integer> switchDelay = new NumberValue<>("Switch Delay", 0, 0, 1000);
 
-    private final BooleanValue dynamicYaw = new BooleanValue("Dynamic Yaw", false);
 
     private final BooleanValue rayCast = new BooleanValue("Ray Cast", false);
     private final BooleanValue clampYaw = new BooleanValue("Clamp", true);
 
     private final BooleanValue moveFix = new BooleanValue("Move Fix", false);
-    private final BooleanValue silentMoveFix = new BooleanValue("Slient Fix", false);
+    private final BooleanValue silentMoveFix = new BooleanValue("Silent Fix", false);
+    private final BooleanValue shouldyaw = new BooleanValue("Silent Yaw Fix", false);
 
     private final BooleanValue upScaffold = new BooleanValue("UP-Scaffold", false);
     private final BooleanValue downScaffold = new BooleanValue("Down-Scaffold", false);
@@ -83,17 +84,19 @@ public class Scaffold extends Module {
     private final BooleanValue facingCheck = new BooleanValue("Facing Check", false);
     private final BooleanValue canUpCheck = new BooleanValue("Can UP Check", false);
 
+    private final BooleanValue noSwing = new BooleanValue("No Swing", false);
+
+
     private final BooleanValue mistake = new BooleanValue("Mistake", false);
     private final NumberValue<Integer> mistakerate = new NumberValue<>("Mistake Rate", 80, 70, 90);
 
-    int sneakCount, silentSlot = -1, startY;
+    int silentSlot = -1;
+    int startY;
 
     boolean canBuild, hasSilent;
 
     EnumFacing enumFacing;
     ItemStack itemStack;
-
-    boolean fakeSneak;
 
     int currentBlocks;
 
@@ -118,6 +121,7 @@ public class Scaffold extends Module {
 
     @Override
     public void onEnable() {
+        super.onEnable();
         if (mc.thePlayer == null)
             return;
 
@@ -130,13 +134,12 @@ public class Scaffold extends Module {
 
         curYaw = mc.thePlayer.rotationYaw;
         curPitch = mc.thePlayer.rotationPitch;
-
-        super.onEnable();
     }
 
     @Override
     public void onDisable() {
         super.onDisable();
+        switchTimer.reset();
     }
 
     @EventTarget
@@ -145,7 +148,6 @@ public class Scaffold extends Module {
         if (curPos != null) {
             if ((!mc.thePlayer.onGround && rotateInAir.getObject()) || (mc.objectMouseOver == null || (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || (!mc.objectMouseOver.getBlockPos().equals(curPos)) && mc.objectMouseOver.sideHit == enumFacing || (mc.objectMouseOver.sideHit != enumFacing && mc.objectMouseOver.getBlockPos().equals(curPos))))) {
                 float[] rotation = utils.faceBlock(curPos, mc.theWorld.getBlockState(curPos).getBlock().getBlockBoundsMaxY() - mc.theWorld.getBlockState(curPos).getBlock().getBlockBoundsMinY() + 0.5D, mouse_vl_fix.getObject(), mouseFix.getObject(), prediction.getObject(), randomAim.getObject(), randomizePitch.getObject(), clampYaw.getObject(), 180);
-
 
                 if (rotation != null)
                     if (simple.getObject()) {
@@ -159,8 +161,6 @@ public class Scaffold extends Module {
                             curPitch = (float) pitch.getObject();
                     }
             }
-        } else {
-
         }
 
     }
@@ -184,6 +184,10 @@ public class Scaffold extends Module {
         if (moveFix.getObject() && rotation.getObject() && silentMoveFix.getObject()) {
             e.setSilentMoveFix(true);
             e.setYaw(curYaw);
+            if (shouldyaw.getObject()) {
+                e.setShouldYaw(utils.getYaw(calcShouldYaw()) + 180);
+                e.setFixYaw(true);
+            }
         }
     }
 
@@ -208,36 +212,134 @@ public class Scaffold extends Module {
     @EventTarget
     private void onWorking(AttackEvent e) {
 
-        final RandomUtil randomUtil = RandomUtil.getInstance();
-
-
         final double y = sameY.getObject() && PlayerUtils.isMoving2() ? startY : mc.thePlayer.posY;
-        boolean flag = true;
 
         if (!sprint.getObject()) {
             ((IAccessorKeyBinding) mc.gameSettings.keyBindSprint).setPressed(false);
             mc.thePlayer.setSprinting(false);
         }
 
-        if ((!PlayerUtils.isMoving2() && mc.gameSettings.keyBindJump.isKeyDown()) || downScaffold.getObject() && utils.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode()) || mc.thePlayer.onGround) {
+        if ((!PlayerUtils.isMoving2() && mc.gameSettings.keyBindJump.isKeyDown()) || downScaffold.getObject() && utils.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode()) || mc.thePlayer.onGround)
             startY = (int) mc.thePlayer.posY;
-        }
+
+        boolean flag = true;
 
 
-        Vec3 position = expand((Vec3) mc.thePlayer.getPositionVector().addVector(0, (y - mc.thePlayer.posY), 0));
-
-        ChatUtils.info("123");
-
+        Vec3 position = expand(mc.thePlayer.getPositionVector().addVector(0, (y - mc.thePlayer.posY), 0));
         this.curPos = getBlockPosToPlaceOn(new BlockPos(position.xCoord, position.yCoord - 1, position.zCoord));
-
 
         itemStack = mc.thePlayer.getCurrentEquippedItem();
 
+        if (curPos != null) {
+            if (!mc.thePlayer.isUsingItem())
+                canBuild = true;
+
+            if (blockCheck.getObject() && allowAir.getObject() || !rayCast.getObject()
+                    || (mc.objectMouseOver != null && mc.objectMouseOver.getBlockPos() != null && mc.theWorld.getBlockState(mc.objectMouseOver.getBlockPos()).getBlock().getMaterial() != Material.air))
+                if (!rayCast.getObject() || (mc.objectMouseOver != null && mc.objectMouseOver.getBlockPos() != null)) {
+                    if (timeHelper.hasReached(delay.getObject())) {
+                        final BlockPos blockpos = rayCast.getObject() ? mc.objectMouseOver.getBlockPos() : curPos;
+                        if (blockpos != null && mc.theWorld.getBlockState(curPos) != null && mc.theWorld.getBlockState(blockpos).getBlock().getMaterial() != Material.air) {
+                            if (this.silentSlot != -1) {
+                                final ItemStack item = mc.thePlayer.inventory.getCurrentItem();
+                                if (item == null || !(item.getItem() instanceof ItemBlock)) {
+                                    this.silentSlot = -1;
+                                }
+                            }
+
+                            if (slient.getObject() && (itemStack == null || !(itemStack.getItem() instanceof ItemBlock)) || switchBlocks.getObject()) {
+                                for (int i = 0; i < 9; i++) {
+                                    final ItemStack item = mc.thePlayer.inventory.getStackInSlot(i);
+                                    if (item != null && item.getItem() instanceof ItemBlock) {
+                                        if (!blackList.contains(Block.getBlockFromItem(item.getItem()))) {
+                                            if ((!switchBlocks.getObject() || !switchedSlots.contains(i)) && (this.silentSlot == -1 || switchBlocks.getObject() && !switchedSlots.contains(i))) {
+                                                if (mc.thePlayer.inventory.currentItem != i) {
+                                                    itemStack = item;
+                                                    if (silentSlot != i) {
+                                                        mc.getNetHandler().getNetworkManager().sendPacket(new C09PacketHeldItemChange(i));
+                                                    }
+                                                    this.silentSlot = i;
+                                                    hasSilent = true;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                this.silentSlot = mc.thePlayer.inventory.currentItem;
+                                hasSilent = true;
+                            }
+
+
+                            if (this.silentSlot != -1) {
+                                itemStack = mc.thePlayer.inventory.getStackInSlot(this.silentSlot);
+                            }
+
+                            if (itemStack != null && itemStack.getItem() instanceof ItemBlock) {
+                                Vec3 vec3 = new Vec3(curPos.getX() + 0.5, curPos.getY() + 0.5, curPos.getZ() + 0.5);
+                                if (automaticVector.getObject() && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
+                                    vec3 = mc.objectMouseOver.hitVec;
+                                if (!blockCheck.getObject() || mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK || mc.objectMouseOver != null && allowAir.getObject() && mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY)
+                                    if ((!rayCast.getObject() || !facingCheck.getObject()) || mc.objectMouseOver != null && mc.objectMouseOver.sideHit == enumFacing || (downScaffold.getObject() && mc.gameSettings.keyBindSneak.isKeyDown()))
+                                        if (!sameY.getObject() || !rayCast.getObject() || (((blockpos.getY() == startY - 1 || !PlayerUtils.isMoving2() && mc.gameSettings.keyBindJump.isKeyDown()) && (!mc.objectMouseOver.sideHit.equals(EnumFacing.UP))) || !PlayerUtils.isMoving2()))
+                                            if (!canUpCheck.getObject() || enumFacing != EnumFacing.UP || (mc.objectMouseOver != null && mc.objectMouseOver.getBlockPos() != null && mc.objectMouseOver.getBlockPos().equals(blockpos))) {
+                                                if (rayCast.getObject() ? (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, itemStack, blockpos, mc.objectMouseOver.sideHit, mc.objectMouseOver.hitVec)) : mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, itemStack, curPos, enumFacing, vec3)) {
+
+                                                    flag = false;
+
+                                                    if (!noSwing.getObject())
+                                                        mc.thePlayer.swingItem();
+                                                    else
+                                                        mc.getNetHandler().getNetworkManager().sendPacket(new C0APacketAnimation());
+
+                                                    int blocks = 0;
+
+                                                    if (switchBlocks.getObject()) {
+                                                        for (int i = 0; i < 9; i++) {
+                                                            final ItemStack item = mc.thePlayer.inventory.getStackInSlot(i);
+                                                            if (item != null && item.getItem() instanceof ItemBlock) {
+                                                                if (!blackList.contains(Block.getBlockFromItem(item.getItem()))) {
+                                                                    blocks++;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    if (itemSwitchTimer.hasReached(switchDelay.getObject()) || !switchBlocks.getObject()) {
+                                                        if (silentSlot != -1 && slient.getObject() && switchBlocks.getObject() && blocks > 1)
+                                                            switchedSlots.add(silentSlot);
+                                                        if (blocks <= switchedSlots.size())
+                                                            switchedSlots.clear();
+                                                        itemSwitchTimer.reset();
+                                                    }
+                                                }
+                                            }
+                            } else {
+                                return;
+                            }
+                            timeHelper.reset();
+                        }
+                        if (itemStack != null && itemStack.stackSize == 0 && this.silentSlot != -1) {
+                            mc.thePlayer.inventory.mainInventory[this.silentSlot] = null;
+                        }
+                        if (flag && !mistake.getObject() && utils.randomInRange(0, 100) <= mistakerate.getObject() && itemStack != null && itemStack.getItem() instanceof ItemBlock) {
+                            if (mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, itemStack)) {
+                                mc.entityRenderer.itemRenderer.resetEquippedProgress2();
+                            }
+                        }
+                    }
+                }
+
+        }
 
     }
 
     @EventTarget
     private void onPacket(PacketEvent e) {
+        if (slient.getObject()) {
+            if (e.getPacket() instanceof C09PacketHeldItemChange) {
+                e.setCancelled(true);
+            }
+        }
     }
 
     @EventTarget
@@ -247,11 +349,23 @@ public class Scaffold extends Module {
 
     @EventTarget
     private void onUpdate(UpdateEvent e) {
+        if (sprint.getObject()) {
+            mc.thePlayer.setSprinting(true);
+        }
+        ((IAccessorKeyBinding) mc.gameSettings.keyBindSprint).setPressed(false);
+
+        if (sameY.getObject())
+            if (!mc.thePlayer.onGround)
+                mc.thePlayer.jumpMovementFactor = 0.02f;
+            else {
+                if (jump.getObject() && PlayerUtils.isMoving2())
+                    mc.thePlayer.jump();
+            }
     }
 
     @EventTarget
     private void onJump(JumpEvent e) {
-        if (jump.getObject()) e.setCancelled(true);
+        //  if (jump.getObject()) e.setCancelled(true);
     }
 
     public BlockPos searchPos(BlockPos pos) {

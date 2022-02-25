@@ -2,11 +2,11 @@
 
 package cn.loli.client.module;
 
+import cn.loli.client.Main;
 import cn.loli.client.module.modules.misc.HUD;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
-import cn.loli.client.Main;
 import com.darkmagician6.eventapi.EventManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
@@ -25,6 +25,9 @@ public abstract class Module {
     private final boolean hidden;
     private int keybind;
     protected boolean state;
+
+    boolean keepReg = false;
+    boolean isReg = false;
 
     //Animations
     public float clickgui_animY;
@@ -77,32 +80,46 @@ public abstract class Module {
         return state;
     }
 
+
     public void setState(boolean state) {
         if (state) {
             this.state = true;
-            onEnable();
+
+            if (mc.thePlayer != null)
+                onEnable();
+
             arraylist_animX = 0;
             arraylist_animY -= 16;
+
+            if (!isReg) {
+                isReg = true;
+                EventManager.register(this);
+            }
+
             if (mc.thePlayer != null && Main.INSTANCE.moduleManager.getModule(HUD.class).getState()) {
                 NotificationManager.show(new Notification(NotificationType.INFO, "Info", getName() + " was enabled", 1));
             }
         } else {
             this.state = false;
-            onDisable();
+
+            if (mc.thePlayer != null)
+                onDisable();
+
+            if (!keepReg && isReg) {
+                isReg = false;
+                EventManager.unregister(this);
+            }
+
             if (mc.thePlayer != null && Main.INSTANCE.moduleManager.getModule(HUD.class).getState()) {
                 NotificationManager.show(new Notification(NotificationType.ERROR, "Info", getName() + " was disabled", 1));
             }
         }
-
-        onToggle();
     }
 
     protected void onEnable() {
-        EventManager.register(this);
     }
 
     protected void onDisable() {
-        EventManager.unregister(this);
     }
 
     protected void onToggle() {
