@@ -145,9 +145,10 @@ public class Scaffold extends Module {
 
     @EventTarget
     private void onRender(RenderEvent e) {
+        ray = utils.rayCastedBlock(curYaw, curPitch);
 
         if (curPos != null) {
-            if ((!mc.thePlayer.onGround && rotateInAir.getObject()) || (mc.objectMouseOver == null || (mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || (!mc.objectMouseOver.getBlockPos().equals(curPos)) && mc.objectMouseOver.sideHit == enumFacing || (mc.objectMouseOver.sideHit != enumFacing && mc.objectMouseOver.getBlockPos().equals(curPos))))) {
+            if ((!mc.thePlayer.onGround && rotateInAir.getObject()) || (ray == null || (ray.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || (!ray.getBlockPos().equals(curPos)) && ray.sideHit == enumFacing || (ray.sideHit != enumFacing && ray.getBlockPos().equals(curPos))))) {
                 float[] rotation = utils.faceBlock(curPos, mc.theWorld.getBlockState(curPos).getBlock().getBlockBoundsMaxY() - mc.theWorld.getBlockState(curPos).getBlock().getBlockBoundsMinY() + 0.5D, mouse_vl_fix.getObject(), mouseFix.getObject(), prediction.getObject(), randomAim.getObject(), randomizePitch.getObject(), clampYaw.getObject(), 180);
 
                 if (rotation != null)
@@ -162,7 +163,6 @@ public class Scaffold extends Module {
                             curPitch = (float) pitch.getObject();
                     }
 
-                ray = utils.rayCastedBlock(curYaw, curPitch);
             }
         }
 
@@ -233,6 +233,7 @@ public class Scaffold extends Module {
 
         itemStack = mc.thePlayer.getCurrentEquippedItem();
 
+
         if (curPos != null) {
             if (!mc.thePlayer.isUsingItem())
                 canBuild = true;
@@ -279,6 +280,7 @@ public class Scaffold extends Module {
                                 itemStack = mc.thePlayer.inventory.getStackInSlot(this.silentSlot);
                             }
 
+
                             if (itemStack != null && itemStack.getItem() instanceof ItemBlock) {
                                 Vec3 vec3 = new Vec3(curPos.getX() + 0.5, curPos.getY() + 0.5, curPos.getZ() + 0.5);
                                 if (automaticVector.getObject() && ray != null && ray.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
@@ -288,7 +290,6 @@ public class Scaffold extends Module {
                                         if (!sameY.getObject() || !rayCast.getObject() || (((blockpos.getY() == startY - 1 || !PlayerUtils.isMoving2() && mc.gameSettings.keyBindJump.isKeyDown()) && (!ray.sideHit.equals(EnumFacing.UP))) || !PlayerUtils.isMoving2()))
                                             if (!canUpCheck.getObject() || enumFacing != EnumFacing.UP || (ray != null && ray.getBlockPos() != null && ray.getBlockPos().equals(blockpos))) {
                                                 if (rayCast.getObject() ? (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, itemStack, blockpos, ray.sideHit, ray.hitVec)) : mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, itemStack, curPos, enumFacing, vec3)) {
-
                                                     flag = false;
 
                                                     if (!noSwing.getObject())
