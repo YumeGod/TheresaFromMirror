@@ -9,10 +9,13 @@ import cn.loli.client.events.RenderWorldLastEvent;
 import cn.loli.client.module.modules.combat.KeepSprint;
 import cn.loli.client.module.modules.render.NoFov;
 import cn.loli.client.module.modules.render.ViewClip;
+import cn.loli.client.module.modules.render.Xray;
 import com.darkmagician6.eventapi.EventManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import org.lwjgl.opengl.GL11;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,10 +24,21 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(EntityRenderer.class)
-public class MixinEntityRenderer {
+public abstract class MixinEntityRenderer {
 
     @Shadow
     private float fovModifierHand;
+
+    @Final
+    @Shadow
+    private int[] lightmapColors;
+
+    @Final
+    @Shadow
+    private DynamicTexture lightmapTexture;
+
+    @Shadow
+    private boolean lightmapUpdateNeeded;
 
     @Inject(method = "renderWorldPass", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/ForgeHooksClient;dispatchRenderLast(Lnet/minecraft/client/renderer/RenderGlobal;F)V"))
     private void onRenderWorldPass(int pass, float partialTicks, long finishTimeNano, CallbackInfo ci) {
@@ -63,6 +77,22 @@ public class MixinEntityRenderer {
     @ModifyVariable(method = {"orientCamera"}, ordinal = 7, at = @At(value = "STORE", ordinal = -1), require = 1)
     private double viewport(double value) {
         return (Main.INSTANCE.moduleManager.getModule(ViewClip.class).getState() && Main.INSTANCE.moduleManager.getModule(ViewClip.class).extend.getObject()) ? Main.INSTANCE.moduleManager.getModule(ViewClip.class).dis.getObject() : (Main.INSTANCE.moduleManager.getModule(ViewClip.class).getState() && !Main.INSTANCE.moduleManager.getModule(ViewClip.class).extend.getObject()) ? 4.0 : value;
+    }
+
+    @Inject(method = "updateLightmap", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getSunBrightness(F)F", shift = At.Shift.BEFORE), cancellable = true)
+    private void updateLightMap(CallbackInfo callbackInfo) {
+        // Client
+        if (Main.INSTANCE.moduleManager.getModule(Xray.class).getState()) {
+            for (int i = 0; i < 256; ++i) {
+                this.lightmapColors[i] = 255 << 24 | 255 << 16 | 255 << 8 | 255;
+            }
+
+            this.lightmapTexture.updateDynamicTexture();
+            this.lightmapUpdateNeeded = false;
+            Minecraft.getMinecraft().mcProfiler.endSection();
+
+            callbackInfo.cancel();
+        }
     }
 
 }

@@ -11,6 +11,7 @@
     "IAccessorMinecraft",
     "IAccessorRenderManager",
     "MixinBlock",
+    "MixinBlockGrass",
     "MixinEntity",
     "MixinEntityLivingBase",
     "MixinEntityPlayer",
@@ -35,8 +36,11 @@
   "client": [
     "IAccessorFontRenderer",
     "IAccessorNetHandlerPlayClient",
+    "MixinBlockModelRenderer",
     "MixinFontRenderer",
     "MixinMovementInputFromOptions",
-    "MixinNetHandlerPlayClient"
+    "MixinNetHandlerPlayClient",
+    "MixinVisGraph",
+    "MixinWorldRenderer"
   ]
 }

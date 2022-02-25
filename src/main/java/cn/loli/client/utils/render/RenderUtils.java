@@ -722,4 +722,13 @@ public class RenderUtils extends Utils {
         GL11.glNormal3d(0.0, 1.0, 0.0);
         GL11.glRotated(-mc.getRenderManager().playerViewY, 0.0, 1.0, 0.0);
     }
+
+    public static int getColor(int red, int green, int blue, int alpha) {
+        int color = clamp(alpha, 0, 255) << 24;
+        color |= clamp(red, 0, 255) << 16;
+        color |= clamp(green, 0, 255) << 8;
+        color |= clamp(blue, 0, 255);
+
+        return color;
+    }
 }
