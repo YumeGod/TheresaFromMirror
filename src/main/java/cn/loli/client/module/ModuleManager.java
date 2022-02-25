@@ -58,6 +58,7 @@ public class ModuleManager {
         addModule(new NoRightClickDelay());
         addModule(new NoRotate());
         addModule(new SafeWalk());
+        addModule(new Scaffold());
         addModule(new SpeedMine());
         addModule(new TellyBridge());
         addModule(new Phase());

@@ -226,8 +226,12 @@ public class Aura extends Module {
 
             if (rotations.getObject()) {
                 if (slient.getObject()) {
-                    event.setYaw(mc.thePlayer.rotationYawHead = curYaw);
+                    event.setYaw(curYaw);
                     event.setPitch(curPitch);
+
+                    if (mc.gameSettings.thirdPersonView != 0 ){
+                        mc.thePlayer.rotationYawHead = curYaw;
+                    }
                 }
             }
 

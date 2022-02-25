@@ -5,12 +5,16 @@ import com.mojang.authlib.Agent;
 import com.mojang.authlib.exceptions.AuthenticationException;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.Session;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
 import java.awt.*;
@@ -229,5 +233,22 @@ public class Utils {
         }
 
         return value;
+    }
+
+    public Block getBlockUnderPlayer(float offsetY) {
+        return getBlockUnderPlayer(mc.thePlayer, offsetY);
+    }
+
+    Block getBlockUnderPlayer(EntityPlayer player, float offsetY) {
+        return mc.theWorld.getBlockState(new BlockPos(player.posX, player.posY - offsetY, player.posZ)).getBlock();
+    }
+
+    public boolean isKeyDown(int key) {
+        if (key < 0) {
+            int i = Mouse.getEventButton();
+            return i - 100 == key;
+        } else {
+            return Keyboard.isKeyDown(key);
+        }
     }
 }

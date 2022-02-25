@@ -3,10 +3,7 @@
 package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
-import cn.loli.client.events.KeyEvent;
-import cn.loli.client.events.LoopEvent;
-import cn.loli.client.events.TickEvent;
-import cn.loli.client.events.WindowResizeEvent;
+import cn.loli.client.events.*;
 import cn.loli.client.module.modules.render.BlockHit;
 import cn.loli.client.utils.render.AnimationUtils;
 import com.darkmagician6.eventapi.EventManager;
@@ -93,6 +90,11 @@ public abstract class MixinMinecraft {
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/fml/common/FMLCommonHandler;onPostClientTick()V", shift = At.Shift.BEFORE))
     private void onPostTick(CallbackInfo ci) {
         EventManager.call(new TickEvent(EventType.POST));
+    }
+
+    @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;isUsingItem()Z", ordinal = 0, shift = At.Shift.BEFORE))
+    private void onAttack(CallbackInfo ci) {
+        EventManager.call(new AttackEvent());
     }
 
     @Inject(method = "shutdown", at = @At("HEAD"))
