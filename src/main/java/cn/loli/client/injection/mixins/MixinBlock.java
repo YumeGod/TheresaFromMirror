@@ -4,7 +4,6 @@ package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
 import cn.loli.client.events.CollisionEvent;
-import cn.loli.client.module.modules.render.Xray;
 import com.darkmagician6.eventapi.EventManager;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -36,28 +35,5 @@ public abstract class MixinBlock {
         EventManager.call(new CollisionEvent(collidingEntity, pos.getX(), pos.getY(), pos.getZ(), mask, (Block) (Object) this));
     }
 
-    @Redirect(method = "getBlockLayer", at = @At(value = "FIELD", target = "Lnet/minecraft/util/EnumWorldBlockLayer;SOLID:Lnet/minecraft/util/EnumWorldBlockLayer;"))
-    private EnumWorldBlockLayer getBlockLayer() {
-        // Client
-        if (Main.INSTANCE.moduleManager.getModule(Xray.class).getState()) {
-            return Main.INSTANCE.moduleManager.getModule(Xray.class).blocksToFind.contains((Object) this) ? EnumWorldBlockLayer.SOLID : EnumWorldBlockLayer.TRANSLUCENT;
-        }
-
-        return EnumWorldBlockLayer.SOLID;
-    }
-
-
-    /**
-     * @author Loli
-     */
-    @SideOnly(Side.CLIENT)
-    @Overwrite
-    public float getAmbientOcclusionLightValue() {
-        // Client
-        if (Main.INSTANCE.moduleManager.getModule(Xray.class).getState())
-            return 1f;
-
-        return this.isBlockNormalCube() ? 0.2F : 1.0F;
-    }
 
 }

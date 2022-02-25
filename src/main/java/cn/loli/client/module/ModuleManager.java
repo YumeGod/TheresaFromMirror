@@ -74,7 +74,6 @@ public class ModuleManager {
         addModule(new OldAnimations());
         addModule(new Tracers());
         addModule(new ViewClip());
-        addModule(new Xray());
 
         //World
         addModule(new Eagle());

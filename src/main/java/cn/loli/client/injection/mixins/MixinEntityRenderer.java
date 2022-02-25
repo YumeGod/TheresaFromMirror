@@ -9,7 +9,6 @@ import cn.loli.client.events.RenderWorldLastEvent;
 import cn.loli.client.module.modules.combat.KeepSprint;
 import cn.loli.client.module.modules.render.NoFov;
 import cn.loli.client.module.modules.render.ViewClip;
-import cn.loli.client.module.modules.render.Xray;
 import com.darkmagician6.eventapi.EventManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
@@ -79,20 +78,5 @@ public abstract class MixinEntityRenderer {
         return (Main.INSTANCE.moduleManager.getModule(ViewClip.class).getState() && Main.INSTANCE.moduleManager.getModule(ViewClip.class).extend.getObject()) ? Main.INSTANCE.moduleManager.getModule(ViewClip.class).dis.getObject() : (Main.INSTANCE.moduleManager.getModule(ViewClip.class).getState() && !Main.INSTANCE.moduleManager.getModule(ViewClip.class).extend.getObject()) ? 4.0 : value;
     }
 
-    @Inject(method = "updateLightmap", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getSunBrightness(F)F", shift = At.Shift.BEFORE), cancellable = true)
-    private void updateLightMap(CallbackInfo callbackInfo) {
-        // Client
-        if (Main.INSTANCE.moduleManager.getModule(Xray.class).getState()) {
-            for (int i = 0; i < 256; ++i) {
-                this.lightmapColors[i] = 255 << 24 | 255 << 16 | 255 << 8 | 255;
-            }
-
-            this.lightmapTexture.updateDynamicTexture();
-            this.lightmapUpdateNeeded = false;
-            Minecraft.getMinecraft().mcProfiler.endSection();
-
-            callbackInfo.cancel();
-        }
-    }
 
 }
