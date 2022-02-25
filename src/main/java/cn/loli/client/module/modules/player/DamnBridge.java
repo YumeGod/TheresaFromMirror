@@ -29,7 +29,7 @@ public class DamnBridge extends Module {
 
     @Override
     public void onEnable() {
-        super.onEnable();
+        
         try {
             if (mc.inGameHasFocus) {
                 if (!PlayerUtils.isOnGround(-1))
@@ -48,7 +48,7 @@ public class DamnBridge extends Module {
 
     @Override
     public void onDisable() {
-        super.onDisable();
+        
         try {
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), false);
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindBack.getKeyCode(), false);

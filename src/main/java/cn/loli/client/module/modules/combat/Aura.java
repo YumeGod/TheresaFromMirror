@@ -115,7 +115,6 @@ public class Aura extends Module {
     public void onEnable() {
         curYaw = mc.thePlayer.rotationYaw;
         curPitch = mc.thePlayer.rotationPitch;
-        super.onEnable();
     }
 
     @Override
@@ -128,8 +127,6 @@ public class Aura extends Module {
             ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
             mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
         }
-
-        super.onDisable();
     }
 
 

@@ -19,13 +19,13 @@ public class Booster extends Module {
     public void onEnable() {
         Blocks.ice.slipperiness = slipper.getObject();
         Blocks.packed_ice.slipperiness = slipper.getObject();
-        super.onEnable();
+        
     }
 
     @Override
     public void onDisable() {
         Blocks.ice.slipperiness = 0.98F;
         Blocks.packed_ice.slipperiness = 0.98F;
-        super.onDisable();
+        
     }
 }

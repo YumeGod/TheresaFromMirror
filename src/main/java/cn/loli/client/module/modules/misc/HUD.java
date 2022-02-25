@@ -119,6 +119,6 @@ public class HUD extends Module {
     @Override
     public void onEnable() {
         if (sorted) sorted = false;
-        super.onEnable();
+        
     }
 }

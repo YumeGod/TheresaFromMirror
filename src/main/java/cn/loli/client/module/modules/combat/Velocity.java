@@ -41,12 +41,12 @@ public class Velocity extends Module {
 
     @Override
     public void onEnable() {
-        super.onEnable();
+        
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
+        
     }
 
     @EventTarget

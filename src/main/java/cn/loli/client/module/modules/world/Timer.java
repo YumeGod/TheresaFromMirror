@@ -19,7 +19,7 @@ public class Timer extends Module {
 
     @Override
     public void onDisable() {
-        super.onDisable();
+        
         ((IAccessorMinecraft) mc).getTimer().timerSpeed = 1.0F;
     }
 

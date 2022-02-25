@@ -45,7 +45,7 @@ public class TellyBridge extends Module {
         } catch (Exception e) {
             ChatUtils.send(("Some Error"));
         }
-        super.onEnable();
+        
     }
 
 
@@ -58,7 +58,7 @@ public class TellyBridge extends Module {
         } catch (Exception e) {
             ChatUtils.send(("Some Error"));
         }
-        super.onDisable();
+        
     }
 
     @EventTarget

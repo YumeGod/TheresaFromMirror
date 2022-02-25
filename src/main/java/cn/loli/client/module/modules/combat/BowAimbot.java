@@ -49,7 +49,7 @@ public class BowAimbot extends Module {
 
     @Override
     public void onEnable() {
-        super.onEnable();
+        
     }
 
 
@@ -108,7 +108,7 @@ public class BowAimbot extends Module {
 
     @Override
     public void onDisable() {
-        super.onDisable();
+        
         targets.clear();
         attackList.clear();
         currentTarget = 0;

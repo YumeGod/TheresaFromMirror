@@ -92,7 +92,7 @@ public class Phase extends Module {
 
     @Override
     protected void onEnable() {
-        super.onEnable();
+        
     }
 
     @Override
@@ -100,7 +100,7 @@ public class Phase extends Module {
         if (mc.thePlayer != null)
             mc.thePlayer.stepHeight = 0.6f;
 
-        super.onDisable();
+        
     }
 
 }

@@ -27,12 +27,12 @@ public class BaffleSpeed extends Module {
     @Override
     public void onEnable() {
         wasObstacle = false;
-        super.onEnable();
+        
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
+        
     }
 
     @EventTarget

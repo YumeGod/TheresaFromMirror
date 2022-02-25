@@ -19,13 +19,13 @@ public class FullBright extends Module {
 
     @Override
     protected void onEnable() {
-        super.onEnable();
+        
         oldGamma = mc.gameSettings.gammaSetting;
     }
 
     @Override
     protected void onDisable() {
-        super.onDisable();
+        
         mc.gameSettings.gammaSetting = oldGamma;
     }
 

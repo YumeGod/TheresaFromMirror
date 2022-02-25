@@ -45,7 +45,7 @@ public class MurderMystery extends Module {
     @Override
     public void onDisable() {
         this.alartedPlayers.clear();
-        super.onDisable();
+        
     }
 
     @EventTarget

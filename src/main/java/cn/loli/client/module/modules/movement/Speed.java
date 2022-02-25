@@ -33,12 +33,12 @@ public class Speed extends Module {
 
     @Override
     public void onEnable() {
-        super.onEnable();
+        
     }
 
     @Override
     public void onDisable() {
-        super.onDisable();
+        
         if (mc.thePlayer != null && mc.theWorld != null) {
             ((IAccessorMinecraft) mc).getTimer().timerSpeed = 1.0F;
             ((IAccessorEntityPlayer) mc.thePlayer).setSpeedInAir(0.02F);

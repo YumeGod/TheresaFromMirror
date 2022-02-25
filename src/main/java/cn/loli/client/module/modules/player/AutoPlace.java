@@ -69,12 +69,12 @@ public class AutoPlace extends Module {
 
     @Override
     protected void onEnable() {
-        super.onEnable();
+        
     }
 
 
     @Override
     protected void onDisable() {
-        super.onDisable();
+        
     }
 }

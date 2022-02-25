@@ -111,6 +111,7 @@ public class Scaffold extends Module {
     private final TimeHelper itemSwitchTimer = new TimeHelper();
 
     BlockPos curPos;
+    MovingObjectPosition ray;
 
     public Scaffold() {
         super("Scaffold", "Its place blocks under you", ModuleCategory.PLAYER);
@@ -121,7 +122,7 @@ public class Scaffold extends Module {
 
     @Override
     public void onEnable() {
-        super.onEnable();
+        
         if (mc.thePlayer == null)
             return;
 
@@ -138,7 +139,7 @@ public class Scaffold extends Module {
 
     @Override
     public void onDisable() {
-        super.onDisable();
+        
         switchTimer.reset();
     }
 
@@ -160,6 +161,8 @@ public class Scaffold extends Module {
                         else
                             curPitch = (float) pitch.getObject();
                     }
+
+                ray = utils.rayCastedBlock(curYaw, curPitch);
             }
         }
 
@@ -234,11 +237,12 @@ public class Scaffold extends Module {
             if (!mc.thePlayer.isUsingItem())
                 canBuild = true;
 
+
             if (blockCheck.getObject() && allowAir.getObject() || !rayCast.getObject()
-                    || (mc.objectMouseOver != null && mc.objectMouseOver.getBlockPos() != null && mc.theWorld.getBlockState(mc.objectMouseOver.getBlockPos()).getBlock().getMaterial() != Material.air))
-                if (!rayCast.getObject() || (mc.objectMouseOver != null && mc.objectMouseOver.getBlockPos() != null)) {
+                    || (ray != null && ray.getBlockPos() != null && mc.theWorld.getBlockState(ray.getBlockPos()).getBlock().getMaterial() != Material.air))
+                if (!rayCast.getObject() || (ray != null && ray.getBlockPos() != null)) {
                     if (timeHelper.hasReached(delay.getObject())) {
-                        final BlockPos blockpos = rayCast.getObject() ? mc.objectMouseOver.getBlockPos() : curPos;
+                        final BlockPos blockpos = rayCast.getObject() ? ray.getBlockPos() : curPos;
                         if (blockpos != null && mc.theWorld.getBlockState(curPos) != null && mc.theWorld.getBlockState(blockpos).getBlock().getMaterial() != Material.air) {
                             if (this.silentSlot != -1) {
                                 final ItemStack item = mc.thePlayer.inventory.getCurrentItem();
@@ -277,13 +281,13 @@ public class Scaffold extends Module {
 
                             if (itemStack != null && itemStack.getItem() instanceof ItemBlock) {
                                 Vec3 vec3 = new Vec3(curPos.getX() + 0.5, curPos.getY() + 0.5, curPos.getZ() + 0.5);
-                                if (automaticVector.getObject() && mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
-                                    vec3 = mc.objectMouseOver.hitVec;
-                                if (!blockCheck.getObject() || mc.objectMouseOver != null && mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK || mc.objectMouseOver != null && allowAir.getObject() && mc.objectMouseOver.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY)
-                                    if ((!rayCast.getObject() || !facingCheck.getObject()) || mc.objectMouseOver != null && mc.objectMouseOver.sideHit == enumFacing || (downScaffold.getObject() && mc.gameSettings.keyBindSneak.isKeyDown()))
-                                        if (!sameY.getObject() || !rayCast.getObject() || (((blockpos.getY() == startY - 1 || !PlayerUtils.isMoving2() && mc.gameSettings.keyBindJump.isKeyDown()) && (!mc.objectMouseOver.sideHit.equals(EnumFacing.UP))) || !PlayerUtils.isMoving2()))
-                                            if (!canUpCheck.getObject() || enumFacing != EnumFacing.UP || (mc.objectMouseOver != null && mc.objectMouseOver.getBlockPos() != null && mc.objectMouseOver.getBlockPos().equals(blockpos))) {
-                                                if (rayCast.getObject() ? (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, itemStack, blockpos, mc.objectMouseOver.sideHit, mc.objectMouseOver.hitVec)) : mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, itemStack, curPos, enumFacing, vec3)) {
+                                if (automaticVector.getObject() && ray != null && ray.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
+                                    vec3 = ray.hitVec;
+                                if (!blockCheck.getObject() || ray != null && ray.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK || ray != null && allowAir.getObject() && ray.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY)
+                                    if ((!rayCast.getObject() || !facingCheck.getObject()) || ray != null && ray.sideHit == enumFacing || (downScaffold.getObject() && mc.gameSettings.keyBindSneak.isKeyDown()))
+                                        if (!sameY.getObject() || !rayCast.getObject() || (((blockpos.getY() == startY - 1 || !PlayerUtils.isMoving2() && mc.gameSettings.keyBindJump.isKeyDown()) && (!ray.sideHit.equals(EnumFacing.UP))) || !PlayerUtils.isMoving2()))
+                                            if (!canUpCheck.getObject() || enumFacing != EnumFacing.UP || (ray != null && ray.getBlockPos() != null && ray.getBlockPos().equals(blockpos))) {
+                                                if (rayCast.getObject() ? (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, itemStack, blockpos, ray.sideHit, ray.hitVec)) : mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, itemStack, curPos, enumFacing, vec3)) {
 
                                                     flag = false;
 

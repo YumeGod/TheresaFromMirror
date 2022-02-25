@@ -23,7 +23,7 @@ public class Fly extends Module {
 
     @Override
     protected void onEnable() {
-        super.onEnable();
+        
         if (mc.thePlayer == null) return;
         if (mode.getCurrentMode().equalsIgnoreCase("Vanilla") && !mc.thePlayer.isSpectator()) {
             mc.thePlayer.capabilities.isFlying = true;
@@ -35,7 +35,7 @@ public class Fly extends Module {
 
     @Override
     protected void onDisable() {
-        super.onDisable();
+        
         if (mc.thePlayer == null) return;
         if (mode.getCurrentMode().equalsIgnoreCase("Vanilla") && !mc.thePlayer.isSpectator()) {
             mc.thePlayer.capabilities.isFlying = false;
