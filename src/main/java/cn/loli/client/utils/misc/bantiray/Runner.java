@@ -1,4 +1,4 @@
-package cn.loli.client.utils.misc.antixray;
+package cn.loli.client.utils.misc.bantiray;
 
 
 import cn.loli.client.utils.misc.ChatUtils;

@@ -1,4 +1,4 @@
-package cn.loli.client.utils.misc.antixray;
+package cn.loli.client.utils.misc.bantiray;
 
 public class RefreshingJob {
     public Runner refresher;

@@ -13,6 +13,7 @@ import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
+import net.minecraft.network.play.client.C03PacketPlayer;
 
 public class Speed extends Module {
 
@@ -189,6 +190,8 @@ public class Speed extends Module {
 
                         if (mc.thePlayer.onGround) {
                             mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + (0.11D * multiply.getObject()), mc.thePlayer.posZ);
+                      //      mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, event.getY() + (0.11D * multiply.getObject()) * 0.25, mc.thePlayer.posZ, false));
+
                             if (stage >= 75) stage = 0;
                             distance += (0.11D * multiply.getObject());
                         }
