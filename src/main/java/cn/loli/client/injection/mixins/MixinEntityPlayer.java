@@ -1,11 +1,9 @@
 package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
-import cn.loli.client.events.JumpEvent;
 import cn.loli.client.injection.implementations.IEntityPlayer;
 import cn.loli.client.module.modules.combat.KeepSprint;
 import cn.loli.client.module.modules.render.OldAnimations;
-import com.darkmagician6.eventapi.EventManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;

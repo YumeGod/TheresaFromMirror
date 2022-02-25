@@ -1,9 +1,6 @@
 package cn.loli.client.module.modules.movement;
 
-import cn.loli.client.events.JumpEvent;
-import cn.loli.client.events.MotionUpdateEvent;
-import cn.loli.client.events.PlayerMoveEvent;
-import cn.loli.client.events.UpdateEvent;
+import cn.loli.client.events.*;
 import cn.loli.client.injection.mixins.IAccessorEntityPlayer;
 import cn.loli.client.injection.mixins.IAccessorKeyBinding;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
