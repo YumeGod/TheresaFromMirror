@@ -8,6 +8,7 @@ import cn.loli.client.injection.implementations.IEntityPlayer;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.misc.AntiBot;
+import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.player.PlayerUtils;
 import cn.loli.client.utils.player.rotation.RotationUtils;
@@ -28,15 +29,18 @@ import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemSword;
+import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
+import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,7 +58,9 @@ public class Aura extends Module {
 
     //   private static final NumberValue<Float> mouseSpeed = new NumberValue<>("Mouse Speed", 5f, 0f, 6f);
     private static final NumberValue<Float> inaccuracy = new NumberValue<>("Inaccuracy", 0f, 0f, 1f);
+    public static final NumberValue<Integer> switchsize = new NumberValue<>("Targets Amount", 1, 1, 5);
 
+    private final BooleanValue multi = new BooleanValue("Multi", false);
 
     private final ModeValue mode = new ModeValue("Priority", "Angle", "Armor", "Range", "Fov", "Angle", "Health", "Hurt Time");
     private final ModeValue esp = new ModeValue("Target ESP", "Box", "Box", "2D", "Icarus");
@@ -67,6 +73,8 @@ public class Aura extends Module {
     private static final BooleanValue boss = new BooleanValue("Boss", true);
     private static final BooleanValue villagers = new BooleanValue("Villagers", false);
     private static final BooleanValue team = new BooleanValue("Team", false);
+
+    private static final BooleanValue witherPriority = new BooleanValue("Wither Priority", false);
 
     private final BooleanValue rotations = new BooleanValue("Rotations", false);
 
@@ -98,11 +106,12 @@ public class Aura extends Module {
     public EntityLivingBase target;
 
     private final TimeHelper attacktimer = new TimeHelper();
+    private final TimeHelper switchTimer = new TimeHelper();
 
     public static ArrayList<Entity> entities = new ArrayList<>();
     public static List<EntityLivingBase> targets = new ArrayList<>();
 
-    int cps;
+    int cps, index;
     static boolean isBlocking = false;
 
     final RotationUtils utils = RotationUtils.getInstance();
@@ -245,6 +254,14 @@ public class Aura extends Module {
             if (mc.thePlayer.getDistanceToEntity(target) < range.getObject()) {
                 while (cps > 0) {
                     attack(target);
+
+                    if (multi.getObject()) {
+                        targets.stream().filter(entityLivingBase -> entityLivingBase != target && entityLivingBase.hurtTime < 7)
+                                .forEach(target -> {
+                                    mc.thePlayer.swingItem();
+                                    mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(target, C02PacketUseEntity.Action.ATTACK)); // 攻击
+                                });
+                    }
                     cps--;
                 }
             }
@@ -261,6 +278,7 @@ public class Aura extends Module {
 
             if ((mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() || mc.thePlayer.isBlocking()) && !isBlocking) {
                 ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
+                ChatUtils.info("Blocking");
                 mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                 isBlocking = true;
             }
@@ -290,6 +308,8 @@ public class Aura extends Module {
 
     private void update() {
         // 初始化变量
+        if (!targets.isEmpty() && index >= targets.size())
+            index = 0; // 超过Switch限制
         try {
             // 添加实体
             targets.removeIf(ent -> !canAttack(ent));
@@ -298,11 +318,14 @@ public class Aura extends Module {
             e.printStackTrace();
         }
 
+        if (mc.thePlayer.getDistanceToEntity(target) > range.getObject())
+            index = 0;
+
         // 拿实体
         if (targets.size() == 0)  // 实体数量为0停止攻击
             target = null;
         else
-            target = targets.get(0);// 设置攻击的Target
+            target = targets.get(index);// 设置攻击的Target
     }
 
 
@@ -343,7 +366,22 @@ public class Aura extends Module {
             }
         }
 
-        return stream.collect(Collectors.toList());
+
+        List<EntityLivingBase> list;
+
+        if (witherPriority.getObject()) {
+            List<EntityLivingBase> sortedList = stream.collect(Collectors.toList());
+            list = new ArrayList<>();
+            list.addAll(sortedList.stream().filter((entity) -> entity instanceof EntityWither).collect(Collectors.toList()));
+            list.addAll(sortedList.stream().filter((entity) -> !(entity instanceof EntityWither)).collect(Collectors.toList()));
+        } else {
+            list = stream.collect(Collectors.toList());
+        }
+
+        if (Keyboard.isKeyDown(Keyboard.KEY_LMENU))
+            Collections.reverse(list);
+
+        return list.subList(0, Math.min(list.size(), switchsize.getObject()));
 
     }
 
@@ -367,7 +405,8 @@ public class Aura extends Module {
         if (PlayerUtils.isOnSameTeam(target) && team.getObject()) return false;
         if (target.isInvisible() && !invisibles.getObject()) return false;
         if (!isInFOV(target, fov.getObject())) return false;
-        if (Main.INSTANCE.moduleManager.getModule(AntiBot.class).getState() && Main.INSTANCE.moduleManager.getModule(AntiBot.class).isBot(target)) return false;
+        if (Main.INSTANCE.moduleManager.getModule(AntiBot.class).getState() && Main.INSTANCE.moduleManager.getModule(AntiBot.class).isBot(target))
+            return false;
 
         return target != mc.thePlayer && target.isEntityAlive() && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() + blockrange.getObject() && target.ticksExisted > ticksExisted.getObject();
     }
