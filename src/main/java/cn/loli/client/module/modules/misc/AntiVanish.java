@@ -23,7 +23,7 @@ public class AntiVanish extends Module {
             if (((S38PacketPlayerListItem) event.getPacket()).getAction() == S38PacketPlayerListItem.Action.UPDATE_LATENCY)
                 for (S38PacketPlayerListItem.AddPlayerData addPlayerData : ((S38PacketPlayerListItem) event.getPacket()).getEntries())
                     if (!((IAccessorNetHandlerPlayClient)mc.getNetHandler()).getPlayerInfoMap().containsKey(addPlayerData.getProfile().getId())) {
-                        final ChatComponentText text = new ChatComponentText("§aA player is vanished!");
+                        final ChatComponentText text = new ChatComponentText("A player is vanished!");
                         text.getChatStyle().setChatClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://namemc.com/profile/" + addPlayerData.getProfile().getId().toString()));
                         try {
                             mc.thePlayer.addChatMessage(text);

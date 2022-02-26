@@ -1,5 +1,7 @@
 package cn.loli.client.utils.player;
 
+import cn.loli.client.utils.Utils;
+import cn.loli.client.utils.player.rotation.RotationUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockLiquid;
@@ -9,12 +11,10 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 
-public class PlayerUtils {
-    private static final Minecraft mc;
+public class PlayerUtils extends Utils {
 
-    static {
-        mc = Minecraft.getMinecraft();
-    }
+    private static PlayerUtils utils;
+
 
     public static boolean isMoving() {
         return (mc.gameSettings.keyBindForward.isKeyDown() || mc.gameSettings.keyBindBack.isKeyDown() || mc.gameSettings.keyBindLeft.isKeyDown() || mc.gameSettings.keyBindRight.isKeyDown());
@@ -71,5 +71,12 @@ public class PlayerUtils {
         }
 
         return false;
+    }
+
+    public static PlayerUtils getInstance() {
+        if (utils == null) {
+            utils = new PlayerUtils();
+        }
+        return utils;
     }
 }

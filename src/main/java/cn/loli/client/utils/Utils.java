@@ -7,10 +7,12 @@ import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
+import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Session;
 import org.jetbrains.annotations.NotNull;
@@ -188,7 +190,7 @@ public class Utils {
         return (Math.random() * (max)) + min;
     }
 
-   public static Color getRainbow(int offset, int speed, float saturation, float brightness) {
+    public static Color getRainbow(int offset, int speed, float saturation, float brightness) {
         float hue = ((System.currentTimeMillis() + offset) % speed) / (float) speed;
         return Color.getHSBColor(hue, saturation, brightness);
     }
@@ -251,4 +253,39 @@ public class Utils {
             return Keyboard.isKeyDown(key);
         }
     }
+
+    public boolean isValidEntityName(Entity entity) {
+        if (!(entity instanceof EntityPlayer))
+            return true;
+        final String name = getName((EntityPlayer) entity);
+        return name.length() <= 16 && name.length() >= 3 && name.matches("[a-zA-Z0-9_]*");
+    }
+
+    String getName(EntityPlayer player) {
+        return player.getGameProfile().getName();
+    }
+
+
+    Color getTeamColor(EntityPlayer player) {
+        ScorePlayerTeam scoreplayerteam = (ScorePlayerTeam) ((EntityPlayer) player).getTeam();
+        int i = 16777215;
+
+        if (scoreplayerteam != null && scoreplayerteam.getColorPrefix() != null) {
+            String s = FontRenderer.getFormatFromString(scoreplayerteam.getColorPrefix());
+            if (s.length() >= 2) {
+                if (mc.getRenderManager().getFontRenderer() != null && mc.getRenderManager().getFontRenderer().getColorCode(s.charAt(1)) != 0)
+                    i = mc.getRenderManager().getFontRenderer().getColorCode(s.charAt(1));
+            }
+        }
+        final float f1 = (float) (i >> 16 & 255) / 255.0F;
+        final float f2 = (float) (i >> 8 & 255) / 255.0F;
+        final float f = (float) (i & 255) / 255.0F;
+
+        return new Color(f1, f2, f);
+    }
+
+    boolean isTeam(EntityPlayer player, EntityPlayer player2) {
+        return player.getTeam() != null && player2.getTeam() != null && (player.getTeam().isSameTeam(player2.getTeam()) || getTeamColor(player).getRGB() == getTeamColor(player2).getRGB());
+    }
+
 }

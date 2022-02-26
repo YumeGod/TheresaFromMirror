@@ -83,6 +83,7 @@ public class ModuleManager {
 
         //Other
         addModule(new Abuser());
+        addModule(new AntiBot());
         addModule(new AntiVanish());
         addModule(new Spoofer());
         addModule(new IgnoreCommands());
