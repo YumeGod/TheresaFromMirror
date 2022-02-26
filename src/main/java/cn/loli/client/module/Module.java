@@ -113,6 +113,7 @@ public abstract class Module {
             if (mc.thePlayer != null && Main.INSTANCE.moduleManager.getModule(HUD.class).getState()) {
                 NotificationManager.show(new Notification(NotificationType.ERROR, "Info", getName() + " was disabled", 1));
             }
+
         }
     }
 

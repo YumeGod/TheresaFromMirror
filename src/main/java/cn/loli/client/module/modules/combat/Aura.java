@@ -2,10 +2,12 @@
 
 package cn.loli.client.module.modules.combat;
 
+import cn.loli.client.Main;
 import cn.loli.client.events.*;
 import cn.loli.client.injection.implementations.IEntityPlayer;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import cn.loli.client.module.modules.misc.AntiBot;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.player.PlayerUtils;
 import cn.loli.client.utils.player.rotation.RotationUtils;
@@ -226,7 +228,7 @@ public class Aura extends Module {
                     event.setYaw(curYaw);
                     event.setPitch(curPitch);
 
-                    if (mc.gameSettings.thirdPersonView != 0 ){
+                    if (mc.gameSettings.thirdPersonView != 0) {
                         mc.thePlayer.rotationYawHead = curYaw;
                     }
                 }
@@ -365,6 +367,7 @@ public class Aura extends Module {
         if (PlayerUtils.isOnSameTeam(target) && team.getObject()) return false;
         if (target.isInvisible() && !invisibles.getObject()) return false;
         if (!isInFOV(target, fov.getObject())) return false;
+        if (Main.INSTANCE.moduleManager.getModule(AntiBot.class).getState() && Main.INSTANCE.moduleManager.getModule(AntiBot.class).isBot(target)) return false;
 
         return target != mc.thePlayer && target.isEntityAlive() && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() + blockrange.getObject() && target.ticksExisted > ticksExisted.getObject();
     }

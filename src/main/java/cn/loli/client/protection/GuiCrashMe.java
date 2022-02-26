@@ -34,6 +34,7 @@ public class GuiCrashMe extends GuiScreen {
     @Override
     public void initGui() {
         Main.INSTANCE.doCrash();
+
         super.initGui();
     }
 

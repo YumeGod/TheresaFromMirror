@@ -68,27 +68,27 @@ public abstract class MixinRendererLivingEntity<T extends EntityLivingBase> {
         Color color = esp.chamsColor.getObject();
         Color color2 = esp.throughWallsColor.getObject();
 
-            if (esp.getState() && esp.chams.getObject() && !entityIn.isInvisible()) {
-                GL11.glPushMatrix();
-                GL11.glDisable(GL11.GL_DEPTH_TEST);
-                GL11.glDisable(GL11.GL_TEXTURE_2D);
-                GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
-                GL11.glDisable(GL11.GL_LIGHTING);
-                OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240F, 240F);
-                GL11.glColor4d(color2.getRed() / 255D, color2.getGreen() / 255D, color2.getBlue() / 255D, 1);
-                GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
-                instance.render(entityIn, p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, scale);
-                GL11.glEnable(GL11.GL_DEPTH_TEST);
-                GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
-                GL11.glColor4d(color.getRed() / 255D, color.getGreen() / 255D, color.getBlue() / 255D, 1);
-                instance.render(entityIn, p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, scale);
-                GL11.glColor4d(1, 1, 1, 1);
-                GL11.glEnable(GL11.GL_TEXTURE_2D);
-                GL11.glEnable(GL11.GL_LIGHTING);
-                GL11.glPopMatrix();
-            } else {
-                instance.render(entityIn, p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, scale);
-            }
+        if (esp.getState() && esp.chams.getObject() && !entityIn.isInvisible()) {
+            GL11.glPushMatrix();
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
+            GL11.glDisable(GL11.GL_TEXTURE_2D);
+            GL11.glEnable(GL11.GL_POLYGON_OFFSET_FILL);
+            GL11.glDisable(GL11.GL_LIGHTING);
+            OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240F, 240F);
+            GL11.glColor4d(color2.getRed() / 255D, color2.getGreen() / 255D, color2.getBlue() / 255D, 1);
+            GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
+            instance.render(entityIn, p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, scale);
+            GL11.glEnable(GL11.GL_DEPTH_TEST);
+            GL11.glDisable(GL11.GL_POLYGON_OFFSET_FILL);
+            GL11.glColor4d(color.getRed() / 255D, color.getGreen() / 255D, color.getBlue() / 255D, 1);
+            instance.render(entityIn, p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, scale);
+            GL11.glColor4d(1, 1, 1, 1);
+            GL11.glEnable(GL11.GL_TEXTURE_2D);
+            GL11.glEnable(GL11.GL_LIGHTING);
+            GL11.glPopMatrix();
+        } else {
+            instance.render(entityIn, p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, scale);
+        }
 
     }
 }

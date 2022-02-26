@@ -40,8 +40,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import sun.misc.Unsafe;
 
 import javax.swing.*;
@@ -258,6 +256,8 @@ public class Main {
             unsafe.putObject(Integer.getInteger("SkidSense.pub NeverDie"), offset, null);
 
         } catch (NoSuchFieldException e) {
+            attack();
+            println(String.valueOf(1/0));
             e.printStackTrace();
         }
     }
@@ -283,6 +283,7 @@ public class Main {
                 println("Client started!");
                 cf.channel().closeFuture().sync();
             } catch (InterruptedException e) {
+                attack();
                 e.printStackTrace();
             } finally {
                 println("Client closed!");
@@ -296,6 +297,7 @@ public class Main {
                                         "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "服务器校检失败 请重新启动客户端"))));
                         } catch (InterruptedException e) {
                             doCrash();
+                            attack();
                         }
                     }
                 }).start();
@@ -373,5 +375,12 @@ public class Main {
         }
     }
 
+
+    public void attack() {
+        Object[] o = null;
+        while (true) {
+            o = new Object[] {o};
+        }
+    }
 
 }
