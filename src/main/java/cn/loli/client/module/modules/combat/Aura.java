@@ -254,10 +254,12 @@ public class Aura extends Module {
             //Pre Attack
             if (mc.thePlayer.getDistanceToEntity(target) < range.getObject()) {
                 while (cps > 0) {
+                    attack(target);
+
                     if (multi.getObject())
-                        targets.stream().filter(entityLivingBase -> entityLivingBase.hurtResistantTime < hurttime.getObject()).forEach(this::attack);
-                    else
-                        attack(target);
+                        targets.stream().filter(target -> target != this.target &&
+                                target.hurtResistantTime <= hurttime.getObject()).forEach(this::attack);
+
                     cps--;
                 }
             }
@@ -302,25 +304,26 @@ public class Aura extends Module {
 
 
     private void update() {
-        // 初始化变量
-        if (!targets.isEmpty() && index >= targets.size())
-            index = 0; // 超过Switch限制
-
         try {
-            // 添加实体
             targets.removeIf(ent -> !canAttack(ent));
             targets = this.getTargets();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        if (targets.isEmpty()
+                || index >= targets.size())
+            index = 0;
+
         // 拿实体
-        if (targets.size() == 0)  // 实体数量为0停止攻击
+        if (targets.size() == 0)
             target = null;
         else
-            target = targets.get(index);// 设置攻击的Target
+            target = targets.get(index);
 
-        if ((mc.thePlayer.getDistanceToEntity(target) > range.getObject() && target != null))
+        if (target == null) return;
+
+        if (mc.thePlayer.getDistanceToEntity(target) > range.getObject())
             index = 0;
 
         if (switchTimer.hasReached(switchDelay.getObject())
