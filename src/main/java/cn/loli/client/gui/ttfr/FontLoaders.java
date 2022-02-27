@@ -37,6 +37,12 @@ public class FontLoaders {
         for (int i = 12; i <= 18; ++i) {
             fonts.put("wqy_microhei" + i, getFont("wqy_microhei", i));
         }
+        for (int i = 12; i <= 18; ++i) {
+            fonts.put("targethub" + i, getFont("targethub", i));
+        }
+        for (int i = 12; i <= 18; ++i) {
+            fonts.put("genshin" + i, getFont("genshin", i));
+        }
         Main.INSTANCE.println("Fonts loading used " + (System.currentTimeMillis() - time) / 1000d + " seconds");
     }
 

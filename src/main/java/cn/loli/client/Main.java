@@ -72,7 +72,7 @@ public class Main {
     @NotNull
     public static final String CLIENT_INITIALS = "星";
 
-    public static FontLoaders fontLoaders;
+    public FontLoaders fontLoaders;
 
     public static Main INSTANCE;
     public String name, password;

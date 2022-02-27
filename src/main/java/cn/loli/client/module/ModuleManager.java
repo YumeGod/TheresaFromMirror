@@ -73,6 +73,7 @@ public class ModuleManager {
         addModule(new ESP());
         addModule(new NoFov());
         addModule(new OldAnimations());
+        addModule(new TargetHUD());
         addModule(new Tracers());
         addModule(new ViewClip());
 

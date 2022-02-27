@@ -33,9 +33,9 @@ public class HUD extends Module {
     private final NumberValue<Number> ArrayListXPos = new NumberValue<>("ArrayListXPos", 0, 0, 15);
     private final NumberValue<Number> ArrayListYPos = new NumberValue<>("ArrayListYPos", 0, 0, 15);
     private final BooleanValue reverse = new BooleanValue("Sort Reverse", false);
-    private final BooleanValue mcfont = new BooleanValue("Mc Font", false);
 
-    public static ModeValue mode = new ModeValue("Mode", "Normal", "Normal");
+    private final ModeValue mode = new ModeValue("Mode", "Normal", "Normal");
+    private final ModeValue font = new ModeValue("Font", "Minecraft", "Minecraft" , "Genshin" , "Ubuntu");
 
     private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -61,10 +61,18 @@ public class HUD extends Module {
     private void render2D(Render2DEvent event) {
         if (!getState()) return;
         ScaledResolution res = new ScaledResolution(Minecraft.getMinecraft());
-        HFontRenderer font = Main.fontLoaders.fonts.get("ubuntu16");
+        boolean mcfont = font.getCurrentMode().equals("Minecraft");
+        
+        HFontRenderer fontRenderer;
+        
+        if (font.getCurrentMode().equals("Genshin")) {
+            fontRenderer = Main.INSTANCE.fontLoaders.get("genshin16");
+        } else
+            fontRenderer = Main.INSTANCE.fontLoaders.get("ubuntu16");
+
         if (!sorted) {
-            sort.sort(Comparator.comparingInt(m -> mcfont.getObject() ? mc.fontRendererObj.getStringWidth(m.getName())
-                    : font.getStringWidth(m.getName())));
+            sort.sort(Comparator.comparingInt(m -> mcfont ? mc.fontRendererObj.getStringWidth(m.getName())
+                    : fontRenderer.getStringWidth(m.getName())));
             if (!reverse.getObject())
                 sort = reverse(sort);
             sorted = true;
@@ -94,12 +102,12 @@ public class HUD extends Module {
             for (Module m : sort) {
                 if (m.getState()) {
                     String s = m.getName();
-                    if (mcfont.getObject())
+                    if (mcfont)
                         mc.fontRendererObj.drawStringWithShadow(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, rainbow(50));
                     else
-                        font.drawStringWithShadow(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, rainbow(50) , 150);
+                        fontRenderer.drawStringWithShadow(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, rainbow(50) , 150);
                     m.arraylist_animY = AnimationUtils.smoothAnimation(m.arraylist_animY, i + ArrayListYPos.getObject().intValue(), 50, .3f);
-                    m.arraylist_animX = AnimationUtils.smoothAnimation(m.arraylist_animX, (mcfont.getObject() ? mc.fontRendererObj.getStringWidth(s) : font.getStringWidth(s)) + ArrayListXPos.getObject().intValue(), 50, .4f);
+                    m.arraylist_animX = AnimationUtils.smoothAnimation(m.arraylist_animX, (mcfont ? mc.fontRendererObj.getStringWidth(s) : fontRenderer.getStringWidth(s)) + ArrayListXPos.getObject().intValue(), 50, .4f);
                     i += 12;
                 }
             }

@@ -208,6 +208,13 @@ public class RenderUtils extends Utils {
         drawRect(width - lineSize, y + lineSize, width, height - lineSize, lineColor.getRGB());
     }
 
+    public static void drawOutlinedRect(float x, float y, float width, float height, float lineSize, int lineColor) {
+        RenderUtils.drawRect(x, y, width, y + lineSize, lineColor);
+        RenderUtils.drawRect(x, height - lineSize, width, height, lineColor);
+        RenderUtils.drawRect(x, y + lineSize, x + lineSize, height - lineSize, lineColor);
+        RenderUtils.drawRect(width - lineSize, y + lineSize, width, height - lineSize, lineColor);
+    }
+
     public static void color(int color) {
         float f = (float) (color >> 24 & 255) / 255.0f;
         float f1 = (float) (color >> 16 & 255) / 255.0f;
@@ -668,7 +675,86 @@ public class RenderUtils extends Utils {
         GlStateManager.resetColor();
     }
 
-    public static void drawIcarusESP(EntityLivingBase target, Color color , boolean rainbow) {
+    public static void drawRoundedRect(float left, float top, float width, float height, float radius, int color) {
+        float right = left + width;
+        float bottom = top + height;
+
+        final int semicircle = 18;
+        final float f = 90.0f / semicircle;
+        GL11.glDisable(2884);
+        GL11.glDisable(3553);
+        GL11.glEnable(3042);
+        GL11.glBlendFunc(770, 771);
+        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
+        color(color);
+        GL11.glBegin(5);
+        GL11.glVertex2f(left + radius, top);
+        GL11.glVertex2f(left + radius, bottom);
+        GL11.glVertex2f(right - radius, top);
+        GL11.glVertex2f(right - radius, bottom);
+        GL11.glEnd();
+        GL11.glBegin(5);
+        GL11.glVertex2f(left, top + radius);
+        GL11.glVertex2f(left + radius, top + radius);
+        GL11.glVertex2f(left, bottom - radius);
+        GL11.glVertex2f(left + radius, bottom - radius);
+        GL11.glEnd();
+        GL11.glBegin(5);
+        GL11.glVertex2f(right, top + radius);
+        GL11.glVertex2f(right - radius, top + radius);
+        GL11.glVertex2f(right, bottom - radius);
+        GL11.glVertex2f(right - radius, bottom - radius);
+        GL11.glEnd();
+        GL11.glBegin(6);
+        float f6 = right - radius;
+        float f7 = top + radius;
+        GL11.glVertex2f(f6, f7);
+        int j = 0;
+        for (j = 0; j <= semicircle; ++j) {
+            final float f8 = j * f;
+            GL11.glVertex2d((f6 + radius * Math.cos(Math.toRadians(f8))),
+                    (f7 - radius * Math.sin(Math.toRadians(f8))));
+        }
+        GL11.glEnd();
+        GL11.glBegin(6);
+        f6 = left + radius;
+        f7 = top + radius;
+        GL11.glVertex2f(f6, f7);
+        for (j = 0; j <= semicircle; ++j) {
+            final float f9 = j * f;
+            GL11.glVertex2d((f6 - radius * Math.cos(Math.toRadians(f9))),
+                    (f7 - radius * Math.sin(Math.toRadians(f9))));
+        }
+        GL11.glEnd();
+        GL11.glBegin(6);
+        f6 = left + radius;
+        f7 = bottom - radius;
+        GL11.glVertex2f(f6, f7);
+        for (j = 0; j <= semicircle; ++j) {
+            final float f10 = j * f;
+            GL11.glVertex2d((f6 - radius * Math.cos(Math.toRadians(f10))),
+                    (f7 + radius * Math.sin(Math.toRadians(f10))));
+        }
+        GL11.glEnd();
+        GL11.glBegin(6);
+        f6 = right - radius;
+        f7 = bottom - radius;
+        GL11.glVertex2f(f6, f7);
+        for (j = 0; j <= semicircle; ++j) {
+            final float f11 = j * f;
+            GL11.glVertex2d((f6 + radius * Math.cos(Math.toRadians(f11))),
+                    (f7 + radius * Math.sin(Math.toRadians(f11))));
+        }
+        GL11.glEnd();
+        GL11.glEnable(3553);
+        GL11.glEnable(2884);
+        GL11.glDisable(3042);
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
+        GlStateManager.resetColor();
+    }
+
+    public static void drawIcarusESP(EntityLivingBase target, Color color, boolean rainbow) {
         GL11.glPushMatrix();
         GL11.glDisable(GL11.GL_TEXTURE_2D);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -730,5 +816,26 @@ public class RenderUtils extends Utils {
         color |= clamp(blue, 0, 255);
 
         return color;
+    }
+
+    public static int darker(int hexColor, int factor) {
+        float alpha = (float) (hexColor >> 24 & 255);
+        float red = Math.max((float) (hexColor >> 16 & 255) - (float) (hexColor >> 16 & 255) / (100.0F / (float) factor), 0.0F);
+        float green = Math.max((float) (hexColor >> 8 & 255) - (float) (hexColor >> 8 & 255) / (100.0F / (float) factor), 0.0F);
+        float blue = Math.max((float) (hexColor & 255) - (float) (hexColor & 255) / (100.0F / (float) factor), 0.0F);
+        return (int) ((float) (((int) alpha << 24) + ((int) red << 16) + ((int) green << 8)) + blue);
+    }
+
+    public static void drawScaledCustomSizeModalRect(float x, float y, float u, float v, float uWidth, float vHeight, float width, float height, float tileWidth, float tileHeight) {
+        float f = 1.0F / tileWidth;
+        float f1 = 1.0F / tileHeight;
+        Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldrenderer = tessellator.getWorldRenderer();
+        worldrenderer.begin(7, DefaultVertexFormats.POSITION_TEX);
+        worldrenderer.pos(x, y + height, 0.0D).tex(u * f, (v + (float) vHeight) * f1).endVertex();
+        worldrenderer.pos(x + width, y + height, 0.0D).tex((u + (float) uWidth) * f, (v + (float) vHeight) * f1).endVertex();
+        worldrenderer.pos(x + width, y, 0.0D).tex((u + (float) uWidth) * f, v * f1).endVertex();
+        worldrenderer.pos(x, y, 0.0D).tex(u * f, v * f1).endVertex();
+        tessellator.draw();
     }
 }
