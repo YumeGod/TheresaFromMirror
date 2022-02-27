@@ -58,6 +58,7 @@ public class Aura extends Module {
     //   private static final NumberValue<Float> mouseSpeed = new NumberValue<>("Mouse Speed", 5f, 0f, 6f);
     private static final NumberValue<Float> inaccuracy = new NumberValue<>("Inaccuracy", 0f, 0f, 1f);
     public static final NumberValue<Integer> switchsize = new NumberValue<>("Targets Amount", 1, 1, 5);
+    public static final NumberValue<Integer> switchDelay = new NumberValue<>("Switch Delay", 100, 0, 500);
 
     private final BooleanValue multi = new BooleanValue("Multi", false);
 
@@ -326,6 +327,11 @@ public class Aura extends Module {
         if ((mc.thePlayer.getDistanceToEntity(target) > range.getObject() && target != null))
             index = 0;
 
+        if (switchTimer.hasReached(switchDelay.getObject())
+                && targets.size() > 1) {
+            switchTimer.reset();
+            ++index;
+        }
     }
 
 
