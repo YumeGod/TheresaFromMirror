@@ -28,7 +28,6 @@ import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemSword;
-import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
@@ -59,6 +58,8 @@ public class Aura extends Module {
     private static final NumberValue<Float> inaccuracy = new NumberValue<>("Inaccuracy", 0f, 0f, 1f);
     public static final NumberValue<Integer> switchsize = new NumberValue<>("Targets Amount", 1, 1, 5);
     public static final NumberValue<Integer> switchDelay = new NumberValue<>("Switch Delay", 100, 0, 500);
+
+    public static final NumberValue<Integer> hurttime = new NumberValue<>("Multi Hurt Time", 20, 0, 20);
 
     private final BooleanValue multi = new BooleanValue("Multi", false);
 
@@ -253,15 +254,10 @@ public class Aura extends Module {
             //Pre Attack
             if (mc.thePlayer.getDistanceToEntity(target) < range.getObject()) {
                 while (cps > 0) {
-                    attack(target);
-
-                    if (multi.getObject()) {
-                        targets.stream().filter(entityLivingBase -> entityLivingBase != target && entityLivingBase.hurtTime < 7)
-                                .forEach(target -> {
-                                    mc.thePlayer.swingItem();
-                                    mc.thePlayer.sendQueue.addToSendQueue(new C02PacketUseEntity(target, C02PacketUseEntity.Action.ATTACK)); // 攻击
-                                });
-                    }
+                    if (multi.getObject())
+                        targets.stream().filter(entityLivingBase -> entityLivingBase.hurtResistantTime < hurttime.getObject()).forEach(this::attack);
+                    else
+                        attack(target);
                     cps--;
                 }
             }
