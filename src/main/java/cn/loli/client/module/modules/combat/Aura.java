@@ -8,7 +8,6 @@ import cn.loli.client.injection.implementations.IEntityPlayer;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.misc.AntiBot;
-import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.player.PlayerUtils;
 import cn.loli.client.utils.player.rotation.RotationUtils;
@@ -309,6 +308,7 @@ public class Aura extends Module {
         // 初始化变量
         if (!targets.isEmpty() && index >= targets.size())
             index = 0; // 超过Switch限制
+
         try {
             // 添加实体
             targets.removeIf(ent -> !canAttack(ent));
@@ -317,14 +317,15 @@ public class Aura extends Module {
             e.printStackTrace();
         }
 
-        if (mc.thePlayer.getDistanceToEntity(target) > range.getObject())
-            index = 0;
-
         // 拿实体
         if (targets.size() == 0)  // 实体数量为0停止攻击
             target = null;
         else
             target = targets.get(index);// 设置攻击的Target
+
+        if ((mc.thePlayer.getDistanceToEntity(target) > range.getObject() && target != null))
+            index = 0;
+
     }
 
 

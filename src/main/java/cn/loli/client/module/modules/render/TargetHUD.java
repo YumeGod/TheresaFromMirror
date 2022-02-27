@@ -57,7 +57,9 @@ public class TargetHUD extends Module {
         }
 
         for (int i = 0; i < playerInfoList.size(); i++)
-            if (System.currentTimeMillis() - playerList.get(playerInfoList.get(i)).timestamp >= 5000)
+            if (System.currentTimeMillis() - playerList.get(playerInfoList.get(i)).timestamp >= 5000
+                    || playerList.get(playerInfoList.get(i)).player.isDead
+                    || playerList.get(playerInfoList.get(i)).player.getDistanceToEntity(mc.thePlayer) > 8)
                 playerList.remove(playerInfoList.remove(i));
 
 
@@ -115,8 +117,8 @@ public class TargetHUD extends Module {
 
             //更改TargetHUD在屏幕坐标的初始位置
             GL11.glTranslatef(x, y, 0);
-            RenderUtils.drawRoundRect(0, 0, 30 + width, 40, 3, RenderUtils.reAlpha(0xffffff, 0.4f));
-            RenderUtils.drawOutlinedRect(0, 0, 30 + width, 40, 1, RenderUtils.reAlpha(0x000000, 0.6f));
+            RenderUtils.drawRoundRect(0, 0, 30 + width, 40, 3, RenderUtils.reAlpha(0x000000, 0.6f));
+            RenderUtils.drawOutlinedRect(0, 0, 30 + width, 40, 1, RenderUtils.reAlpha(0xffffff, 0.4f));
 
             fontRenderer.drawString(playerName, 30f, 2f, new Color(0xffffff).getRGB());
             fontRenderer2.drawString(healthStr, 28 + width - fontRenderer2.getStringWidth(healthStr) - 2, 4f, 0xffcccccc);
@@ -127,7 +129,7 @@ public class TargetHUD extends Module {
             float maxHealth = isNaN ? 20 : ent.getMaxHealth();
             float healthPercent = RenderUtils.clamp(health / maxHealth, 0f, 1f);
 
-            RenderUtils.drawRectBound(31, 15f, width - 4, 10f, RenderUtils.reAlpha(new Color(0xffffff).getRGB(), 0.35f));
+            RenderUtils.drawRectBound(31, 15f, width - 4, 10f, RenderUtils.reAlpha(new Color(0x000000).getRGB(), 0.35f));
 
             float barWidth = width - 6;
             float drawPercent = (barWidth / 100) * (healthPercent * 100);
@@ -180,8 +182,8 @@ public class TargetHUD extends Module {
 
             if (!heal) RenderUtils.drawRoundedRect(32, 16f, drawPercent, 3f, 1, RenderUtils.reAlpha(col, 0.95f));
 
-            RenderUtils.drawRoundedRect(32, 20f, width - 5, 5f, 1, RenderUtils.reAlpha(new Color(0xB6B6B6).getRGB(), 0.6f));
-            RenderUtils.drawRoundedRect(32, 21f, f3, 3f, 1, 0xff4286f5);
+            RenderUtils.drawRoundedRect(32, 20f, width - 6, 5f, 1, RenderUtils.reAlpha(new Color(0x000000).getRGB(), 0.5f));
+            RenderUtils.drawRoundedRect(33, 21f, f3, 3f, 0, 0xff4286f5);
 
             RenderUtils.drawOutlinedRect(2, 2, 28, 28, 1, new Color(0xBEFFFFFF, true), new Color(0xD3FFFFFF, true));
 
