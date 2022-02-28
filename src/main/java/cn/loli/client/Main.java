@@ -275,7 +275,6 @@ public class Main {
                 println("Client started!");
                 cf.channel().closeFuture().sync();
             } catch (InterruptedException e) {
-                attack();
                 e.printStackTrace();
             } finally {
                 println("Client closed!");

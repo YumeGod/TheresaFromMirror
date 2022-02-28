@@ -1,6 +1,9 @@
 package cn.loli.client.module.modules.player;
 
 import cn.loli.client.events.GuiHandleEvent;
+import cn.loli.client.events.PacketEvent;
+import cn.loli.client.events.TickEvent;
+import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.timer.TimeHelper;
@@ -10,6 +13,7 @@ import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.inventory.GuiChest;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.init.Blocks;
@@ -17,6 +21,8 @@ import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.*;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S2DPacketOpenWindow;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,6 +41,7 @@ public class ChestStealer extends Module {
     private final BooleanValue stackItems = new BooleanValue("Stack Items", false);
     private final BooleanValue randomPick = new BooleanValue("Pick Randomize", false);
     private final BooleanValue autoClose = new BooleanValue("Auto Close", false);
+    boolean isChest = false;
 
     final InventoryUtil inventoryUtil = InventoryUtil.getInstance();
 
@@ -43,22 +50,29 @@ public class ChestStealer extends Module {
     }
 
     @EventTarget
-    private void onGui(GuiHandleEvent event) {
+        private void onGui(TickEvent event) {
         if (mc.currentScreen == null) {
             timeHelper.reset();
             startTimer.reset();
+            isChest = false;
             return;
         }
 
         if (mc.currentScreen instanceof GuiChest) {
+
             if (!startTimer.hasReached((long) (startDelay.getObject() + inventoryUtil.getRandomGaussian(20))))
                 return;
+
             itemsToSteal.clear();
 
-
-            final ContainerChest chest = (ContainerChest)mc.thePlayer.openContainer;
+            final ContainerChest chest = (ContainerChest) mc.thePlayer.openContainer;
             final IInventory inventory = chest.getLowerChestInventory();
             boolean isEmpty = true;
+
+            final String chestName = inventory.getDisplayName().getUnformattedText();
+
+            if (!chestName.equals(I18n.format("container.chest")) && !chestName.equals(I18n.format("container.chestDouble")))
+                return;
 
             if (intelligent.getObject()) {
                 addIntelligentSlotsToSteal();
@@ -94,10 +108,24 @@ public class ChestStealer extends Module {
             }
 
             if (isEmpty && autoClose.getObject())
-               mc.thePlayer.closeScreen();
+                mc.thePlayer.closeScreen();
         }
     }
-    
+
+    @EventTarget
+    private void onCheck(PacketEvent event) {
+        final Packet<?> packet = event.getPacket();
+
+        // Open delay (wait before you steal)
+        if (packet instanceof S2DPacketOpenWindow) { // When you open a window
+            final S2DPacketOpenWindow openWindow = (S2DPacketOpenWindow) packet;
+
+            if (openWindow.getGuiId().equals("minecraft:container"))
+                isChest = false;
+
+        }
+    }
+
     private void addIntelligentSlotsToSteal() {
         float bestSwordDamage = -1, bestBowDamage = -1, bestPickAxeStrength = -1, bestAxeStrength = -1;
         float bestBootsProtection = -1, bestLeggingsProtection = -1, bestChestPlateProtection = -1, bestHelmetProtection = -1;

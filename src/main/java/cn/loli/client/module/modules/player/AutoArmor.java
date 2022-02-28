@@ -1,6 +1,7 @@
 package cn.loli.client.module.modules.player;
 
 import cn.loli.client.events.GuiHandleEvent;
+import cn.loli.client.events.TickEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.timer.TimeHelper;
@@ -42,7 +43,7 @@ public class AutoArmor extends Module {
     }
 
     @EventTarget
-    private void onGui(GuiHandleEvent event) {
+    private void onGui(TickEvent event) {
         if (mc.currentScreen instanceof GuiInventory) {
             if (!timeHelper.hasReached((long) (startDelay.getObject() + inventoryUtil.getRandomGaussian(20)))) {
                 throwTimer.reset();
