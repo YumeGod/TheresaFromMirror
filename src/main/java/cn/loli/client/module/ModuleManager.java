@@ -50,8 +50,10 @@ public class ModuleManager {
         addModule(new Sprint());
 
         //Player
+        addModule(new AutoArmor());
         addModule(new AutoPlace());
         addModule(new AutoTools());
+        addModule(new ChestStealer());
         addModule(new DamnBridge());
         addModule(new MurderMystery());
         addModule(new NoFall());
@@ -90,6 +92,13 @@ public class ModuleManager {
         addModule(new IgnoreCommands());
         addModule(new HUD()); // Needs to be second last
         addModule(new ClickGUIModule()); // Needs to be last
+
+        // sort by alphabets
+        modules.sort((mod, mod1) -> {
+            int char0 = mod.getName().charAt(0);
+            int char1 = mod1.getName().charAt(0);
+            return -Integer.compare(char1, char0);
+        });
     }
 
     private void addModule(@NotNull Module module) {
