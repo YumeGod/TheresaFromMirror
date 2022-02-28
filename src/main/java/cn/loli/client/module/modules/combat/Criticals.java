@@ -4,12 +4,13 @@ package cn.loli.client.module.modules.combat;
 
 import cn.loli.client.Main;
 import cn.loli.client.events.MotionUpdateEvent;
-import cn.loli.client.notifications.Notification;
-import cn.loli.client.notifications.NotificationManager;
-import cn.loli.client.notifications.NotificationType;
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import cn.loli.client.module.modules.movement.Speed;
+import cn.loli.client.notifications.Notification;
+import cn.loli.client.notifications.NotificationManager;
+import cn.loli.client.notifications.NotificationType;
 import cn.loli.client.utils.player.PlayerUtils;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
@@ -87,11 +88,12 @@ public class Criticals extends Module {
     public void onEdit(MotionUpdateEvent e) {
         if (e.getEventType() == EventType.PRE)
             if ("Hypixel".equals(mode.getCurrentMode()))
-                if (PlayerUtils.isMoving2()) {
+                if (PlayerUtils.isMoving2() && !Main.INSTANCE.moduleManager.getModule(Speed.class).getState()) {
                     Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
                     if (entity == null) return;
                     if (mc.thePlayer.onGround && entity.hurtResistantTime != 20) {
                         e.setY(e.getY() + 0.003);
+
                         if (mc.thePlayer.ticksExisted % 10 == 0)
                             e.setY(e.getY() + 0.001);
 
