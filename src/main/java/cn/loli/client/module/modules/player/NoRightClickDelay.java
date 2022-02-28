@@ -7,6 +7,9 @@ import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import com.darkmagician6.eventapi.EventTarget;
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.ItemBlock;
 
 public class NoRightClickDelay extends Module {
     public NoRightClickDelay() {
@@ -18,7 +21,7 @@ public class NoRightClickDelay extends Module {
      */
     @EventTarget
     public void onUpdate(UpdateEvent e) {
-        if (mc.gameSettings.keyBindUseItem.isKeyDown() && !mc.thePlayer.isUsingItem()) {
+        if (mc.gameSettings.keyBindUseItem.isKeyDown() && (mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemBlock)) {
             ((IAccessorMinecraft) mc).invokeRightClickMouse();
         }
     }
