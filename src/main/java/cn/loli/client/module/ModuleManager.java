@@ -2,6 +2,8 @@
 
 package cn.loli.client.module;
 
+import cn.loli.client.Main;
+import cn.loli.client.events.KeyEvent;
 import cn.loli.client.module.modules.combat.*;
 import cn.loli.client.module.modules.misc.*;
 import cn.loli.client.module.modules.movement.*;
@@ -9,8 +11,6 @@ import cn.loli.client.module.modules.player.*;
 import cn.loli.client.module.modules.render.*;
 import cn.loli.client.module.modules.world.Eagle;
 import cn.loli.client.module.modules.world.Timer;
-import cn.loli.client.Main;
-import cn.loli.client.events.KeyEvent;
 import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.EventTarget;
 import org.jetbrains.annotations.NotNull;
@@ -109,6 +109,8 @@ public class ModuleManager {
 
     @NotNull
     public List<Module> getModules() {
+        for (Module m : modules)
+            System.out.println(m.getName());
         return modules;
     }
 

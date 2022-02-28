@@ -45,7 +45,7 @@ public class HUD extends Module {
     public HUD() {
         super("HUD", "The heads up display overlay", ModuleCategory.MISC);
         setState(true);
-        sort = Main.INSTANCE.moduleManager.getModules();
+        sort.addAll(Main.INSTANCE.moduleManager.getModules());
     }
 
     //反转ArrayList
