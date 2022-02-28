@@ -109,8 +109,6 @@ public class ModuleManager {
 
     @NotNull
     public List<Module> getModules() {
-        for (Module m : modules)
-            System.out.println(m.getName());
         return modules;
     }
 

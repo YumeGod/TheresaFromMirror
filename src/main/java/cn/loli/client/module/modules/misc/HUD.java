@@ -7,6 +7,7 @@ import cn.loli.client.events.Render2DEvent;
 import cn.loli.client.gui.ttfr.HFontRenderer;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import cn.loli.client.module.ModuleManager;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.utils.render.AnimationUtils;
 import cn.loli.client.utils.render.RenderUtils;
@@ -39,7 +40,7 @@ public class HUD extends Module {
 
     private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
-    List<Module> sort;
+    public List<Module> sort = new ArrayList<>();
     private boolean sorted = false;
 
     public HUD() {
