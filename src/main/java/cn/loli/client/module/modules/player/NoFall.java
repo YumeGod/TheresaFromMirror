@@ -61,7 +61,7 @@ public class NoFall extends Module {
             C03PacketPlayer look = (C03PacketPlayer) event.getPacket();
             if (cancel.getObject())
                 if (look.getRotating() && look.isMoving())
-                    if ((mc.thePlayer.fallDistance > 1.5) && isBlockUnder())
+                    if ((mc.thePlayer.fallDistance > 1) && isBlockUnder())
                         event.setPacket(new C03PacketPlayer.C04PacketPlayerPosition
                                 (look.getPositionX(), look.getPositionY(), look.getPositionZ(), look.isOnGround()));
 
