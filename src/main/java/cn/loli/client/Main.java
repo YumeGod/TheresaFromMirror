@@ -112,31 +112,6 @@ public class Main {
             println("Gay");
         }
 
-        /*try {
-            if (HttpUtil.performGetRequest
-                    (new URL("https://pastebin.com/raw/T0XipKMF")).contains("i am a man"))
-                println("无论前方艰险如何 我都会在你身边");
-            else
-                doCrash();
-        } catch (IOException e) {
-            doCrash();
-        }*/
-
-        fileManager = new FileManager();
-        valueManager = new ValueManager();
-        commandManager = new CommandManager();
-        moduleManager = new ModuleManager();
-
-        commandManager.addCommands();
-        moduleManager.addModules();
-        fileManager.load();
-
-//        moduleManager.getModule(ClickGUIModule.class).createClickGui();
-        fontLoaders = new FontLoaders();
-
-        //IRC
-        IRC();
-
         //Auth
         new Thread(() -> {
             try {
@@ -156,6 +131,7 @@ public class Main {
                                     null, "NO DEBUG PLZ? " + "\n" + "Debugging is just skidding with extra work ;)", "Theresa.exe", 0);
                         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
                             doCrash();
+                            attack();
                         }
                         doCrash();
                     }
@@ -164,6 +140,22 @@ public class Main {
                 exception.printStackTrace();
             }
         }).start();
+
+        //IRC
+        IRC();
+
+        fileManager = new FileManager();
+        valueManager = new ValueManager();
+        commandManager = new CommandManager();
+        moduleManager = new ModuleManager();
+
+        commandManager.addCommands();
+        moduleManager.addModules();
+        fileManager.load();
+
+//        moduleManager.getModule(ClickGUIModule.class).createClickGui();
+        fontLoaders = new FontLoaders();
+
 
         //Crasher
         packetQueue = new ConcurrentLinkedQueue<>();
