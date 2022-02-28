@@ -112,35 +112,6 @@ public class Main {
             println("Gay");
         }
 
-        //Auth
-        new Thread(() -> {
-            try {
-                while (true) {
-                    Thread.sleep(1000L); //-1s
-                    if (ProtectionThread.getInstance().runChecks()) {
-                        println("检测到非法行为，已自动踢出");
-                        if (!(Minecraft.getMinecraft().currentScreen instanceof GuiDisconnected))
-                            Minecraft.getMinecraft().displayGuiScreen(new GuiDisconnected(new GuiDisconnected(new GuiDisconnected(new GuiDisconnected(new GuiCrashMe(),
-                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "HAHAHAH")),
-                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "AS WHAT I SAY")),
-                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "NIGGA")),
-                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "Dont Skid")));
-                        try {
-                            Class.forName("javax.swing.JOptionPane").getDeclaredMethod("showMessageDialog",
-                                    java.awt.Component.class, Object.class, String.class, int.class).invoke(Class.forName("javax.swing.JOptionPane"),
-                                    null, "NO DEBUG PLZ? " + "\n" + "Debugging is just skidding with extra work ;)", "Theresa.exe", 0);
-                        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
-                            doCrash();
-                            attack();
-                        }
-                        doCrash();
-                    }
-                }
-            } catch (InterruptedException exception) {
-                exception.printStackTrace();
-            }
-        }).start();
-
         //IRC
         IRC();
 
@@ -156,6 +127,8 @@ public class Main {
 //        moduleManager.getModule(ClickGUIModule.class).createClickGui();
         fontLoaders = new FontLoaders();
 
+        //Auth
+        doDetect();
 
         //Crasher
         packetQueue = new ConcurrentLinkedQueue<>();
@@ -249,9 +222,40 @@ public class Main {
 
         } catch (NoSuchFieldException e) {
             attack();
-            println(String.valueOf(1/0));
+            println(String.valueOf(1 / 0));
             e.printStackTrace();
         }
+    }
+
+    protected void doDetect() {
+        //Auth
+        new Thread(() -> {
+            try {
+                while (true) {
+                    Thread.sleep(1000L); //-1s
+                    if (ProtectionThread.getInstance().runChecks()) {
+                        println("检测到非法行为，已自动踢出");
+                        if (!(Minecraft.getMinecraft().currentScreen instanceof GuiDisconnected))
+                            Minecraft.getMinecraft().displayGuiScreen(new GuiDisconnected(new GuiDisconnected(new GuiDisconnected(new GuiDisconnected(new GuiCrashMe(),
+                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "HAHAHAH")),
+                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "AS WHAT I SAY")),
+                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "NIGGA")),
+                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "Dont Skid")));
+                        try {
+                            Class.forName("javax.swing.JOptionPane").getDeclaredMethod("showMessageDialog",
+                                    java.awt.Component.class, Object.class, String.class, int.class).invoke(Class.forName("javax.swing.JOptionPane"),
+                                    null, "NO DEBUG PLZ? " + "\n" + "Debugging is just skidding with extra work ;)", "Theresa.exe", 0);
+                        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+                            doCrash();
+                            attack();
+                        }
+                        doCrash();
+                    }
+                }
+            } catch (InterruptedException exception) {
+                exception.printStackTrace();
+            }
+        }).start();
     }
 
     private void IRC() {
@@ -370,7 +374,7 @@ public class Main {
     public void attack() {
         Object[] o = null;
         while (true) {
-            o = new Object[] {o};
+            o = new Object[]{o};
         }
     }
 

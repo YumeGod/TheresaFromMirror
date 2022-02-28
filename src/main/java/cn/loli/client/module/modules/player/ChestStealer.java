@@ -1,9 +1,7 @@
 package cn.loli.client.module.modules.player;
 
-import cn.loli.client.events.GuiHandleEvent;
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.events.TickEvent;
-import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.timer.TimeHelper;
@@ -50,7 +48,7 @@ public class ChestStealer extends Module {
     }
 
     @EventTarget
-        private void onGui(TickEvent event) {
+    private void onGui(TickEvent event) {
         if (mc.currentScreen == null) {
             timeHelper.reset();
             startTimer.reset();
