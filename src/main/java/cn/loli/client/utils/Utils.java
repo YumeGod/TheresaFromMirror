@@ -23,6 +23,7 @@ import java.awt.*;
 import java.io.InputStream;
 import java.net.Proxy;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
     private static final Random RANDOM = new Random();
@@ -287,5 +288,36 @@ public class Utils {
     boolean isTeam(EntityPlayer player, EntityPlayer player2) {
         return player.getTeam() != null && player2.getTeam() != null && (player.getTeam().isSameTeam(player2.getTeam()) || getTeamColor(player).getRGB() == getTeamColor(player2).getRGB());
     }
+
+    private final ThreadLocalRandom threadLocalRandom = ThreadLocalRandom.current();
+
+    public double getRandomDouble(double min, double max) {
+        return threadLocalRandom.nextDouble(min, max);
+    }
+
+    public int getRandomInteger(int min, int max) {
+        return threadLocalRandom.nextInt(min, max);
+    }
+
+    public double getRandomGaussian(double average) {
+        return threadLocalRandom.nextGaussian() * average;
+    }
+
+    public float getRandomFloat(float min, float max) {
+        return (float) threadLocalRandom.nextDouble(min, max);
+    }
+
+    /*by AdvancedCode*/
+    public double smooth (double max, double min, double time, boolean randomizing, double randomStrength) {
+        min += 1;
+        double radians = Math.toRadians((System.currentTimeMillis() * time % 360) - 180);
+        double base = (Math.tanh(radians) + 1) / 2;
+        double delta = max - min;
+        delta *= base;
+        double value = min + delta;
+        if(randomizing)value *= ThreadLocalRandom.current().nextDouble(randomStrength,1);
+        return Math.ceil(value *1000) / 1000;
+    }
+
 
 }

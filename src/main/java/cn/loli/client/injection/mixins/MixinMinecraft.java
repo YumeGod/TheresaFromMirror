@@ -113,4 +113,10 @@ public abstract class MixinMinecraft {
         if (blockHit.getState() && !blockHit.animationsOnly.getObject()) return false;
         return player.isUsingItem();
     }
+
+
+    @Inject(method = "runTick", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/GuiScreen;allowUserInput:Z", shift = At.Shift.BEFORE))
+    private void GuiHandle(CallbackInfo ci) {
+        EventManager.call(new GuiHandleEvent());
+    }
 }

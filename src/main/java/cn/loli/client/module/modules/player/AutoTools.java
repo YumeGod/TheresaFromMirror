@@ -3,7 +3,7 @@ package cn.loli.client.module.modules.player;
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.utils.player.InvUtils;
+import cn.loli.client.utils.player.InventoryUtil;
 import cn.loli.client.value.BooleanValue;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.block.Block;
@@ -77,8 +77,8 @@ public class AutoTools extends Module {
                 ItemStack curSlot = mc.thePlayer.inventoryContainer.getSlot(i1).getStack();
                 if (curSlot != null && (curSlot.getItem() instanceof ItemSword)) {
                     double dmg = ((AttributeModifier) curSlot.getAttributeModifiers().get("generic.attackDamage").toArray()[0]).getAmount()
-                            + InvUtils.getEnchantment(curSlot, Enchantment.sharpness) * 1.25
-                            + InvUtils.getEnchantment(curSlot, Enchantment.fireAspect);
+                            + InventoryUtil.getInstance().getEnchantment(curSlot, Enchantment.sharpness) * 1.25
+                            + InventoryUtil.getInstance().getEnchantment(curSlot, Enchantment.fireAspect);
                     if (dmg > f) {
                         bestSlot = i1 - 36;
                         f = dmg;

@@ -158,7 +158,7 @@ public class TargetHUD extends Module {
             boolean isBlock = ent.isBlocking();
             boolean canSee = ent.canEntityBeSeen(mc.thePlayer);
             boolean isHeal = heal || ent.getActivePotionEffect(Potion.regeneration) != null;
-            boolean canFall = ent.getActivePotionEffect(Potion.moveSpeed) != null;
+            boolean speed = ent.getActivePotionEffect(Potion.moveSpeed) != null;
 
             if (isArmor)
                 partIndex[0] = 0xEFC434;
@@ -172,7 +172,7 @@ public class TargetHUD extends Module {
                 partIndex[4] = 0xA776D4;
             if (isHeal)
                 partIndex[5] = 0x9AD019;
-            if (canFall)
+            if (speed)
                 partIndex[6] = 0x76E2A9;
 
             for (int i = 0; i < 7; i++)
