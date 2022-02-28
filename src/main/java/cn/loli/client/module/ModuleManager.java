@@ -99,6 +99,7 @@ public class ModuleManager {
             int char1 = mod1.getName().charAt(0);
             return -Integer.compare(char1, char0);
         });
+
     }
 
     private void addModule(@NotNull Module module) {

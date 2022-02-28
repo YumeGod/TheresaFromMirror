@@ -41,7 +41,7 @@ public class AntiBot extends Module {
     private final BooleanValue rotation = new BooleanValue("Illegal Rotation", false);
 
     private final NumberValue<Number> ticksExisted = new NumberValue<>("Ticks Existed", 0, 0, 100);
-    private final NumberValue<Number> ping = new NumberValue<>("Ping", -1, -1, 500);
+    private final NumberValue<Number> ping = new NumberValue<>("Ping", 0, 0, 500);
 
 
     private final ArrayList<Entity> madeSound = new ArrayList<>();

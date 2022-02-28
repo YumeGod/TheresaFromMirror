@@ -18,6 +18,7 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.List;
 import java.util.Objects;
 
 import static cn.loli.client.value.ColorValue.isHovered;
@@ -423,6 +424,7 @@ public class ClickGui extends GuiScreen {
 
         //功能列表
         float modsY = y + 50 + mods_wheel;
+
         for (Module m : Main.INSTANCE.moduleManager.getModules()) {
             if (m.getCategory() == curType) {
                 if (modsY < (y + height - 20)) {
