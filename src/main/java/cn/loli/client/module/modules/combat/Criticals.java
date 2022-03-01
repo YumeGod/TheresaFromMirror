@@ -11,7 +11,6 @@ import cn.loli.client.module.modules.movement.Speed;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
-import cn.loli.client.utils.player.PlayerUtils;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
@@ -25,7 +24,7 @@ import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Criticals extends Module {
-    private final ModeValue mode = new ModeValue("Mode", "Packet", "Packet", "Edit", "Hover", "Hypixel");
+    private final ModeValue mode = new ModeValue("Mode", "Packet", "Packet", "Edit");
     private final NumberValue<Integer> cpc = new NumberValue<>("Hit", 4, 1, 10);
     int counter;
 
@@ -52,23 +51,11 @@ public class Criticals extends Module {
 
         switch (mode.getCurrentMode()) {
             case "Packet": {
-                sendPacket(0.012 + ThreadLocalRandom.current().nextDouble(1.0E-4, 9.0E-4));
-                sendPacket(0.005 + ThreadLocalRandom.current().nextDouble(0.001));
-                break;
-            }
-            case "Hover": {
-                sendPacket(0.001);
-                sendPacket(-0.0075);
-                sendPacket(0.01);
+                sendPacket(0.004 + ThreadLocalRandom.current().nextDouble(0.001));
+                sendPacket(0.001 + ThreadLocalRandom.current().nextDouble(0.001));
                 break;
             }
             case "Edit": {
-                sendPacket(0);
-                sendPacket(0.075 + ThreadLocalRandom.current().nextDouble(0.008) * (new Random().nextBoolean() ? 0.98 : 0.99) + mc.thePlayer.ticksExisted % 0.0215 * 0.94);
-                sendPacket((new Random().nextBoolean() ? 0.01063469198817 : 0.013999999) * (new Random().nextBoolean() ? 0.98 : 0.99));
-                break;
-            }
-            case "Hypixel": {
                 break;
             }
             default:
@@ -87,7 +74,7 @@ public class Criticals extends Module {
     @EventTarget
     public void onEdit(MotionUpdateEvent e) {
         if (e.getEventType() == EventType.PRE)
-            if ("Hypixel".equals(mode.getCurrentMode()))
+            if ("Edit".equals(mode.getCurrentMode()))
                 if (playerUtils.isMoving2() && !Main.INSTANCE.moduleManager.getModule(Speed.class).getState()) {
                     Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
                     if (entity == null) return;
