@@ -3,6 +3,7 @@ package cn.loli.client.module.modules.misc;
 import cn.loli.client.Main;
 import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PacketEvent;
+import cn.loli.client.events.TickEvent;
 import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
@@ -10,6 +11,7 @@ import cn.loli.client.module.modules.player.NoRotate;
 import cn.loli.client.value.BooleanValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
+import net.minecraft.client.gui.GuiDownloadTerrain;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -108,17 +110,22 @@ public class Abuser extends Module {
                         mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
                                 ((S08PacketPlayerPosLook) event.getPacket()).getZ(), ((S08PacketPlayerPosLook) event.getPacket()).getYaw(), ((S08PacketPlayerPosLook) event.getPacket()).getPitch(), false));
 
-                    if (mc.currentScreen != null)
-                        mc.thePlayer.closeScreen();
-
                     event.setCancelled(true);
                 }
             }
 
             if (event.getPacket() instanceof S32PacketConfirmTransaction) {
-                if (mc.thePlayer.ticksExisted > 10 && !hasDisable)
+                if (mc.thePlayer.ticksExisted > 30 && !hasDisable)
                     hasDisable = true;
             }
+        }
+    }
+
+    @EventTarget
+    private void onTick(TickEvent event) {
+        if (hypixel.getObject()) {
+            if (mc.currentScreen != null && !hasDisable)
+                mc.thePlayer.closeScreen();
         }
     }
 

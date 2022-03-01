@@ -61,8 +61,6 @@ public class NoRotate extends Module {
                     mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
                             ((S08PacketPlayerPosLook) event.getPacket()).getZ(), ((S08PacketPlayerPosLook) event.getPacket()).getYaw(), ((S08PacketPlayerPosLook) event.getPacket()).getPitch(), false));
 
-                if (mc.currentScreen != null)
-                    mc.thePlayer.closeScreen();
 
                 event.setCancelled(true);
             }
