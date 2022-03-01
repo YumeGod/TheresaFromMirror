@@ -34,7 +34,7 @@ public class NoFall extends Module {
             return;
 
         if (mode.getCurrentMode().equalsIgnoreCase("Packet")) {
-            if (mc.thePlayer.fallDistance > 2F && isBlockUnder()) {
+            if (mc.thePlayer.fallDistance > 2.25F && isBlockUnder()) {
                 mc.thePlayer.sendQueue.addToSendQueue(new C03PacketPlayer(true));
                 mc.thePlayer.fallDistance *= .1;
             }

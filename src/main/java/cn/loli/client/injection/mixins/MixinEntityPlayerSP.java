@@ -67,7 +67,6 @@ public class MixinEntityPlayerSP extends MixinEntity {
         RotationHook.prevPitch = cachedRotationPitch;
     }
 
-
     @Inject(method = "onUpdateWalkingPlayer", at = @At("RETURN"))
     private void onUpdateWalkingPlayerPost(CallbackInfo ci) {
         posX = cachedX;

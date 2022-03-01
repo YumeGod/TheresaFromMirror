@@ -11,8 +11,8 @@ import cn.loli.client.module.modules.movement.Speed;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
+import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.value.ModeValue;
-import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.entity.Entity;
@@ -20,13 +20,12 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C03PacketPlayer;
 
-import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Criticals extends Module {
-    private final ModeValue mode = new ModeValue("Mode", "Packet", "Packet", "Edit");
-    private final NumberValue<Integer> cpc = new NumberValue<>("Hit", 4, 1, 10);
-    int counter;
+    private final ModeValue mode = new ModeValue("Mode", "Edit", "Edit");
+    //   private final NumberValue<Integer> cpc = new NumberValue<>("Hit", 4, 1, 10);
+    int counter = 0;
 
     public Criticals() {
         super("Criticals", "Makes you always deal a critical hit.", ModuleCategory.COMBAT);
@@ -39,7 +38,6 @@ public class Criticals extends Module {
                 if (((C02PacketUseEntity) e.getPacket()).getAction() == C02PacketUseEntity.Action.ATTACK) {
                     Entity entity = ((C02PacketUseEntity) e.getPacket()).getEntityFromWorld(mc.theWorld);
                     if (!(entity instanceof EntityLiving)) return;
-                    counter++;
                 }
             }
         }
@@ -65,9 +63,6 @@ public class Criticals extends Module {
 
     private void sendPacket(double yOffset) {
         C03PacketPlayer.C04PacketPlayerPosition packet = new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + yOffset, mc.thePlayer.posZ, false);
-
-        if (counter % cpc.getObject() == 0)
-            mc.thePlayer.sendQueue.addToSendQueue(packet);
     }
 
 
@@ -75,17 +70,19 @@ public class Criticals extends Module {
     public void onEdit(MotionUpdateEvent e) {
         if (e.getEventType() == EventType.PRE)
             if ("Edit".equals(mode.getCurrentMode()))
-                if (playerUtils.isMoving2() && !Main.INSTANCE.moduleManager.getModule(Speed.class).getState()) {
+                if (playerUtils.isMoving2()) {
+                    double[] offset = {0.0625, 0.03125};
+                    if (counter == 4) counter = 0;
                     Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
                     if (entity == null) return;
-                    if (mc.thePlayer.onGround && entity.hurtResistantTime != 20) {
-                        e.setY(e.getY() + 0.003);
-
-                        if (mc.thePlayer.ticksExisted % 10 == 0)
-                            e.setY(e.getY() + 0.001);
-
-                        e.setOnGround(false);
-                    }
+                    if (mc.thePlayer.onGround) {
+                        if (entity.hurtResistantTime != 20){
+                            e.setY(e.getY() + (offset[counter] + ThreadLocalRandom.current().nextDouble(0.000001)));
+                            e.setOnGround(false);
+                            counter++;
+                        }
+                    } else
+                        counter = 0;
                 }
     }
 }

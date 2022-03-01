@@ -1,15 +1,23 @@
 package cn.loli.client.module.modules.misc;
 
+import cn.loli.client.Main;
+import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import cn.loli.client.module.modules.player.NoRotate;
 import cn.loli.client.value.BooleanValue;
 import com.darkmagician6.eventapi.EventTarget;
+import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.*;
+import net.minecraft.network.play.server.S01PacketJoinGame;
+import net.minecraft.network.play.server.S07PacketRespawn;
+import net.minecraft.network.play.server.S08PacketPlayerPosLook;
+import net.minecraft.network.play.server.S32PacketConfirmTransaction;
 import net.minecraft.util.BlockPos;
 
 public class Abuser extends Module {
@@ -18,6 +26,9 @@ public class Abuser extends Module {
     private final BooleanValue range = new BooleanValue("Reach Bypass", false);
     private final BooleanValue ncp = new BooleanValue("NCP Flag", false);
     private final BooleanValue redesky = new BooleanValue("Rede Sky", false);
+    private final BooleanValue hypixel = new BooleanValue("Hypixel-Semi", false);
+
+    public boolean hasDisable;
 
     public Abuser() {
         super("Abuser", "Abuse Something which you can bypass some anti cheat", ModuleCategory.MISC);
@@ -26,12 +37,12 @@ public class Abuser extends Module {
 
     @Override
     public void onEnable() {
-        
+
     }
 
     @Override
     public void onDisable() {
-        
+
     }
 
     @EventTarget
@@ -49,6 +60,81 @@ public class Abuser extends Module {
                 event.setCancelled(true);
         }
 
+        if (hypixel.getObject()) {
+            if (event.getPacket() instanceof S01PacketJoinGame)
+                hasDisable = false;
+
+            if (event.getPacket() instanceof S08PacketPlayerPosLook
+                    && !Main.INSTANCE.moduleManager.getModule(NoRotate.class).getState()) {
+                if (mc.thePlayer != null && mc.theWorld != null) {
+                    double d0 = ((S08PacketPlayerPosLook) event.getPacket()).getX();
+                    double d1 = ((S08PacketPlayerPosLook) event.getPacket()).getY();
+                    double d2 = ((S08PacketPlayerPosLook) event.getPacket()).getZ();
+                    float f = ((S08PacketPlayerPosLook) event.getPacket()).getYaw();
+                    float f1 = ((S08PacketPlayerPosLook) event.getPacket()).getPitch();
+
+                    if (((S08PacketPlayerPosLook) event.getPacket()).func_179834_f().contains(S08PacketPlayerPosLook.EnumFlags.X)) {
+                        d0 += mc.thePlayer.posX;
+                    } else {
+                        mc.thePlayer.motionX = 0.0D;
+                    }
+
+                    if (((S08PacketPlayerPosLook) event.getPacket()).func_179834_f().contains(S08PacketPlayerPosLook.EnumFlags.Y)) {
+                        d1 += mc.thePlayer.posY;
+                    } else {
+                        mc.thePlayer.motionY = 0.0D;
+                    }
+
+                    if (((S08PacketPlayerPosLook) event.getPacket()).func_179834_f().contains(S08PacketPlayerPosLook.EnumFlags.Z)) {
+                        d2 += mc.thePlayer.posZ;
+                    } else {
+                        mc.thePlayer.motionZ = 0.0D;
+                    }
+
+                    if (((S08PacketPlayerPosLook) event.getPacket()).func_179834_f().contains(S08PacketPlayerPosLook.EnumFlags.X_ROT)) {
+                        f1 += mc.thePlayer.rotationPitch;
+                    }
+
+                    if (((S08PacketPlayerPosLook) event.getPacket()).func_179834_f().contains(S08PacketPlayerPosLook.EnumFlags.Y_ROT)) {
+                        f += mc.thePlayer.rotationYaw;
+                    }
+
+                    mc.thePlayer.setPositionAndRotation(d0, d1, d2, f, f1);
+
+                    if (hasDisable)
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
+                                ((S08PacketPlayerPosLook) event.getPacket()).getZ(), false));
+                    else
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
+                                ((S08PacketPlayerPosLook) event.getPacket()).getZ(), ((S08PacketPlayerPosLook) event.getPacket()).getYaw(), ((S08PacketPlayerPosLook) event.getPacket()).getPitch(), false));
+
+                    if (mc.currentScreen != null)
+                        mc.thePlayer.closeScreen();
+
+                    event.setCancelled(true);
+                }
+            }
+
+            if (event.getPacket() instanceof S32PacketConfirmTransaction) {
+                if (mc.thePlayer.ticksExisted > 10 && !hasDisable)
+                    hasDisable = true;
+            }
+        }
+    }
+
+    @EventTarget
+    private void onMotionUpdate(MotionUpdateEvent event) {
+        if (event.getEventType() == EventType.PRE) {
+            if (hypixel.getObject()) {
+                if (!hasDisable) {
+                    mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(0, 0, 0, mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch, false));
+                    event.setX(1993634.696969696969);
+                    event.setY(1993634.696969696969);
+                    event.setZ(1993634.696969696969);
+                    event.setOnGround(false);
+                }
+            }
+        }
     }
 
     @EventTarget
@@ -74,11 +160,6 @@ public class Abuser extends Module {
     }
 
     //来点色图
-
-
-
-
-
 
 
 }
