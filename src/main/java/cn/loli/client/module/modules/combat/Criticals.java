@@ -88,7 +88,7 @@ public class Criticals extends Module {
     public void onEdit(MotionUpdateEvent e) {
         if (e.getEventType() == EventType.PRE)
             if ("Hypixel".equals(mode.getCurrentMode()))
-                if (PlayerUtils.isMoving2() && !Main.INSTANCE.moduleManager.getModule(Speed.class).getState()) {
+                if (playerUtils.isMoving2() && !Main.INSTANCE.moduleManager.getModule(Speed.class).getState()) {
                     Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
                     if (entity == null) return;
                     if (mc.thePlayer.onGround && entity.hurtResistantTime != 20) {

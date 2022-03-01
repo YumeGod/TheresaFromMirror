@@ -77,8 +77,8 @@ public class AutoTools extends Module {
                 ItemStack curSlot = mc.thePlayer.inventoryContainer.getSlot(i1).getStack();
                 if (curSlot != null && (curSlot.getItem() instanceof ItemSword)) {
                     double dmg = ((AttributeModifier) curSlot.getAttributeModifiers().get("generic.attackDamage").toArray()[0]).getAmount()
-                            + InventoryUtil.getInstance().getEnchantment(curSlot, Enchantment.sharpness) * 1.25
-                            + InventoryUtil.getInstance().getEnchantment(curSlot, Enchantment.fireAspect);
+                            + inventoryUtil.getEnchantment(curSlot, Enchantment.sharpness) * 1.25
+                            + inventoryUtil.getEnchantment(curSlot, Enchantment.fireAspect);
                     if (dmg > f) {
                         bestSlot = i1 - 36;
                         f = dmg;

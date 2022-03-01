@@ -154,7 +154,7 @@ public class BowAimbot extends Module {
         }
 
         if (target instanceof EntityArmorStand && !armorStand.getObject()) return false;
-        if (PlayerUtils.isOnSameTeam(target) && !team.getObject()) return false;
+        if (playerUtils.isOnSameTeam(target) && !team.getObject()) return false;
         if (target.isInvisible() && !invisibles.getObject()) return false;
         if (!isInFOV(target, fov.getObject())) return false;
         if (!target.canEntityBeSeen(mc.thePlayer)) return false;

@@ -32,7 +32,6 @@ import java.util.Map;
 
 public class TargetHUD extends Module {
 
-    final RotationUtils utils = RotationUtils.getInstance();
     Entity entity;
     Map<EntityLivingBase, Float> health = new HashMap<>();
     Map<EntityPlayer, PlayerInfo> playerList = new HashMap<>();
@@ -74,7 +73,7 @@ public class TargetHUD extends Module {
     private void onReload(TickEvent event) {
         entity = Main.INSTANCE.moduleManager.getModule(Aura.class).getState()
                 ? Main.INSTANCE.moduleManager.getModule(Aura.class).target
-                : utils.rayCastedEntity(6.0, RotationHook.yaw, RotationHook.pitch);
+                : rotationUtils.rayCastedEntity(6.0, RotationHook.yaw, RotationHook.pitch);
     }
 
     static class PlayerInfo {

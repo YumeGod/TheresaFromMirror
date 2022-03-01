@@ -12,8 +12,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemAxe;
 import net.minecraft.item.ItemSword;
 
-import static cn.loli.client.utils.player.rotation.RotationUtils.getPitch;
-import static cn.loli.client.utils.player.rotation.RotationUtils.getYaw;
 
 public class AimBot extends Module {
     private final BooleanValue playersOnly = new BooleanValue("PlayersOnly", true);
@@ -45,10 +43,10 @@ public class AimBot extends Module {
     }
 
     private synchronized void faceEntity(EntityLivingBase entity) {
-        if (verticalAim.getObject() && Math.abs(getPitch(entity) - mc.thePlayer.rotationPitch) <= maxPitch.getObject() && Math.abs(getYaw(entity) - mc.thePlayer.rotationYaw) < maxYaw.getObject())
-            mc.thePlayer.rotationPitch = getPitch(entity);
+        if (verticalAim.getObject() && Math.abs(rotationUtils.getYaw(entity) - mc.thePlayer.rotationPitch) <= maxPitch.getObject() && Math.abs(rotationUtils.getYaw(entity) - mc.thePlayer.rotationYaw) < maxYaw.getObject())
+            mc.thePlayer.rotationPitch = rotationUtils.getPitch(entity);
 
-        if (Math.abs(getYaw(entity) - mc.thePlayer.rotationYaw) < maxYaw.getObject())
-            mc.thePlayer.rotationYaw = getYaw(entity);
+        if (Math.abs(rotationUtils.getYaw(entity) - mc.thePlayer.rotationYaw) < maxYaw.getObject())
+            mc.thePlayer.rotationYaw = rotationUtils.getYaw(entity);
     }
 }

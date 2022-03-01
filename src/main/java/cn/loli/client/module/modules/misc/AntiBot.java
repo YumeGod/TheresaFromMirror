@@ -53,7 +53,6 @@ public class AntiBot extends Module {
 
 
     private final CopyOnWriteArrayList<Entity> copyEntities = new CopyOnWriteArrayList<>();
-    final PlayerUtils utils = PlayerUtils.getInstance();
 
     public AntiBot() {
         super("AntiBot", "You doesn't hit bots", ModuleCategory.MISC);
@@ -168,7 +167,7 @@ public class AntiBot extends Module {
                 if (mc.theWorld != null) {
                     final EntityPlayer player = mc.theWorld.getPlayerEntityByUUID(((S0CPacketSpawnPlayer) event.getPacket()).getPlayer());
                     if (player != null)
-                        if ((!player.onGround || utils.getBlockUnderPlayer(1) == Blocks.air) && groundSpawnCheck.getObject())
+                        if ((!player.onGround || playerUtils.getBlockUnderPlayer(1) == Blocks.air) && groundSpawnCheck.getObject())
                             groundSpawnEntity.add(player);
                 }
             }
@@ -235,7 +234,7 @@ public class AntiBot extends Module {
     }
 
     public boolean checkedName(Entity entity) {
-        if (!utils.isValidEntityName(entity))
+        if (!playerUtils.isValidEntityName(entity))
             return false;
         return true;
     }

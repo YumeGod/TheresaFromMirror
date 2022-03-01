@@ -32,7 +32,7 @@ public class DamnBridge extends Module {
         
         try {
             if (mc.inGameHasFocus) {
-                if (!PlayerUtils.isOnGround(-1))
+                if (!playerUtils.isOnGround(-1))
                     this.setState(false);
                 startYaw = mc.thePlayer.rotationYaw;
                 startPitch = mc.thePlayer.rotationPitch;

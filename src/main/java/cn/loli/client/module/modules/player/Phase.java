@@ -5,7 +5,7 @@ import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PlayerMoveEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.utils.player.MoveUtils;
+import cn.loli.client.utils.player.movement.MoveUtils;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.block.Block;
@@ -61,7 +61,7 @@ public class Phase extends Module {
             } else {
                 event.setY(mc.thePlayer.motionY = 0.0f);
             }
-            MoveUtils.setMotion(event, MoveUtils.getBaseMoveSpeed());
+            moveUtils.setMotion(event, moveUtils.getBaseMoveSpeed());
         }
     }
 

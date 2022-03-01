@@ -7,12 +7,9 @@ import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.authlib.yggdrasil.YggdrasilUserAuthentication;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.potion.Potion;
-import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.Session;
 import org.jetbrains.annotations.NotNull;
@@ -21,6 +18,7 @@ import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.net.Proxy;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -84,43 +82,11 @@ public class Utils {
         return Math.toRadians(yaw);
     }
 
-    /*
-     * By DarkStorm
-     */
-    public static Point calculateMouseLocation() {
-        Minecraft minecraft = Minecraft.getMinecraft();
-        int scale = minecraft.gameSettings.guiScale;
-        if (scale == 0)
-            scale = 1000;
-        int scaleFactor = 0;
-        while (scaleFactor < scale && minecraft.displayWidth / (scaleFactor + 1) >= 320 && minecraft.displayHeight / (scaleFactor + 1) >= 240)
-            scaleFactor++;
-        return new Point(Mouse.getX() / scaleFactor, minecraft.displayHeight / scaleFactor - Mouse.getY() / scaleFactor - 1);
-    }
-
     public static String stripColorCodes(String original) {
         return original.replaceAll("/\u00a7[0-9A-FK-OR]+/i", "");
     }
 
-    public static double getBaseMoveSpeed() {
-        double baseSpeed = 0.2875D;
-        if (Minecraft.getMinecraft().thePlayer.isPotionActive(Potion.moveSpeed)) {
-            baseSpeed *= 1.0D + 0.2D * (double) (Minecraft.getMinecraft().thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier() + 1);
-        }
-
-        return baseSpeed;
-    }
-
-    public static double getJumpBoostModifier(double baseJumpHeight) {
-        if (Minecraft.getMinecraft().thePlayer.isPotionActive(Potion.jump)) {
-            int amplifier = Minecraft.getMinecraft().thePlayer.getActivePotionEffect(Potion.jump).getAmplifier();
-            baseJumpHeight += (float) (amplifier + 1) * 0.1F;
-        }
-
-        return baseJumpHeight;
-    }
-
-    public static double getYaw(boolean strafing) {
+    public double getYaw(boolean strafing) {
         float rotationYaw = strafing ? Minecraft.getMinecraft().thePlayer.rotationYawHead : Minecraft.getMinecraft().thePlayer.rotationYaw;
         float forward = 1F;
 
@@ -267,35 +233,13 @@ public class Utils {
     }
 
 
-    Color getTeamColor(EntityPlayer player) {
-        ScorePlayerTeam scoreplayerteam = (ScorePlayerTeam) ((EntityPlayer) player).getTeam();
-        int i = 16777215;
+    final ThreadLocalRandom threadLocalRandom = ThreadLocalRandom.current();
 
-        if (scoreplayerteam != null && scoreplayerteam.getColorPrefix() != null) {
-            String s = FontRenderer.getFormatFromString(scoreplayerteam.getColorPrefix());
-            if (s.length() >= 2) {
-                if (mc.getRenderManager().getFontRenderer() != null && mc.getRenderManager().getFontRenderer().getColorCode(s.charAt(1)) != 0)
-                    i = mc.getRenderManager().getFontRenderer().getColorCode(s.charAt(1));
-            }
-        }
-        final float f1 = (float) (i >> 16 & 255) / 255.0F;
-        final float f2 = (float) (i >> 8 & 255) / 255.0F;
-        final float f = (float) (i & 255) / 255.0F;
-
-        return new Color(f1, f2, f);
-    }
-
-    boolean isTeam(EntityPlayer player, EntityPlayer player2) {
-        return player.getTeam() != null && player2.getTeam() != null && (player.getTeam().isSameTeam(player2.getTeam()) || getTeamColor(player).getRGB() == getTeamColor(player2).getRGB());
-    }
-
-    private final ThreadLocalRandom threadLocalRandom = ThreadLocalRandom.current();
-
-    public double getRandomDouble(double min, double max) {
+    double getRandomDouble(double min, double max) {
         return threadLocalRandom.nextDouble(min, max);
     }
 
-    public int getRandomInteger(int min, int max) {
+    int getRandomInteger(int min, int max) {
         return threadLocalRandom.nextInt(min, max);
     }
 
@@ -303,21 +247,23 @@ public class Utils {
         return threadLocalRandom.nextGaussian() * average;
     }
 
-    public float getRandomFloat(float min, float max) {
+    float getRandomFloat(float min, float max) {
         return (float) threadLocalRandom.nextDouble(min, max);
     }
 
-    /*by AdvancedCode*/
-    public double smooth (double max, double min, double time, boolean randomizing, double randomStrength) {
-        min += 1;
-        double radians = Math.toRadians((System.currentTimeMillis() * time % 360) - 180);
-        double base = (Math.tanh(radians) + 1) / 2;
-        double delta = max - min;
-        delta *= base;
-        double value = min + delta;
-        if(randomizing)value *= ThreadLocalRandom.current().nextDouble(randomStrength,1);
-        return Math.ceil(value *1000) / 1000;
-    }
+    public static double round(final double value, final double inc) {
+        if (inc == 0.0) return value;
+        else if (inc == 1.0) return Math.round(value);
+        else {
+            final double halfOfInc = inc / 2.0;
+            final double floored = Math.floor(value / inc) * inc;
 
+            if (value >= floored + halfOfInc)
+                return new BigDecimal(Math.ceil(value / inc) * inc)
+                        .doubleValue();
+            else return new BigDecimal(floored)
+                    .doubleValue();
+        }
+    }
 
 }

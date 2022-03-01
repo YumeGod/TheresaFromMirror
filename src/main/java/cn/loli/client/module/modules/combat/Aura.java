@@ -115,7 +115,6 @@ public class Aura extends Module {
     int cps, index;
     static boolean isBlocking = false;
 
-    final RotationUtils utils = RotationUtils.getInstance();
     float curYaw, curPitch;
 
     public Aura() {
@@ -166,7 +165,7 @@ public class Aura extends Module {
         if (rotations.getObject()) {
             if (target != null) {
                 float[] rots;
-                rots = utils.facePlayer(target, mouse_vl_fix.getObject(), random.getObject(), !instant.getObject(), prediction.getObject(), mouseFix.getObject()
+                rots = rotationUtils.facePlayer(target, mouse_vl_fix.getObject(), random.getObject(), !instant.getObject(), prediction.getObject(), mouseFix.getObject()
                         , bestVector.getObject(), inaccuracy.getObject(), clampYaw.getObject(), rotationSpeed.getObject(), range.getObject());
 
                 curYaw = rots[0];
@@ -290,7 +289,7 @@ public class Aura extends Module {
         }
 
         if (rayCast.getObject())
-            entity = utils.rayCastedEntity(range.getObject(), curYaw, curPitch);
+            entity = rotationUtils.rayCastedEntity(range.getObject(), curYaw, curPitch);
 
         if (entity != null) {
             mc.thePlayer.swingItem();
@@ -407,7 +406,7 @@ public class Aura extends Module {
             if (target instanceof INpc && !villagers.getObject()) return false;
         }
         if (target instanceof EntityArmorStand) return false;
-        if (PlayerUtils.isOnSameTeam(target) && team.getObject()) return false;
+        if (playerUtils.isOnSameTeam(target) && team.getObject()) return false;
         if (target.isInvisible() && !invisibles.getObject()) return false;
         if (!isInFOV(target, fov.getObject())) return false;
         if (Main.INSTANCE.moduleManager.getModule(AntiBot.class).getState() && Main.INSTANCE.moduleManager.getModule(AntiBot.class).isBot(target))

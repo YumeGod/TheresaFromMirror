@@ -16,7 +16,7 @@ public class RotationUtils extends Utils {
 
     private static RotationUtils utils;
 
-    public static float getYaw(Entity entity) {
+    public float getYaw(Entity entity) {
         if (entity == null) return mc.thePlayer.rotationYaw;
 
         double diffX = entity.posX - mc.thePlayer.posX;
@@ -27,7 +27,7 @@ public class RotationUtils extends Utils {
         return mc.thePlayer.rotationYaw + MathHelper.wrapAngleTo180_float(yaw - mc.thePlayer.rotationYaw);
     }
 
-    public static float getPitch(Entity entity) {
+    public float getPitch(Entity entity) {
         if (entity == null) return mc.thePlayer.rotationPitch;
 
         double diffY;

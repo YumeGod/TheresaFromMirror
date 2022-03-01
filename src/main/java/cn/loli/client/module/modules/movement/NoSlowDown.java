@@ -27,7 +27,7 @@ public class NoSlowDown extends Module {
                 || mc.theWorld == null)
             return;
 
-        if (!mc.thePlayer.isUsingItem() || (mc.thePlayer.getHeldItem().getItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemBow) || (onlyOnMove.getObject() && !PlayerUtils.isMoving2()))
+        if (!mc.thePlayer.isUsingItem() || (mc.thePlayer.getHeldItem().getItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemBow) || (onlyOnMove.getObject() && !playerUtils.isMoving2()))
             return;
 
         if (event.getEventType() == EventType.PRE) {

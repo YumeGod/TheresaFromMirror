@@ -41,8 +41,6 @@ public class ChestStealer extends Module {
     private final BooleanValue autoClose = new BooleanValue("Auto Close", false);
     boolean isChest = false;
 
-    final InventoryUtil inventoryUtil = InventoryUtil.getInstance();
-
     public ChestStealer() {
         super("Chest Stealer", "You steal the items from a chest", ModuleCategory.PLAYER);
     }

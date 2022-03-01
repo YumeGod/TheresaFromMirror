@@ -6,7 +6,7 @@ import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
-import cn.loli.client.utils.player.MoveUtils;
+import cn.loli.client.utils.player.movement.MoveUtils;
 import cn.loli.client.utils.player.PlayerUtils;
 import cn.loli.client.utils.player.rotation.RotationUtils;
 import cn.loli.client.value.BooleanValue;
@@ -101,7 +101,6 @@ public class Scaffold extends Module {
     int currentBlocks;
 
     float curYaw, curPitch;
-    final RotationUtils utils = RotationUtils.getInstance();
 
     private final List<Block> blackList;
     private final List<Integer> switchedSlots = new ArrayList<>();
@@ -145,15 +144,15 @@ public class Scaffold extends Module {
 
     @EventTarget
     private void onRender(RenderEvent e) {
-        ray = utils.rayCastedBlock(curYaw, curPitch);
+        ray = rotationUtils.rayCastedBlock(curYaw, curPitch);
 
         if (curPos != null) {
             if ((!mc.thePlayer.onGround && rotateInAir.getObject()) || (ray == null || (ray.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || (!ray.getBlockPos().equals(curPos)) && ray.sideHit == enumFacing || (ray.sideHit != enumFacing && ray.getBlockPos().equals(curPos))))) {
-                float[] rotation = utils.faceBlock(curPos, mc.theWorld.getBlockState(curPos).getBlock().getBlockBoundsMaxY() - mc.theWorld.getBlockState(curPos).getBlock().getBlockBoundsMinY() + 0.5D, mouse_vl_fix.getObject(), mouseFix.getObject(), prediction.getObject(), randomAim.getObject(), randomizePitch.getObject(), clampYaw.getObject(), 180);
+                float[] rotation = rotationUtils.faceBlock(curPos, mc.theWorld.getBlockState(curPos).getBlock().getBlockBoundsMaxY() - mc.theWorld.getBlockState(curPos).getBlock().getBlockBoundsMinY() + 0.5D, mouse_vl_fix.getObject(), mouseFix.getObject(), prediction.getObject(), randomAim.getObject(), randomizePitch.getObject(), clampYaw.getObject(), 180);
 
                 if (rotation != null)
                     if (simple.getObject()) {
-                        curYaw = (dynamicYaw.getObject() ? MoveUtils.getDirection(mc.thePlayer.rotationYaw) : mc.thePlayer.rotationYaw) + 180;
+                        curYaw = (dynamicYaw.getObject() ? moveUtils.getDirection(mc.thePlayer.rotationYaw) : mc.thePlayer.rotationYaw) + 180;
                         curPitch = mc.thePlayer.onGround || staticPitch.getObject() ? (float) pitch.getObject() : rotation[1];
                     } else {
                         curYaw = rotation[0];
@@ -188,7 +187,7 @@ public class Scaffold extends Module {
             e.setSilentMoveFix(true);
             e.setYaw(curYaw);
             if (shouldyaw.getObject()) {
-                e.setShouldYaw(utils.getYaw(calcShouldYaw()) + 180);
+                e.setShouldYaw(rotationUtils.getYaw(calcShouldYaw()) + 180);
                 e.setFixYaw(true);
             }
         }
@@ -199,9 +198,9 @@ public class Scaffold extends Module {
     private void onMotion(MotionUpdateEvent e) {
         if (e.getEventType() == EventType.PRE) {
             if (rotation.getObject()) {
-                if (keeprotation.getObject() || utils.getBlockUnderPlayer(0.01F) == Blocks.air) {
+                if (keeprotation.getObject() || playerUtils.getBlockUnderPlayer(0.01F) == Blocks.air) {
                     e.setYaw(mc.thePlayer.rotationYawHead = curYaw);
-                    e.setPitch(curPitch + (float) (randomizePitch.getObject() ? utils.randomInRange(-0.1, 0.1) : 0));
+                    e.setPitch(curPitch + (float) (randomizePitch.getObject() ? playerUtils.randomInRange(-0.1, 0.1) : 0));
                 }
             }
         }
@@ -215,14 +214,14 @@ public class Scaffold extends Module {
     @EventTarget
     private void onWorking(AttackEvent e) {
 
-        final double y = sameY.getObject() && PlayerUtils.isMoving2() ? startY : mc.thePlayer.posY;
+        final double y = sameY.getObject() && playerUtils.isMoving2() ? startY : mc.thePlayer.posY;
 
         if (!sprint.getObject()) {
             ((IAccessorKeyBinding) mc.gameSettings.keyBindSprint).setPressed(false);
             mc.thePlayer.setSprinting(false);
         }
 
-        if ((!PlayerUtils.isMoving2() && mc.gameSettings.keyBindJump.isKeyDown()) || downScaffold.getObject() && utils.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode()) || mc.thePlayer.onGround)
+        if ((!playerUtils.isMoving2() && mc.gameSettings.keyBindJump.isKeyDown()) || downScaffold.getObject() && playerUtils.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode()) || mc.thePlayer.onGround)
             startY = (int) mc.thePlayer.posY;
 
         boolean flag = true;
@@ -287,7 +286,7 @@ public class Scaffold extends Module {
                                     vec3 = ray.hitVec;
                                 if (!blockCheck.getObject() || ray != null && ray.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK || ray != null && allowAir.getObject() && ray.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY)
                                     if ((!rayCast.getObject() || !facingCheck.getObject()) || ray != null && ray.sideHit == enumFacing || (downScaffold.getObject() && mc.gameSettings.keyBindSneak.isKeyDown()))
-                                        if (!sameY.getObject() || !rayCast.getObject() || (((blockpos.getY() == startY - 1 || !PlayerUtils.isMoving2() && mc.gameSettings.keyBindJump.isKeyDown()) && (!ray.sideHit.equals(EnumFacing.UP))) || !PlayerUtils.isMoving2()))
+                                        if (!sameY.getObject() || !rayCast.getObject() || (((blockpos.getY() == startY - 1 || !playerUtils.isMoving2() && mc.gameSettings.keyBindJump.isKeyDown()) && (!ray.sideHit.equals(EnumFacing.UP))) || !playerUtils.isMoving2()))
                                             if (!canUpCheck.getObject() || enumFacing != EnumFacing.UP || (ray != null && ray.getBlockPos() != null && ray.getBlockPos().equals(blockpos))) {
                                                 if (rayCast.getObject() ? (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, itemStack, blockpos, ray.sideHit, ray.hitVec)) : mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, itemStack, curPos, enumFacing, vec3)) {
                                                     flag = false;
@@ -326,7 +325,7 @@ public class Scaffold extends Module {
                         if (itemStack != null && itemStack.stackSize == 0 && this.silentSlot != -1) {
                             mc.thePlayer.inventory.mainInventory[this.silentSlot] = null;
                         }
-                        if (flag && !mistake.getObject() && utils.randomInRange(0, 100) <= mistakerate.getObject() && itemStack != null && itemStack.getItem() instanceof ItemBlock) {
+                        if (flag && !mistake.getObject() && playerUtils.randomInRange(0, 100) <= mistakerate.getObject() && itemStack != null && itemStack.getItem() instanceof ItemBlock) {
                             if (mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, itemStack)) {
                                 mc.entityRenderer.itemRenderer.resetEquippedProgress2();
                             }
@@ -363,7 +362,7 @@ public class Scaffold extends Module {
             if (!mc.thePlayer.onGround)
                 mc.thePlayer.jumpMovementFactor = 0.02f;
             else {
-                if (jump.getObject() && PlayerUtils.isMoving2())
+                if (jump.getObject() && playerUtils.isMoving2())
                     mc.thePlayer.jump();
             }
     }
@@ -386,7 +385,7 @@ public class Scaffold extends Module {
 
     private float[] bestVector(BlockPos position, float pitch, int reach) {
         for (float yaw = (int) curYaw; yaw < curYaw + 360; yaw += 0.1) {
-            final MovingObjectPosition movingObjectPosition = utils.rayTrace(yaw, pitch, reach);
+            final MovingObjectPosition movingObjectPosition = rotationUtils.rayTrace(yaw, pitch, reach);
             if (movingObjectPosition.sideHit == enumFacing && movingObjectPosition.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK) {
                 ChatUtils.info(movingObjectPosition.hitVec.xCoord + " " + movingObjectPosition.hitVec.yCoord + " " + movingObjectPosition.hitVec.zCoord);
                 final BlockPos blockPos = movingObjectPosition.getBlockPos();
@@ -398,7 +397,7 @@ public class Scaffold extends Module {
 
     public Vec3 calcShouldYaw() {
         BlockPos pos = new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ);
-        Vec3 vec2 = (Vec3) utils.getVectorForRotation(0, mc.thePlayer.rotationYaw);
+        Vec3 vec2 = (Vec3) rotationUtils.getVectorForRotation(0, mc.thePlayer.rotationYaw);
         Vec3 v = new Vec3(pos.getX(), pos.getY(), pos.getZ());
         Vec3 vec = (Vec3) v.addVector(0.5, 0, 0.5);
         return (Vec3) vec.addVector(Math.round(vec2.xCoord), 0, Math.round(vec2.zCoord));
@@ -406,11 +405,11 @@ public class Scaffold extends Module {
 
     public Vec3 expand(Vec3 position) {
         if (expand.getObject()) {
-            final double direction = allDirectionExpand.getObject() ? MoveUtils.getDirection(mc.thePlayer.rotationYaw) : mc.thePlayer.rotationYaw;
+            final double direction = allDirectionExpand.getObject() ? moveUtils.getDirection(mc.thePlayer.rotationYaw) : mc.thePlayer.rotationYaw;
             final Vec3 expandVector = new Vec3(-Math.sin(direction / 180 * Math.PI), 0, Math.cos(direction / 180 * Math.PI));
             int bestExpand = 0;
             for (int i = 0; i < expandLength.getObject(); i++) {
-                if (mc.gameSettings.keyBindJump.isKeyDown() && !PlayerUtils.isMoving2())
+                if (mc.gameSettings.keyBindJump.isKeyDown() && !playerUtils.isMoving2())
                     break;
                 if (getBlockPosToPlaceOn(new BlockPos(position.addVector(0, -1, 0).add(new Vec3(expandVector.xCoord * i, expandVector.yCoord * i, expandVector.zCoord * i)))) != null && enumFacing != EnumFacing.UP) {
                     bestExpand = i;
@@ -428,7 +427,7 @@ public class Scaffold extends Module {
         final BlockPos blockPos2 = pos.add(1, 0, 0);
         final BlockPos blockPos3 = pos.add(0, 0, -1);
         final BlockPos blockPos4 = pos.add(0, 0, 1);
-        final boolean isDown = downScaffold.getObject() && utils.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode());
+        final boolean isDown = downScaffold.getObject() && playerUtils.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode());
         if (isDown)
             ((IAccessorKeyBinding) mc.gameSettings.keyBindSneak).setPressed(false);
         final float down = isDown ? 1 : 0;

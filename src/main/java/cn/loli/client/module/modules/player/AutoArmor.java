@@ -28,7 +28,6 @@ public class AutoArmor extends Module {
 
     private final TimeHelper timeHelper = new TimeHelper();
     private final TimeHelper throwTimer = new TimeHelper();
-    final InventoryUtil inventoryUtil = InventoryUtil.getInstance();
 
     private final BooleanValue inv = new BooleanValue("On Inventory", false);
     private static final NumberValue<Integer> startDelay = new NumberValue<>("Start Delay", 0, 0, 200);

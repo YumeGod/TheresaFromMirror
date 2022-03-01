@@ -7,6 +7,10 @@ import cn.loli.client.module.modules.misc.HUD;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
+import cn.loli.client.utils.player.InventoryUtil;
+import cn.loli.client.utils.player.PlayerUtils;
+import cn.loli.client.utils.player.movement.MoveUtils;
+import cn.loli.client.utils.player.rotation.RotationUtils;
 import com.darkmagician6.eventapi.EventManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
@@ -34,6 +38,12 @@ public abstract class Module {
     public float clickgui_animX;
     public float arraylist_animX;
     public float arraylist_animY;
+
+    public static PlayerUtils playerUtils = PlayerUtils.getInstance();
+    public static RotationUtils rotationUtils = RotationUtils.getInstance();
+    public static InventoryUtil inventoryUtil = InventoryUtil.getInstance();
+    public static MoveUtils moveUtils = MoveUtils.getInstance();
+
 
     protected Module(String name, String description, ModuleCategory moduleCategory) {
         this(name, description, moduleCategory, true, false, Keyboard.KEY_NONE);

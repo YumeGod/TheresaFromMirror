@@ -1,7 +1,6 @@
 package cn.loli.client.utils.player;
 
 import cn.loli.client.utils.Utils;
-import cn.loli.client.utils.player.rotation.RotationUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.block.BlockLiquid;
@@ -16,20 +15,20 @@ public class PlayerUtils extends Utils {
     private static PlayerUtils utils;
 
 
-    public static boolean isMoving() {
+    public boolean isMoving() {
         return (mc.gameSettings.keyBindForward.isKeyDown() || mc.gameSettings.keyBindBack.isKeyDown() || mc.gameSettings.keyBindLeft.isKeyDown() || mc.gameSettings.keyBindRight.isKeyDown());
     }
 
-    public static boolean isMoving2() {
+    public boolean isMoving2() {
         return ((mc.thePlayer.moveForward != 0.0F || mc.thePlayer.moveStrafing != 0.0F));
     }
 
-    public static boolean isOnGround(double height) {
+    public boolean isOnGround(double height) {
         return !mc.theWorld.getCollidingBoundingBoxes(mc.thePlayer,
                 mc.thePlayer.getEntityBoundingBox().offset(0.0D, -height, 0.0D)).isEmpty();
     }
 
-    public static boolean isOnSameTeam(Entity entity) {
+    public boolean isOnSameTeam(Entity entity) {
         if (Minecraft.getMinecraft().thePlayer.getDisplayName().getUnformattedText().startsWith("\247")) {
             if (Minecraft.getMinecraft().thePlayer.getDisplayName().getUnformattedText().length() <= 2
                     || entity.getDisplayName().getUnformattedText().length() <= 2) {
@@ -41,7 +40,7 @@ public class PlayerUtils extends Utils {
         return false;
     }
 
-    public static boolean isInLiquid() {
+    public boolean isInLiquid() {
         if (mc.thePlayer.isInWater()) {
             return true;
         }
@@ -62,7 +61,7 @@ public class PlayerUtils extends Utils {
         return inLiquid;
     }
 
-    public static boolean isReallyOnGround() {
+    public boolean isReallyOnGround() {
         Entity entity = Minecraft.getMinecraft().thePlayer;
         double y = entity.getEntityBoundingBox().offset(0.0D, -0.01D, 0.0D).minY;
         Block block = Minecraft.getMinecraft().theWorld.getBlockState(new BlockPos(entity.posX, y, entity.posZ)).getBlock();
