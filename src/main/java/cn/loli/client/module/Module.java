@@ -22,6 +22,11 @@ public abstract class Module {
     protected static final Minecraft mc = Minecraft.getMinecraft();
     protected static final GameSettings game = mc.gameSettings;
     protected static final Random r = new Random();
+    protected final static PlayerUtils playerUtils = PlayerUtils.getInstance();
+    protected final static RotationUtils rotationUtils = RotationUtils.getInstance();
+    protected final static InventoryUtil inventoryUtil = InventoryUtil.getInstance();
+    protected final static MoveUtils moveUtils = MoveUtils.getInstance();
+
     private final String name;
     private final String description;
     private final ModuleCategory category;
@@ -39,10 +44,7 @@ public abstract class Module {
     public float arraylist_animX;
     public float arraylist_animY;
 
-    public static PlayerUtils playerUtils = PlayerUtils.getInstance();
-    public static RotationUtils rotationUtils = RotationUtils.getInstance();
-    public static InventoryUtil inventoryUtil = InventoryUtil.getInstance();
-    public static MoveUtils moveUtils = MoveUtils.getInstance();
+
 
 
     protected Module(String name, String description, ModuleCategory moduleCategory) {
