@@ -69,15 +69,15 @@ public class Criticals extends Module {
     public void onEdit(MotionUpdateEvent e) {
         if (e.getEventType() == EventType.PRE)
             if ("Edit".equals(mode.getCurrentMode()))
-                if (playerUtils.isMoving2() && !Main.INSTANCE.moduleManager.getModule(Speed.class).getState()) {
-                    double[] offset = {ThreadLocalRandom.current().nextDouble(0.0019, 0.0091921599284565),
-                            ThreadLocalRandom.current().nextDouble(1.5E-4, 1.63166800276E-4)};
-                    if (counter == 4) counter = 0;
+                if (playerUtils.isMoving2()) {
+                    double[] offset = {ThreadLocalRandom.current().nextDouble(.01032422909396, .02032422909396),
+                            ThreadLocalRandom.current().nextDouble(.001032422909396, .002032422909396)};
+                    if (counter == 2) counter = 0;
                     Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
                     if (entity == null) return;
                     if (mc.thePlayer.onGround) {
                         if (entity.hurtResistantTime != 20) {
-                            e.setY(e.getY() + (offset[counter] + ThreadLocalRandom.current().nextDouble(0.000001)));
+                            e.setY(e.getY() + (offset[counter]));
                             e.setOnGround(false);
                             counter++;
                         }

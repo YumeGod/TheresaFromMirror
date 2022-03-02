@@ -12,12 +12,10 @@ import cn.loli.client.value.BooleanValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.client.gui.GuiDownloadTerrain;
-import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.*;
-import net.minecraft.network.play.server.S01PacketJoinGame;
 import net.minecraft.network.play.server.S07PacketRespawn;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.network.play.server.S32PacketConfirmTransaction;
@@ -102,7 +100,8 @@ public class Abuser extends Module {
                         f += mc.thePlayer.rotationYaw;
                     }
 
-                    mc.thePlayer.setPositionAndRotation(d0, d1, d2, f, f1);
+                    mc.thePlayer.setPositionAndRotation(d0, d1, d2,
+                            mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
 
                     if (hasDisable)
                         mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),

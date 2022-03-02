@@ -25,7 +25,6 @@ public class Speed extends Module {
     private final NumberValue<Float> multiply = new NumberValue<>("Multiply", 1f, 1f, 2f);
     private final BooleanValue boost = new BooleanValue("Boost", true);
     private final BooleanValue clips = new BooleanValue("Clips", true);
-    private final BooleanValue crit = new BooleanValue("Fall Damage", true);
 
     double distance;
     int stage;
@@ -107,24 +106,6 @@ public class Speed extends Module {
 
                         double motionX = mc.gameSettings.keyBindForward.isKeyDown() && clips.getObject() ? (MathHelper.sin((float) Math.toRadians(mc.thePlayer.rotationYaw)) * 0.065) : 0;
                         double motionZ = mc.gameSettings.keyBindForward.isKeyDown() && clips.getObject() ? (MathHelper.cos((float) Math.toRadians(mc.thePlayer.rotationYaw)) * 0.065) : 0;
-
-                        if (Main.INSTANCE.moduleManager.getModule(Aura.class).target != null && crit.getObject()) {
-                            int ht = Main.INSTANCE.moduleManager.getModule(Aura.class).target.hurtResistantTime;
-                            switch (ht) {
-                                case 18:
-                                case 20: {
-                                    event.setOnGround(false);
-                                    event.setY(mc.thePlayer.posY + ThreadLocalRandom.current().nextDouble(0.0019, 0.0091921599284565));
-                                    break;
-                                }
-                                case 17:
-                                case 19: {
-                                    event.setOnGround(false);
-                                    event.setY(mc.thePlayer.posY + ThreadLocalRandom.current().nextDouble(1.5E-4, 1.63166800276E-4));
-                                    break;
-                                }
-                            }
-                        }
 
                         if (mc.thePlayer.onGround) {
                             mc.thePlayer.setPosition(mc.thePlayer.posX - motionX, mc.thePlayer.posY + (0.11D * multiply.getObject()), mc.thePlayer.posZ + motionZ);

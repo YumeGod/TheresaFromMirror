@@ -53,7 +53,8 @@ public class NoRotate extends Module {
                     f += mc.thePlayer.rotationYaw;
                 }
 
-                mc.thePlayer.setPositionAndRotation(d0, d1, d2, f, f1);
+                mc.thePlayer.setPositionAndRotation(d0, d1, d2,
+                        mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
 
 
                 if (!Main.INSTANCE.moduleManager.getModule(Abuser.class).hasDisable && Main.INSTANCE.moduleManager.getModule(Abuser.class).getState())
