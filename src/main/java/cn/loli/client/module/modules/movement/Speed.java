@@ -119,8 +119,7 @@ public class Speed extends Module {
 
                         if (mc.thePlayer.onGround) {
                             if (setposition.getObject())
-                            mc.thePlayer.setPosition(mc.thePlayer.posX - motionX, mc.thePlayer.posY + (0.11D * multiply.getObject()
-                                    + ThreadLocalRandom.current().nextDouble(0.000001)), mc.thePlayer.posZ + motionZ);
+                            mc.thePlayer.setPosition(mc.thePlayer.posX - motionX, mc.thePlayer.posY + (0.11D * multiply.getObject()), mc.thePlayer.posZ + motionZ);
                             else mc.thePlayer.motionY = 0.11D * multiply.getObject() * 0.5;
                             if (stage >= 150) stage = 0;
                             distance += (0.11D * multiply.getObject());

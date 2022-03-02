@@ -64,7 +64,7 @@ public class Abuser extends Module {
         }
 
         if (hypixel.getObject()) {
-            if (event.getPacket() instanceof S01PacketJoinGame)
+            if (event.getPacket() instanceof S07PacketRespawn)
                 hasDisable = false;
 
             if (event.getPacket() instanceof S08PacketPlayerPosLook
@@ -125,8 +125,8 @@ public class Abuser extends Module {
     @EventTarget
     private void onTick(TickEvent event) {
         if (hypixel.getObject()) {
-            if (mc.currentScreen != null && (mc.thePlayer != null) && !hasDisable)
-                mc.displayGuiScreen(null);
+            if (mc.currentScreen instanceof GuiDownloadTerrain && (mc.thePlayer != null) && !hasDisable)
+                mc.thePlayer.closeScreen();
         }
     }
 

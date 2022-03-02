@@ -10,7 +10,6 @@ import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
-import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import com.darkmagician6.eventapi.EventTarget;
@@ -19,7 +18,7 @@ import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.AxisAlignedBB;
 
 public class NoFall extends Module {
-    private final ModeValue mode = new ModeValue("Mode", "Packet", "Packet", "Vulcan");
+    private final ModeValue mode = new ModeValue("Mode", "Packet", "Packet", "Vulcan", "Edit");
 
     private final BooleanValue cancel = new BooleanValue("Slient", false);
 
@@ -34,7 +33,7 @@ public class NoFall extends Module {
             return;
 
         if (mode.getCurrentMode().equalsIgnoreCase("Packet")) {
-            if (mc.thePlayer.fallDistance > 2.25F && isBlockUnder()) {
+            if (mc.thePlayer.fallDistance > 2F && isBlockUnder()) {
                 mc.thePlayer.sendQueue.addToSendQueue(new C03PacketPlayer(true));
                 mc.thePlayer.fallDistance *= .1;
             }
@@ -49,6 +48,9 @@ public class NoFall extends Module {
                     mc.thePlayer.motionY = -0.0784000015258789;
                 }
             }
+        } else if (mode.getCurrentMode().equalsIgnoreCase("Edit")) {
+            if (mc.thePlayer.fallDistance > 2F && isBlockUnder())
+                event.setOnGround(true);
         } else {
             NotificationManager.show(new Notification(NotificationType.WARNING, this.getName(), "Invalid mode: " + mode.getCurrentMode(), 2));
         }
