@@ -4,10 +4,9 @@ import cn.loli.client.Main;
 import com.google.gson.JsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.IChatComponent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SideOnly(Side.CLIENT)
+
+
 public class ChatUtils {
     public static final String PRIMARY_COLOR = "§7";
     public static final String SECONDARY_COLOR = "§5";

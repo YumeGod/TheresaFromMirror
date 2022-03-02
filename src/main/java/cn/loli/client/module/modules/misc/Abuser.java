@@ -12,6 +12,7 @@ import cn.loli.client.value.BooleanValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.client.gui.GuiDownloadTerrain;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -124,8 +125,8 @@ public class Abuser extends Module {
     @EventTarget
     private void onTick(TickEvent event) {
         if (hypixel.getObject()) {
-            if (mc.currentScreen != null && !hasDisable)
-                mc.thePlayer.closeScreen();
+            if (mc.currentScreen != null && (mc.thePlayer != null) && !hasDisable)
+                mc.displayGuiScreen(null);
         }
     }
 
