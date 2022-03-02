@@ -11,7 +11,6 @@ import cn.loli.client.module.modules.movement.Speed;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
-import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.value.ModeValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
@@ -70,13 +69,14 @@ public class Criticals extends Module {
     public void onEdit(MotionUpdateEvent e) {
         if (e.getEventType() == EventType.PRE)
             if ("Edit".equals(mode.getCurrentMode()))
-                if (playerUtils.isMoving2()) {
-                    double[] offset = {0.0625, 0.03125};
+                if (playerUtils.isMoving2() && !Main.INSTANCE.moduleManager.getModule(Speed.class).getState()) {
+                    double[] offset = {ThreadLocalRandom.current().nextDouble(0.0019, 0.0091921599284565),
+                            ThreadLocalRandom.current().nextDouble(1.5E-4, 1.63166800276E-4)};
                     if (counter == 4) counter = 0;
                     Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
                     if (entity == null) return;
                     if (mc.thePlayer.onGround) {
-                        if (entity.hurtResistantTime != 20){
+                        if (entity.hurtResistantTime != 20) {
                             e.setY(e.getY() + (offset[counter] + ThreadLocalRandom.current().nextDouble(0.000001)));
                             e.setOnGround(false);
                             counter++;
