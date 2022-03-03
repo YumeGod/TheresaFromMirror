@@ -7,7 +7,6 @@ import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.module.modules.movement.Speed;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
@@ -71,16 +70,15 @@ public class Criticals extends Module {
             if ("Edit".equals(mode.getCurrentMode()))
                 if (playerUtils.isMoving2()) {
                     double[] offset = {ThreadLocalRandom.current().nextDouble(.01032422909396, .02032422909396),
-                            ThreadLocalRandom.current().nextDouble(.001032422909396, .002032422909396)};
-                    if (counter == 2) counter = 0;
+                            ThreadLocalRandom.current().nextDouble(.005032422909396, .010032422909396),
+                            ThreadLocalRandom.current().nextDouble(.003032422909396, .005032422909396)};
+                    if (counter == 3) counter = 0;
                     Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
                     if (entity == null) return;
                     if (mc.thePlayer.onGround) {
-                        if (entity.hurtResistantTime != 20) {
-                            e.setY(e.getY() + (offset[counter]));
-                            e.setOnGround(false);
-                            counter++;
-                        }
+                        e.setY(e.getY() + (offset[counter]));
+                        e.setOnGround(false);
+                        counter++;
                     } else
                         counter = 0;
                 }
