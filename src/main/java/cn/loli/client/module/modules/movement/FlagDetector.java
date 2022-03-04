@@ -2,6 +2,8 @@
 
 package cn.loli.client.module.modules.movement;
 
+import cn.loli.client.Main;
+import cn.loli.client.module.ModuleManager;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
@@ -58,8 +60,10 @@ public class FlagDetector extends Module {
 
             if (setback) {
                 lastSetBacks.add(System.currentTimeMillis());
-                if (lastSetBacks.size() < 3)
+                if (lastSetBacks.size() < 3){
+                    Main.INSTANCE.moduleManager.getModule(Speed.class).setState(false);
                     NotificationManager.show(new Notification(NotificationType.WARNING, getName(), "Setback detected", 1));
+                }
             }
         }
     }
