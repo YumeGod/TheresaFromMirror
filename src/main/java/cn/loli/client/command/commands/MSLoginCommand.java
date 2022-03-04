@@ -4,9 +4,11 @@ import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.command.Command;
 import cn.loli.client.command.CommandException;
 import cn.loli.client.utils.misc.ChatUtils;
+/*
 import me.ratsiel.auth.model.mojang.MinecraftAuthenticator;
 import me.ratsiel.auth.model.mojang.MinecraftToken;
 import me.ratsiel.auth.model.mojang.profile.MinecraftProfile;
+*/
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Session;
 import org.jetbrains.annotations.NotNull;
@@ -44,6 +46,8 @@ public class MSLoginCommand extends Command {
             password = args[1];
         }
         try {
+            //TODO: 源依赖被owner删除
+            /*
             MinecraftAuthenticator minecraftAuthenticator = new MinecraftAuthenticator();
             MinecraftToken minecraftToken = minecraftAuthenticator.loginWithXbox(username, password);
             MinecraftProfile minecraftProfile = minecraftAuthenticator.checkOwnership(minecraftToken);
@@ -51,6 +55,7 @@ public class MSLoginCommand extends Command {
             ((IAccessorMinecraft) Minecraft.getMinecraft()).setSession(session);
 
             ChatUtils.success("Logged in. New IGN: " + session.getUsername());
+            */
         } catch (Exception e) {
             throw new CommandException(e.getMessage());
         } finally {

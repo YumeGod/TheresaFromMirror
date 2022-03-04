@@ -5,9 +5,11 @@ package cn.loli.client.gui.altmanager;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.utils.Utils;
 import com.mojang.authlib.exceptions.AuthenticationException;
+/*
 import me.ratsiel.auth.model.mojang.MinecraftAuthenticator;
 import me.ratsiel.auth.model.mojang.MinecraftToken;
 import me.ratsiel.auth.model.mojang.profile.MinecraftProfile;
+*/
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -98,6 +100,7 @@ public class GuiAltManager extends GuiScreen {
     }
 
     private void microsoftLogin() {
+        /*
         if (usernamePasswordField.getText().length() != 0 && usernamePasswordField.getText().contains(":") && !usernamePasswordField.getText().endsWith(":")) {
             usernameField.setText(usernamePasswordField.getText().split(":")[0]);
             passwordField.setText(usernamePasswordField.getText().split(":")[1]);
@@ -130,6 +133,7 @@ public class GuiAltManager extends GuiScreen {
         } catch (Exception e) {
             status = "\u00a7cError: " + e.getMessage();
         }
+        */
     }
 
     @Override
