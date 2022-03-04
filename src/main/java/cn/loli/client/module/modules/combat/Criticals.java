@@ -10,6 +10,7 @@ import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
+import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
@@ -22,7 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Criticals extends Module {
     private final ModeValue mode = new ModeValue("Mode", "Edit", "Edit");
-    //   private final NumberValue<Integer> cpc = new NumberValue<>("Hit", 4, 1, 10);
+    private final BooleanValue packetsWhenNoMove = new BooleanValue("packets when no move", false);
     int counter = 0;
 
     public Criticals() {
@@ -67,21 +68,28 @@ public class Criticals extends Module {
     @EventTarget
     public void onEdit(MotionUpdateEvent e) {
         if (e.getEventType() == EventType.PRE)
-            if ("Edit".equals(mode.getCurrentMode()))
-                if (playerUtils.isMoving2()) {
-                    double[] offset = {ThreadLocalRandom.current().nextDouble(.01032422909396, .02032422909396),
-                            ThreadLocalRandom.current().nextDouble(.005032422909396, .010032422909396),
-                            ThreadLocalRandom.current().nextDouble(.003032422909396, .005032422909396)};
-                    if (counter == 3) counter = 0;
-                    Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
-                    if (entity == null) return;
-                    if (mc.thePlayer.onGround) {
+            if ("Edit".equals(mode.getCurrentMode())) {
+                double[] offset = {ThreadLocalRandom.current().nextDouble(.01032422909396, .02032422909396),
+                        ThreadLocalRandom.current().nextDouble(.005032422909396, .010032422909396),
+                        ThreadLocalRandom.current().nextDouble(.003032422909396, .005032422909396)};
+                if (counter == 3) counter = 0;
+                Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
+                if (entity == null) return;
+                if (mc.thePlayer.onGround) {
+                    if (playerUtils.isMoving2()) {
                         e.setY(e.getY() + (offset[counter]));
                         e.setOnGround(false);
                         counter++;
-                    } else
+                    } else {
                         counter = 0;
+                        if (packetsWhenNoMove.getObject())
+                            for (double i : offset) {
+                                sendPacket(i);
+                            }
+                    }
                 }
+            }
+
     }
 }
 
