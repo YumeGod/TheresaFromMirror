@@ -47,6 +47,7 @@ repositories {
         name = 'jitpack'
         url = 'https://jitpack.io'
     }
+
 }
 
 

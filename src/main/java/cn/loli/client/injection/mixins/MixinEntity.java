@@ -4,10 +4,11 @@ package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
 import cn.loli.client.events.MoveFlyEvent;
-import cn.loli.client.events.SafeWalkEvent;
+import cn.loli.client.events.StepEvent;
 import cn.loli.client.module.modules.combat.Velocity;
 import cn.loli.client.module.modules.player.SafeWalk;
 import com.darkmagician6.eventapi.EventManager;
+import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -42,6 +43,9 @@ public abstract class MixinEntity {
     public double motionZ;
 
     @Shadow
+    public float stepHeight;
+
+    @Shadow
     public void moveEntity(double x, double y, double z) {
     }
 
@@ -67,6 +71,29 @@ public abstract class MixinEntity {
         MoveFlyEvent event = new MoveFlyEvent(rotationYaw);
         EventManager.call(event);
         return ((Object) this == Minecraft.getMinecraft().thePlayer) ? event.getYaw() : rotationYaw;
+    }
+
+    @Redirect(method = {"moveEntity"}, at = @At(value = "FIELD", target = "Lnet/minecraft/entity/Entity;stepHeight:F", ordinal = 1))
+    public float onStep(Entity instance) {
+        StepEvent event = new StepEvent(instance.stepHeight, EventType.PRE);
+        if ((Object) this == Minecraft.getMinecraft().thePlayer)
+            EventManager.call(event);
+
+        return event.getStepHeight();
+    }
+
+    @Inject(method = {"moveEntity"}, at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;setEntityBoundingBox(Lnet/minecraft/util/AxisAlignedBB;)V", shift = At.Shift.AFTER, ordinal = 7))
+    public void onStep(double axisalignedbb1, double axisalignedbb2, double axisalignedbb13, CallbackInfo ci) {
+        StepEvent event = new StepEvent(this.stepHeight, EventType.POST);
+
+        if ((Object) this == Minecraft.getMinecraft().thePlayer) {
+            double blockHeight = event.getStepHeight() + axisalignedbb2;
+            if (blockHeight % 0.015625 == 0) {
+                event.setHeightStepped(blockHeight);
+                EventManager.call(event);
+            }
+        }
+
     }
 
 

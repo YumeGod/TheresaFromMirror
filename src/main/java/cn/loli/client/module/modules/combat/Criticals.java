@@ -70,8 +70,8 @@ public class Criticals extends Module {
         if (e.getEventType() == EventType.PRE)
             if ("Edit".equals(mode.getCurrentMode())) {
                 double[] offset = {ThreadLocalRandom.current().nextDouble(.01032422909396, .02032422909396),
-                        ThreadLocalRandom.current().nextDouble(.005032422909396, .010032422909396),
-                        ThreadLocalRandom.current().nextDouble(.003032422909396, .005032422909396)};
+                        ThreadLocalRandom.current().nextDouble(.008032422909396, .010032422909396),
+                        ThreadLocalRandom.current().nextDouble(.005032422909396, .006032422909396)};
                 if (counter == 3) counter = 0;
                 Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
                 if (entity == null) return;

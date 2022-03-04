@@ -93,6 +93,8 @@ public class Main {
     public int realPosZ;
     public static ChannelFuture cf;
 
+    boolean isDead = true;
+
     public Main() {
         INSTANCE = this;
         EventManager.register(this);
@@ -112,6 +114,9 @@ public class Main {
             println("Gay");
         }
 
+        //Auth
+        doDetect();
+
         //IRC
         IRC();
 
@@ -126,9 +131,6 @@ public class Main {
 
 //        moduleManager.getModule(ClickGUIModule.class).createClickGui();
         fontLoaders = new FontLoaders();
-
-        //Auth
-        doDetect();
 
         //Crasher
         packetQueue = new ConcurrentLinkedQueue<>();
@@ -278,8 +280,7 @@ public class Main {
 //                cf = bootstrap.connect("127.0.0.1", 9822).sync();
                 println("Client started!");
                 cf.channel().closeFuture().sync();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            } catch (InterruptedException ignored) {
             } finally {
                 println("Client closed!");
                 eventExecutors.shutdownGracefully();
@@ -287,9 +288,8 @@ public class Main {
                     while (true) {
                         try {
                             Thread.sleep(100L);
-                            if (!(Minecraft.getMinecraft().currentScreen instanceof GuiDisconnected))
-                                Minecraft.getMinecraft().displayGuiScreen((new GuiDisconnected(new GuiCrashMe(),
-                                        "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "服务器校检失败 请重新启动客户端"))));
+                            Minecraft.getMinecraft().displayGuiScreen((new GuiDisconnected(new GuiCrashMe(),
+                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "服务器校检失败 请重新启动客户端"))));
                         } catch (InterruptedException e) {
                             doCrash();
                             attack();
@@ -362,6 +362,7 @@ public class Main {
     public void doLogin() {
         Login login = new Login();
         login.init();
+        isDead = false;
         while (login.isVisible()) {
             try {
                 Thread.sleep(100);

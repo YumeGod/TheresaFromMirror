@@ -48,6 +48,7 @@ public class ModuleManager {
         addModule(new NoJumpDelay());
         addModule(new NoSlowDown());
         addModule(new Sprint());
+        addModule(new Step());
 
         //Player
         addModule(new AutoArmor());
