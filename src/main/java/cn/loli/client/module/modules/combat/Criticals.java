@@ -25,7 +25,9 @@ public class Criticals extends Module {
     private final ModeValue mode = new ModeValue("Mode", "Edit", "Edit", "Packet");
     private final ModeValue offsetvalue = new ModeValue("Offset Value", "NCP", "NCP", "Mini", "Negative");
     private final BooleanValue packetsWhenNoMove = new BooleanValue("packets when no move", false);
+    private final BooleanValue always = new BooleanValue("Always", false);
     int counter = 0;
+    double[] offset = new double[3];
 
     public Criticals() {
         super("Criticals", "Makes you always deal a critical hit.", ModuleCategory.COMBAT);
@@ -43,15 +45,17 @@ public class Criticals extends Module {
         }
     }
 
-    public void onCrit() {
+    public void onCrit(Entity entity) {
         if (!(mc.thePlayer.isCollidedVertically && mc.thePlayer.onGround))
             return;
 
         switch (mode.getCurrentMode()) {
             case "Packet":
-            case "Edit": {
+                if (always.getObject() || entity.hurtResistantTime != 20)
+                    for (double i : offset) sendPacket(i);
                 break;
-            }
+            case "Edit":
+                break;
             default:
                 NotificationManager.show(new Notification(NotificationType.WARNING, this.getName(), "Invalid mode: " + mode.getCurrentMode(), 2));
         }
@@ -59,14 +63,13 @@ public class Criticals extends Module {
 
     private void sendPacket(double yOffset) {
         C03PacketPlayer.C04PacketPlayerPosition packet = new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + yOffset, mc.thePlayer.posZ, false);
+        mc.getNetHandler().getNetworkManager().sendPacket(packet);
     }
 
 
     @EventTarget
     public void onEdit(MotionUpdateEvent e) {
         if (e.getEventType() == EventType.PRE) {
-            double[] offset = new double[3];
-
             switch (offsetvalue.getCurrentMode()) {
                 case "NCP":
                     offset = new double[]{ThreadLocalRandom.current().nextDouble(.01832422909396, .02032422909396),
@@ -80,9 +83,10 @@ public class Criticals extends Module {
                     break;
                 case "Negative":
                     offset = new double[]{ThreadLocalRandom.current().nextDouble(.00317, .00526),
-                            ThreadLocalRandom.current().nextDouble(-.01032422909396, -.01232422909396),
+                            ThreadLocalRandom.current().nextDouble(.00317, .00526),
+                            -ThreadLocalRandom.current().nextDouble(9.0e-4d, 9.0e-4d * 2),
                             ThreadLocalRandom.current().nextDouble(9.0e-4d, 9.0e-4d * 2),
-                            ThreadLocalRandom.current().nextDouble(.00317, .00526)};
+                    };
                     break;
             }
 
@@ -91,23 +95,16 @@ public class Criticals extends Module {
                 Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
                 if (entity == null) return;
                 if (mc.thePlayer.onGround) {
-                    if (playerUtils.isMoving2()) {
-                        e.setY(e.getY() + (offset[counter]));
-                        e.setOnGround(false);
-                        counter++;
-                    } else {
-                        counter = 0;
-                        if (packetsWhenNoMove.getObject())
-                            for (double i : offset) sendPacket(i);
-                    }
-                }
-            }
-            if ("Packet".equals(mode.getCurrentMode())) {
-                Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
-                if (entity == null) return;
-                if (mc.thePlayer.onGround) {
-                    if (packetsWhenNoMove.getObject())
-                        for (double i : offset) sendPacket(i);
+                    if (always.getObject() || entity.hurtResistantTime != 20)
+                        if (playerUtils.isMoving2()) {
+                            e.setY(e.getY() + (offset[counter]));
+                            e.setOnGround(false);
+                            counter++;
+                        } else {
+                            counter = 0;
+                            if (packetsWhenNoMove.getObject())
+                                for (double i : offset) sendPacket(i);
+                        }
                 }
             }
         }

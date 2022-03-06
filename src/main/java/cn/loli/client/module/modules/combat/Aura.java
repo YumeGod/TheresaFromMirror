@@ -9,8 +9,6 @@ import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.misc.AntiBot;
 import cn.loli.client.utils.misc.timer.TimeHelper;
-import cn.loli.client.utils.player.PlayerUtils;
-import cn.loli.client.utils.player.rotation.RotationUtils;
 import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ColorValue;
@@ -117,6 +115,7 @@ public class Aura extends Module {
 
     float curYaw, curPitch;
 
+    Criticals crit;
     public Aura() {
         super("Aura", "Automatically attacks enemies around you.", ModuleCategory.COMBAT);
     }
@@ -126,6 +125,7 @@ public class Aura extends Module {
     public void onEnable() {
         curYaw = mc.thePlayer.rotationYaw;
         curPitch = mc.thePlayer.rotationPitch;
+        crit = Main.INSTANCE.moduleManager.getModule(Criticals.class);
     }
 
     @Override
@@ -292,6 +292,7 @@ public class Aura extends Module {
             entity = rotationUtils.rayCastedEntity(range.getObject(), curYaw, curPitch);
 
         if (entity != null) {
+            if (crit.getState()) crit.onCrit(entity);
             mc.thePlayer.swingItem();
             mc.playerController.attackEntity(mc.thePlayer, entity);
         } else {

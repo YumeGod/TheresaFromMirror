@@ -23,11 +23,6 @@ public class MixinPlayerControllerMP implements IPlayerControllerMP {
 
     @Inject(method = "attackEntity",  at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/PlayerControllerMP;syncCurrentPlayItem()V", shift = At.Shift.AFTER))
     private void attackEntity(EntityPlayer playerIn, Entity targetEntity, CallbackInfo ci){
-        if (!Main.INSTANCE.moduleManager.getModule(Criticals.class).getState())
-            return;
-
-            Main.INSTANCE.moduleManager.getModule(Criticals.class).onCrit();
-
     }
 
     @Override
