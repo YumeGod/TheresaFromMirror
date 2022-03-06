@@ -22,7 +22,7 @@ import net.minecraft.network.play.client.C03PacketPlayer;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Criticals extends Module {
-    private final ModeValue mode = new ModeValue("Mode", "Edit", "Edit");
+    private final ModeValue mode = new ModeValue("Mode", "Edit", "Edit", "Packet");
     private final BooleanValue packetsWhenNoMove = new BooleanValue("packets when no move", false);
     int counter = 0;
 
@@ -47,11 +47,7 @@ public class Criticals extends Module {
             return;
 
         switch (mode.getCurrentMode()) {
-            case "Packet": {
-                sendPacket(0.004 + ThreadLocalRandom.current().nextDouble(0.001));
-                sendPacket(0.001 + ThreadLocalRandom.current().nextDouble(0.001));
-                break;
-            }
+            case "Packet":
             case "Edit": {
                 break;
             }
@@ -69,9 +65,9 @@ public class Criticals extends Module {
     public void onEdit(MotionUpdateEvent e) {
         if (e.getEventType() == EventType.PRE)
             if ("Edit".equals(mode.getCurrentMode())) {
-                double[] offset = {ThreadLocalRandom.current().nextDouble(.01032422909396, .02032422909396),
-                        ThreadLocalRandom.current().nextDouble(.008032422909396, .010032422909396),
-                        ThreadLocalRandom.current().nextDouble(.005032422909396, .006032422909396)};
+                double[] offset = {ThreadLocalRandom.current().nextDouble(.01832422909396, .02032422909396),
+                        ThreadLocalRandom.current().nextDouble(.01032422909396, .01232422909396),
+                        ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396)};
                 if (counter == 3) counter = 0;
                 Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
                 if (entity == null) return;
@@ -89,6 +85,17 @@ public class Criticals extends Module {
                     }
                 }
             }
+        if ("Packet".equals(mode.getCurrentMode())) {
+            double[] offset = {ThreadLocalRandom.current().nextDouble(.01832422909396, .02032422909396),
+                    -ThreadLocalRandom.current().nextDouble(.01032422909396, .01232422909396),
+                    ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396)};
+            Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
+            if (entity == null) return;
+            if (mc.thePlayer.onGround) {
+                if (packetsWhenNoMove.getObject())
+                    for (double i : offset) {sendPacket(i);}
+            }
+        }
 
     }
 }

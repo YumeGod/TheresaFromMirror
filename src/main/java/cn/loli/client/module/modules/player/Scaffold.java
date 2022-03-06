@@ -339,11 +339,7 @@ public class Scaffold extends Module {
 
     @EventTarget
     private void onPacket(PacketEvent e) {
-        if (slient.getObject()) {
-            if (e.getPacket() instanceof C09PacketHeldItemChange) {
-                e.setCancelled(true);
-            }
-        }
+
     }
 
     @EventTarget

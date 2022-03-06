@@ -56,6 +56,7 @@ public class ModuleManager {
         addModule(new AutoTools());
         addModule(new ChestStealer());
         addModule(new DamnBridge());
+        addModule(new InvCleaner());
         addModule(new MurderMystery());
         addModule(new NoFall());
         addModule(new NoRightClickDelay());
