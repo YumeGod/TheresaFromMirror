@@ -74,11 +74,9 @@ public class Criticals extends Module {
             switch (offsetvalue.getCurrentMode()) {
                 case "NCP":
                     offset = new double[]{
-                            ThreadLocalRandom.current().nextDouble(.01832422909396, .02032422909396),
-                            -ThreadLocalRandom.current().nextDouble(9.0e-4d, 9.0e-4d * 2),
-                            ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396)};
-                    if (Main.INSTANCE.moduleManager.getModule(Speed.class).getState())
-                        offset[1] = ThreadLocalRandom.current().nextDouble(.007032422909396, .007032422909396 * 2);
+                            ThreadLocalRandom.current().nextDouble(.00332422909396, .00432422909396),
+                            ThreadLocalRandom.current().nextDouble(9.0e-9d, 9.0e-9d * 2),
+                            ThreadLocalRandom.current().nextDouble(.005032422909396, .006032422909396)};
                     break;
                 case "Mini":
                     offset = new double[]{
@@ -89,12 +87,10 @@ public class Criticals extends Module {
                 case "Negative":
                     offset = new double[]{
                             ThreadLocalRandom.current().nextDouble(.00317, .00526),
+                            ThreadLocalRandom.current().nextDouble(9.0e-9d, 9.0e-9d * 2),
                             ThreadLocalRandom.current().nextDouble(.00217, .00326),
-                            -ThreadLocalRandom.current().nextDouble(9.0e-4d, 9.0e-4d * 2),
                             ThreadLocalRandom.current().nextDouble(9.0e-4d, 9.0e-4d * 2),
                     };
-                    if (Main.INSTANCE.moduleManager.getModule(Speed.class).getState())
-                        offset[2] = 9.0e-3d;
                     break;
                 case "Positive":
                     offset = new double[]{
