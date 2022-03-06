@@ -23,6 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Criticals extends Module {
     private final ModeValue mode = new ModeValue("Mode", "Edit", "Edit", "Packet");
+    private final ModeValue offsetvalue = new ModeValue("Offset Value", "NCP", "NCP", "Mini", "Negative");
     private final BooleanValue packetsWhenNoMove = new BooleanValue("packets when no move", false);
     int counter = 0;
 
@@ -63,12 +64,30 @@ public class Criticals extends Module {
 
     @EventTarget
     public void onEdit(MotionUpdateEvent e) {
-        if (e.getEventType() == EventType.PRE)
+        if (e.getEventType() == EventType.PRE) {
+            double[] offset = new double[3];
+
+            switch (offsetvalue.getCurrentMode()) {
+                case "NCP":
+                    offset = new double[]{ThreadLocalRandom.current().nextDouble(.01832422909396, .02032422909396),
+                            -ThreadLocalRandom.current().nextDouble(.01032422909396, .01232422909396),
+                            ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396)};
+                    break;
+                case "Mini":
+                    offset = new double[]{ThreadLocalRandom.current().nextDouble(.01832422909396, .02032422909396),
+                            ThreadLocalRandom.current().nextDouble(.01032422909396, .01232422909396),
+                            ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396)};
+                    break;
+                case "Negative":
+                    offset = new double[]{ThreadLocalRandom.current().nextDouble(.00317, .00526),
+                            ThreadLocalRandom.current().nextDouble(-.01032422909396, -.01232422909396),
+                            ThreadLocalRandom.current().nextDouble(9.0e-4d, 9.0e-4d * 2),
+                            ThreadLocalRandom.current().nextDouble(.00317, .00526)};
+                    break;
+            }
+
             if ("Edit".equals(mode.getCurrentMode())) {
-                double[] offset = {ThreadLocalRandom.current().nextDouble(.01832422909396, .02032422909396),
-                        ThreadLocalRandom.current().nextDouble(.01032422909396, .01232422909396),
-                        ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396)};
-                if (counter == 3) counter = 0;
+                if (counter == offset.length) counter = 0;
                 Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
                 if (entity == null) return;
                 if (mc.thePlayer.onGround) {
@@ -79,23 +98,20 @@ public class Criticals extends Module {
                     } else {
                         counter = 0;
                         if (packetsWhenNoMove.getObject())
-                            for (double i : offset) {
-                                sendPacket(i);
-                            }
+                            for (double i : offset) sendPacket(i);
                     }
                 }
             }
-        if ("Packet".equals(mode.getCurrentMode())) {
-            double[] offset = {ThreadLocalRandom.current().nextDouble(.01832422909396, .02032422909396),
-                    -ThreadLocalRandom.current().nextDouble(.01032422909396, .01232422909396),
-                    ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396)};
-            Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
-            if (entity == null) return;
-            if (mc.thePlayer.onGround) {
-                if (packetsWhenNoMove.getObject())
-                    for (double i : offset) {sendPacket(i);}
+            if ("Packet".equals(mode.getCurrentMode())) {
+                Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
+                if (entity == null) return;
+                if (mc.thePlayer.onGround) {
+                    if (packetsWhenNoMove.getObject())
+                        for (double i : offset) sendPacket(i);
+                }
             }
         }
+
 
     }
 }
