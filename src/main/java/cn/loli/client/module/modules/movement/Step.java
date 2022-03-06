@@ -1,5 +1,6 @@
 package cn.loli.client.module.modules.movement;
 
+import cn.loli.client.Main;
 import cn.loli.client.events.StepEvent;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
@@ -35,17 +36,15 @@ public class Step extends Module {
                 this.resetTimer = false;
             }
             if (mc.thePlayer.isCollidedVertically && !mc.gameSettings.keyBindJump.isKeyDown() && timer.hasReached(100)) {
-                event.setStepHeight(mc.thePlayer.stepHeight = 1.5F);
+                event.setStepHeight(1.5F);
             }
         }
         if (event.getEventType() == EventType.POST) {
             final double realHeight = mc.thePlayer.getEntityBoundingBox().minY - mc.thePlayer.posY;
             if (realHeight >= .625) {
                 timer.reset();
-                ((IAccessorMinecraft) mc).getTimer().timerSpeed = 0.4F;
                 resetTimer = true;
                 doNCPStep(realHeight);
-                ((IAccessorMinecraft) mc).getTimer().timerSpeed = 1.0F;
             }
         }
     }

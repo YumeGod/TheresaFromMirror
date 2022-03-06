@@ -2,20 +2,21 @@
 
 package cn.loli.client.module.modules.movement;
 
+import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PlayerMoveEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.utils.player.movement.MoveUtils;
-import cn.loli.client.utils.player.PlayerUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.value.ModeValue;
 import com.darkmagician6.eventapi.EventTarget;
+import com.darkmagician6.eventapi.types.EventType;
 
 public class Fly extends Module {
     private final ModeValue mode = new ModeValue("Mode", "Vanilla", "Vanilla", "Hypixel");
 
     TimeHelper timer = new TimeHelper();
-
+    private boolean jumped;
+    private boolean clipped;
 
     public Fly() {
         super("Fly", "Reach for the skies!", ModuleCategory.MOVEMENT);
@@ -23,7 +24,7 @@ public class Fly extends Module {
 
     @Override
     protected void onEnable() {
-        
+
         if (mc.thePlayer == null) return;
         if (mode.getCurrentMode().equalsIgnoreCase("Vanilla") && !mc.thePlayer.isSpectator()) {
             mc.thePlayer.capabilities.isFlying = true;
@@ -31,11 +32,14 @@ public class Fly extends Module {
             if (!mc.thePlayer.capabilities.isCreativeMode)
                 mc.thePlayer.capabilities.allowFlying = true;
         }
+
+        jumped = false;
+        clipped = false;
     }
 
     @Override
     protected void onDisable() {
-        
+
         if (mc.thePlayer == null) return;
         if (mode.getCurrentMode().equalsIgnoreCase("Vanilla") && !mc.thePlayer.isSpectator()) {
             mc.thePlayer.capabilities.isFlying = false;
@@ -46,28 +50,31 @@ public class Fly extends Module {
         }
     }
 
+    @EventTarget
+    private void onMotion(MotionUpdateEvent e) {
+        if (mode.getCurrentMode().equalsIgnoreCase("Hypixel") && !mc.thePlayer.isSpectator()) {
+            if (e.getEventType() == EventType.PRE) {
+                if (!jumped && mc.thePlayer.onGround) {
+                    mc.thePlayer.motionY = 0.075f;
+                    jumped = true;
+                    return;
+                }
+                if (mc.thePlayer.onGround && !clipped) {
+                    e.setY(e.getY() - 0.075f);
+                    e.setOnGround(true);
+                    clipped = true;
+                }
+                if (clipped) {
+                    mc.thePlayer.motionY = 0.0;
+                }
+            }
+        }
+    }
 
     @EventTarget
     private void onMove(PlayerMoveEvent e) {
         if (mode.getCurrentMode().equalsIgnoreCase("Hypixel") && !mc.thePlayer.isSpectator()) {
-            e.setX((mc.thePlayer.motionX = 0));
-            e.setY((mc.thePlayer.motionY = 0));
-            e.setZ((mc.thePlayer.motionZ = 0));
-
-            if (moveUtils.isOnGround(0.01)){
-                mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.004 * Math.random(), mc.thePlayer.posZ);
-                timer.reset(); // Don't forget reset
-            }
-
-            if (playerUtils.isMoving2()) {
-                if (timer.hasReached(1200)) {
-                    double playerYaw = Math.toRadians(mc.thePlayer.rotationYaw);
-                    mc.thePlayer.setPosition(mc.thePlayer.posX + 5 * -Math.sin(playerYaw), mc.thePlayer.posY - 2, mc.thePlayer.posZ + 5 * Math.cos(playerYaw));
-                    timer.reset(); // Don't forget reset
-                }
-            } else {
-                moveUtils.setMotion(e, 0);
-            }
+            moveUtils.setMotion(e, 0.2);
         }
     }
 
