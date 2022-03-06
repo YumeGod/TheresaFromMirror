@@ -115,8 +115,10 @@ public class Abuser extends Module {
             }
 
             if (event.getPacket() instanceof S32PacketConfirmTransaction) {
-                if (mc.thePlayer.ticksExisted > 30 && !hasDisable)
-                    hasDisable = true;
+                if (((S32PacketConfirmTransaction) event.getPacket()).getWindowId() == 0
+                        && ((S32PacketConfirmTransaction) event.getPacket()).getActionNumber() < 0)
+                    if (mc.thePlayer.ticksExisted > 30 && !hasDisable)
+                        hasDisable = true;
             }
         }
     }

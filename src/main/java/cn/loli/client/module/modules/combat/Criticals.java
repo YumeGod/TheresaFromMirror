@@ -7,6 +7,7 @@ import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import cn.loli.client.module.modules.movement.Speed;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
@@ -23,7 +24,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Criticals extends Module {
     private final ModeValue mode = new ModeValue("Mode", "Edit", "Edit", "Packet");
-    private final ModeValue offsetvalue = new ModeValue("Offset Value", "NCP", "NCP", "Mini", "Negative");
+    private final ModeValue offsetvalue = new ModeValue("Offset Value", "NCP", "NCP", "Mini", "Negative", "Positive");
     private final BooleanValue packetsWhenNoMove = new BooleanValue("packets when no move", false);
     private final BooleanValue always = new BooleanValue("Always", false);
     int counter = 0;
@@ -72,20 +73,35 @@ public class Criticals extends Module {
         if (e.getEventType() == EventType.PRE) {
             switch (offsetvalue.getCurrentMode()) {
                 case "NCP":
-                    offset = new double[]{ThreadLocalRandom.current().nextDouble(.01832422909396, .02032422909396),
-                            -ThreadLocalRandom.current().nextDouble(.01032422909396, .01232422909396),
+                    offset = new double[]{
+                            ThreadLocalRandom.current().nextDouble(.01832422909396, .02032422909396),
+                            -ThreadLocalRandom.current().nextDouble(9.0e-4d, 9.0e-4d * 2),
                             ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396)};
+                    if (Main.INSTANCE.moduleManager.getModule(Speed.class).getState())
+                        offset[1] = ThreadLocalRandom.current().nextDouble(.007032422909396, .007032422909396 * 2);
                     break;
                 case "Mini":
-                    offset = new double[]{ThreadLocalRandom.current().nextDouble(.01832422909396, .02032422909396),
+                    offset = new double[]{
+                            ThreadLocalRandom.current().nextDouble(.01832422909396, .02032422909396),
                             ThreadLocalRandom.current().nextDouble(.01032422909396, .01232422909396),
                             ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396)};
                     break;
                 case "Negative":
-                    offset = new double[]{ThreadLocalRandom.current().nextDouble(.00317, .00526),
+                    offset = new double[]{
                             ThreadLocalRandom.current().nextDouble(.00317, .00526),
+                            ThreadLocalRandom.current().nextDouble(.00217, .00326),
                             -ThreadLocalRandom.current().nextDouble(9.0e-4d, 9.0e-4d * 2),
                             ThreadLocalRandom.current().nextDouble(9.0e-4d, 9.0e-4d * 2),
+                    };
+                    if (Main.INSTANCE.moduleManager.getModule(Speed.class).getState())
+                        offset[2] = 9.0e-3d;
+                    break;
+                case "Positive":
+                    offset = new double[]{
+                            ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396),
+                            ThreadLocalRandom.current().nextDouble(9.0e-4d, 9.0e-4d * 2),
+                            ThreadLocalRandom.current().nextDouble(.00317, .00526),
+                            ThreadLocalRandom.current().nextDouble(9.0e-4d, 9.0e-4d * 2)
                     };
                     break;
             }
