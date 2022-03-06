@@ -7,7 +7,6 @@ import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.module.modules.movement.Speed;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
@@ -75,7 +74,7 @@ public class Criticals extends Module {
                 case "NCP":
                     offset = new double[]{
                             ThreadLocalRandom.current().nextDouble(.00332422909396, .00432422909396),
-                            ThreadLocalRandom.current().nextDouble(9.0e-9d, 9.0e-9d * 2),
+                            ThreadLocalRandom.current().nextDouble(9.0e-5d, 9.0e-5d * 4),
                             ThreadLocalRandom.current().nextDouble(.005032422909396, .006032422909396)};
                     break;
                 case "Mini":
@@ -87,7 +86,7 @@ public class Criticals extends Module {
                 case "Negative":
                     offset = new double[]{
                             ThreadLocalRandom.current().nextDouble(.00317, .00526),
-                            ThreadLocalRandom.current().nextDouble(9.0e-9d, 9.0e-9d * 2),
+                            ThreadLocalRandom.current().nextDouble(9.0e-6d, 9.0e-6d * 4),
                             ThreadLocalRandom.current().nextDouble(.00217, .00326),
                             ThreadLocalRandom.current().nextDouble(9.0e-4d, 9.0e-4d * 2),
                     };
@@ -95,9 +94,9 @@ public class Criticals extends Module {
                 case "Positive":
                     offset = new double[]{
                             ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396),
-                            ThreadLocalRandom.current().nextDouble(9.0e-4d, 9.0e-4d * 2),
+                            ThreadLocalRandom.current().nextDouble(9.0e-3d, 9.0e-3d * 2),
                             ThreadLocalRandom.current().nextDouble(.00317, .00526),
-                            ThreadLocalRandom.current().nextDouble(9.0e-4d, 9.0e-4d * 2)
+                            ThreadLocalRandom.current().nextDouble(9.0e-2d, 9.0e-2d * 2)
                     };
                     break;
             }
@@ -114,13 +113,14 @@ public class Criticals extends Module {
                             counter++;
                         } else {
                             counter = 0;
-                            if (packetsWhenNoMove.getObject())
+                            if (packetsWhenNoMove.getObject() &&
+                                    (entity.hurtResistantTime == 0 || entity.hurtResistantTime > 15))
                                 for (double i : offset) sendPacket(i);
+
                         }
                 }
             }
         }
-
 
     }
 }
