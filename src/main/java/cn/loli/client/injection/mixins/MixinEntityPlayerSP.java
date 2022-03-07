@@ -64,9 +64,10 @@ public class MixinEntityPlayerSP extends MixinEntity {
         rotationPitch = event.getPitch();
         onGround = event.isOnGround();
 
+        RotationHook.prevYaw = RotationHook.yaw;
+        RotationHook.prevPitch = RotationHook.pitch;
+
         if (!Main.INSTANCE.moduleManager.getModule(AlwaysRotate.class).getState()){
-            RotationHook.prevYaw = RotationHook.yaw;
-            RotationHook.prevPitch = RotationHook.pitch;
             RotationHook.yaw = rotationYaw;
             RotationHook.pitch = rotationPitch;
         }

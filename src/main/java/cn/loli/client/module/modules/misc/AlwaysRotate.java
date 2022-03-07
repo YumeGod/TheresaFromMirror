@@ -15,9 +15,7 @@ public class AlwaysRotate extends Module {
     @EventTarget
     private void onPacket(PacketEvent event) {
         if (event.getPacket() instanceof C03PacketPlayer) {
-            if (((C03PacketPlayer) event.getPacket()).getRotating()) {
-                RotationHook.prevYaw = RotationHook.yaw;
-                RotationHook.prevPitch = RotationHook.pitch;
+            if (((C03PacketPlayer) event.getPacket()).getRotating()){
                 RotationHook.yaw = ((C03PacketPlayer) event.getPacket()).getYaw();
                 RotationHook.pitch = ((C03PacketPlayer) event.getPacket()).getPitch();
             }
