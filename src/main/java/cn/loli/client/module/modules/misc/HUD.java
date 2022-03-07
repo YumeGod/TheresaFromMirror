@@ -5,19 +5,17 @@ package cn.loli.client.module.modules.misc;
 import cn.loli.client.Main;
 import cn.loli.client.events.Render2DEvent;
 import cn.loli.client.gui.ttfr.HFontRenderer;
+import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.module.ModuleManager;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.utils.render.AnimationUtils;
-import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.GlStateManager;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -36,7 +34,7 @@ public class HUD extends Module {
     private final BooleanValue reverse = new BooleanValue("Sort Reverse", false);
 
     private final ModeValue mode = new ModeValue("Mode", "Normal", "Normal");
-    private final ModeValue font = new ModeValue("Font", "Minecraft", "Minecraft" , "Genshin" , "Ubuntu");
+    private final ModeValue font = new ModeValue("Font", "Minecraft", "Minecraft", "Genshin", "Ubuntu");
 
     private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -63,9 +61,9 @@ public class HUD extends Module {
         if (!getState()) return;
         ScaledResolution res = new ScaledResolution(Minecraft.getMinecraft());
         boolean mcfont = font.getCurrentMode().equals("Minecraft");
-        
+
         HFontRenderer fontRenderer;
-        
+
         if (font.getCurrentMode().equals("Genshin")) {
             fontRenderer = Main.INSTANCE.fontLoaders.get("genshin16");
         } else
@@ -81,8 +79,9 @@ public class HUD extends Module {
 
         int i = ArrayListYPos.getObject().intValue();
 
-
-        double currSpeed = Math.sqrt(mc.thePlayer.motionX * mc.thePlayer.motionX + mc.thePlayer.motionZ * mc.thePlayer.motionZ);
+        double xDist = mc.thePlayer.posX - mc.thePlayer.lastTickPosX;
+        double zDist = mc.thePlayer.posZ - mc.thePlayer.lastTickPosZ;
+        double currSpeed = StrictMath.sqrt(xDist * xDist + zDist * zDist) * 20.0 * ((IAccessorMinecraft) mc).getTimer().timerSpeed;
 
         if (showClientInfo.getObject()) {
             int fpsWidth = mc.fontRendererObj.drawString("FPS: " + Minecraft.getDebugFPS(), 2, res.getScaledHeight() - mc.fontRendererObj.FONT_HEIGHT - 2, -1, true);
@@ -106,7 +105,7 @@ public class HUD extends Module {
                     if (mcfont)
                         mc.fontRendererObj.drawStringWithShadow(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, rainbow(50));
                     else
-                        fontRenderer.drawStringWithShadow(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, rainbow(50) , 150);
+                        fontRenderer.drawStringWithShadow(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, rainbow(50), 150);
                     m.arraylist_animY = AnimationUtils.smoothAnimation(m.arraylist_animY, i + ArrayListYPos.getObject().intValue(), 50, .3f);
                     m.arraylist_animX = AnimationUtils.smoothAnimation(m.arraylist_animX, (mcfont ? mc.fontRendererObj.getStringWidth(s) : fontRenderer.getStringWidth(s)) + ArrayListXPos.getObject().intValue(), 50, .4f);
                     i += 12;
@@ -128,6 +127,6 @@ public class HUD extends Module {
     @Override
     public void onEnable() {
         if (sorted) sorted = false;
-        
+
     }
 }

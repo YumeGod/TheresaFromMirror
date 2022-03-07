@@ -12,6 +12,8 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.init.Items;
 import net.minecraft.item.*;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +34,8 @@ public class InvCleaner extends Module {
     private final BooleanValue preferSword = new BooleanValue("Prefer Sword", true);
 
     private final BooleanValue keepTools = new BooleanValue("Keep Tools", true);
+
+    private final BooleanValue keepRod = new BooleanValue("Keep Rods", false);
 
     private static final NumberValue<Integer> swordSlot = new NumberValue<>("Sword Slot", 1, 0, 9);
 
@@ -122,6 +126,11 @@ public class InvCleaner extends Module {
             return true;
         if (is.getItem() instanceof ItemBow && is != bestBow())
             return true;
+        if (is.getItem() instanceof ItemFishingRod && !keepRod.getObject())
+            return true;
+        if (is.getItem().getUnlocalizedName().contains("potion"))
+            return isBadPotion(is);
+
         if (keepTools.getObject()) {
             if (is.getItem() instanceof ItemAxe && is != bestAxe() && (preferSword.getObject() || is != bestWeapon()))
                 return true;
@@ -140,7 +149,20 @@ public class InvCleaner extends Module {
         return false;
     }
 
-    public ItemStack bestWeapon() {
+    boolean isBadPotion(final ItemStack stack) {
+        if (stack != null && stack.getItem() instanceof ItemPotion) {
+            final ItemPotion potion = (ItemPotion) stack.getItem();
+            for (final PotionEffect o : potion.getEffects(stack)) {
+                if (o.getPotionID() == Potion.poison.getId() || o.getPotionID() == Potion.moveSlowdown.getId()
+                        || o.getPotionID() == Potion.harm.getId()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    ItemStack bestWeapon() {
         ItemStack bestWeapon = null;
         float itemDamage = -1;
 
@@ -160,7 +182,7 @@ public class InvCleaner extends Module {
         return bestWeapon;
     }
 
-    public ItemStack bestSword() {
+    ItemStack bestSword() {
         ItemStack bestSword = null;
         float itemDamage = -1;
 
@@ -180,7 +202,7 @@ public class InvCleaner extends Module {
         return bestSword;
     }
 
-    public ItemStack bestBow() {
+    ItemStack bestBow() {
         ItemStack bestBow = null;
         float itemDamage = -1;
 
@@ -200,7 +222,7 @@ public class InvCleaner extends Module {
         return bestBow;
     }
 
-    public ItemStack bestAxe() {
+    ItemStack bestAxe() {
         ItemStack bestTool = null;
         float itemSkill = -1;
 
@@ -220,7 +242,7 @@ public class InvCleaner extends Module {
         return bestTool;
     }
 
-    public ItemStack bestPick() {
+    ItemStack bestPick() {
         ItemStack bestTool = null;
         float itemSkill = -1;
 
@@ -240,7 +262,7 @@ public class InvCleaner extends Module {
         return bestTool;
     }
 
-    public ItemStack bestShovel() {
+    ItemStack bestShovel() {
         ItemStack bestTool = null;
         float itemSkill = -1;
 
@@ -260,7 +282,7 @@ public class InvCleaner extends Module {
         return bestTool;
     }
 
-    public float getToolRating(ItemStack itemStack) {
+    float getToolRating(ItemStack itemStack) {
         float damage = getToolMaterialRating(itemStack, false);
         damage += EnchantmentHelper.getEnchantmentLevel(Enchantment.efficiency.effectId, itemStack) * 2.00F;
         damage += EnchantmentHelper.getEnchantmentLevel(Enchantment.silkTouch.effectId, itemStack) * 0.50F;
@@ -270,7 +292,7 @@ public class InvCleaner extends Module {
         return damage;
     }
 
-    public float getItemDamage(ItemStack itemStack) {
+    float getItemDamage(ItemStack itemStack) {
         float damage = getToolMaterialRating(itemStack, true);
         damage += EnchantmentHelper.getEnchantmentLevel(Enchantment.sharpness.effectId, itemStack) * 1.25F;
         damage += EnchantmentHelper.getEnchantmentLevel(Enchantment.fireAspect.effectId, itemStack) * 0.50F;
@@ -282,7 +304,7 @@ public class InvCleaner extends Module {
         return damage;
     }
 
-    public float getBowDamage(ItemStack itemStack) {
+    float getBowDamage(ItemStack itemStack) {
         float damage = 5;
         damage += EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, itemStack) * 1.25F;
         damage += EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, itemStack) * 0.75F;
@@ -292,7 +314,7 @@ public class InvCleaner extends Module {
         return damage;
     }
 
-    public float getToolMaterialRating(ItemStack itemStack, boolean checkForDamage) {
+    float getToolMaterialRating(ItemStack itemStack, boolean checkForDamage) {
         final Item is = itemStack.getItem();
         int rating = 0;
 
