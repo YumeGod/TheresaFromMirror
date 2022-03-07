@@ -157,10 +157,6 @@ public class Utils {
         return (Math.random() * (max)) + min;
     }
 
-    public static Color getRainbow(int offset, int speed, float saturation, float brightness) {
-        float hue = ((System.currentTimeMillis() + offset) % speed) / (float) speed;
-        return Color.getHSBColor(hue, saturation, brightness);
-    }
 
     public static <T extends Number> T clamp(T value, T minimum, T maximum) {
         if (value instanceof Integer) {

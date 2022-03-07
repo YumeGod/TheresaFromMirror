@@ -754,6 +754,11 @@ public class RenderUtils extends Utils {
         GlStateManager.resetColor();
     }
 
+    public static Color getRainbow(int offset, int speed, float saturation, float brightness) {
+        float hue = ((System.currentTimeMillis() + offset) % speed) / (float) speed;
+        return Color.getHSBColor(hue, saturation, brightness);
+    }
+
     public static void drawIcarusESP(EntityLivingBase target, Color color, boolean rainbow) {
         GL11.glPushMatrix();
         GL11.glDisable(GL11.GL_TEXTURE_2D);

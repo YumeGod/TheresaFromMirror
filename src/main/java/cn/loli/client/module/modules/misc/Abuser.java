@@ -126,7 +126,7 @@ public class Abuser extends Module {
     @EventTarget
     private void onTick(TickEvent event) {
         if (hypixel.getObject()) {
-            if (mc.currentScreen instanceof GuiDownloadTerrain && (mc.thePlayer != null) && !hasDisable)
+            if (mc.currentScreen instanceof GuiDownloadTerrain && (mc.thePlayer != null))
                 mc.thePlayer.closeScreen();
         }
     }

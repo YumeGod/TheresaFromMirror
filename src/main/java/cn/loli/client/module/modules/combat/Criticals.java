@@ -74,7 +74,6 @@ public class Criticals extends Module {
                 case "NCP":
                     offset = new double[]{
                             ThreadLocalRandom.current().nextDouble(.00332422909396, .00432422909396),
-                            ThreadLocalRandom.current().nextDouble(9.0e-5d, 9.0e-5d * 4),
                             ThreadLocalRandom.current().nextDouble(.005032422909396, .006032422909396)};
                     break;
                 case "Mini":
@@ -88,15 +87,13 @@ public class Criticals extends Module {
                             ThreadLocalRandom.current().nextDouble(.00317, .00526),
                             ThreadLocalRandom.current().nextDouble(9.0e-6d, 9.0e-6d * 4),
                             ThreadLocalRandom.current().nextDouble(.00217, .00326),
-                            ThreadLocalRandom.current().nextDouble(9.0e-4d, 9.0e-4d * 2),
                     };
                     break;
                 case "Positive":
                     offset = new double[]{
                             ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396),
-                            ThreadLocalRandom.current().nextDouble(9.0e-3d, 9.0e-3d * 2),
                             ThreadLocalRandom.current().nextDouble(.00317, .00526),
-                            ThreadLocalRandom.current().nextDouble(9.0e-2d, 9.0e-2d * 2)
+                            ThreadLocalRandom.current().nextDouble(9.0e-4d, 9.0e-4d * 2)
                     };
                     break;
             }

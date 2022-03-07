@@ -352,6 +352,7 @@ public class Main {
             addWindowListener(new WindowAdapter() {
 
                 public void windowClosing(WindowEvent e) {
+                    System.exit(0);
                     FMLCommonHandler.instance().exitJava(0, true);
                 }
 

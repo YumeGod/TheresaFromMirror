@@ -1,14 +1,17 @@
 package cn.loli.client.module.modules.render;
 
 
+import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.Render2DEvent;
 import cn.loli.client.events.Render3DEvent;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
+import cn.loli.client.injection.mixins.IAccessorRenderManager;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ColorValue;
+import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GLAllocation;
@@ -26,6 +29,7 @@ import javax.vecmath.Vector4f;
 import java.awt.*;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +38,7 @@ import static net.minecraft.client.gui.Gui.drawRect;
 public class ESP extends Module {
 
     private final Map<EntityPlayer, float[]> entityPosMap = new HashMap<>();
+    private final ArrayList<PlayerLocationInfo> playerLocationInfo = new ArrayList<>();
 
     private final FloatBuffer windowPosition = BufferUtils.createFloatBuffer(4);
     private final IntBuffer viewport = GLAllocation.createDirectIntBuffer(16);
@@ -54,6 +59,8 @@ public class ESP extends Module {
     public final ColorValue chamsColor = new ColorValue("Cham-Default-Color", new Color(187, 21, 21, 210));
     public final ColorValue throughWallsColor = new ColorValue("Cham-ThroughWalls-Color", new Color(23, 74, 183, 210));
 
+
+    int rainbowOffset;
 
     public ESP() {
         super("ESP", "Make you able see others in your view", ModuleCategory.RENDER);
@@ -168,17 +175,18 @@ public class ESP extends Module {
                 }
 
                 entityPosMap.put(player, new float[]{position.x, position.z, position.y, position.w});
-
                 GL11.glPopMatrix();
             }
         }
 
-        for (EntityPlayer player : entityPosMap.keySet()) {
+        for (EntityPlayer player : entityPosMap.keySet())
             if (icarus.getObject()) RenderUtils.drawIcarusESP(player, icarusColor.getObject(), false);
-        }
 
     }
 
+    @EventTarget
+    private void onUpdate(MotionUpdateEvent event) {
+    }
 
     public static void startScissorBox(ScaledResolution sr, int x, int y, int width, int height) {
         int sf = sr.getScaleFactor();
@@ -228,13 +236,13 @@ public class ESP extends Module {
         return Color.HSBtoRGB(percentage, 1.0F, 1.0F);
     }
 
-    @Override
-    public void onEnable() {
-        
-    }
+    static class PlayerLocationInfo {
+        private final double[] position;
+        private final long timestamp;
 
-    @Override
-    public void onDisable() {
-        
+        public PlayerLocationInfo(double[] position, final long timestamp) {
+            this.position = position;
+            this.timestamp = timestamp;
+        }
     }
 }
