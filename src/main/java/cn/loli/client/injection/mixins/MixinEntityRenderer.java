@@ -6,9 +6,11 @@ import cn.loli.client.Main;
 import cn.loli.client.events.Render3DEvent;
 import cn.loli.client.events.RenderEvent;
 import cn.loli.client.events.RenderWorldLastEvent;
+import cn.loli.client.events.RotationEvent;
 import cn.loli.client.module.modules.combat.KeepSprint;
 import cn.loli.client.module.modules.render.NoFov;
 import cn.loli.client.module.modules.render.ViewClip;
+import cn.loli.client.utils.player.rotation.RotationHook;
 import com.darkmagician6.eventapi.EventManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
@@ -66,6 +68,18 @@ public abstract class MixinEntityRenderer {
             fovModifierHand *= 0.9f;
             Main.INSTANCE.moduleManager.getModule(KeepSprint.class).modify = false;
         }
+    }
+
+    @Inject(method = "updateCameraAndRender", at = @At(value = "FIELD", target = "Lnet/minecraft/client/settings/GameSettings;smoothCamera:Z", shift = At.Shift.BEFORE))
+    private void onRotationHook(CallbackInfo callbackInfo) {
+   /*     RotationHook.prevYaw = RotationHook.yaw;
+        RotationHook.prevPitch = RotationHook.pitch;
+        final RotationEvent rotationEvent = new RotationEvent(Minecraft.getMinecraft().thePlayer.rotationYaw, Minecraft.getMinecraft().thePlayer.rotationPitch);
+        EventManager.call(rotationEvent);
+        RotationHook.yaw = rotationEvent.getYaw();
+        RotationHook.pitch = rotationEvent.getPitch();
+
+    */
     }
 
     @ModifyVariable(method = {"orientCamera"}, ordinal = 3, at = @At(value = "STORE", ordinal = -1), require = 1)

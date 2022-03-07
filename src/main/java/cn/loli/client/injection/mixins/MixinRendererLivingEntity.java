@@ -3,6 +3,7 @@ package cn.loli.client.injection.mixins;
 import cn.loli.client.Main;
 import cn.loli.client.module.modules.render.ESP;
 import cn.loli.client.module.modules.render.OldAnimations;
+import cn.loli.client.utils.player.rotation.RotationHook;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBase;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -69,7 +70,7 @@ public abstract class MixinRendererLivingEntity<T extends EntityLivingBase> {
         Color color = esp.chamsColor.getObject();
         Color color2 = esp.throughWallsColor.getObject();
 
-        if (esp.getState() && esp.chams.getObject() && 
+        if (esp.getState() && esp.chams.getObject() &&
                 (entityIn instanceof EntityPlayer && entityIn != Minecraft.getMinecraft().thePlayer) && !entityIn.isInvisible()) {
             GL11.glPushMatrix();
             GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -92,5 +93,41 @@ public abstract class MixinRendererLivingEntity<T extends EntityLivingBase> {
             instance.render(entityIn, p_78088_2_, p_78088_3_, p_78088_4_, p_78088_5_, p_78088_6_, scale);
         }
 
+    }
+
+    @Redirect(method = "doRender(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/EntityLivingBase;rotationYawHead:F"))
+    protected float doYaw(EntityLivingBase instance) {
+        if (instance == Minecraft.getMinecraft().thePlayer) return RotationHook.yaw;
+        return instance.rotationYawHead;
+    }
+
+    @Redirect(method = "doRender(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/EntityLivingBase;prevRotationYawHead:F"))
+    protected float doPrevYaw(EntityLivingBase instance) {
+        if (instance == Minecraft.getMinecraft().thePlayer) return RotationHook.prevYaw;
+        return instance.prevRotationYawHead;
+    }
+
+    @Redirect(method = "doRender(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/EntityLivingBase;renderYawOffset:F"))
+    protected float doYawOffset(EntityLivingBase instance) {
+        if (instance == Minecraft.getMinecraft().thePlayer) return RotationHook.yaw;
+        return instance.renderYawOffset;
+    }
+
+    @Redirect(method = "doRender(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/EntityLivingBase;prevRenderYawOffset:F"))
+    protected float doPrevYawOffset(EntityLivingBase instance) {
+        if (instance == Minecraft.getMinecraft().thePlayer) return RotationHook.prevYaw;
+        return instance.prevRenderYawOffset;
+    }
+
+    @Redirect(method = "doRender(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/EntityLivingBase;rotationPitch:F"))
+    protected float doPitch(EntityLivingBase instance) {
+        if (instance == Minecraft.getMinecraft().thePlayer) return RotationHook.pitch;
+        return instance.rotationPitch;
+    }
+
+    @Redirect(method = "doRender(Lnet/minecraft/entity/EntityLivingBase;DDDFF)V", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/EntityLivingBase;prevRotationPitch:F"))
+    protected float doPrevPitch(EntityLivingBase instance) {
+        if (instance == Minecraft.getMinecraft().thePlayer) return RotationHook.prevPitch;
+        return instance.prevRotationPitch;
     }
 }

@@ -3,7 +3,10 @@
 package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
-import cn.loli.client.events.*;
+import cn.loli.client.events.MotionUpdateEvent;
+import cn.loli.client.events.PlayerMoveEvent;
+import cn.loli.client.events.UpdateEvent;
+import cn.loli.client.module.modules.misc.AlwaysRotate;
 import cn.loli.client.module.modules.movement.NoSlowDown;
 import cn.loli.client.utils.player.rotation.RotationHook;
 import com.darkmagician6.eventapi.EventManager;
@@ -61,10 +64,13 @@ public class MixinEntityPlayerSP extends MixinEntity {
         rotationPitch = event.getPitch();
         onGround = event.isOnGround();
 
-        RotationHook.yaw = rotationYaw;
-        RotationHook.pitch = rotationPitch;
-        RotationHook.prevYaw = cachedRotationYaw;
-        RotationHook.prevPitch = cachedRotationPitch;
+        if (!Main.INSTANCE.moduleManager.getModule(AlwaysRotate.class).getState()){
+            RotationHook.prevYaw = RotationHook.yaw;
+            RotationHook.prevPitch = RotationHook.pitch;
+            RotationHook.yaw = rotationYaw;
+            RotationHook.pitch = rotationPitch;
+        }
+
     }
 
     @Inject(method = "onUpdateWalkingPlayer", at = @At("RETURN"))

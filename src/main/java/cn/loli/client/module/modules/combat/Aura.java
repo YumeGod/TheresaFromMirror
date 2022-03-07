@@ -116,6 +116,7 @@ public class Aura extends Module {
     float curYaw, curPitch;
 
     Criticals crit;
+
     public Aura() {
         super("Aura", "Automatically attacks enemies around you.", ModuleCategory.COMBAT);
     }
@@ -174,6 +175,11 @@ public class Aura extends Module {
                 curYaw = mc.thePlayer.rotationYaw;
                 curPitch = mc.thePlayer.rotationPitch;
             }
+
+            if (!slient.getObject()) {
+                mc.thePlayer.rotationYaw = curYaw;
+                mc.thePlayer.rotationPitch = curPitch;
+            }
         }
 
         if (target != null && show.getObject()) {
@@ -193,6 +199,14 @@ public class Aura extends Module {
 
         }
 
+    }
+
+    @EventTarget
+    public void onRotation(RotationEvent event) {
+        if (rotations.getObject()) {
+            event.setYaw(curYaw);
+            event.setPitch(curPitch);
+        }
     }
 
     @EventTarget
@@ -231,15 +245,10 @@ public class Aura extends Module {
                 return;
             }
 
-
             if (rotations.getObject()) {
                 if (slient.getObject()) {
                     event.setYaw(curYaw);
                     event.setPitch(curPitch);
-
-                    if (mc.gameSettings.thirdPersonView != 0) {
-                        mc.thePlayer.rotationYawHead = curYaw;
-                    }
                 }
             }
 
@@ -267,11 +276,6 @@ public class Aura extends Module {
 
         if (event.getEventType() == EventType.POST) {
             if (target == null) return;
-
-            if (!slient.getObject()) {
-                mc.thePlayer.rotationYaw = curYaw;
-                mc.thePlayer.rotationPitch = curPitch;
-            }
 
             if ((mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() || mc.thePlayer.isBlocking()) && !isBlocking) {
                 ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
