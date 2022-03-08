@@ -2,20 +2,23 @@ package cn.loli.client.module.modules.render;
 
 import cn.loli.client.Main;
 import cn.loli.client.events.Render2DEvent;
+import cn.loli.client.events.RenderEvent;
 import cn.loli.client.events.TickEvent;
 import cn.loli.client.gui.ttfr.HFontRenderer;
+import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.combat.Aura;
 import cn.loli.client.utils.player.rotation.RotationHook;
-import cn.loli.client.utils.player.rotation.RotationUtils;
 import cn.loli.client.utils.render.AnimationUtils;
 import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.ModeValue;
+import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.network.NetworkPlayerInfo;
+import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.entity.Entity;
@@ -23,9 +26,17 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EnumPlayerModelParts;
 import net.minecraft.potion.Potion;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.Vec3;
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.glu.GLU;
 
+import javax.vecmath.Vector3f;
+import javax.vecmath.Vector4f;
 import java.awt.*;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,9 +46,18 @@ public class TargetHUD extends Module {
     Entity entity;
     Map<EntityLivingBase, Float> health = new HashMap<>();
     Map<EntityPlayer, PlayerInfo> playerList = new HashMap<>();
+    Map<EntityPlayer, Float[]> posMap = new HashMap<>();
+
     ArrayList<EntityPlayer> playerInfoList = new ArrayList<>();
 
+    private final FloatBuffer windowPosition = BufferUtils.createFloatBuffer(4);
+    private final IntBuffer viewport = GLAllocation.createDirectIntBuffer(16);
+    private final FloatBuffer modelMatrix = GLAllocation.createDirectFloatBuffer(16);
+    private final FloatBuffer projectionMatrix = GLAllocation.createDirectFloatBuffer(16);
+
     private final ModeValue font = new ModeValue("Font", "Genshin", "Genshin", "Ubuntu");
+    private final NumberValue<Integer> targetAmount = new NumberValue<>("Display Amount", 5, 1, 6);
+    private final ModeValue sort = new ModeValue("Display", "Normal", "Normal", "Player");
 
     public TargetHUD() {
         super("Target Hud", "Make you can check the detail of targets", ModuleCategory.RENDER);
@@ -49,7 +69,7 @@ public class TargetHUD extends Module {
 
         int renderIndex = 0;
 
-        if (entity != null && entity instanceof EntityPlayer && !playerList.containsKey(entity) && playerList.size() < 5) {
+        if (entity != null && entity instanceof EntityPlayer && !playerList.containsKey(entity) && playerList.size() < targetAmount.getObject()) {
             PlayerInfo info = new PlayerInfo((EntityPlayer) entity, System.currentTimeMillis());
             playerInfoList.add(info.player);
             playerList.put((EntityPlayer) entity, info);
@@ -63,17 +83,89 @@ public class TargetHUD extends Module {
 
 
         for (int i = 0; i < playerList.size(); i++) {
+            float x;
+            float y;
+
+            if (sort.getCurrentMode().equals("Player")) {
+                x = (posMap.get(playerInfoList.get(i))[0] + posMap.get(playerInfoList.get(i))[2]) / 2.25f;
+                y = ((posMap.get(playerInfoList.get(i))[1] + posMap.get(playerInfoList.get(i))[3]) / 2.25f) - 19;
+            } else {
+                x = sr.getScaledWidth() / 2f + 18;
+                y = sr.getScaledHeight() / 2f - 17.5f + (renderIndex * 42);
+            }
+
             new THud(playerList.get(playerInfoList.get(i)).player).
-                    render(sr.getScaledWidth() / 2f + 18, sr.getScaledHeight() / 2f - 17.5f + (renderIndex * 42));
+                    render(x, y);
             renderIndex++;
         }
     }
+
+    @EventTarget
+    private void onRender(RenderEvent event) {
+        for (int i = 0; i < playerList.size(); i++) {
+            //3d coordinate to 2d coordinate
+            ScaledResolution res = new ScaledResolution(mc);
+            int scaleFactor = res.getScaleFactor();
+            Vec3 vec3 = getVec3(playerInfoList.get(i));
+            float posX = (float) (vec3.xCoord - mc.getRenderManager().viewerPosX);
+            float posY = (float) (vec3.yCoord - mc.getRenderManager().viewerPosY);
+            float posZ = (float) (vec3.zCoord - mc.getRenderManager().viewerPosZ);
+
+            GL11.glPushMatrix();
+            double halfWidth = playerInfoList.get(i).width / 2.0D + 0.18F;
+            AxisAlignedBB bb = new AxisAlignedBB(posX - halfWidth, posY, posZ - halfWidth, posX + halfWidth,
+                    posY + playerInfoList.get(i).height + 0.18D, posZ + halfWidth);
+
+            double[][] vectors = {{bb.minX, bb.minY, bb.minZ}, {bb.minX, bb.maxY, bb.minZ},
+                    {bb.minX, bb.maxY, bb.maxZ}, {bb.minX, bb.minY, bb.maxZ}, {bb.maxX, bb.minY, bb.minZ},
+                    {bb.maxX, bb.maxY, bb.minZ}, {bb.maxX, bb.maxY, bb.maxZ}, {bb.maxX, bb.minY, bb.maxZ}};
+
+            Vector3f projection;
+            Vector4f position = new Vector4f(Float.MAX_VALUE, Float.MAX_VALUE, -1.0F, -1.0F);
+
+            for (double[] vec : vectors) {
+                projection = project2D((float) vec[0], (float) vec[1], (float) vec[2], scaleFactor);
+                if (projection != null && projection.z >= 0.0F && projection.z < 1.0F) {
+                    position.x = Math.min(position.x, projection.x);
+                    position.y = Math.min(position.y, projection.y);
+                    position.z = Math.max(position.z, projection.x);
+                    position.w = Math.max(position.w, projection.y);
+                }
+            }
+
+            posMap.put(playerInfoList.get(i), new Float[]{position.x, position.y, position.z, position.w});
+            GL11.glPopMatrix();
+        }
+    }
+
 
     @EventTarget
     private void onReload(TickEvent event) {
         entity = Main.INSTANCE.moduleManager.getModule(Aura.class).getState()
                 ? Main.INSTANCE.moduleManager.getModule(Aura.class).target
                 : rotationUtils.rayCastedEntity(6.0, RotationHook.yaw, RotationHook.pitch);
+    }
+
+    private Vec3 getVec3(final EntityPlayer var0) {
+        final float timer = ((IAccessorMinecraft) mc).getTimer().renderPartialTicks;
+        final double x = var0.lastTickPosX + (var0.posX - var0.lastTickPosX) * timer;
+        final double y = var0.lastTickPosY + (var0.posY - var0.lastTickPosY) * timer;
+        final double z = var0.lastTickPosZ + (var0.posZ - var0.lastTickPosZ) * timer;
+        return new Vec3(x, y, z);
+    }
+
+
+    private Vector3f project2D(float x, float y, float z, int scaleFactor) {
+        GL11.glGetFloat(GL11.GL_MODELVIEW_MATRIX, modelMatrix);
+        GL11.glGetFloat(GL11.GL_PROJECTION_MATRIX, projectionMatrix);
+        GL11.glGetInteger(GL11.GL_VIEWPORT, viewport);
+
+        if (GLU.gluProject(x, y, z, modelMatrix, projectionMatrix, viewport, windowPosition)) {
+            return new Vector3f(windowPosition.get(0) / scaleFactor,
+                    (mc.displayHeight - windowPosition.get(1)) / scaleFactor, windowPosition.get(2));
+        }
+
+        return null;
     }
 
     static class PlayerInfo {

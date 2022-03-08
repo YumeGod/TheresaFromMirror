@@ -74,8 +74,9 @@ public class Criticals extends Module {
             switch (offsetvalue.getCurrentMode()) {
                 case "NCP":
                     offset = new double[]{
-                            ThreadLocalRandom.current().nextDouble(.00332422909396, .00432422909396),
-                            ThreadLocalRandom.current().nextDouble(.005032422909396, .006032422909396)};
+                            ThreadLocalRandom.current().nextDouble(.0232422909396, .02432422909396),
+                            ThreadLocalRandom.current().nextDouble(.0172422909396, .0182422909396),
+                            ThreadLocalRandom.current().nextDouble(.0112422909396, .0122422909396)};
                     break;
                 case "Mini":
                     offset = new double[]{
@@ -106,8 +107,8 @@ public class Criticals extends Module {
                 if (entity == null) return;
                 if (mc.thePlayer.onGround) {
                     if (always.getObject() || entity.hurtResistantTime != 20)
-                        if (playerUtils.isMoving2() &&
-                                (!speed.getState() || !speed.modes.getCurrentMode().equals("Bunny"))) {
+                        if (playerUtils.isMoving2()) {
+                            if (speed.getState()) offset[counter] *= 0.08;
                             e.setY(e.getY() + (offset[counter]));
                             e.setOnGround(false);
                             counter++;

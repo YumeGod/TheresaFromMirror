@@ -104,8 +104,7 @@ public class Speed extends Module {
                 if (playerUtils.isMoving2()) {
                     double baseMoveSpeed = moveUtils.getBaseMoveSpeed(0.2871, 0.2);
                     boolean shouldLowhop = !mc.gameSettings.keyBindJump.isKeyDown() &&
-                            !mc.thePlayer.isPotionActive(Potion.jump) && !mc.thePlayer.isCollidedHorizontally &&
-                            moveUtils.simJumpShouldDoLowHop(baseMoveSpeed);
+                            !mc.thePlayer.isPotionActive(Potion.jump) && !mc.thePlayer.isCollidedHorizontally;
 
                     if (!mc.thePlayer.onGround && shouldLowhop && mc.thePlayer.fallDistance < 0.54)
                         event.setY(mc.thePlayer.motionY = lowHopYModification(mc.thePlayer.motionY, moveUtils.round(mc.thePlayer.posY - (int) mc.thePlayer.posY, 0.001)));
