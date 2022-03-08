@@ -21,6 +21,7 @@ public class NoFall extends Module {
     private final ModeValue mode = new ModeValue("Mode", "Packet", "Packet", "Vulcan", "Edit");
 
     private final BooleanValue cancel = new BooleanValue("Slient", false);
+    private final BooleanValue isvoid = new BooleanValue("Ignore Void", false);
 
     public NoFall() {
         super("NoFall", "Negates fall damage.", ModuleCategory.PLAYER);
@@ -33,7 +34,7 @@ public class NoFall extends Module {
             return;
 
         if (mode.getCurrentMode().equalsIgnoreCase("Packet")) {
-            if (mc.thePlayer.fallDistance > 2F && isBlockUnder()) {
+            if (mc.thePlayer.fallDistance > 2F && (isvoid.getObject() || isBlockUnder())) {
                 mc.thePlayer.sendQueue.addToSendQueue(new C03PacketPlayer(true));
                 mc.thePlayer.fallDistance *= .1;
             }
@@ -49,7 +50,7 @@ public class NoFall extends Module {
                 }
             }
         } else if (mode.getCurrentMode().equalsIgnoreCase("Edit")) {
-            if (mc.thePlayer.fallDistance > 2F && isBlockUnder())
+            if (mc.thePlayer.fallDistance > 2F && (isvoid.getObject() || isBlockUnder()))
                 event.setOnGround(true);
         } else {
             NotificationManager.show(new Notification(NotificationType.WARNING, this.getName(), "Invalid mode: " + mode.getCurrentMode(), 2));

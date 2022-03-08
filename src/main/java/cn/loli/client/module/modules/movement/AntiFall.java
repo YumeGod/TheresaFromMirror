@@ -3,11 +3,14 @@ package cn.loli.client.module.modules.movement;
 import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.network.play.client.C03PacketPlayer;
 
 public class AntiFall extends Module {
+
+    private final NumberValue<Integer> falldistance = new NumberValue<>("Fall Distance", 3, 1, 6);
 
     public AntiFall() {
         super("AntiFall", "I am the first one to fixz antifalls maybe", ModuleCategory.MOVEMENT);
@@ -16,7 +19,7 @@ public class AntiFall extends Module {
     @EventTarget
     public void onFall(MotionUpdateEvent event) {
         if (event.getEventType() == EventType.PRE) {
-            if (mc.thePlayer.fallDistance > 3.0 && playerUtils.isOverVoid(mc)) {
+            if (mc.thePlayer.fallDistance > falldistance.getObject() && playerUtils.isOverVoid(mc)) {
                 event.setX(event.getX() * playerUtils.randomInRange(0.99, 1.01));
                 event.setZ(event.getZ() * playerUtils.randomInRange(0.99, 1.01));
             }
