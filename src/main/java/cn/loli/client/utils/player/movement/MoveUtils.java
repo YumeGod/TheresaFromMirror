@@ -2,12 +2,16 @@ package cn.loli.client.utils.player.movement;
 
 import cn.loli.client.events.PlayerMoveEvent;
 import cn.loli.client.utils.Utils;
+import cn.loli.client.utils.player.rotation.RotationUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.Vec3;
 
 import java.util.Arrays;
 
@@ -16,25 +20,34 @@ public class MoveUtils extends Utils {
     private static MoveUtils utils;
 
     //From Zane's Old Move Utils
-    public final double SPRINTING_MOD = 1.0 / 1.3F;
-    public final double SNEAK_MOD = 0.3F;
-    public final double ICE_MOD = 2.5F;
-    public final double WALK_SPEED = 0.221;
-    private final double SWIM_MOD = 0.115F / WALK_SPEED;
-    private final double[] DEPTH_STRIDER_VALUES = {
+    final double SPRINTING_MOD = 1.0 / 1.3F;
+    final double SNEAK_MOD = 0.3F;
+    final double ICE_MOD = 2.5F;
+    final double WALK_SPEED = 0.221;
+    final double SWIM_MOD = 0.115F / WALK_SPEED;
+    final double[] DEPTH_STRIDER_VALUES = {
             1.0F,
             0.1645F / SWIM_MOD / WALK_SPEED,
             0.1995F / SWIM_MOD / WALK_SPEED,
             1.0F / SWIM_MOD,
     };
-    public final double MIN_DIST = 1.0E-3;
+    final double MIN_DIST = 1.0E-3;
 
-    private final double AIR_FRICTION = 0.98F;
-    private final double WATER_FRICTION = 0.89F;
-    private final double LAVA_FRICTION = 0.535F;
-    public final double BUNNY_DIV_FRICTION = 160.0 - 1.0E-3;
+    final double AIR_FRICTION = 0.98F;
+    final double WATER_FRICTION = 0.89F;
+    final double LAVA_FRICTION = 0.535F;
+    final double BUNNY_DIV_FRICTION = 160.0 - 1.0E-3;
 
-    private final double[] SPEEDS = new double[3];
+    final double[] SPEEDS = new double[3];
+
+    public final double[] LOW_HOP_Y_POSITIONS = {
+            round(0.4, 0.001),
+            round(0.71, 0.001),
+            round(0.75, 0.001),
+            round(0.55, 0.001),
+            round(0.41, 0.001)
+    };
+
 
     public void setMotion(PlayerMoveEvent event, double speed) {
         double forward = mc.thePlayer.movementInput.moveForward;
@@ -78,7 +91,7 @@ public class MoveUtils extends Utils {
         return baseSpeed;
     }
 
-    public double getBaseMoveSpeed(double speed , double v) {
+    public double getBaseMoveSpeed(double speed, double v) {
         double baseSpeed = speed;
         if (Minecraft.getMinecraft().thePlayer.isPotionActive(Potion.moveSpeed)) {
             int amplifier = Minecraft.getMinecraft().thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier();
@@ -157,10 +170,43 @@ public class MoveUtils extends Utils {
         return baseFallDist + amp;
     }
 
+    public boolean simJumpShouldDoLowHop(final double baseMoveSpeedRef) {
+        // Calculate the direction moved in
+        final float direction = calculateYawFromSrcToDst(mc.thePlayer.rotationYaw,
+                mc.thePlayer.lastTickPosX, mc.thePlayer.lastTickPosZ,
+                mc.thePlayer.posX, mc.thePlayer.posZ);
+        final Vec3 start = new Vec3(mc.thePlayer.posX,
+                mc.thePlayer.posY + LOW_HOP_Y_POSITIONS[2],
+                mc.thePlayer.posZ);
+        // Cast a ray at waist height in the direction moved in for 10 blocks
+        final MovingObjectPosition rayTrace = mc.theWorld.rayTraceBlocks(start,
+                getDstVec(start, direction, 0.0F, 8),
+                false, true, true);
+        // If did not hit anything just continue
+        if (rayTrace == null) return true;
+        if (rayTrace.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK)
+            return true;
+        if (rayTrace.hitVec == null) return true;
+
+        // Check if player can fit above
+        final AxisAlignedBB bb = mc.thePlayer.getEntityBoundingBox();
+        if (mc.theWorld.checkBlockCollision(
+                bb.offset(bb.minX - rayTrace.hitVec.xCoord,
+                        bb.minY - rayTrace.hitVec.yCoord,
+                        bb.minZ - rayTrace.hitVec.zCoord)))
+            return false;
+
+        // Distance to the block hit
+        final double dist = start.distanceTo(rayTrace.hitVec);
+        final double normalJumpDist = 4.0;
+        return dist > normalJumpDist;
+    }
+
+
     public double calculateJumpDistance(final double baseMoveSpeedRef,
-                                               double[] velocity, // Re-use velocity to store velocity
-                                               double lastDist, // Re-use lastDist to store the lastDist
-                                               final MotionModificationFunc motionModificationFunc) {
+                                        double[] velocity, // Re-use velocity to store velocity
+                                        double lastDist, // Re-use lastDist to store the lastDist
+                                        final MotionModificationFunc motionModificationFunc) {
         double posY = 0.0;
 
         double totalDistance = 0.0;

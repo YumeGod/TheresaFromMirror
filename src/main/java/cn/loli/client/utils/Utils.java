@@ -11,7 +11,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityAgeable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockPos;
+import net.minecraft.util.MathHelper;
 import net.minecraft.util.Session;
+import net.minecraft.util.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -26,6 +28,10 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Utils {
     private static final Random RANDOM = new Random();
     public static final Minecraft mc = Minecraft.getMinecraft();
+
+
+    protected final double RAD_TO_DEG = 180.0 / Math.PI;
+    protected final double DEG_TO_RAD = Math.PI / 180.0;
 
     /**
      * This function returns a random value between min and max
@@ -247,7 +253,7 @@ public class Utils {
         return (float) threadLocalRandom.nextDouble(min, max);
     }
 
-    public static double round(final double value, final double inc) {
+    public double round(final double value, final double inc) {
         if (inc == 0.0) return value;
         else if (inc == 1.0) return Math.round(value);
         else {
@@ -260,6 +266,41 @@ public class Utils {
             else return new BigDecimal(floored)
                     .doubleValue();
         }
+    }
+
+
+    /**
+     * Adapted from {@link Entity#getVectorForRotation}
+     */
+    protected Vec3 getPointedVec(final float yaw,
+                                 final float pitch) {
+        final double theta = -Math.cos(-pitch * DEG_TO_RAD);
+
+        return new Vec3(Math.sin(-yaw * DEG_TO_RAD - Math.PI) * theta,
+                Math.sin(-pitch * DEG_TO_RAD),
+                Math.cos(-yaw * DEG_TO_RAD - Math.PI) * theta);
+    }
+
+
+    protected Vec3 getDstVec(final Vec3 src,
+                             final float yaw,
+                             final float pitch,
+                             final double reach) {
+        final Vec3 rotationVec = getPointedVec(yaw, pitch);
+        return src.addVector(rotationVec.xCoord * reach,
+                rotationVec.yCoord * reach,
+                rotationVec.zCoord * reach);
+    }
+
+    protected float calculateYawFromSrcToDst(final float yaw,
+                                                 final double srcX,
+                                                 final double srcZ,
+                                                 final double dstX,
+                                                 final double dstZ) {
+        final double xDist = dstX - srcX;
+        final double zDist = dstZ - srcZ;
+        final float var1 = (float) (StrictMath.atan2(zDist, xDist) * 180.0 / Math.PI) - 90.0F;
+        return yaw + MathHelper.wrapAngleTo180_float(var1 - yaw);
     }
 
 }

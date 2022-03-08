@@ -14,6 +14,7 @@ import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.network.play.client.C03PacketPlayer;
+import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;
 
 public class Speed extends Module {
@@ -26,7 +27,7 @@ public class Speed extends Module {
     double distance;
     int stage;
     double speed, less;
-    boolean lessSlow;
+    boolean wasOnGround;
 
     public Speed() {
         super("Speed", "Just You Speed Boost", ModuleCategory.MOVEMENT);
@@ -39,14 +40,12 @@ public class Speed extends Module {
 
     @Override
     public void onDisable() {
-
         if (mc.thePlayer != null && mc.theWorld != null) {
             ((IAccessorMinecraft) mc).getTimer().timerSpeed = 1.0F;
             ((IAccessorEntityPlayer) mc.thePlayer).setSpeedInAir(0.02F);
             stage = 0;
             speed = 0;
             less = 0;
-            lessSlow = false;
             distance = 0;
         }
     }
@@ -76,7 +75,7 @@ public class Speed extends Module {
                 if (playerUtils.isMoving2()) {
                     if (playerUtils.isInLiquid()) return;
                     if (boost.getObject()) {
-                        speed = getHypixelSpeed(stage) * 0.96;
+                        speed = getLegitSpeed(stage) * 0.96;
                         if (speed < moveUtils.getBaseMoveSpeed())
                             speed = moveUtils.getBaseMoveSpeed();
                     } else {
@@ -93,10 +92,38 @@ public class Speed extends Module {
                     mc.getNetHandler().addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX + event.getX(), mc.thePlayer.posY, mc.thePlayer.posZ + event.getZ(), true));
                     event.setX(event.getX() * 2);
                     event.setZ(event.getZ() * 2);
-              //      moveUtils.setMotion(event, moveUtils.getBaseMoveSpeed(0.2681, 0.2));
+                    //      moveUtils.setMotion(event, moveUtils.getBaseMoveSpeed(0.2681, 0.2));
                     mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + (0.11D * multiply.getObject()), mc.thePlayer.posZ);
                 } else {
                     moveUtils.setMotion(event, moveUtils.getBaseMoveSpeed(0.2691, 0.2));
+                }
+                break;
+            }
+            case "Bunny": {
+                if (playerUtils.isMoving2()) {
+                    double baseMoveSpeed = moveUtils.getBaseMoveSpeed(0.2871, 0.2);
+                    boolean shouldLowhop = !mc.gameSettings.keyBindJump.isKeyDown() &&
+                            !mc.thePlayer.isPotionActive(Potion.jump) && !mc.thePlayer.isCollidedHorizontally &&
+                            moveUtils.simJumpShouldDoLowHop(baseMoveSpeed);
+
+                    if (!mc.thePlayer.onGround && shouldLowhop && mc.thePlayer.fallDistance < 0.54)
+                        event.setY(mc.thePlayer.motionY = lowHopYModification(mc.thePlayer.motionY, moveUtils.round(mc.thePlayer.posY - (int) mc.thePlayer.posY, 0.001)));
+
+                    if (mc.thePlayer.onGround && !wasOnGround) {
+                        speed = baseMoveSpeed * 1.7;
+                        event.setY(mc.thePlayer.motionY = shouldLowhop ? 0.4F : moveUtils.getJumpHeight(mc.thePlayer));
+                        wasOnGround = true;
+                    } else if (wasOnGround) {
+                        wasOnGround = false;
+                        final double bunnySlope = 0.66 * (distance - baseMoveSpeed);
+                        speed = distance - bunnySlope;
+                    } else {
+                        speed = moveUtils.applyNCPFriction(mc.thePlayer, speed, distance, baseMoveSpeed);
+                    }
+
+                    speed = Math.max(speed, baseMoveSpeed);
+
+                    moveUtils.setMotion(event, speed);
                 }
                 break;
             }
@@ -122,7 +149,10 @@ public class Speed extends Module {
                     }
                     break;
                 }
-                case "Ground": {
+                case "Bunny": {
+                    double xDist = mc.thePlayer.posX - mc.thePlayer.lastTickPosX;
+                    double zDist = mc.thePlayer.posZ - mc.thePlayer.lastTickPosZ;
+                    distance = Math.sqrt(xDist * xDist + zDist * zDist);
                     break;
                 }
             }
@@ -137,7 +167,7 @@ public class Speed extends Module {
     }
 
 
-    private double getHypixelSpeed(int stage) {
+    private double getLegitSpeed(int stage) {
         double base = 0;
 
         final double init = moveUtils.getBaseMoveSpeed() + (moveUtils.getSpeedEffect() * 0.075);
@@ -147,5 +177,22 @@ public class Speed extends Module {
         else if (stage >= 1) base = slowDown;
 
         return Math.max(base, moveUtils.getBaseMoveSpeed());
+    }
+
+    private double lowHopYModification(final double baseMotionY,
+                                       final double yDistFromGround) {
+        if (yDistFromGround == moveUtils.LOW_HOP_Y_POSITIONS[0]) {
+            return 0.31;
+        } else if (yDistFromGround == moveUtils.LOW_HOP_Y_POSITIONS[1]) {
+            return 0.04;
+        } else if (yDistFromGround == moveUtils.LOW_HOP_Y_POSITIONS[2]) {
+            return -0.2;
+        } else if (yDistFromGround == moveUtils.LOW_HOP_Y_POSITIONS[3]) {
+            return -0.14;
+        } else if (yDistFromGround == moveUtils.LOW_HOP_Y_POSITIONS[4]) {
+            return -0.2;
+        }
+
+        return baseMotionY;
     }
 }
