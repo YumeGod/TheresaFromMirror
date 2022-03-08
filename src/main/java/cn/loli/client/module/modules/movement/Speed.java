@@ -1,6 +1,5 @@
 package cn.loli.client.module.modules.movement;
 
-import cn.loli.client.Main;
 import cn.loli.client.events.JumpEvent;
 import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PlayerMoveEvent;
@@ -9,19 +8,17 @@ import cn.loli.client.injection.mixins.IAccessorEntityPlayer;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.module.modules.combat.Aura;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
+import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.MathHelper;
-
-import java.util.concurrent.ThreadLocalRandom;
 
 public class Speed extends Module {
 
-    private final ModeValue modes = new ModeValue("Mode", "Mini", "PacketAbusing", "Mini");
+    private final ModeValue modes = new ModeValue("Mode", "Mini", "PacketAbusing", "Mini", "Zoom", "Bunny");
     private final NumberValue<Float> multiply = new NumberValue<>("Multiply", 1f, 1f, 2f);
     private final BooleanValue boost = new BooleanValue("Boost", true);
     private final BooleanValue clips = new BooleanValue("Clips", true);
@@ -91,6 +88,18 @@ public class Speed extends Module {
                 }
                 break;
             }
+            case "Zoom": {
+                if (playerUtils.isMoving2() && playerUtils.isOnGround(0.01) && !mc.thePlayer.isCollidedHorizontally) {
+                    mc.getNetHandler().addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX + event.getX(), mc.thePlayer.posY, mc.thePlayer.posZ + event.getZ(), true));
+                    event.setX(event.getX() * 2);
+                    event.setZ(event.getZ() * 2);
+              //      moveUtils.setMotion(event, moveUtils.getBaseMoveSpeed(0.2681, 0.2));
+                    mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + (0.11D * multiply.getObject()), mc.thePlayer.posZ);
+                } else {
+                    moveUtils.setMotion(event, moveUtils.getBaseMoveSpeed(0.2691, 0.2));
+                }
+                break;
+            }
         }
 
     }
@@ -111,6 +120,9 @@ public class Speed extends Module {
                             mc.thePlayer.setPosition(mc.thePlayer.posX - motionX, mc.thePlayer.posY + (0.11D * multiply.getObject()), mc.thePlayer.posZ + motionZ);
                         }
                     }
+                    break;
+                }
+                case "Ground": {
                     break;
                 }
             }

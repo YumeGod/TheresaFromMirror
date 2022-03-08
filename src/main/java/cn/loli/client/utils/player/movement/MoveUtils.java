@@ -78,6 +78,15 @@ public class MoveUtils extends Utils {
         return baseSpeed;
     }
 
+    public double getBaseMoveSpeed(double speed , double v) {
+        double baseSpeed = speed;
+        if (Minecraft.getMinecraft().thePlayer.isPotionActive(Potion.moveSpeed)) {
+            int amplifier = Minecraft.getMinecraft().thePlayer.getActivePotionEffect(Potion.moveSpeed).getAmplifier();
+            baseSpeed *= 1.0 + v * (amplifier + 1);
+        }
+        return baseSpeed;
+    }
+
 
     public double[] getSpeed(double speed, float yaw, boolean direction) {
         final double motionX = -Math.sin(Math.toRadians(direction ? getDirection(yaw) : yaw)) * speed;
