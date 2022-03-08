@@ -4,6 +4,7 @@ import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import com.darkmagician6.eventapi.EventTarget;
+import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.network.play.client.C03PacketPlayer;
 
 public class AntiFall extends Module {
@@ -14,16 +15,14 @@ public class AntiFall extends Module {
 
     @EventTarget
     public void onFall(MotionUpdateEvent event) {
-        event.setOnGround(true);
-        if (mc.thePlayer.fallDistance > 3.0) {
-            mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition
-                    (mc.thePlayer.posX,mc.thePlayer.posY + 2, mc.thePlayer.posZ, false));
-            mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition
-                    (mc.thePlayer.posX,mc.thePlayer.posY - 2, mc.thePlayer.posZ, false));
-            mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer(false));
+        if (event.getEventType() == EventType.PRE) {
+            if (mc.thePlayer.fallDistance > 3.0 && playerUtils.isOverVoid(mc)) {
+                event.setX(event.getX() * playerUtils.randomInRange(0.99, 1.01));
+                event.setZ(event.getZ() * playerUtils.randomInRange(0.99, 1.01));
+            }
         }
-    }
 
+    }
 
     public void blinkTo(double speed, float yaw) {
         this.blinkTo(speed, mc.thePlayer.posY + 1e-31, yaw, mc.thePlayer.onGround);

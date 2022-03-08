@@ -51,6 +51,7 @@ public class ModuleManager {
         addModule(new Step());
 
         //Player
+        addModule(new AntiFall());
         addModule(new AutoArmor());
         addModule(new AutoPlace());
         addModule(new AutoTools());

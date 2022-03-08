@@ -7,6 +7,7 @@ import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 
@@ -71,6 +72,24 @@ public class PlayerUtils extends Utils {
 
         return false;
     }
+
+    public boolean isOverVoid(final Minecraft mc) {
+        final AxisAlignedBB bb = mc.thePlayer.getEntityBoundingBox();
+        final double height = bb.maxY - bb.minY;
+
+        double offset = height;
+
+        AxisAlignedBB bbPos;
+
+        while (!mc.theWorld.checkBlockCollision((bbPos = bb.addCoord(0, -offset, 0)))) {
+            if (bbPos.minY <= 0.0) return true;
+
+            offset += height;
+        }
+
+        return false;
+    }
+
 
     public static PlayerUtils getInstance() {
         if (utils == null) {
