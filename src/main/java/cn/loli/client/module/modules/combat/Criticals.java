@@ -7,6 +7,7 @@ import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import cn.loli.client.module.modules.movement.Speed;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
@@ -100,11 +101,13 @@ public class Criticals extends Module {
 
             if ("Edit".equals(mode.getCurrentMode())) {
                 if (counter == offset.length) counter = 0;
+                Speed speed = Main.INSTANCE.moduleManager.getModule(Speed.class);
                 Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
                 if (entity == null) return;
                 if (mc.thePlayer.onGround) {
                     if (always.getObject() || entity.hurtResistantTime != 20)
-                        if (playerUtils.isMoving2()) {
+                        if (playerUtils.isMoving2() &&
+                                (!speed.getState() || !speed.modes.getCurrentMode().equals("Bunny"))) {
                             e.setY(e.getY() + (offset[counter]));
                             e.setOnGround(false);
                             counter++;

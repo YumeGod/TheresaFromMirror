@@ -20,7 +20,7 @@ import net.minecraft.util.MathHelper;
 
 public class Speed extends Module {
 
-    private final ModeValue modes = new ModeValue("Mode", "Mini", "PacketAbusing", "Mini", "Zoom", "Bunny");
+    public final ModeValue modes = new ModeValue("Mode", "Mini", "PacketAbusing", "Mini", "Zoom", "Bunny");
     private final NumberValue<Float> multiply = new NumberValue<>("Multiply", 1f, 1f, 2f);
     private final BooleanValue boost = new BooleanValue("Boost", true);
     private final BooleanValue clips = new BooleanValue("Clips", true);
