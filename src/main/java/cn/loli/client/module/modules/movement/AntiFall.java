@@ -1,4 +1,4 @@
-package cn.loli.client.module.modules.player;
+package cn.loli.client.module.modules.movement;
 
 import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.module.Module;
@@ -10,7 +10,7 @@ import net.minecraft.network.play.client.C03PacketPlayer;
 public class AntiFall extends Module {
 
     public AntiFall() {
-        super("AntiFall", "I am the first one to fixz antifalls maybe", ModuleCategory.PLAYER);
+        super("AntiFall", "I am the first one to fixz antifalls maybe", ModuleCategory.MOVEMENT);
     }
 
     @EventTarget

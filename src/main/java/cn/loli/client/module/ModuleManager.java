@@ -40,6 +40,7 @@ public class ModuleManager {
         addModule(new Velocity());
 
         //Movement
+        addModule(new AntiFall());
         addModule(new BaffleSpeed());
         addModule(new Speed());
         addModule(new FlagDetector());
@@ -51,7 +52,6 @@ public class ModuleManager {
         addModule(new Step());
 
         //Player
-        addModule(new AntiFall());
         addModule(new AutoArmor());
         addModule(new AutoPlace());
         addModule(new AutoTools());
