@@ -8,6 +8,7 @@ import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.player.NoRotate;
+import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.value.BooleanValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
@@ -30,6 +31,7 @@ public class Abuser extends Module {
     private final BooleanValue hypixel = new BooleanValue("Hypixel-Semi", false);
 
     public boolean hasDisable;
+    public double x, y, z;
 
     public Abuser() {
         super("Abuser", "Abuse Something which you can bypass some anti cheat", ModuleCategory.MISC);
@@ -92,13 +94,9 @@ public class Abuser extends Module {
                         mc.thePlayer.motionZ = 0.0D;
                     }
 
-                    if (((S08PacketPlayerPosLook) event.getPacket()).func_179834_f().contains(S08PacketPlayerPosLook.EnumFlags.X_ROT)) {
-                        f1 += mc.thePlayer.rotationPitch;
-                    }
-
-                    if (((S08PacketPlayerPosLook) event.getPacket()).func_179834_f().contains(S08PacketPlayerPosLook.EnumFlags.Y_ROT)) {
-                        f += mc.thePlayer.rotationYaw;
-                    }
+                    x = ((S08PacketPlayerPosLook) event.getPacket()).getX();
+                    y = ((S08PacketPlayerPosLook) event.getPacket()).getY();
+                    z = ((S08PacketPlayerPosLook) event.getPacket()).getZ();
 
                     mc.thePlayer.setPositionAndRotation(d0, d1, d2,
                             mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
@@ -120,6 +118,14 @@ public class Abuser extends Module {
                     if (mc.thePlayer.ticksExisted > 30 && !hasDisable)
                         hasDisable = true;
             }
+
+            if (event.getPacket() instanceof C03PacketPlayer) {
+                event.setCancelled(!hasDisable);
+                if (x == ((C03PacketPlayer) event.getPacket()).getPositionX() && y == ((C03PacketPlayer) event.getPacket()).getPositionY() && z == ((C03PacketPlayer) event.getPacket()).getPositionZ()) {
+                    event.setPacket(new C03PacketPlayer.C04PacketPlayerPosition(x, y, z, false));
+                    ChatUtils.info("i love sex " + event.isCancelled());
+                }
+            }
         }
     }
 
@@ -136,7 +142,6 @@ public class Abuser extends Module {
         if (event.getEventType() == EventType.PRE) {
             if (hypixel.getObject()) {
                 if (!hasDisable) {
-                    mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(0, 0, 0, mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch, false));
                     event.setX(1993634.696969696969);
                     event.setY(1993634.696969696969);
                     event.setZ(1993634.696969696969);

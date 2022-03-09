@@ -93,7 +93,6 @@ public class Speed extends Module {
                     mc.getNetHandler().addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX + event.getX(), mc.thePlayer.posY, mc.thePlayer.posZ + event.getZ(), true));
                     event.setX(event.getX() * 2);
                     event.setZ(event.getZ() * 2);
-                    //      moveUtils.setMotion(event, moveUtils.getBaseMoveSpeed(0.2681, 0.2));
                     mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + (0.11D * multiply.getObject()), mc.thePlayer.posZ);
                 } else {
                     moveUtils.setMotion(event, moveUtils.getBaseMoveSpeed(0.2691, 0.2));

@@ -19,7 +19,8 @@ public class NoRotate extends Module {
     public void onPacket(PacketEvent event) {
         if (event.getPacket() instanceof S08PacketPlayerPosLook) {
             if (mc.thePlayer != null && mc.theWorld != null) {
-                if (!Main.INSTANCE.moduleManager.getModule(Abuser.class).getState() && mc.thePlayer.rotationPitch == 0.0F) return;
+                if (!Main.INSTANCE.moduleManager.getModule(Abuser.class).getState() && mc.thePlayer.rotationPitch == 0.0F)
+                    return;
 
                 double d0 = ((S08PacketPlayerPosLook) event.getPacket()).getX();
                 double d1 = ((S08PacketPlayerPosLook) event.getPacket()).getY();
@@ -52,6 +53,10 @@ public class NoRotate extends Module {
                 if (((S08PacketPlayerPosLook) event.getPacket()).func_179834_f().contains(S08PacketPlayerPosLook.EnumFlags.Y_ROT)) {
                     f += mc.thePlayer.rotationYaw;
                 }
+
+                Main.INSTANCE.moduleManager.getModule(Abuser.class).x = ((S08PacketPlayerPosLook) event.getPacket()).getX();
+                Main.INSTANCE.moduleManager.getModule(Abuser.class).y = ((S08PacketPlayerPosLook) event.getPacket()).getY();
+                Main.INSTANCE.moduleManager.getModule(Abuser.class).z = ((S08PacketPlayerPosLook) event.getPacket()).getZ();
 
                 mc.thePlayer.setPositionAndRotation(d0, d1, d2,
                         mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
