@@ -60,6 +60,8 @@ public class ESP extends Module {
     public final ColorValue throughWallsColor = new ColorValue("Cham-ThroughWalls-Color", new Color(23, 74, 183, 210));
 
 
+    //TODO: ESP Overlay
+
     int rainbowOffset;
 
     public ESP() {

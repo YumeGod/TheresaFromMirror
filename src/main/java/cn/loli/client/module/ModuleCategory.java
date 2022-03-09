@@ -10,6 +10,8 @@ public enum ModuleCategory {
     WORLD("World"),
     MISC("Misc");
 
+    //TODO: SkyBlocks and other mods
+
     private final String name;
 
     ModuleCategory(String name) {

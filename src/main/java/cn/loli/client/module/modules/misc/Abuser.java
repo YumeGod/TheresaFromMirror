@@ -123,7 +123,6 @@ public class Abuser extends Module {
                 event.setCancelled(!hasDisable);
                 if (x == ((C03PacketPlayer) event.getPacket()).getPositionX() && y == ((C03PacketPlayer) event.getPacket()).getPositionY() && z == ((C03PacketPlayer) event.getPacket()).getPositionZ()) {
                     event.setPacket(new C03PacketPlayer.C04PacketPlayerPosition(x, y, z, false));
-                    ChatUtils.info("i love sex " + event.isCancelled());
                 }
             }
         }
