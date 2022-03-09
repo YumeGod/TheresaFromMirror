@@ -93,6 +93,7 @@ public class ModuleManager {
         addModule(new AntiBot());
         addModule(new AntiVanish());
         addModule(new AlwaysRotate());
+        addModule(new AutoPlay());
         addModule(new Spoofer());
         addModule(new IgnoreCommands());
         addModule(new HUD()); // Needs to be second last

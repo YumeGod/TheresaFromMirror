@@ -38,6 +38,7 @@
     "IAccessorNetHandlerPlayClient",
     "MixinBlockModelRenderer",
     "MixinFontRenderer",
+    "MixinGuiNewChat",
     "MixinMovementInputFromOptions",
     "MixinNetHandlerPlayClient",
     "MixinVisGraph",
