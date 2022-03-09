@@ -7,8 +7,10 @@ import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.timer.TimeHelper;
+import cn.loli.client.utils.player.rotation.RotationHook;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
+import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.block.BlockLiquid;
@@ -23,7 +25,13 @@ public class AutoFish extends Module {
 
     private final BooleanValue cast = new BooleanValue("Cast", false);
     private final BooleanValue move = new BooleanValue("Auto-Move", false);
+
+    private final BooleanValue glitch = new BooleanValue("Glitch", false);
     private final BooleanValue lock = new BooleanValue("Locked", false);
+
+    private static final NumberValue<Integer> role = new NumberValue<>("Rod Handle Delay", 4500, 2000, 5000);
+    private static final NumberValue<Integer> hold = new NumberValue<>("Catch Delay", 150, 0, 300);
+    private static final NumberValue<Integer> rerole = new NumberValue<>("Re Cast Delay", 150, 0, 500);
 
     private final TimeHelper timer = new TimeHelper();
     private boolean shouldCatch = false;
@@ -39,7 +47,8 @@ public class AutoFish extends Module {
     public void onPacket(PacketEvent e) {
         if (e.getPacket() instanceof S29PacketSoundEffect) {
             S29PacketSoundEffect packet = (S29PacketSoundEffect) e.getPacket();
-            if (!shouldReCast && staticCheck() && packet.getSoundName().equals("random.splash") && !mode.getCurrentMode().equalsIgnoreCase("Bounce")) {
+            if (!shouldReCast && packet.getSoundName().equals("random.splash")
+                    && !mode.getCurrentMode().equalsIgnoreCase("Bounce")) {
                 shouldCatch = true;
                 timer.reset();
             }
@@ -51,13 +60,19 @@ public class AutoFish extends Module {
     public void onMove(MotionUpdateEvent e) {
         if (e.getEventType() == EventType.PRE) {
             if (mc.thePlayer.getHeldItem().getItem() == Items.fishing_rod) {
-                if (move.getObject()) {
-                    e.setX(e.getX() + playerUtils.randomInRange(-0.049, 0.049));
-                    e.setZ(e.getZ() - playerUtils.randomInRange(-0.049, 0.049));
+                if (move.getObject())
+                    if (mc.thePlayer.ticksExisted % 2 == 0)
+                        moveUtils.addMotion(0.18, RotationHook.yaw + 90);
+                    else
+                        moveUtils.addMotion(-0.18, RotationHook.yaw + 90);
+
+                if (glitch.getObject()) {
+                    e.setX(e.getX() + mc.thePlayer.ticksExisted % 2 == 0 ? 1 : -1 * playerUtils.randomInRange(0.01, 0.02));
+                    e.setZ(e.getZ() + mc.thePlayer.ticksExisted % 2 == 0 ? 1 : -1 * playerUtils.randomInRange(0.01, 0.02));
                 }
                 if (lock.getObject()) {
-                    e.setYaw((float) (yaw * playerUtils.randomInRange(0.98, 1.02)));
-                    e.setPitch(pitch);
+                    e.setYaw((float) (yaw * playerUtils.randomInRange(0.99, 1.01)));
+                    e.setPitch((float) (pitch * playerUtils.randomInRange(0.99, 1.01)));
                 }
             }
         }
@@ -81,13 +96,13 @@ public class AutoFish extends Module {
 
         if (mc.thePlayer.fishEntity == null) {
             if (shouldReCast) {
-                if (timer.hasReached(450)) {
+                if (timer.hasReached(rerole.getObject())) {
                     ((IAccessorMinecraft) mc).invokeRightClickMouse();
                     timer.reset();
                     shouldCatch = false;
                     shouldReCast = false;
                 }
-            } else if (cast.getObject() && timer.hasReached(4500)) {
+            } else if (cast.getObject() && timer.hasReached(role.getObject())) {
                 ((IAccessorMinecraft) mc).invokeRightClickMouse();
                 timer.reset();
                 shouldCatch = false;
@@ -95,7 +110,7 @@ public class AutoFish extends Module {
             }
         } else if (staticCheck() && waterCheck()) {
             if (shouldCatch) {
-                if (timer.hasReached(350)) {
+                if (timer.hasReached(hold.getObject())) {
                     ((IAccessorMinecraft) mc).invokeRightClickMouse();
                     timer.reset();
                     shouldCatch = false;
