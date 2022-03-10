@@ -225,64 +225,7 @@ public class AutoFarm extends Module {
 
         return temp && mc.thePlayer.getDistance(position.getX(), position.getY(), position.getZ()) <= 18;
     }
-    
-    /*
-    private boolean isBlockValid(BlockPos position, boolean isPlant) {
-        boolean valid = false;
-        Block target = mc.theWorld.getBlockState(position).getBlock();
-        if (isPlant) {
-            if (target instanceof BlockFarmland) {
-                BlockFarmland farmland = (BlockFarmland) target;
-                if (!(mc.theWorld.getBlockState(position.offset(EnumFacing.UP)).getBlock() instanceof BlockCrops) && farmland.getMetaFromState(mc.theWorld.getBlockState(position)) == 7) {
-                    valid = true;
-                }
-            } else if (target instanceof BlockSoulSand) {
-                if (!(mc.theWorld.getBlockState(position.offset(EnumFacing.UP)).getBlock() instanceof BlockNetherWart)) {
-                    valid = true;
-                }
-            } else if ((target instanceof BlockDirt || target instanceof BlockGrass || target instanceof BlockSand) && !(mc.theWorld.getBlockState(position.offset(EnumFacing.UP)).getBlock() instanceof BlockCrops) && !(mc.theWorld.getBlockState(position.offset(EnumFacing.UP)).getBlock() instanceof BlockReed) && mc.theWorld.isAnyLiquid(target.getCollisionBoundingBox(mc.theWorld, position, mc.theWorld.getBlockState(position)))) {
-                valid = true;
-            }
-        } else {
-            if (target instanceof BlockCrops) {
-                BlockCrops crops = (BlockCrops) target;
-                valid = crops.getMetaFromState(mc.theWorld.getBlockState(position)) == 7;
-            } else if (target instanceof BlockNetherWart) {
-                BlockNetherWart wart = (BlockNetherWart) target;
-                valid = wart.getMetaFromState(mc.theWorld.getBlockState(position)) == 3;
-            } else if (target instanceof BlockReed) {
-                valid = mc.theWorld.getBlockState(position.offset(EnumFacing.DOWN)).getBlock() instanceof BlockReed;
-            }
-        }
-        return valid && getFacingDirectionToPosition(position) != null && mc.thePlayer.getDistance(position.getX(), position.getY(), position.getZ()) < 24.0;
-    }
-    */
 
-    private boolean isStackValid(ItemStack stack) {
-        if (stack == null) {
-            return false;
-        }
-        Block block = mc.theWorld.getBlockState(this.action.pos).getBlock();
-        return block instanceof BlockFarmland ? stack.getItem() instanceof ItemSeeds || stack.getItem() == Items.carrot || stack.getItem() == Items.potato : (block instanceof BlockSoulSand ? stack.getItem() == Items.nether_wart : (block instanceof BlockDirt || block instanceof BlockGrass || block instanceof BlockSand) && mc.theWorld.isAnyLiquid(block.getCollisionBoundingBox(mc.theWorld, this.action.pos, mc.theWorld.getBlockState(this.action.pos))) && stack.getItem() instanceof ItemReed);
-    }
-
-    private EnumFacing getFacingDirectionToPosition(BlockPos position) {
-        EnumFacing direction = null;
-        if (!mc.theWorld.getBlockState(position.add(0, 1, 0)).getBlock().isBlockNormalCube()) {
-            direction = EnumFacing.UP;
-        } else if (!mc.theWorld.getBlockState(position.add(0, -1, 0)).getBlock().isBlockNormalCube()) {
-            direction = EnumFacing.DOWN;
-        } else if (!mc.theWorld.getBlockState(position.add(1, 0, 0)).getBlock().isBlockNormalCube()) {
-            direction = EnumFacing.EAST;
-        } else if (!mc.theWorld.getBlockState(position.add(-1, 0, 0)).getBlock().isBlockNormalCube()) {
-            direction = EnumFacing.WEST;
-        } else if (!mc.theWorld.getBlockState(position.add(0, 0, 1)).getBlock().isBlockNormalCube()) {
-            direction = EnumFacing.SOUTH;
-        } else if (!mc.theWorld.getBlockState(position.add(0, 0, 1)).getBlock().isBlockNormalCube()) {
-            direction = EnumFacing.NORTH;
-        }
-        return direction;
-    }
 
     static class PlantSeedTask {
         private final BlockPos pos;
