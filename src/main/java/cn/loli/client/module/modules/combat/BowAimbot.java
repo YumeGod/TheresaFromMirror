@@ -93,7 +93,7 @@ public class BowAimbot extends Module {
     }
 
     @EventTarget
-    private void onTick(TickEvent event) {
+    private void onTick(UpdateEvent event) {
         if (!slient.getObject() && allowAiming(mc.thePlayer)) {
             mc.thePlayer.rotationYaw = yaw;
             mc.thePlayer.rotationPitch = pitch;
