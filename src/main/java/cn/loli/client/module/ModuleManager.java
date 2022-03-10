@@ -82,6 +82,7 @@ public class ModuleManager {
         addModule(new OldAnimations());
         addModule(new TargetHUD());
         addModule(new Tracers());
+        addModule(new Trajectories());
         addModule(new Trail());
         addModule(new ViewClip());
 
