@@ -93,7 +93,7 @@ public class AutoFarm extends Module {
         if (action != null) {
             if (action.pos != null) {
                 float[] rot = rotationUtils.faceBlock(action.pos, 0.0
-                        , false, false, false, true, false, false, 10);
+                        , true, true, false, true, false, false, 180);
                 yaw = rot[0];
                 pitch = rot[1];
                 ray = rotationUtils.rayCastedBlock(RotationHook.yaw, RotationHook.pitch);
