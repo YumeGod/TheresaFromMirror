@@ -215,6 +215,7 @@ public class Aura extends Module {
             event.setYaw(curYaw);
     }
 
+
     @EventTarget
     public void onJump(JumpYawEvent event) {
         if (moveFix.getObject() && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() && target != null)

@@ -6,6 +6,7 @@ import cn.loli.client.Main;
 import cn.loli.client.events.KeyEvent;
 import cn.loli.client.module.modules.combat.*;
 import cn.loli.client.module.modules.misc.*;
+import cn.loli.client.module.modules.misc.skyblock.AutoFarm;
 import cn.loli.client.module.modules.movement.*;
 import cn.loli.client.module.modules.player.*;
 import cn.loli.client.module.modules.render.*;
@@ -37,6 +38,7 @@ public class ModuleManager {
         addModule(new BowAimbot());
         addModule(new Criticals());
         addModule(new KeepSprint());
+        addModule(new Range());
         addModule(new Velocity());
 
         //Movement
@@ -93,6 +95,7 @@ public class ModuleManager {
         addModule(new AntiBot());
         addModule(new AntiVanish());
         addModule(new AlwaysRotate());
+       // addModule(new AutoFarm());
         addModule(new AutoFish());
         addModule(new AutoPlay());
         addModule(new Spoofer());
