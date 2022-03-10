@@ -12,13 +12,18 @@ import cn.loli.client.value.BooleanValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemReed;
+import net.minecraft.item.ItemSeedFood;
 import net.minecraft.item.ItemSeeds;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.MovingObjectPosition;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
@@ -30,6 +35,8 @@ public class AutoFarm extends Module {
     final List<PlantSeedTask> plantSeedTaskArrayList = new ArrayList<>();
     float yaw, pitch;
     TimeHelper time = new TimeHelper();
+    TimeHelper delay = new TimeHelper();
+    MovingObjectPosition ray;
 
     private final BooleanValue heuristic = new BooleanValue("Heuristic", false);
     private final BooleanValue slient = new BooleanValue("Slient-Rotate", false);
@@ -56,31 +63,41 @@ public class AutoFarm extends Module {
     private void onRotate(RenderEvent e) {
         if (!heuristic.getObject()) {
             if (time.hasReached(500)) {
-                for (double y = mc.thePlayer.posY + 12.0; y > mc.thePlayer.posY - 12.0; y -= 1.0) {
-                    for (double x = mc.thePlayer.posX - 12.0; x < mc.thePlayer.posX + 12.0; x += 1.0) {
-                        for (double z = mc.thePlayer.posZ - 12.0; z < mc.thePlayer.posZ + 12.0; z += 1.0) {
-                            BlockPos pos = new BlockPos(x, y, z);
+                for (int y = 6; y >= -1; --y)
+                    for (int x = -9; x <= 9; ++x)
+                        for (int z = -9; z <= 9; ++z)
+                            if (x != 0 || z != 0) {
+                                BlockPos pos = new BlockPos(mc.thePlayer.posX + (double) x, mc.thePlayer.posY + (double) y, mc.thePlayer.posZ + (double) z);
 
-                            if (!plantSeedTaskArrayList.contains(new PlantSeedTask(pos, false)) && isBlockValid(pos, false))
-                                plantSeedTaskArrayList.add(new PlantSeedTask(pos, false));
+                                if (!plantSeedTaskArrayList.contains(new PlantSeedTask(pos, true)) && isBlockValid(pos, true))
+                                    plantSeedTaskArrayList.add(new PlantSeedTask(pos, true));
 
-                            if (!plantSeedTaskArrayList.contains(new PlantSeedTask(pos, true)) && isBlockValid(pos, true))
-                                plantSeedTaskArrayList.add(new PlantSeedTask(pos, true));
-                        }
-                    }
-                }
+                                if (!plantSeedTaskArrayList.contains(new PlantSeedTask(pos, false)) && isBlockValid(pos, false))
+                                    plantSeedTaskArrayList.add(new PlantSeedTask(pos, false));
+
+                            }
+
                 time.reset();
             }
         }
 
-        plantSeedTaskArrayList.sort(Comparator.comparingDouble(o -> (mc.thePlayer.getDistance(o.pos.getX(), o.pos.getY(), o.pos.getZ()))));
-        action = plantSeedTaskArrayList.get(0);
+        plantSeedTaskArrayList.removeIf(task -> !isBlockValid(task.pos, task.isPlant));
 
-        if (action.pos != null) {
-            float[] rot = rotationUtils.faceBlock(action.pos, mc.theWorld.getBlockState(action.pos).getBlock().getBlockBoundsMaxY() - mc.theWorld.getBlockState(action.pos).getBlock().getBlockBoundsMinY() + 0.5D,
-                    false, false, false, false, false, false, 180);
-            yaw = rot[0];
-            pitch = rot[1];
+        plantSeedTaskArrayList.sort
+                (Comparator.comparingDouble(o -> (mc.thePlayer.getDistance(o.pos.getX(), o.pos.getY(), o.pos.getZ()))));
+
+        if ((action == null || !plantSeedTaskArrayList.contains(action))
+                && !plantSeedTaskArrayList.isEmpty())
+            action = plantSeedTaskArrayList.get(0);
+
+        if (action != null) {
+            if (action.pos != null) {
+                float[] rot = rotationUtils.faceBlock(action.pos, 0.0
+                        , false, false, false, true, false, false, 10);
+                yaw = rot[0];
+                pitch = rot[1];
+                ray = rotationUtils.rayCastedBlock(RotationHook.yaw, RotationHook.pitch);
+            }
         } else {
             yaw = mc.thePlayer.rotationYaw;
             pitch = mc.thePlayer.rotationPitch;
@@ -91,29 +108,47 @@ public class AutoFarm extends Module {
     private void onSort(TickEvent e) {
         if (Keyboard.isKeyDown(Keyboard.KEY_LMENU)) return;
 
-        if (action.pos != null) {
-            if (mc.thePlayer.getDistance(action.pos.getX(), action.pos.getY(), action.pos.getZ()) > 1)
-                moveUtils.addMotion(0.02, RotationHook.yaw);
-        }
         if (!slient.getObject()) {
             mc.thePlayer.rotationYaw = yaw;
             mc.thePlayer.rotationPitch = pitch;
         }
 
         if (action.pos != null) {
-            if (isBlockValid(action.pos, action.isPlant)) {
-                if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getCurrentEquippedItem(), action.pos, getFacingDirectionToPosition(action.pos), new Vec3(action.pos.getX(), action.pos.getY(), action.pos.getZ()))) {
+            KeyBinding.setKeyBindState(mc.gameSettings.keyBindJump.getKeyCode(), mc.thePlayer.isCollidedHorizontally);
+
+            if (mc.thePlayer.getDistance(action.pos.getX(), action.pos.getY(), action.pos.getZ()) > 1)
+                moveUtils.setSpeed(0.22, RotationHook.yaw);
+        }
+
+        if (ray.sideHit != null) {
+            if (ray.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK)
+                return;
+
+            if (action.isPlant) {
+                if (!isBlockValid(ray.getBlockPos(), true))
+                    return;
+
+                if (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, mc.thePlayer.getCurrentEquippedItem(),
+                        ray.getBlockPos(), ray.sideHit, ray.hitVec)) {
                     mc.thePlayer.swingItem();
-                }
-            } else if (isBlockValid(action.pos, !action.isPlant)) {
-                if (mc.playerController.clickBlock(action.pos, getFacingDirectionToPosition(action.pos))) {
-                    mc.thePlayer.swingItem();
+                    plantSeedTaskArrayList.remove(action);
+                    action = null;
+
+                    delay.reset();
                 }
             } else {
-                action = null;
-            }
+                if (!isBlockValid(ray.getBlockPos(), false))
+                    return;
 
-            plantSeedTaskArrayList.remove(action);
+                if (mc.playerController.onPlayerDamageBlock(ray.getBlockPos(), ray.sideHit)) {
+                    mc.thePlayer.swingItem();
+                    plantSeedTaskArrayList.remove(action);
+                    action = null;
+
+                    delay.reset();
+                }
+
+            }
         }
     }
 
@@ -130,6 +165,68 @@ public class AutoFarm extends Module {
         }
     }
 
+    private boolean isBlockValid(BlockPos position, boolean isPlant) {
+        boolean temp = false;
+        Block block = mc.theWorld.getBlockState(position).getBlock();
+        if (isPlant) {
+            if (mc.thePlayer.getHeldItem().getItem() == Items.nether_wart) {
+                if (block instanceof BlockSoulSand) {
+                    if (mc.theWorld.getBlockState(position.up()).getBlock() == Blocks.air) {
+                        temp = true;
+                    }
+                }
+            }
+            if (mc.thePlayer.getHeldItem().getItem() == Items.reeds) {
+                if (block instanceof BlockGrass || block instanceof BlockDirt || block instanceof BlockSand) {
+                    if (mc.theWorld.getBlockState(position.up()).getBlock() == Blocks.air) {
+                        for (EnumFacing side : EnumFacing.Plane.HORIZONTAL) {
+                            IBlockState blockState = mc.theWorld.getBlockState(position.offset(side));
+                            if (blockState.getBlock().getMaterial() == Material.water || blockState.getBlock() == Blocks.ice) {
+                                temp = true;
+                            }
+                        }
+                    }
+                }
+            }
+            if (mc.thePlayer.getHeldItem().getItem() instanceof ItemSeeds || mc.thePlayer.getHeldItem().getItem() instanceof ItemSeedFood) {
+                if (block instanceof BlockFarmland) {
+                    if (mc.theWorld.getBlockState(position.up()).getBlock() == Blocks.air) {
+                        temp = true;
+                    }
+                }
+            }
+        } else {
+            if ((block instanceof BlockTallGrass) || (block instanceof BlockFlower) || (block instanceof BlockDoublePlant)) {
+                temp = true;
+            } else if (block instanceof BlockCrops) {
+                BlockCrops crops = (BlockCrops) block;
+                if (crops.getMetaFromState(mc.theWorld.getBlockState(position)) == 7) { // Crops are grown
+                    temp = true;
+                }
+            } else if (block instanceof BlockNetherWart) {
+                BlockNetherWart netherWart = (BlockNetherWart) block;
+                if (netherWart.getMetaFromState(mc.theWorld.getBlockState(position)) == 3) { // Nether Wart is grown
+                    temp = true;
+                }
+            } else if (block instanceof BlockReed) {
+                if (mc.theWorld.getBlockState(position.down()).getBlock() instanceof BlockReed) { // Check if a reed is under it
+                    temp = true;
+                }
+            } else if (block instanceof BlockCactus) {
+                if (mc.theWorld.getBlockState(position.down()).getBlock() instanceof BlockCactus) { // Check if a cactus is under it
+                    temp = true;
+                }
+            } else if (block instanceof BlockPumpkin) {
+                temp = true;
+            } else if (block instanceof BlockMelon) {
+                temp = true;
+            }
+        }
+
+        return temp && mc.thePlayer.getDistance(position.getX(), position.getY(), position.getZ()) <= 18;
+    }
+    
+    /*
     private boolean isBlockValid(BlockPos position, boolean isPlant) {
         boolean valid = false;
         Block target = mc.theWorld.getBlockState(position).getBlock();
@@ -159,6 +256,7 @@ public class AutoFarm extends Module {
         }
         return valid && getFacingDirectionToPosition(position) != null && mc.thePlayer.getDistance(position.getX(), position.getY(), position.getZ()) < 24.0;
     }
+    */
 
     private boolean isStackValid(ItemStack stack) {
         if (stack == null) {
@@ -170,17 +268,17 @@ public class AutoFarm extends Module {
 
     private EnumFacing getFacingDirectionToPosition(BlockPos position) {
         EnumFacing direction = null;
-        if (!mc.theWorld.getBlockState(position.add(0, 1, 0)).getBlock().isFullCube()) {
+        if (!mc.theWorld.getBlockState(position.add(0, 1, 0)).getBlock().isBlockNormalCube()) {
             direction = EnumFacing.UP;
-        } else if (!mc.theWorld.getBlockState(position.add(0, -1, 0)).getBlock().isFullCube()) {
+        } else if (!mc.theWorld.getBlockState(position.add(0, -1, 0)).getBlock().isBlockNormalCube()) {
             direction = EnumFacing.DOWN;
-        } else if (!mc.theWorld.getBlockState(position.add(1, 0, 0)).getBlock().isFullCube()) {
+        } else if (!mc.theWorld.getBlockState(position.add(1, 0, 0)).getBlock().isBlockNormalCube()) {
             direction = EnumFacing.EAST;
-        } else if (!mc.theWorld.getBlockState(position.add(-1, 0, 0)).getBlock().isFullCube()) {
+        } else if (!mc.theWorld.getBlockState(position.add(-1, 0, 0)).getBlock().isBlockNormalCube()) {
             direction = EnumFacing.WEST;
-        } else if (!mc.theWorld.getBlockState(position.add(0, 0, 1)).getBlock().isFullCube()) {
+        } else if (!mc.theWorld.getBlockState(position.add(0, 0, 1)).getBlock().isBlockNormalCube()) {
             direction = EnumFacing.SOUTH;
-        } else if (!mc.theWorld.getBlockState(position.add(0, 0, 1)).getBlock().isFullCube()) {
+        } else if (!mc.theWorld.getBlockState(position.add(0, 0, 1)).getBlock().isBlockNormalCube()) {
             direction = EnumFacing.NORTH;
         }
         return direction;
