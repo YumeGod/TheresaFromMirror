@@ -1,17 +1,16 @@
-package me.superskidder.utils;
-
 public class Entity {
     String name;
     State rank;
     boolean gotKey;
 
-    public Entity(String name) {
+
+    public Entity(String name , State rank , boolean gotKey) {
         this.name = name;
         this.rank = rank;
         this.gotKey = gotKey;
     }
 
-    public enum State {
+    enum State {
         ADMIN, USER
     }
 

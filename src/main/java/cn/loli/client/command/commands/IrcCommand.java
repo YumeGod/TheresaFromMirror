@@ -2,6 +2,7 @@ package cn.loli.client.command.commands;
 
 import cn.loli.client.Main;
 import cn.loli.client.command.Command;
+import cn.loli.client.connection.Entity;
 import cn.loli.client.connection.Packet;
 import cn.loli.client.connection.PacketUtil;
 import com.mojang.realmsclient.gui.ChatFormatting;
@@ -26,7 +27,8 @@ public class IrcCommand extends Command {
             sb.append(arg).append(" ");
         }
 
-        Main.cf.channel().writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, Main.INSTANCE.name + ChatFormatting.WHITE + ": " + ChatFormatting.GRAY + sb).pack());
+        Main.cf.channel().writeAndFlush(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey), PacketUtil.Type.MESSAGE,
+                Main.INSTANCE.name + ChatFormatting.WHITE + ": " + ChatFormatting.GRAY + sb).pack());
     }
 
     @Override

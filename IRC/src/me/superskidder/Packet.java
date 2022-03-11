@@ -7,21 +7,21 @@ import java.security.interfaces.RSAPrivateKey;
 
 public class Packet {
 
-    Entity user;
+    String user;
     String content;
     PacketUtil.Type type;
 
-    public Packet(Entity user, PacketUtil.Type type, String content) {
+    public Packet(String user, PacketUtil.Type type, String content) {
         this.user = user;
         this.type = type;
         this.content = content;
     }
 
     public String pack() {
-        if (!user.hasKey())
-            return user.getName() + "@NIGGA@" + type.name() + "@SKID@" + user.getName();
+        if (PacketUtil.Type.PONG.equals(type))
+            return user + "@NIGGA@" + type.name() + "@SKID@" + content;
 
-        return user.getName() + "@NIGGA@" +
-                RSAUtils.privateEncrypt(type.name() + "@SKID@" + content, (RSAPrivateKey) Server.INSTANCE.userAuth.get(user).getKeyPair().getPrivate());
+        return user + "@NIGGA@" +
+                RSAUtils.privateEncrypt(type.name() + "@SKID@" + content, Server.INSTANCE.userAuth.get(user).getKeyPair().getPrivate());
     }
 }

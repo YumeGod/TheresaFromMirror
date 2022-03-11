@@ -7,43 +7,25 @@ import java.util.Map;
 
 public class Handler {
 
-    List<Entity> entity;
-    Map<Entity, UserAuth> map;
+    Map<String, UserAuth> map;
 
     public Handler() {
-        entity = new ArrayList<>();
         this.map = new HashMap<>();
     }
 
-    public void addEntity(Entity e) {
-        entity.add(e);
-    }
-
-    public void removeEntity(Entity e) {
-        entity.remove(e);
-    }
-
-    public Entity getEntity(String name) {
-        for (Entity e : entity)
-            if (e.getName().equals(name))
-                return e;
-
-        return null;
-    }
-
-    public void handle(Entity user, UserAuth access) {
+    public void handle(String user, UserAuth access) {
         map.put(user, access);
     }
 
-    public Map<Entity, UserAuth> getMap() {
+    public Map<String, UserAuth> getMap() {
         return map;
     }
 
-    public UserAuth get(Entity user) {
+    public UserAuth get(String user) {
         return map.get(user);
     }
 
-    public void remove(Entity user) {
+    public void remove(String user) {
         map.remove(user);
     }
 

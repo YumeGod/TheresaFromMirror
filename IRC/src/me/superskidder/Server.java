@@ -22,28 +22,23 @@ import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 public class Server {
-    public ChannelFuture cf;
-    public int port;
-    public String db;
-    public String db_userName;
-    public String db_password;
+    public static ChannelFuture cf;
+    public static int port;
+    public static String db;
+    public static String db_userName;
+    public static String db_password;
 
-    public Map<String, String> ranks = new HashMap<>();
+    public static Map<String, String> ranks = new HashMap<>();
 
     public static Server INSTANCE;
 
-    Handler userAuth;
+    static Handler userAuth;
 
     public Server() {
         INSTANCE = this;
     }
 
     public static void main(String[] args) {
-        INSTANCE.ServerInit(args);
-    }
-
-
-    void ServerInit(String[] args) {
         // 初始化Handle
         userAuth = new Handler();
 
@@ -109,4 +104,6 @@ public class Server {
             }
         }
     }
+
+
 }

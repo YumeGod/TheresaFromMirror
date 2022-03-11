@@ -27,6 +27,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import net.minecraft.client.Minecraft;
@@ -53,6 +54,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.interfaces.RSAPublicKey;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Queue;
@@ -94,6 +96,9 @@ public class Main {
     public static ChannelFuture cf;
 
     boolean isDead = true;
+
+    public RSAPublicKey publicKey;
+    public boolean hasKey;
 
     public Main() {
         INSTANCE = this;
@@ -272,7 +277,6 @@ public class Main {
                             protected void initChannel(SocketChannel socketChannel) {
                                 socketChannel.pipeline().addLast(new StringEncoder(StandardCharsets.UTF_8));
                                 socketChannel.pipeline().addLast(new StringDecoder(Charset.forName("GBK")));
-
                                 socketChannel.pipeline().addLast(new NettyClientHandler());
                             }
                         });

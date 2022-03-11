@@ -1,6 +1,5 @@
 package me.superskidder.utils;
 
-import java.security.KeyPair;
 
 public class UserAuth {
 

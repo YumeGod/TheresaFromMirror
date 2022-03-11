@@ -10,10 +10,10 @@ import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import me.superskidder.datebase.VisitMySql;
 import me.superskidder.utils.Entity;
+import me.superskidder.utils.KeyPair;
 import me.superskidder.utils.RSAUtils;
 import me.superskidder.utils.UserAuth;
 
-import java.security.KeyPair;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -54,22 +54,18 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                 Map<String, String> rsaKey = RSAUtils.createKeys(1024);
 
                 //Try to get the entity from the database
-                Entity entity = Server.INSTANCE.userAuth.getEntity(p.user.getName());
+                System.out.println("Private Key for this boi: " + RSAUtils.getPrivateKey(rsaKey.get("privateKey")));
 
-                //Edit Status
-                p.user.setGotKey(true);
+                Entity entity = new Entity(p.user);
 
                 //Get the Key and put to map
-                Server.INSTANCE.userAuth.handle(p.user, new UserAuth(p.user, new KeyPair(RSAUtils.getPublicKey(rsaKey.get("publicKey"))
+                Server.INSTANCE.userAuth.handle(p.user, new UserAuth(entity, new KeyPair(RSAUtils.getPublicKey(rsaKey.get("publicKey"))
                         , RSAUtils.getPrivateKey(rsaKey.get("privateKey")))));
-
-                //Added Entity List
-                if (entity == null)
-                    Server.INSTANCE.userAuth.addEntity(p.user);
 
                 //get Public Key (Dont Forget to re Get it)
                 ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.PONG, rsaKey.get("publicKey")).pack());
 
+                System.out.println("Successful for Handle");
                 break;
             case LOGIN:
                 //Get the Info
@@ -78,7 +74,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                 System.out.println("Account" + info[0] + "  Password-  " + info[1] +
                         "  Contact-  " + info[2] + "  IP-  " + ctx.channel().remoteAddress() + "  Time-  " + sdf.format(new Date()));
 
-                System.out.println("Private Key for this boi: " + Server.INSTANCE.userAuth.get(p.user).getKeyPair().getPrivate());
+                System.out.println("Private Key for this boi: " + Server.userAuth.get(p.user).getKeyPair().getPrivate());
 
                 if (info.length == 3) {
                     String verify = VisitMySql.verify(info[0], info[1], info[2]);
@@ -97,14 +93,14 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
             case COMMAND:
                 break;
             case HEARTBEAT:
-                if (Objects.equals(p.content, "PING!")) {
+                if (Objects.equals(p.content, "PING!"))
                     ctx.channel().pipeline().writeAndFlush(new Packet(p.user, PacketUtil.Type.HEARTBEAT, "PONG!").pack());
-                }
+                else
+                    ctx.close();
                 break;
             case EXIT:
-                Server.INSTANCE.userAuth.removeEntity(p.user);
                 Server.INSTANCE.userAuth.remove(p.user);
-                System.out.println("Cya later " + p.user.getName());
+                System.out.println("Cya later " + p.user);
                 ctx.close();
                 break;
             case MESSAGE:
