@@ -8,7 +8,7 @@ import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.player.NoRotate;
-import cn.loli.client.utils.misc.ChatUtils;
+import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.value.BooleanValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
@@ -32,6 +32,7 @@ public class Abuser extends Module {
 
     public boolean hasDisable;
     public double x, y, z;
+    public TimeHelper timer = new TimeHelper();
 
     public Abuser() {
         super("Abuser", "Abuse Something which you can bypass some anti cheat", ModuleCategory.MISC);
@@ -64,8 +65,10 @@ public class Abuser extends Module {
         }
 
         if (hypixel.getObject()) {
-            if (event.getPacket() instanceof S07PacketRespawn)
+            if (event.getPacket() instanceof S07PacketRespawn) {
                 hasDisable = false;
+                timer.reset();
+            }
 
             if (event.getPacket() instanceof S08PacketPlayerPosLook
                     && !Main.INSTANCE.moduleManager.getModule(NoRotate.class).getState()) {
@@ -101,9 +104,9 @@ public class Abuser extends Module {
                     mc.thePlayer.setPositionAndRotation(d0, d1, d2,
                             mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
 
-                    if (hasDisable)
-                        mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
-                                ((S08PacketPlayerPosLook) event.getPacket()).getZ(), false));
+                    if (!hasDisable && timer.hasReached(2000))
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(13371337.696969, 13371337.696969,
+                                13371337.696969, true));
                     else
                         mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
                                 ((S08PacketPlayerPosLook) event.getPacket()).getZ(), ((S08PacketPlayerPosLook) event.getPacket()).getYaw(), ((S08PacketPlayerPosLook) event.getPacket()).getPitch(), false));
@@ -115,15 +118,18 @@ public class Abuser extends Module {
             if (event.getPacket() instanceof S32PacketConfirmTransaction) {
                 if (((S32PacketConfirmTransaction) event.getPacket()).getWindowId() == 0
                         && ((S32PacketConfirmTransaction) event.getPacket()).getActionNumber() < 0)
-                    if (mc.thePlayer.ticksExisted > 30 && !hasDisable)
+                    if (!hasDisable)
                         hasDisable = true;
             }
 
             if (event.getPacket() instanceof C03PacketPlayer) {
-                event.setCancelled(!hasDisable);
-                if (x == ((C03PacketPlayer) event.getPacket()).getPositionX() && y == ((C03PacketPlayer) event.getPacket()).getPositionY() && z == ((C03PacketPlayer) event.getPacket()).getPositionZ()) {
-                    event.setPacket(new C03PacketPlayer.C04PacketPlayerPosition(x, y, z, false));
+                //event.setCancelled(!hasDisable);
+                if (hasDisable){
+                    if (x == ((C03PacketPlayer) event.getPacket()).getPositionX() && y == ((C03PacketPlayer) event.getPacket()).getPositionY() && z == ((C03PacketPlayer) event.getPacket()).getPositionZ()) {
+                        event.setPacket(new C03PacketPlayer.C04PacketPlayerPosition(x, y, z, false));
+                    }
                 }
+
             }
         }
     }
@@ -140,11 +146,11 @@ public class Abuser extends Module {
     private void onMotionUpdate(MotionUpdateEvent event) {
         if (event.getEventType() == EventType.PRE) {
             if (hypixel.getObject()) {
-                if (!hasDisable) {
+                if (!hasDisable && timer.hasReached(2000)) {
                     event.setX(1993634.696969696969);
                     event.setY(1993634.696969696969);
                     event.setZ(1993634.696969696969);
-                    event.setOnGround(false);
+                    event.setOnGround(true);
                 }
             }
         }
