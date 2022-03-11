@@ -2,8 +2,6 @@ package cn.loli.client.connection;
 
 import cn.loli.client.Main;
 
-import java.security.interfaces.RSAPublicKey;
-
 public class PacketUtil {
 
     public static Packet unpack(String content) {
@@ -22,7 +20,7 @@ public class PacketUtil {
         }
 
         try {
-            strings[1] = RSAUtils.publicDecrypt(strings[1], (RSAPublicKey) Main.INSTANCE.publicKey);
+            strings[1] = RSAUtils.privateDecrypt(strings[1], RSAUtils.getPrivateKey(Main.INSTANCE.privateKey));
             i = new Packet(user, Type.valueOf(strings[1].split("@SKID@")[0]), strings[1].split("@SKID@")[1]);
         } catch (Exception e) {
             e.printStackTrace();

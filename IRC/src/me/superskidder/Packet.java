@@ -22,6 +22,6 @@ public class Packet {
             return user + "@NIGGA@" + type.name() + "@SKID@" + content;
 
         return user + "@NIGGA@" +
-                RSAUtils.privateEncrypt(type.name() + "@SKID@" + content, Server.INSTANCE.userAuth.get(user).getKeyPair().getPrivate());
+                RSAUtils.publicEncrypt(type.name() + "@SKID@" + content, Server.INSTANCE.userAuth.get(user).getKeyPair().getPublic());
     }
 }

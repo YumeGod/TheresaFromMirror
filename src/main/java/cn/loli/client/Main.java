@@ -4,6 +4,7 @@ package cn.loli.client;
 
 import cn.loli.client.command.CommandManager;
 import cn.loli.client.connection.NettyClientHandler;
+import cn.loli.client.connection.RSAUtils;
 import cn.loli.client.events.LoopEvent;
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.events.TextEvent;
@@ -12,6 +13,7 @@ import cn.loli.client.file.FileManager;
 import cn.loli.client.gui.ttfr.FontLoaders;
 import cn.loli.client.module.ModuleManager;
 import cn.loli.client.protection.GuiCrashMe;
+import cn.loli.client.protection.KeyPair;
 import cn.loli.client.protection.ProtectionThread;
 import cn.loli.client.utils.misc.ExploitFix;
 import cn.loli.client.utils.misc.timer.TimeHelper;
@@ -25,7 +27,6 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import net.minecraft.client.Minecraft;
@@ -52,8 +53,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -95,7 +99,10 @@ public class Main {
 
     boolean isDead = true;
 
-    public RSAPublicKey publicKey;
+
+    public String privateKey;
+    public String publicKey;
+
     public boolean hasKey;
 
     public Main() {
@@ -277,7 +284,8 @@ public class Main {
                                 socketChannel.pipeline().addLast(new StringDecoder(Charset.forName("GBK")));
                                 socketChannel.pipeline().addLast(new NettyClientHandler());
                             }
-                        }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(65535));;
+                        }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(65535));
+                ;
                 cf = bootstrap.connect("101.43.166.241", 9822).sync();
                 println("Client started!");
                 cf.channel().closeFuture().sync();
@@ -340,6 +348,9 @@ public class Main {
                     Main.INSTANCE.name = name.getText();
                     Main.INSTANCE.password = (new String(password.getPassword()));
 
+                    Map<String, String> keyMap = RSAUtils.createKeys(2048);
+                    Main.INSTANCE.publicKey = keyMap.get("publicKey");
+                    Main.INSTANCE.privateKey = keyMap.get("privateKey");
                     setVisible(false);
                 }
             });

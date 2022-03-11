@@ -59,11 +59,12 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                 Entity entity = new Entity(p.user);
 
                 //Get the Key and put to map
-                Server.INSTANCE.userAuth.handle(p.user, new UserAuth(entity, new KeyPair(RSAUtils.getPublicKey(rsaKey.get("publicKey"))
+                Server.INSTANCE.userAuth.handle(p.user, new UserAuth(entity, new KeyPair(RSAUtils.getPublicKey(p.content)
                         , RSAUtils.getPrivateKey(rsaKey.get("privateKey")))));
 
                 //get Public Key (Dont Forget to re Get it)
-                ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.PONG, rsaKey.get("publicKey")).pack());
+                //Then send the Public Key to the Client
+                ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.PONG, RSAUtils.publicEncrypt(rsaKey.get("publicKey"), Server.INSTANCE.userAuth.get(p.user).getKeyPair().getPublic())).pack());
 
                 System.out.println("Successful for Handle");
                 break;

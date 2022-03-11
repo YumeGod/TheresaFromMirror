@@ -15,10 +15,9 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        System.out.println("Client connected!");
 
         ctx.channel().writeAndFlush(new String(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey),
-                PacketUtil.Type.PING, Main.INSTANCE.name).pack().getBytes(), StandardCharsets.UTF_8));
+                PacketUtil.Type.PING, Main.INSTANCE.publicKey).pack().getBytes(), StandardCharsets.UTF_8));
 
 
         new Thread(() -> {
@@ -44,13 +43,15 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
             switch (p.type) {
                 case PONG:
                     try {
-                        Main.INSTANCE.publicKey = RSAUtils.getPublicKey(result);
+                        Main.INSTANCE.publicKey = RSAUtils.privateDecrypt(p.content, RSAUtils.getPrivateKey(Main.INSTANCE.privateKey));
                     } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-                        e.printStackTrace();
+                       Main.INSTANCE.doCrash();
                     }
                     Main.INSTANCE.hasKey = true;
                     channelHandlerContext.channel().writeAndFlush(new String(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey),
                             PacketUtil.Type.LOGIN, (Main.INSTANCE.name + "|" + Main.INSTANCE.password + "|" + HWIDUtil.getHWID())).pack().getBytes(), StandardCharsets.UTF_8));
+
+                    Main.INSTANCE.println("Client connected!");
                 case LOGIN:
                 case COMMAND:
                 case HEARTBEAT:
