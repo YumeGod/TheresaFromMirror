@@ -94,10 +94,8 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
             case COMMAND:
                 break;
             case HEARTBEAT:
-                if (Objects.equals(p.content, "PING!"))
-                    ctx.channel().pipeline().writeAndFlush(new Packet(p.user, PacketUtil.Type.HEARTBEAT, "PONG!").pack());
-                else
-                    ctx.close();
+                String i = p.content.replace("PING" , "PONG");;
+                ctx.channel().pipeline().writeAndFlush(new Packet(p.user, PacketUtil.Type.HEARTBEAT, i).pack());
                 break;
             case EXIT:
                 Server.INSTANCE.userAuth.remove(p.user);

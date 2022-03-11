@@ -1,6 +1,7 @@
 package cn.loli.client.connection;
 
 import cn.loli.client.Main;
+import cn.loli.client.utils.misc.CrashUtils;
 import cn.loli.client.utils.protection.HWIDUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -10,8 +11,12 @@ import net.minecraft.util.ChatComponentText;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Objects;
 
 public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
+
+    CrashUtils crashUtils = new CrashUtils();
+    String ping;
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
@@ -27,8 +32,11 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                if (Main.INSTANCE.hasKey)
-                    ctx.channel().writeAndFlush(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey), PacketUtil.Type.HEARTBEAT, "PING!").pack());
+                if (Main.INSTANCE.hasKey) {
+                    ping = "PING!" + crashUtils.AlphabeticRandom(10);
+                    ctx.channel().writeAndFlush(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey), PacketUtil.Type.HEARTBEAT, ping).pack());
+
+                }
             }
         }).start();
     }
@@ -45,16 +53,21 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
                     try {
                         Main.INSTANCE.publicKey = RSAUtils.privateDecrypt(p.content, RSAUtils.getPrivateKey(Main.INSTANCE.privateKey));
                     } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-                       Main.INSTANCE.doCrash();
+                        Main.INSTANCE.doCrash();
                     }
                     Main.INSTANCE.hasKey = true;
                     channelHandlerContext.channel().writeAndFlush(new String(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey),
                             PacketUtil.Type.LOGIN, (Main.INSTANCE.name + "|" + Main.INSTANCE.password + "|" + HWIDUtil.getHWID())).pack().getBytes(), StandardCharsets.UTF_8));
 
                     Main.INSTANCE.println("Client connected!");
+                    break;
                 case LOGIN:
                 case COMMAND:
                 case HEARTBEAT:
+                    String i = p.content.replace("PONG", "PING");
+
+                    if (!Objects.equals(i, ping))
+                        channelHandlerContext.close();
                 case EXIT:
                     break;
                 case MESSAGE:
