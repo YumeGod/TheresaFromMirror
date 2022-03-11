@@ -5,12 +5,17 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import me.superskidder.datebase.VisitMySql;
+import me.superskidder.utils.RSAUtils;
+import me.superskidder.utils.UserAuth;
 
+import java.security.KeyPair;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
 import java.util.Objects;
 
 import static me.superskidder.PacketUtil.unpack;
@@ -24,23 +29,29 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
             IdleStateEvent ent = (IdleStateEvent) evt;
-            switch (ent.state()) {
-                case READER_IDLE:
-                    ctx.writeAndFlush(sdf.format(new Date()) + ": You have heart disease");
-                    System.out.println("User" + ctx.channel().remoteAddress() + "Disconnected");
-                    ctx.close();
-                    break;
+            if (ent.state() == IdleState.READER_IDLE) {
+                ctx.writeAndFlush(sdf.format(new Date()) + ": You have heart disease");
+                System.out.println("User" + ctx.channel().remoteAddress() + "Disconnected");
+                ctx.close();
             }
         }
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String o) throws Exception {
-        Channel channel = ctx.channel();
-//        System.out.println("[DEBUG]"+o);
+        // Un Pack for decrypt
         Packet p = unpack(o);
+
+        // Get the Packet Info
         if (p != null) {
             switch (p.type) {
+                case PING:
+                    Map<String, String> rsaKey = RSAUtils.createKeys(1024);
+                    //TODO : Username
+                    Server.INSTANCE.userAuth.handle("", new UserAuth("", new KeyPair(RSAUtils.getPublicKey(rsaKey.get("publicKey"))
+                            , RSAUtils.getPrivateKey(rsaKey.get("privateKey")))));
+
+                    break;
                 case LOGIN:
                     String[] info = p.content.split("\\|");
                     System.out.println(info[0] + "  -  " + info[1] + "  -  " + info[2]);
@@ -55,6 +66,8 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                     } else {
                         ctx.close();
                     }
+
+
                     channelGroup.writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + info[0] + " login successfully").pack());
                     break;
                 case COMMAND:
@@ -90,7 +103,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-        Channel channel = ctx.channel();
         channelGroup.writeAndFlush(sdf.format(new Date()) + ": Client " + ctx.channel().remoteAddress() + " exit IRC.");
     }
 

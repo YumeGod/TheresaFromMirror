@@ -13,6 +13,8 @@ public class PacketUtil {
 
     enum Type {
         LOGIN,
+        PING,
+        PONG,
         HEARTBEAT,
         EXIT,
         MESSAGE,

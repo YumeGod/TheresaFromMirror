@@ -12,6 +12,7 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import me.superskidder.datebase.VisitMySql;
+import me.superskidder.utils.Handler;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -21,22 +22,42 @@ import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 public class Server {
-    public static ChannelFuture cf;
-    public static int port;
-    public static String datebase;
-    public static String datebaseUserName;
-    public static String datebasePassword;
-    public static Map<String, String> ranks = new HashMap<>();
+    public ChannelFuture cf;
+    public int port;
+    public String db;
+    public String db_userName;
+    public String db_password;
+
+    public Map<String, String> ranks = new HashMap<>();
+
+    public static Server INSTANCE;
+
+    Handler userAuth;
+
+    public Server() {
+        INSTANCE = this;
+    }
 
     public static void main(String[] args) {
+        INSTANCE.ServerInit(args);
+    }
+
+
+    void ServerInit(String[] args) {
+        // 初始化Handle
+        userAuth = new Handler();
+
+        //Split args and for smh
         port = Integer.parseInt(args[0]);
-        datebase = args[1];
-        datebaseUserName = args[2];
-        datebasePassword = args[3];
+        db = args[1];
+        db_userName = args[2];
+        db_password = args[3];
         String[] rs = args[4].split(";");
         for (String r : rs) {
             ranks.put(r.split(",")[0], r.split(",")[1]);
         }
+
+        //Start Server Thread
 
         Thread thread = new Thread(() -> {
             EventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -70,6 +91,8 @@ public class Server {
             }
         });
         thread.start();
+
+        //Scanner for console (Maybe Improved Soon)
         Scanner sc = new Scanner(System.in);
         while (sc.hasNext()) {
             String s = sc.nextLine();

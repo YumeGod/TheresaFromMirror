@@ -10,9 +10,9 @@ public class DBHelper {
 
     private static Connection Conn;
 
-    private static String URL = "jdbc:mysql://localhost:3306/"+ Server.datebase;
-    private static String UserName = Server.datebaseUserName;
-    private static String Password = Server.datebasePassword;
+    private static String URL = "jdbc:mysql://localhost:3306/"+ Server.INSTANCE.db;
+    private static String UserName = Server.INSTANCE.db_userName;
+    private static String Password = Server.INSTANCE.db_password;
 
     public static Connection getConnection() {
 

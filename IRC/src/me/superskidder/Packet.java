@@ -10,6 +10,9 @@ public class Packet {
     }
 
     public String pack() {
+        if (type == PacketUtil.Type.AUTH)
+            return type.name() + "@SKID@" + content;
+
         return type.name() + "@SKID@" + content;
     }
 }
