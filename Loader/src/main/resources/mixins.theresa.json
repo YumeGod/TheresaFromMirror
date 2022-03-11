@@ -1,0 +1,6 @@
+{
+  "plugin": "theresa.loader.MixinReInject",
+  "required": true,
+  "package": "cn.loli.client.injection.mixins",
+  "compatibilityLevel": "JAVA_8"
+}
