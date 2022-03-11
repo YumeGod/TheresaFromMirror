@@ -7,7 +7,6 @@ import java.security.interfaces.RSAPublicKey;
 public class PacketUtil {
 
     public static Packet unpack(String content) {
-        System.out.println(content);
 
         String[] strings = content.split("@NIGGA@");
         if (strings.length != 2) return null;

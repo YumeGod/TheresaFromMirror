@@ -4,6 +4,8 @@ import cn.loli.client.Main;
 import cn.loli.client.utils.protection.HWIDUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.ChatComponentText;
 
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
@@ -12,7 +14,7 @@ import java.security.spec.InvalidKeySpecException;
 public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
-    public void channelActive(ChannelHandlerContext ctx) throws InterruptedException {
+    public void channelActive(ChannelHandlerContext ctx) {
         System.out.println("Client connected!");
 
         ctx.channel().writeAndFlush(new String(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey),
@@ -38,7 +40,6 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
         Packet p = PacketUtil.unpack(s);
         String result = "";
         if (p != null) {
-            System.out.println("[DEBUG]" + p.type.name() + "  -  " + p.content);
             result = p.content;
             switch (p.type) {
                 case PONG:
@@ -56,7 +57,8 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
                 case EXIT:
                     break;
                 case MESSAGE:
-                    System.out.println(result);
+                    if (Minecraft.getMinecraft().thePlayer != null)
+                        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(result));
                     break;
             }
         }
