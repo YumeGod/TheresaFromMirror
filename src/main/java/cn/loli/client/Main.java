@@ -21,9 +21,7 @@ import com.Kernel32;
 import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.EventTarget;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -279,7 +277,7 @@ public class Main {
                                 socketChannel.pipeline().addLast(new StringDecoder(Charset.forName("GBK")));
                                 socketChannel.pipeline().addLast(new NettyClientHandler());
                             }
-                        });
+                        }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(65535));;
                 cf = bootstrap.connect("101.43.166.241", 9822).sync();
 //                cf = bootstrap.connect("127.0.0.1", 9822).sync();
                 println("Client started!");

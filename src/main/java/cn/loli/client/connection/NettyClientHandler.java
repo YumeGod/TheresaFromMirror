@@ -18,6 +18,18 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
         ctx.channel().writeAndFlush(new String(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey),
                 PacketUtil.Type.PING, Main.INSTANCE.name).pack().getBytes(), StandardCharsets.UTF_8));
 
+
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(1000L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (Main.INSTANCE.hasKey)
+                    ctx.channel().writeAndFlush(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey), PacketUtil.Type.HEARTBEAT, "PING!").pack());
+            }
+        }).start();
     }
 
 
@@ -35,6 +47,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
                     } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
                         e.printStackTrace();
                     }
+                    Main.INSTANCE.hasKey = true;
                     channelHandlerContext.channel().writeAndFlush(new String(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey),
                             PacketUtil.Type.LOGIN, (Main.INSTANCE.name + "|" + Main.INSTANCE.password + "|" + HWIDUtil.getHWID())).pack().getBytes(), StandardCharsets.UTF_8));
                 case LOGIN:
