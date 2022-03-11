@@ -9,6 +9,7 @@ import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import me.superskidder.datebase.VisitMySql;
+import me.superskidder.utils.Entity;
 import me.superskidder.utils.RSAUtils;
 import me.superskidder.utils.UserAuth;
 
@@ -39,59 +40,78 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String o) throws Exception {
-        // Un Pack for decrypt
+        // unPack for decrypt
         Packet p = unpack(o);
 
-        // Get the Packet Info
-        if (p != null) {
-            switch (p.type) {
-                case PING:
-                    Map<String, String> rsaKey = RSAUtils.createKeys(1024);
-                    //TODO : Username
-                    Server.INSTANCE.userAuth.handle("", new UserAuth("", new KeyPair(RSAUtils.getPublicKey(rsaKey.get("publicKey"))
-                            , RSAUtils.getPrivateKey(rsaKey.get("privateKey")))));
+        //Check if the Packet Available
+        if (p == null)
+            throw new Exception("Packet is null");
 
-                    break;
-                case LOGIN:
-                    String[] info = p.content.split("\\|");
-                    System.out.println(info[0] + "  -  " + info[1] + "  -  " + info[2]);
-                    if (info.length == 3) {
-                        String infos = VisitMySql.verify(info[0], info[1], info[2]);
-                        System.out.println(infos);
-                        if (infos.contains("Failed")) {
-                            System.out.println(info[0] + " Verify failed");
-                            ctx.writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + "Sorry, " + infos).pack());
-                            ctx.close();
-                        }
-                    } else {
+        // Get the Packet Info
+        switch (p.type) {
+            case PING:
+                //init the map
+                Map<String, String> rsaKey = RSAUtils.createKeys(1024);
+
+                //Try to get the entity from the database
+                Entity entity = Server.INSTANCE.userAuth.getEntity(p.user.getName());
+
+                //Edit Status
+                p.user.setGotKey(true);
+
+                //Get the Key and put to map
+                Server.INSTANCE.userAuth.handle(p.user, new UserAuth(p.user, new KeyPair(RSAUtils.getPublicKey(rsaKey.get("publicKey"))
+                        , RSAUtils.getPrivateKey(rsaKey.get("privateKey")))));
+
+                //Added Entity List
+                if (entity == null)
+                    Server.INSTANCE.userAuth.addEntity(p.user);
+
+                //get Public Key (Dont Forget to re Get it)
+                ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.PONG, rsaKey.get("publicKey")).pack());
+
+                break;
+            case LOGIN:
+                //Get the Info
+                String[] info = p.content.split("\\|");
+
+                System.out.println("Account" + info[0] + "  Password-  " + info[1] +
+                        "  Contact-  " + info[2] + "  IP-  " + ctx.channel().remoteAddress() + "  Time-  " + sdf.format(new Date()));
+
+                System.out.println("Private Key for this boi: " + Server.INSTANCE.userAuth.get(p.user).getKeyPair().getPrivate());
+
+                if (info.length == 3) {
+                    String verify = VisitMySql.verify(info[0], info[1], info[2]);
+                    System.out.println(verify);
+                    if (verify.contains("Failed")) {
+                        System.out.println(info[0] + " Verify failed");
+                        ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + "Sorry, " + verify).pack());
                         ctx.close();
                     }
+                } else {
+                    ctx.close();
+                }
 
-
-                    channelGroup.writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + info[0] + " login successfully").pack());
-                    break;
-                case COMMAND:
-                    break;
-                case HEARTBEAT:
-                    if (Objects.equals(p.content, "PING!")) {
-                        ctx.channel().pipeline().writeAndFlush(new Packet(PacketUtil.Type.HEARTBEAT, "PONG!").pack());
-                    }
-                    break;
-                case EXIT:
-                    channelGroup.writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + p.content).pack());
-                    break;
-                case MESSAGE:
-//                    channelGroup.forEach(channel1 -> {
-//                        if (channel1 != channel) {
-                    channelGroup.writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + p.content).pack());
-
-//                        } else {
-//                            channel.writeAndFlush(new Packet(PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\2472" + p.content).pack());
-//                        }
-//                    });
-                    break;
-            }
+                channelGroup.writeAndFlush(new Packet(p.user, PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + info[0] + " login successfully").pack());
+                break;
+            case COMMAND:
+                break;
+            case HEARTBEAT:
+                if (Objects.equals(p.content, "PING!")) {
+                    ctx.channel().pipeline().writeAndFlush(new Packet(p.user, PacketUtil.Type.HEARTBEAT, "PONG!").pack());
+                }
+                break;
+            case EXIT:
+                Server.INSTANCE.userAuth.removeEntity(p.user);
+                Server.INSTANCE.userAuth.remove(p.user);
+                System.out.println("Cya later " + p.user.getName());
+                ctx.close();
+                break;
+            case MESSAGE:
+                channelGroup.writeAndFlush(new Packet(p.user, PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + p.content).pack());
+                break;
         }
+
     }
 
     @Override
