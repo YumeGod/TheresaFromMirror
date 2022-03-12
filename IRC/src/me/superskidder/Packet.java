@@ -1,9 +1,6 @@
 package me.superskidder;
 
-import me.superskidder.utils.Entity;
 import me.superskidder.utils.RSAUtils;
-
-import java.security.interfaces.RSAPrivateKey;
 
 public class Packet {
 
@@ -23,5 +20,17 @@ public class Packet {
 
         return user + "@NIGGA@" +
                 RSAUtils.publicEncrypt(type.name() + "@SKID@" + content, Server.INSTANCE.userAuth.get(user).getKeyPair().getPublic());
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public PacketUtil.Type getType() {
+        return type;
+    }
+
+    public String getUser() {
+        return user;
     }
 }

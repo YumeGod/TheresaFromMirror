@@ -1,6 +1,5 @@
 package me.superskidder;
 
-import me.superskidder.utils.Entity;
 import me.superskidder.utils.RSAUtils;
 
 import java.security.interfaces.RSAPrivateKey;
@@ -40,10 +39,11 @@ public class PacketUtil {
     }
 
 
-    enum Type {
+    public enum Type {
         LOGIN,
         PING,
         PONG,
+        AUTHORIZE,
         HEARTBEAT,
         EXIT,
         MESSAGE,

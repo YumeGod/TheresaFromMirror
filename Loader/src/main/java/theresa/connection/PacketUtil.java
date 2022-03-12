@@ -1,6 +1,7 @@
-package cn.loli.client.connection;
+package theresa.connection;
 
-import cn.loli.client.Main;
+import theresa.Main;
+import theresa.protection.RSAUtils;
 
 public class PacketUtil {
 
@@ -31,13 +32,8 @@ public class PacketUtil {
 
 
     public enum Type {
-        LOGIN,
         PING,
         PONG,
         AUTHORIZE,
-        HEARTBEAT,
-        EXIT,
-        MESSAGE,
-        COMMAND,
     }
 }

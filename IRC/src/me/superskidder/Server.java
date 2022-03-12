@@ -11,9 +11,11 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
+import me.loader.Loader;
 import me.superskidder.datebase.VisitMySql;
 import me.superskidder.utils.Handler;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -33,6 +35,7 @@ public class Server {
     public static Server INSTANCE;
 
     static Handler userAuth;
+    static Loader loader;
 
     public Server() {
         INSTANCE = this;
@@ -41,6 +44,16 @@ public class Server {
     public static void main(String[] args) {
         // 初始化Handle
         userAuth = new Handler();
+
+        new Thread(
+                () -> {
+                    try {
+                        loader = new Loader(37721);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+        ).start();
 
         //Split args and for smh
         port = Integer.parseInt(args[0]);

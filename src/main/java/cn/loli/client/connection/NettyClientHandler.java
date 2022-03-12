@@ -61,6 +61,8 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
 
                     Main.INSTANCE.println("Client connected!");
                     break;
+                case AUTHORIZE:
+                        break;
                 case LOGIN:
                 case COMMAND:
                 case HEARTBEAT:

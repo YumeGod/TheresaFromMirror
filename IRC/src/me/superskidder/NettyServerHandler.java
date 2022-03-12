@@ -17,7 +17,6 @@ import me.superskidder.utils.UserAuth;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
-import java.util.Objects;
 
 import static me.superskidder.PacketUtil.unpack;
 
@@ -72,10 +71,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                 //Get the Info
                 String[] info = p.content.split("\\|");
 
-                System.out.println("Account" + info[0] + "  Password-  " + info[1] +
-                        "  Contact-  " + info[2] + "  IP-  " + ctx.channel().remoteAddress() + "  Time-  " + sdf.format(new Date()));
-
-                System.out.println("Private Key for this boi: " + Server.userAuth.get(p.user).getKeyPair().getPrivate());
+                //   System.out.println("Account" + info[0] + "  Password-  " + info[1] + "  Contact-  " + info[2] + "  IP-  " + ctx.channel().remoteAddress() + "  Time-  " + sdf.format(new Date()));
+                System.out.println("Request for Login");
+                System.out.println("Private Key for this boi: " + Server.userAuth.get(p.user).getKeyPair().getPrivate().getPrivateExponent());
 
                 if (info.length == 3) {
                     String verify = VisitMySql.verify(info[0], info[1], info[2]);
@@ -91,10 +89,33 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
 
                 channelGroup.writeAndFlush(new Packet(p.user, PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + info[0] + " login successfully").pack());
                 break;
+            case AUTHORIZE:
+                String[] strings = p.content.split("\\|");
+
+                System.out.println("Request for Authorize");
+                System.out.println("Public Key for this boi: " + Server.userAuth.get(p.user).getKeyPair().getPrivate());
+
+                if (strings.length == 3) {
+                    String verify = VisitMySql.verify(strings[0], strings[1], strings[2]);
+
+                    System.out.println(verify);
+
+                    if (verify.contains("Failed"))
+                        ctx.close();
+
+                } else {
+                    ctx.close();
+                }
+
+                Server.INSTANCE.userAuth.giveAccess(p.user, true);
+                ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.AUTHORIZE, p.user + p.user).pack());
+                ctx.close();
+                break;
             case COMMAND:
                 break;
             case HEARTBEAT:
-                String i = p.content.replace("PING" , "PONG");;
+                String i = p.content.replace("PING", "PONG");
+                ;
                 ctx.channel().pipeline().writeAndFlush(new Packet(p.user, PacketUtil.Type.HEARTBEAT, i).pack());
                 break;
             case EXIT:

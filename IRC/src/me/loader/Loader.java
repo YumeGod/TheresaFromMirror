@@ -1,6 +1,8 @@
 package me.loader;
 
 import com.sun.istack.internal.NotNull;
+import me.superskidder.Packet;
+import me.superskidder.PacketUtil;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -9,9 +11,9 @@ import java.util.Arrays;
 import java.util.Objects;
 
 
-public class Server {
+public class Loader {
 
-    public Server(int port) throws IOException {
+    public Loader(int port) throws IOException {
         System.out.println((Object) "Authorization Done...");
         ServerSocket tcpServer = new ServerSocket(port);
         System.out.println("Waiting for connection...");
@@ -49,9 +51,18 @@ class Client extends Thread {
 
         while (!clientSocket.isClosed()) {
             String received = null;
+            Packet packet = null;
+            String content = null;
             try {
                 received = Objects.requireNonNull(input).readUTF();
+                packet = PacketUtil.unpack(received);
+                content = packet.getContent();
             } catch (IOException e) {
+                try {
+                    clientSocket.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
                 e.printStackTrace();
             }
 
@@ -60,10 +71,11 @@ class Client extends Thread {
 
             String ip = clientSocket.getInetAddress().getHostAddress();
 
+
             //The Authorized Stream
-            if (Objects.equals(received, "HIHI")) {
+            if (Objects.equals(content, "GayLOL")) {
                 try {
-                    Objects.requireNonNull(output).writeUTF("Passed");
+                    Objects.requireNonNull(output).writeUTF(new Packet(packet.getUser(), PacketUtil.Type.COMMAND, "Passed").pack());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

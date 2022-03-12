@@ -4,7 +4,11 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import net.minecraft.launchwrapper.Launch
 import net.minecraft.launchwrapper.LaunchClassLoader
+import theresa.Main
 import theresa.antidump.AntiDump
+import theresa.connection.Entity
+import theresa.connection.Packet
+import theresa.connection.PacketUtil
 import java.io.DataInputStream
 import java.io.DataOutputStream
 import java.io.File
@@ -35,9 +39,15 @@ object Loader {
         }
 
 
+        val main = Main();
+        main.IRC()
 
-        val host = "127.0.0.1"
-        val port = 37254 //Port
+        while (!main.hasKey)
+            Thread.sleep(1000);
+
+
+        val host = "101.43.166.241"
+        val port = 37721 //Port
 
         val fileSocket = Socket(host, port)
         val inputF = DataInputStream(fileSocket.getInputStream())
@@ -45,9 +55,21 @@ object Loader {
 
         var passed = false
         //驗證的東西
-        outputF.writeUTF("HIHI")
+        outputF.writeUTF(
+            String(
+                Packet(
+                    Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey),
+                    PacketUtil.Type.AUTHORIZE,
+                    "GayLOL"
+                ).pack().toByteArray(), StandardCharsets.UTF_8
+            )
+        )
 
-        if (inputF.readUTF().equals("Passed")) {
+        val response = inputF.readUTF()
+
+        val i = PacketUtil.unpack(response)
+
+        if (i.content.equals("Passed")) {
             passed = true
         }
 
@@ -69,7 +91,8 @@ object Loader {
                     }
                 }
             }
-            val mixinConfig: JsonObject = Gson().fromJson(String(mixinByte, StandardCharsets.UTF_8), JsonObject::class.java)
+            val mixinConfig: JsonObject =
+                Gson().fromJson(String(mixinByte, StandardCharsets.UTF_8), JsonObject::class.java)
             mixinConfig.getAsJsonArray("client").forEach {
                 mixinCache.add(it.asString)
             }
