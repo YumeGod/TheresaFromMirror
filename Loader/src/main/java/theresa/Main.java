@@ -65,9 +65,7 @@ public class Main {
                 cf.channel().closeFuture().sync();
             } catch (InterruptedException ignored) {
             } finally {
-                println("Client closed!");
                 eventExecutors.shutdownGracefully();
-                doCrash();
             }
         }).start();
     }

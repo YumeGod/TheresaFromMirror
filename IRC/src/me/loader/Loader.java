@@ -50,7 +50,7 @@ class Client extends Thread {
         }
 
         while (!clientSocket.isClosed()) {
-            String received = null;
+            String received;
             Packet packet = null;
             String content = null;
             try {
@@ -75,7 +75,7 @@ class Client extends Thread {
             //The Authorized Stream
             if (Objects.equals(content, "GayLOL")) {
                 try {
-                    Objects.requireNonNull(output).writeUTF(new Packet(packet.getUser(), PacketUtil.Type.COMMAND, "Passed").pack());
+                    Objects.requireNonNull(output).writeUTF(new Packet(packet.getUser(), PacketUtil.Type.AUTHORIZE, "Passed").pack());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
