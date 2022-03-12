@@ -15,7 +15,7 @@ class MixinLoaderPlugin : IFMLLoadingPlugin {
         Loader.load()
         if (Loader.shouldInit) {
             MixinBootstrap.init()
-            Mixins.addConfiguration("mixins.hanabiloader.json")
+            Mixins.addConfiguration("mixins.theresa.json")
             MixinEnvironment.getDefaultEnvironment().obfuscationContext = "searge"
             MixinEnvironment.getDefaultEnvironment().side = MixinEnvironment.Side.CLIENT
         }

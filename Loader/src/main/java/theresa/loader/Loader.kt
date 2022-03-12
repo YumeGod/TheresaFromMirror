@@ -29,14 +29,14 @@ object Loader {
         AntiDump.setPackageNameFilter()
         AntiDump.dissasembleStructs()
 //
-
         val resourceCache = LaunchClassLoader::class.java.getDeclaredField("resourceCache").let {
             it.isAccessible = true
             it[Launch.classLoader] as MutableMap<String, ByteArray>
         }
 
 
-        val host = "173.82.163.16"
+
+        val host = "127.0.0.1"
         val port = 37254 //Port
 
         val fileSocket = Socket(host, port)

@@ -35,7 +35,7 @@ class MixinReInject : IMixinConfigPlugin {
 
     override fun getRefMapperConfig(): String? {
         return if (!Loader.shouldInit) {
-            "mixins.hanabi.refmap.json"
+            "mixins.loli.refmap.json"
         } else {
             try {
                 val refMap = Loader.refMapFile.absolutePath.replace(File.separatorChar, '/')
