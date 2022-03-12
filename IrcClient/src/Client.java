@@ -41,7 +41,7 @@ public class Client {
                                 socketChannel.pipeline().addLast(new NettyClientHandler());
                             }
                         }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(65535));
-                cf = bootstrap.connect("101.43.166.241", 9822).sync();
+                cf = bootstrap.connect("15.204.152.11",9822).sync();
 //                cf = bootstrap.connect("127.0.0.1", 9822).sync();
                 System.out.println("Client started!");
                 cf.channel().closeFuture().sync();

@@ -8,12 +8,18 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.concurrent.GlobalEventExecutor;
-import me.superskidder.datebase.VisitMySql;
 import me.superskidder.utils.Entity;
 import me.superskidder.utils.KeyPair;
 import me.superskidder.utils.RSAUtils;
 import me.superskidder.utils.UserAuth;
+import org.apache.commons.io.Charsets;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.Validate;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -36,6 +42,48 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
             }
         }
     }
+
+
+    private static HttpURLConnection createUrlConnection(URL url) throws IOException {
+        Validate.notNull(url);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setConnectTimeout(15000);
+        connection.setReadTimeout(15000);
+        connection.setUseCaches(false);
+        return connection;
+    }
+
+    //get content from url
+    public static String performGetRequest(URL url) throws IOException {
+        Validate.notNull(url);
+
+        HttpURLConnection connection = createUrlConnection(url);
+        InputStream inputStream = null;
+        connection.setRequestProperty("User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0) Gecko/20100101 Firefox/6.0");
+
+        String var6;
+        try {
+            String result;
+            try {
+                inputStream = connection.getInputStream();
+                return IOUtils.toString(inputStream, Charsets.UTF_8);
+            } catch (IOException var10) {
+                IOUtils.closeQuietly(inputStream);
+                inputStream = connection.getErrorStream();
+                if (inputStream == null) {
+                    throw var10;
+                }
+            }
+
+            result = IOUtils.toString(inputStream, Charsets.UTF_8);
+            var6 = result;
+        } finally {
+            IOUtils.closeQuietly(inputStream);
+        }
+
+        return var6;
+    }
+
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String o) throws Exception {
@@ -76,11 +124,10 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                 System.out.println("Private Key for this boi: " + Server.userAuth.get(p.user).getKeyPair().getPrivate().getPrivateExponent());
 
                 if (info.length == 3) {
-                    String verify = VisitMySql.verify(info[0], info[1], info[2]);
-                    System.out.println(verify);
-                    if (verify.contains("Failed")) {
-                        System.out.println(info[0] + " Verify failed");
-                        ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + "Sorry, " + verify).pack());
+                    String result = performGetRequest(new URL("https://api.m0jang.org/auth.php?user=" + info[0] + "&pass=" + info[1] + "&hwid=" + info[2]));
+                    if (!result.contains("success")) {
+                        System.out.println(info[0] + " Verify failed -> " + result);
+                        ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + "Sorry, you failed the login, ERROR CODE " + result).pack());
                         ctx.close();
                     }
                 } else {
@@ -96,13 +143,10 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                 System.out.println("Public Key for this boi: " + Server.userAuth.get(p.user).getKeyPair().getPrivate());
 
                 if (strings.length == 3) {
-                    String verify = VisitMySql.verify(strings[0], strings[1], strings[2]);
-
-                    System.out.println(verify);
-
-                    if (verify.contains("Failed"))
+                    String result = performGetRequest(new URL("https://api.m0jang.org/auth.php?user=" + strings[0] + "&pass=" + strings[1] + "&hwid=" + strings[2]));
+                    if (!result.contains("success")) {
                         ctx.close();
-
+                    }
                 } else {
                     ctx.close();
                 }

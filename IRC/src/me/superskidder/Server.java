@@ -12,7 +12,6 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
 import me.loader.Loader;
-import me.superskidder.datebase.VisitMySql;
 import me.superskidder.utils.Handler;
 
 import java.io.IOException;
@@ -106,14 +105,6 @@ public class Server {
             String s = sc.nextLine();
             if (s.equals("stop")) {
                 System.exit(0);
-            }
-            if (s.startsWith("register ")) {
-                String[] ss = s.split(" ");
-                if (ss.length != 3) {
-                    System.out.println("Invalid args!");
-                } else {
-                    VisitMySql.register(ss[1], ss[2]);
-                }
             }
         }
     }
