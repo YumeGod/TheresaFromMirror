@@ -15,6 +15,7 @@ import cn.loli.client.module.ModuleManager;
 import cn.loli.client.protection.GuiCrashMe;
 import cn.loli.client.protection.KeyPair;
 import cn.loli.client.protection.ProtectionThread;
+import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.ExploitFix;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.others.SoundFxPlayer;
@@ -48,9 +49,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.Socket;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
@@ -272,6 +277,7 @@ public class Main {
 
     private void IRC() {
         doLogin();
+
         new Thread(() -> {
             EventLoopGroup eventExecutors = new NioEventLoopGroup();
             try {
@@ -348,9 +354,6 @@ public class Main {
                     Main.INSTANCE.name = name.getText();
                     Main.INSTANCE.password = (new String(password.getPassword()));
 
-                    Map<String, String> keyMap = RSAUtils.createKeys(2048);
-                    Main.INSTANCE.publicKey = keyMap.get("publicKey");
-                    Main.INSTANCE.privateKey = keyMap.get("privateKey");
                     setVisible(false);
                 }
             });
@@ -372,13 +375,27 @@ public class Main {
     }
 
     public void doLogin() {
-        Login login = new Login();
-        login.init();
-        isDead = false;
-        while (login.isVisible()) {
+        Socket socket = new Socket();
+        try {
+            socket = new Socket("127.0.0.1", 12580);
+            socket.setSoTimeout(5000);
+            DataInputStream inputStream = new DataInputStream(socket.getInputStream());
+            DataOutputStream outputStream = new DataOutputStream(socket.getOutputStream());
+            outputStream.writeUTF("FuckYou");
+            while (!socket.isClosed()) {
+                String received = Objects.requireNonNull(inputStream).readUTF();
+                Main.INSTANCE.name = received.split(":")[0];
+                Main.INSTANCE.password = received.split(":")[1];
+                Map<String, String> keyMap = RSAUtils.createKeys(2048);
+                Main.INSTANCE.publicKey = keyMap.get("publicKey");
+                Main.INSTANCE.privateKey = keyMap.get("privateKey");
+                socket.close();
+            }
+        } catch (IOException e) {
             try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
+                socket.close();
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
         }
     }

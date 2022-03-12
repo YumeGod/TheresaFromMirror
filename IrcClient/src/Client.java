@@ -7,10 +7,16 @@ import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
+import java.util.Objects;
 
 public class Client {
     public static ChannelFuture cf;
@@ -25,30 +31,32 @@ public class Client {
     public static void main(String[] args) {
         name = "VanillaMirror";
         password = "hazenova3C";
-        hwid = "12345678";
 
-        System.out.println("Hello World");
         new Thread(() -> {
-            EventLoopGroup eventExecutors = new NioEventLoopGroup();
+            ServerSocket serverSocket = null;
             try {
-                Bootstrap bootstrap = new Bootstrap();
-                bootstrap.group(eventExecutors).channel(NioSocketChannel.class)
-                        .handler(new ChannelInitializer<SocketChannel>() {
-                            @Override
-                            protected void initChannel(SocketChannel socketChannel) {
-                                socketChannel.pipeline().addLast(new StringEncoder(StandardCharsets.UTF_8));
-                                socketChannel.pipeline().addLast(new StringDecoder(Charset.forName("GBK")));
-                                socketChannel.pipeline().addLast(new NettyClientHandler());
-                            }
-                        }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(65535));
-                cf = bootstrap.connect("15.204.152.11",9822).sync();
-//                cf = bootstrap.connect("127.0.0.1", 9822).sync();
-                System.out.println("Client started!");
-                cf.channel().closeFuture().sync();
-            } catch (InterruptedException ignored) {
-            } finally {
-                System.out.println("Client closed!");
-                eventExecutors.shutdownGracefully();
+                serverSocket = new ServerSocket(12580);
+                Socket socket = serverSocket.accept();
+                DataInputStream input = null;
+                DataOutputStream output = null;
+                try {
+                    input = new DataInputStream(socket.getInputStream());
+                    output = new DataOutputStream(socket.getOutputStream());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                while (!serverSocket.isClosed()) {
+                    String received = Objects.requireNonNull(input).readUTF();
+                    if (received.equals("FuckYou"))
+                        Objects.requireNonNull(output).writeUTF(name + ":" + password);
+                }
+
+            } catch (IOException e) {
+                try {
+                    serverSocket.close();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
             }
         }).start();
     }

