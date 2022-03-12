@@ -69,7 +69,10 @@ object Loader {
 
         val i = PacketUtil.unpack(response)
 
+        main.println("DEBUG: $i")
+
         if (i.content.equals("Passed")) {
+            main.println("Passed")
             passed = true
         }
 
