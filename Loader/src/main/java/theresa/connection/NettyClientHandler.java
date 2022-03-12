@@ -41,7 +41,8 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
                 case AUTHORIZE:
                     if (p.content.equals(Main.INSTANCE.name + Main.INSTANCE.name)) {
                         Main.INSTANCE.println("Client authorized!");
-                    }
+                    } else
+                        channelHandlerContext.close();
                         break;
             }
         }

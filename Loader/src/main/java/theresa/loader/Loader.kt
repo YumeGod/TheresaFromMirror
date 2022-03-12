@@ -46,7 +46,7 @@ object Loader {
             Thread.sleep(1000);
 
 
-        val host = "101.43.166.241"
+        val host = "15.204.152.11"
         val port = 37721 //Port
 
         val fileSocket = Socket(host, port)
@@ -69,7 +69,6 @@ object Loader {
 
         val i = PacketUtil.unpack(response)
 
-        main.println("DEBUG: $i")
 
         if (i.content.equals("Passed")) {
             main.println("Passed")

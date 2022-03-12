@@ -60,7 +60,7 @@ public class Main {
                                 socketChannel.pipeline().addLast(new NettyClientHandler());
                             }
                         }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(65535));
-                cf = bootstrap.connect("101.43.166.241", 9822).sync();
+                cf = bootstrap.connect("15.204.152.11", 9822).sync();
                 println("Client started!");
                 cf.channel().closeFuture().sync();
             } catch (InterruptedException ignored) {
