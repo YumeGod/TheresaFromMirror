@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="391.0" prefWidth="334.0" stylesheets="@bootstrapfx.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Button layoutX="101.0" layoutY="299.0" mnemonicParsing="false" prefHeight="37.0" prefWidth="132.0" text="Login" />
+      <TextField layoutX="95.0" layoutY="163.0" prefHeight="30.0" prefWidth="210.0" promptText="Please input username..." />
+      <TextField layoutX="98.0" layoutY="225.0" prefHeight="30.0" prefWidth="210.0" promptText="Please input password..." />
+      <Label layoutX="109.0" layoutY="76.0" prefHeight="44.0" prefWidth="117.0" style="-fx-font-size: 18;" text="Theresa Login">
+         <font>
+            <Font size="22.0" />
+         </font>
+      </Label>
+      <Label layoutX="19.0" layoutY="167.0" prefHeight="23.0" prefWidth="81.0" text="Username:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="20.0" layoutY="229.0" prefHeight="23.0" prefWidth="72.0" text="Password:">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+   </children>
+</Pane>
