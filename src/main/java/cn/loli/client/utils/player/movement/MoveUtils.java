@@ -1,6 +1,5 @@
 package cn.loli.client.utils.player.movement;
 
-import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PlayerMoveEvent;
 import cn.loli.client.utils.Utils;
 import cn.loli.client.utils.player.rotation.RotationUtils;
@@ -15,7 +14,6 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 
 import java.util.Arrays;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class MoveUtils extends Utils {
 
@@ -259,8 +257,6 @@ public class MoveUtils extends Utils {
         }
         player.sendQueue.addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(x, y, z, true));
     }
-
-
 
     public static MoveUtils getInstance() {
         if (utils == null) {

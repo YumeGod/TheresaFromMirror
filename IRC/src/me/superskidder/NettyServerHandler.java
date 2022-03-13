@@ -91,10 +91,8 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
         Packet p = unpack(o);
 
         //Check if the Packet Available
-        if (p == null){
-            ctx.close();
-            throw new Exception("Close Due to couldnt figure out if the packet is null");
-        }
+        if (p == null)
+            throw new Exception("Packet is null");
 
         // Get the Packet Info
         switch (p.type) {
@@ -121,12 +119,13 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                 //Get the Info
                 String[] info = p.content.split("\\|");
 
-                //   System.out.println("Account" + info[0] + "  Password-  " + info[1] + "  Contact-  " + info[2] + "  IP-  " + ctx.channel().remoteAddress() + "  Time-  " + sdf.format(new Date()));
                 System.out.println("Request for Login");
-                System.out.println("Private Key for this boi: " + Server.userAuth.get(p.user).getKeyPair().getPrivate().getPrivateExponent());
 
                 if (info.length == 3) {
                     String result = performGetRequest(new URL("https://api.m0jang.org/auth.php?user=" + info[0] + "&pass=" + info[1] + "&hwid=" + info[2]));
+                    System.out.println("Account-" + info[0] + " Password-" + info[1] + " Contact-" + info[2] + " IP-" + ctx.channel().remoteAddress() + " Time-" + sdf.format(new Date()));
+                    System.out.println(result);
+
                     if (!result.contains("success")) {
                         System.out.println(info[0] + " Verify failed -> " + result);
                         ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + "Sorry, you failed the login, ERROR CODE " + result).pack());
@@ -142,7 +141,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                 String[] strings = p.content.split("\\|");
 
                 System.out.println("Request for Authorize");
-                System.out.println("Public Key for this boi: " + Server.userAuth.get(p.user).getKeyPair().getPrivate());
 
                 if (strings.length == 3) {
                     String result = performGetRequest(new URL("https://api.m0jang.org/auth.php?user=" + strings[0] + "&pass=" + strings[1] + "&hwid=" + strings[2]));
