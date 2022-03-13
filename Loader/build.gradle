@@ -87,6 +87,7 @@ dependencies {
         exclude module: 'kotlin-stdlib-common'
         exclude module: 'annotations'
     }
+    implementation 'com.formdev:flatlaf:2.0.2'
 	
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
