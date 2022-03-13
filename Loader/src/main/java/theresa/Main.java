@@ -83,7 +83,6 @@ public class Main {
         private static final long serialVersionUID = 1L;
 
         public void init() {
-            setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             FlatLightLaf.install();
             setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             setAlwaysOnTop(true);
