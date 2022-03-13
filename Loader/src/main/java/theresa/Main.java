@@ -62,7 +62,7 @@ public class Main {
                                 socketChannel.pipeline().addLast(new StringDecoder(Charset.forName("GBK")));
                                 socketChannel.pipeline().addLast(new NettyClientHandler());
                             }
-                        }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(1024 * 1024));
+                        }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(65535));
                 cf = bootstrap.connect("15.204.152.11", 9822).sync();
                 println("Client started!");
                 cf.channel().closeFuture().sync();
