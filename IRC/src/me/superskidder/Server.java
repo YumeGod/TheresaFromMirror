@@ -79,7 +79,7 @@ public class Server {
                                 socketChannel.pipeline().addLast(new IdleStateHandler(10, 20, 25, TimeUnit.SECONDS));
                                 socketChannel.pipeline().addLast(new NettyServerHandler());
                             }
-                        }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(65535));
+                        });
 
                 try {
                     cf = bootstrap.bind(port).sync();

@@ -91,8 +91,10 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
         Packet p = unpack(o);
 
         //Check if the Packet Available
-        if (p == null)
-            throw new Exception("Packet is null");
+        if (p == null){
+            ctx.close();
+            throw new Exception("Close Due to couldnt figure out if the packet is null");
+        }
 
         // Get the Packet Info
         switch (p.type) {
