@@ -6,9 +6,6 @@ import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
-import cn.loli.client.utils.player.movement.MoveUtils;
-import cn.loli.client.utils.player.PlayerUtils;
-import cn.loli.client.utils.player.rotation.RotationUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
@@ -121,7 +118,7 @@ public class Scaffold extends Module {
 
     @Override
     public void onEnable() {
-        
+
         if (mc.thePlayer == null)
             return;
 
@@ -138,12 +135,13 @@ public class Scaffold extends Module {
 
     @Override
     public void onDisable() {
-        
+
         switchTimer.reset();
     }
 
     @EventTarget
     private void onRender(RenderEvent e) {
+        ray = rotationUtils.rayCastedBlock(curYaw, curPitch);
 
         if (curPos != null) {
             if ((!mc.thePlayer.onGround && rotateInAir.getObject()) || (ray == null || (ray.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || (!ray.getBlockPos().equals(curPos)) && ray.sideHit == enumFacing || (ray.sideHit != enumFacing && ray.getBlockPos().equals(curPos))))) {
@@ -161,18 +159,18 @@ public class Scaffold extends Module {
                             curPitch = (float) pitch.getObject();
                     }
 
-                ray = rotationUtils.rayCastedBlock(curYaw, curPitch);
             }
         }
 
-    }
+
+}
 
     @EventTarget
     private void onRotate(RotationEvent e) {
-       if (rotation.getObject()){
-           e.setYaw(curYaw);
-           e.setPitch(curPitch);
-       }
+        if (rotation.getObject()) {
+            e.setYaw(curYaw);
+            e.setPitch(curPitch);
+        }
     }
 
     @EventTarget

@@ -108,7 +108,7 @@ public class Speed extends Module {
                     if (!mc.thePlayer.onGround && shouldLowhop && mc.thePlayer.fallDistance < 0.54)
                         event.setY(mc.thePlayer.motionY = lowHopYModification(mc.thePlayer.motionY, moveUtils.round(mc.thePlayer.posY - (int) mc.thePlayer.posY, 0.001)));
 
-                    if (mc.thePlayer.onGround && !wasOnGround) {
+                    if (mc.thePlayer.onGround && mc.thePlayer.isCollidedVertically && !wasOnGround) {
                         speed = baseMoveSpeed * 1.7;
                         event.setY(mc.thePlayer.motionY = shouldLowhop ? 0.4F : moveUtils.getJumpHeight(mc.thePlayer));
                         wasOnGround = true;

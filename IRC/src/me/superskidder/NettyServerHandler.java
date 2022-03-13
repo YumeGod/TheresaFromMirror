@@ -12,14 +12,17 @@ import me.superskidder.utils.Entity;
 import me.superskidder.utils.KeyPair;
 import me.superskidder.utils.RSAUtils;
 import me.superskidder.utils.UserAuth;
-import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
@@ -54,34 +57,20 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
     }
 
     //get content from url
-    public static String performGetRequest(URL url) throws IOException {
-        Validate.notNull(url);
-
-        HttpURLConnection connection = createUrlConnection(url);
-        InputStream inputStream = null;
-        connection.setRequestProperty("User-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:6.0) Gecko/20100101 Firefox/6.0");
-
-        String var6;
+    public static String getStatus(String url) {
+        final CloseableHttpClient closeableHttpClient = HttpClients.createDefault();
+        final HttpGet httpGet = new HttpGet(url);
+        httpGet.setHeader("user-agent",
+                "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.94 Safari/537.36");
+        httpGet.setHeader("xf-api-key", "LnM-qSeQqtJlJmJnVt76GhU-SoiolWs9");
+        String result = null;
         try {
-            String result;
-            try {
-                inputStream = connection.getInputStream();
-                return IOUtils.toString(inputStream, Charsets.UTF_8);
-            } catch (IOException var10) {
-                IOUtils.closeQuietly(inputStream);
-                inputStream = connection.getErrorStream();
-                if (inputStream == null) {
-                    throw var10;
-                }
-            }
-
-            result = IOUtils.toString(inputStream, Charsets.UTF_8);
-            var6 = result;
-        } finally {
-            IOUtils.closeQuietly(inputStream);
+            CloseableHttpResponse closeableHttpResponse = closeableHttpClient.execute(httpGet);
+            result = IOUtils.toString(closeableHttpResponse.getEntity().getContent(), StandardCharsets.UTF_8);
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         }
-
-        return var6;
+        return result;
     }
 
 
@@ -117,36 +106,39 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                 break;
             case LOGIN:
                 //Get the Info
-                String[] info = p.content.split("\\|");
+                String[] split = p.content.split("\\|");
 
-                //   System.out.println("Account" + info[0] + "  Password-  " + info[1] + "  Contact-  " + info[2] + "  IP-  " + ctx.channel().remoteAddress() + "  Time-  " + sdf.format(new Date()));
                 System.out.println("Request for Login");
-                System.out.println("Private Key for this boi: " + Server.userAuth.get(p.user).getKeyPair().getPrivate().getPrivateExponent());
 
-                if (info.length == 3) {
-                    String result = performGetRequest(new URL("https://api.m0jang.org/auth.php?user=" + info[0] + "&pass=" + info[1] + "&hwid=" + info[2]));
+                if (split.length == 3) {
+                    String url = "https://api.m0jang.org/auth.php?user=" + split[0] + "&pass=" + split[1] + "&hwid=" + split[2];
+
+                    System.out.println(url);
+
+                    String result = getStatus(url);
+
+                    System.out.println(result);
+
                     if (!result.contains("success")) {
-                        System.out.println(info[0] + " Verify failed -> " + result);
-                        ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + "Sorry, you failed the login, ERROR CODE " + result).pack());
+                        System.out.println(split[0] + " Verify failed -> " + result);
                         ctx.close();
                     }
                 } else {
                     ctx.close();
                 }
 
-                channelGroup.writeAndFlush(new Packet(p.user, PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + info[0] + " login successfully").pack());
+                channelGroup.writeAndFlush(new Packet(p.user, PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + split[0] + " login successfully").pack());
                 break;
             case AUTHORIZE:
                 String[] strings = p.content.split("\\|");
 
                 System.out.println("Request for Authorize");
-                System.out.println("Public Key for this boi: " + Server.userAuth.get(p.user).getKeyPair().getPrivate());
 
                 if (strings.length == 3) {
-                    String result = performGetRequest(new URL("https://api.m0jang.org/auth.php?user=" + strings[0] + "&pass=" + strings[1] + "&hwid=" + strings[2]));
-                    if (!result.contains("success")) {
-                        ctx.close();
-                    }
+                    String url = "https://api.m0jang.org/auth.php?user=" + strings[0] + "&pass=" + strings[1] + "&hwid=" + strings[2];
+                    String result = getStatus(url);
+                    if (!result.contains("success")) ctx.close();
+
                 } else {
                     ctx.close();
                 }
