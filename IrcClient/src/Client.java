@@ -35,17 +35,6 @@ public class Client {
         name = "VanillaMirror";
         password = "hazenova3C";
 
-        String url = "https://api.m0jang.org/auth.php?user=" + name + "&pass=" + password + "&hwid=" + "F42A4A0D258DBAD51E7A2BD10950DF4DA5D0478A";
-
-        System.out.println(url);
-
-        try {
-            String result = performGetRequest(new URL(url));
-            System.out.println(result);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
 
         new Thread(() -> {
             ServerSocket serverSocket = null;
