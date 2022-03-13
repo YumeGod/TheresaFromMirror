@@ -12,7 +12,6 @@ import cn.loli.client.value.ModeValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 
 public class Fly extends Module {
 
@@ -63,15 +62,21 @@ public class Fly extends Module {
     private void onMotion(MotionUpdateEvent e) {
         if (mode.getCurrentMode().equalsIgnoreCase("Hypixel") && !mc.thePlayer.isSpectator()) {
             if (e.getEventType() == EventType.PRE) {
-                if (enduring.getObject()) {
-                } else {
+                {
                     if (!jumped && mc.thePlayer.onGround) {
-                        mc.thePlayer.motionY = 0.075f;
+                        if (enduring.getObject()) {
+                            for (int i = 0; i < 30; i++) {
+                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.0625, mc.thePlayer.posZ, false));
+                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, true));
+                            }
+                            mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.075, mc.thePlayer.posZ, false));
+                        }
+                        mc.thePlayer.motionY = 0.075;
                         jumped = true;
                         return;
                     }
                     if (mc.thePlayer.onGround && !clipped) {
-                        e.setY(e.getY() - 0.075f);
+                        e.setY(e.getY() - 0.075);
                         e.setOnGround(true);
                         clipped = true;
                     }
@@ -86,44 +91,15 @@ public class Fly extends Module {
 
     @EventTarget
     private void onPacket(PacketEvent e) {
-        if (e.getPacket() instanceof S08PacketPlayerPosLook) stage = 1;
     }
+
     @EventTarget
     private void onMove(PlayerMoveEvent e) {
-        if (!enduring.getObject()) {
-            if (mode.getCurrentMode().equalsIgnoreCase("Hypixel") && !mc.thePlayer.isSpectator() && clipped) {
-                e.setY(mc.thePlayer.motionY = 0.0);
-                moveUtils.setMotion(e, moveUtils.getBaseMoveSpeed(0.281, 0.2));
-            }
-        } else {
-            if (mode.getCurrentMode().equalsIgnoreCase("Hypixel") && !mc.thePlayer.isSpectator()) {
-                switch (stage) {
-                    case 0:
-                        if (mc.thePlayer.onGround) {
-                            for (int i = 0; i < 50; i++) {
-                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.05, mc.thePlayer.posZ, false));
-                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, true));
-                            }
-                            mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.05, mc.thePlayer.posZ, false));
-                            mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.83, mc.thePlayer.posZ, false));
-                            mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.83, mc.thePlayer.posZ, false));
-                            mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.83, mc.thePlayer.posZ, false));
-                            stage = 1;
-                        }
-                        break;
-                    case 1:
-
-                        break;
-                    case 2:
-                        stage += 1;
-                        break;
-                }
-
-                e.setY(mc.thePlayer.motionY = (stage == 1 ? 0.05 : 0));
-                moveUtils.setMotion(e, stage < 2 ? 0 : moveUtils.getBaseMoveSpeed(0.281, 0.2));
-            }
-        }
-
+        if (mode.getCurrentMode().equalsIgnoreCase("Hypixel") && !mc.thePlayer.isSpectator() && clipped) {
+            e.setY(mc.thePlayer.motionY = 0.0);
+            moveUtils.setMotion(e, moveUtils.getBaseMoveSpeed(0.281, 0.2));
+        } else
+            moveUtils.setMotion(e, 0);
     }
 
     private void setEdit(MotionUpdateEvent event) {
