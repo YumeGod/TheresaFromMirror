@@ -79,6 +79,7 @@ public class Fly extends Module {
                         e.setY(e.getY() - 0.075);
                         e.setOnGround(true);
                         clipped = true;
+                   //     mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.075, mc.thePlayer.posZ);
                     }
 
                     if (clipped) {
