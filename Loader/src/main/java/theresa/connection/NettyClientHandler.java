@@ -17,7 +17,6 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
     public void channelActive(ChannelHandlerContext ctx) {
         ctx.channel().writeAndFlush(new String(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey),
                 PacketUtil.Type.PING, Main.INSTANCE.publicKey).pack().getBytes(), StandardCharsets.UTF_8));
-
     }
 
 
@@ -48,5 +47,9 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
         }
     }
 
-
+    @Override
+    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+        super.handlerRemoved(ctx);
+        Main.INSTANCE.login.setVisible(false);
+    }
 }

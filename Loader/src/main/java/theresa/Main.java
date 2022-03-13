@@ -1,5 +1,7 @@
 package theresa;
 
+import com.formdev.flatlaf.FlatClientProperties;
+import com.formdev.flatlaf.FlatLightLaf;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -42,14 +44,22 @@ public class Main {
 
     public String name, password;
     public static ChannelFuture cf;
-
+    public Login login;
 
     public Main() {
         INSTANCE = this;
     }
 
     public void IRC() {
-        doLogin();
+        login = new Login();
+        login.init();
+        while (login.isVisible()) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
+        }
+
         new Thread(() -> {
             EventLoopGroup eventExecutors = new NioEventLoopGroup();
             try {
@@ -77,37 +87,46 @@ public class Main {
         private static final long serialVersionUID = 1L;
 
         public void init() {
+            FlatLightLaf.install();
             setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             setAlwaysOnTop(true);
             // 设置顶部提示文字和主窗体的宽，高，x值，y值
-            setTitle("Theresa.exe - Verify");
-            setBounds(0, 0, 275, 175);
+            setTitle("Theresa.exe");
+            setBounds(0, 0, 320, 400);
             setLocationRelativeTo(null);
             Container cp = getContentPane(); // 添加一个cp容器
             cp.setLayout(null); // 设置添加的cp容器为流布局管理器
-
+            JLabel head = new JLabel("Login...");
+            head.setBounds(100, 20, 275, 60);
+            head.putClientProperty("FlatLaf.styleClass", "h0");
             // 设置左侧用户名文字
-            JLabel jl = new JLabel("用户名：");
-            jl.setBounds(30, 10, 200, 35);
+            JLabel jl = new JLabel("Username:");
+            jl.setBounds(30, 100, 200, 30);
             final JTextField name = new JTextField(); // 用户名框
-            name.setBounds(100, 10, 150, 35); // 设置用户名框的宽，高，x值，y值
+            name.setBounds(100, 100, 150, 30); // 设置用户名框的宽，高，x值，y值
 
             // 设置左侧密码文字
-            JLabel jl2 = new JLabel("密码：");
-            jl2.setBounds(30, 50, 200, 35);
+            JLabel jl2 = new JLabel("Password:");
+            jl2.setBounds(30, 160, 200, 30);
             final JPasswordField password = new JPasswordField(); // 密码框：为加密的***
-            password.setBounds(100, 50, 150, 35); // 设置密码框的宽，高，x值，y值
+            password.setBounds(100, 160, 150, 30); // 设置密码框的宽，高，x值，y值
+            password.putClientProperty(FlatClientProperties.STYLE, "showRevealButton: true");
 
-            // 将jl、name、jl2、password添加到容器cp中
+            JProgressBar progressBar = new JProgressBar();
+            progressBar.setBounds(10, 150, 290, 10);
+            progressBar.setIndeterminate(true);
+            progressBar.setVisible(false);
+            // 将head、jl、name、jl2、password添加到容器cp中
+            cp.add(head);
             cp.add(jl);
             cp.add(name);
             cp.add(jl2);
             cp.add(password);
+            cp.add(progressBar);
 
             // 确定按钮
-            JButton jb = new JButton("确定"); // 添加一个确定按钮
+            JButton jb = new JButton("Login"); // 添加一个确定按钮
             jb.addActionListener(new ActionListener() { // 为确定按钮添加监听事件
-
                 public void actionPerformed(ActionEvent arg0) {
                     Main.INSTANCE.name = name.getText();
                     Main.INSTANCE.password = (new String(password.getPassword()));
@@ -115,8 +134,17 @@ public class Main {
                     Map<String, String> keyMap = RSAUtils.createKeys(2048);
                     Main.INSTANCE.publicKey = keyMap.get("publicKey");
                     Main.INSTANCE.privateKey = keyMap.get("privateKey");
-
                     //Get The Auto-Login System By Theresa.exe
+
+
+                    // Hide all the components
+                    head.setVisible(false);
+                    jl.setVisible(false);
+                    name.setVisible(false);
+                    jl2.setVisible(false);
+                    password.setVisible(false);
+                    jb.setVisible(false);
+                    progressBar.setVisible(true);
 
                     //New Thread SUS
                     new Thread(() -> {
@@ -147,10 +175,9 @@ public class Main {
                         }
                     }).start();
 
-                    setVisible(false);
                 }
             });
-            jb.setBounds(10, 100, 250, 30); // 设置确定按钮的宽，高，x值，y值
+            jb.setBounds(90, 240, 140, 35); // 设置确定按钮的宽，高，x值，y值
             cp.add(jb); // 将确定按钮添加到cp容器中
 
             setResizable(false);
@@ -164,17 +191,6 @@ public class Main {
                 }
 
             });
-        }
-    }
-
-    public void doLogin() {
-        Login login = new Login();
-        login.init();
-        while (login.isVisible()) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-            }
         }
     }
 
