@@ -53,8 +53,12 @@ public class Main {
     public void IRC() {
         login = new Login();
         login.init();
-
-
+        while (login.head.isVisible()) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+            }
+        }
 
         new Thread(() -> {
             EventLoopGroup eventExecutors = new NioEventLoopGroup();
@@ -81,6 +85,7 @@ public class Main {
 
     public static class Login extends JFrame {
         private static final long serialVersionUID = 1L;
+        public JLabel head;
 
         public void init() {
             FlatLightLaf.install();
@@ -92,7 +97,7 @@ public class Main {
             setLocationRelativeTo(null);
             Container cp = getContentPane(); // 添加一个cp容器
             cp.setLayout(null); // 设置添加的cp容器为流布局管理器
-            JLabel head = new JLabel("Login...");
+            head = new JLabel("Login...");
             head.setBounds(100, 20, 275, 60);
             head.putClientProperty("FlatLaf.styleClass", "h0");
             // 设置左侧用户名文字
