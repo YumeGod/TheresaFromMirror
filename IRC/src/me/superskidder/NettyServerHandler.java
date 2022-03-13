@@ -12,7 +12,6 @@ import me.superskidder.utils.Entity;
 import me.superskidder.utils.KeyPair;
 import me.superskidder.utils.RSAUtils;
 import me.superskidder.utils.UserAuth;
-import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -21,7 +20,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
