@@ -24,6 +24,7 @@ public class Fly extends Module {
     private boolean clipped;
     boolean detect;
 
+    double lastY;
     int stage, offset;
 
     public Fly() {
@@ -45,6 +46,7 @@ public class Fly extends Module {
         clipped = false;
         stage = 0;
         offset = 0;
+        detect = false;
     }
 
     @Override
@@ -72,19 +74,23 @@ public class Fly extends Module {
                                     mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.05, mc.thePlayer.posZ, false));
                                     mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, true));
                                 }
-                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, true));
+                                lastY = e.getY();
+                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook
+                                        (mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ , mc.thePlayer.rotationYaw , mc.thePlayer.rotationPitch, true));
                                 stage++;
                                 break;
                             case 1:
                                 e.setOnGround(false);
                                 e.setY(mc.thePlayer.posY + 0.05);
+                                detect = true;
                                 mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.05, mc.thePlayer.posZ);
                                 stage++;
                                 break;
                             case 2:
-                                for (int i = 0; i < 3; i++)
-                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition
-                                        (mc.thePlayer.posX, mc.thePlayer.posY - 0.22, mc.thePlayer.posZ, false));
+                            case 3:
+                                //    mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY - 0.22, mc.thePlayer.posZ, true));
+                                e.setOnGround(true);
+                                e.setY(mc.thePlayer.posY - 0.22);
                                 stage++;
                                 break;
                             default:
@@ -117,10 +123,13 @@ public class Fly extends Module {
 
     @EventTarget
     private void onPacket(PacketEvent e) {
-        if (e.getPacket() instanceof C03PacketPlayer) {
-            if (!((C03PacketPlayer) e.getPacket()).isMoving()
-                    && !((C03PacketPlayer) e.getPacket()).getRotating())
+        if (e.getPacket() instanceof C03PacketPlayer && mode.getCurrentMode().equalsIgnoreCase("Hypixel") && !mc.thePlayer.isSpectator()) {
+            if (!((C03PacketPlayer) e.getPacket()).isMoving() && !((C03PacketPlayer) e.getPacket()).getRotating())
                 e.setCancelled(true);
+
+            if (lastY == ((C03PacketPlayer) e.getPacket()).getPositionY()) {
+                if (detect) e.setCancelled(true);
+            }
         }
     }
 

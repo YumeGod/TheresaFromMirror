@@ -108,7 +108,7 @@ public class Criticals extends Module {
                 if (mc.thePlayer.onGround) {
                     if (always.getObject() || entity.hurtResistantTime != 20)
                         if (playerUtils.isMoving2()) {
-                            if (speed.getState()) offset[counter] *= 0.001;
+                            if (speed.getState()) offset[counter] *= 3e-4;
                             e.setY(e.getY() + (offset[counter]));
                             e.setOnGround(false);
                             counter++;

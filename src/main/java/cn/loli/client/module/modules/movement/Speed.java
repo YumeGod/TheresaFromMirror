@@ -89,7 +89,7 @@ public class Speed extends Module {
                 break;
             }
             case "Zoom": {
-                if (playerUtils.isMoving2() && playerUtils.isOnGround(0.01) && !mc.thePlayer.isCollidedHorizontally) {
+                if (playerUtils.isMoving2() && playerUtils.isOnGround(0.01) && !mc.thePlayer.isCollidedHorizontally && mc.thePlayer.ticksExisted % 2 == 0) {
                     mc.getNetHandler().addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX + event.getX(), mc.thePlayer.posY, mc.thePlayer.posZ + event.getZ(), true));
                     event.setX(event.getX() * 2);
                     event.setZ(event.getZ() * 2);
