@@ -53,12 +53,8 @@ public class Main {
     public void IRC() {
         login = new Login();
         login.init();
-        while (login.isVisible()) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-            }
-        }
+
+
 
         new Thread(() -> {
             EventLoopGroup eventExecutors = new NioEventLoopGroup();
@@ -87,6 +83,7 @@ public class Main {
         private static final long serialVersionUID = 1L;
 
         public void init() {
+            setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             FlatLightLaf.install();
             setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             setAlwaysOnTop(true);
