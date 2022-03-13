@@ -153,8 +153,6 @@ shadowJar {
     classifier = ""
 }
 
-reobf { shadowJar { mappingType = "SEARGE" } }
-tasks.reobfShadowJar.mustRunAfter shadowJar
 
 configurations {
     external
