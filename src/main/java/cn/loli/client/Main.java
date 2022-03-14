@@ -251,8 +251,7 @@ public class Main {
         new Thread(() -> {
             try {
                 while (true) {
-                    if(!connected)
-                        Minecraft.getMinecraft().displayGuiScreen(new GuiReconnectIRC());
+                    if(!connected) Minecraft.getMinecraft().displayGuiScreen(new GuiReconnectIRC());
                     Thread.sleep(1000L); //-1s
                     if (ProtectionThread.getInstance().runChecks()) {
                         println("检测到非法行为，已自动踢出");
@@ -380,6 +379,10 @@ public class Main {
                 Main.INSTANCE.publicKey = keyMap.get("publicKey");
                 Main.INSTANCE.privateKey = keyMap.get("privateKey");
                 socket.close();
+
+                //Detect
+                if (Main.INSTANCE.name == null || Main.INSTANCE.password == null)
+                    Main.INSTANCE.doCrash();
             }
         } catch (IOException e) {
             try {

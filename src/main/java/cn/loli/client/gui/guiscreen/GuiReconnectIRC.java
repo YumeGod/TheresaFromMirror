@@ -13,6 +13,9 @@ import java.awt.*;
 import java.util.Map;
 
 public class GuiReconnectIRC extends GuiScreen {
+
+    //TODO: 切换服务器并且美化这坨屎
+
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
@@ -44,25 +47,26 @@ public class GuiReconnectIRC extends GuiScreen {
             }
 
             if (isHovered(x1, y1, x1 + 64, y1 + 80, mouseX, mouseY) && Mouse.isButtonDown(0)) {
+                //Init
+                Main.INSTANCE.hasKey = false;
 
                 //Re Generate RSA
-                Main.INSTANCE.hasKey = false;
                 Map<String, String> keyMap = RSAUtils.createKeys(2048);
                 Main.INSTANCE.publicKey = keyMap.get("publicKey");
                 Main.INSTANCE.privateKey = keyMap.get("privateKey");
 
                 switch (i) {
                     case 0:
-                        Main.INSTANCE.bootstrap.connect(getip("Japan-1"), 9822);
+                        Main.INSTANCE.bootstrap.connect(getIP("Japan-1"), 9822);
                         break;
                     case 1:
-                        Main.INSTANCE.bootstrap.connect(getip("HK-2"), 9822);
+                        Main.INSTANCE.bootstrap.connect(getIP("HK-1"), 9822);
                         break;
                     case 2:
-                        Main.INSTANCE.bootstrap.connect(getip("US-1"), 9822);
+                        Main.INSTANCE.bootstrap.connect(getIP("US-1"), 9822);
                         break;
                     case 3:
-                        Main.INSTANCE.bootstrap.connect(getip("US-2"), 9822);
+                        Main.INSTANCE.bootstrap.connect(getIP("US-2"), 9822);
                         break;
                 }
                 mc.displayGuiScreen(new GuiMainMenu());
@@ -76,11 +80,13 @@ public class GuiReconnectIRC extends GuiScreen {
     }
 
 
-    public String getip(String name) {
+    //TODO : USE DNS TO SOLVE THE IP SOURCE
+
+    public String getIP(String name) {
         switch (name) {
             case "Japan-1":
                 return "167.88.184.79";
-            case "HK-2":
+            case "HK-1":
                 return "2404:8c80:0:1009:395:fbec:c4f8:e384";
             case "US-1":
                 return "15.204.152.11";
