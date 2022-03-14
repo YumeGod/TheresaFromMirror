@@ -1,6 +1,7 @@
 package cn.loli.client.gui.guiscreen;
 
 import cn.loli.client.Main;
+import cn.loli.client.connection.RSAUtils;
 import cn.loli.client.utils.render.RenderUtils;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
@@ -9,6 +10,7 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
 
 import java.awt.*;
+import java.util.Map;
 
 public class GuiReconnectIRC extends GuiScreen {
     @Override
@@ -42,6 +44,13 @@ public class GuiReconnectIRC extends GuiScreen {
             }
 
             if (isHovered(x1, y1, x1 + 64, y1 + 80, mouseX, mouseY) && Mouse.isButtonDown(0)) {
+
+                //Re Generate RSA
+                Main.INSTANCE.hasKey = false;
+                Map<String, String> keyMap = RSAUtils.createKeys(2048);
+                Main.INSTANCE.publicKey = keyMap.get("publicKey");
+                Main.INSTANCE.privateKey = keyMap.get("privateKey");
+
                 switch (i) {
                     case 0:
                         Main.INSTANCE.bootstrap.connect(getip("Japan-1"), 9822);
@@ -72,7 +81,7 @@ public class GuiReconnectIRC extends GuiScreen {
             case "Japan-1":
                 return "167.88.184.79";
             case "HK-2":
-                return "45.94.41.7";
+                return "2404:8c80:0:1009:395:fbec:c4f8:e384";
             case "US-1":
                 return "15.204.152.11";
             case "US-2":

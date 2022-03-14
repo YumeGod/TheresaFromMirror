@@ -301,9 +301,6 @@ public class Main {
             } catch (InterruptedException ignored) {
             } finally {
                 println("Client closed!");
-//                eventExecutors.shutdownGracefully();
-//                            Minecraft.getMinecraft().displayGuiScreen((new GuiDisconnected(new GuiCrashMe(),
-//                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "服务器校检失败 请重新启动客户端"))));
             }
         }).start();
     }

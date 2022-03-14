@@ -42,10 +42,6 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
                     e.printStackTrace();
                 }
                 if (Main.INSTANCE.hasKey) {
-                    if (alive.hasReached(8000)) {
-                        Main.INSTANCE.println("Timeout, Process Dead...");
-                        Main.INSTANCE.doCrash();
-                    }
                     ping = "PING!" + crashUtils.AlphabeticRandom(10);
                     ctx.channel().writeAndFlush(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey), PacketUtil.Type.HEARTBEAT, ping).pack());
                 }
