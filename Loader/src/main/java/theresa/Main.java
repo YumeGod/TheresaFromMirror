@@ -31,6 +31,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -59,7 +60,7 @@ public class Main {
         login.init();
         while (login.head.isVisible()) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -78,7 +79,7 @@ public class Main {
                                 socketChannel.pipeline().addLast(new NettyClientHandler());
                             }
                         }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(1024*1024));
-                cf = bootstrap.connect("15.204.152.11", 9822).sync();
+                cf = bootstrap.connect(getip((String) Objects.requireNonNull(login.jcb1.getSelectedItem())), 9822).sync();
                 println("Client started!");
                 cf.channel().closeFuture().sync();
             } catch (InterruptedException ignored) {
@@ -88,10 +89,24 @@ public class Main {
         }).start();
     }
 
+    public String getip(String name){
+        switch (name){
+            case "Japan-1":
+                return "167.88.184.79";
+            case "HK-2":
+                return "45.94.41.7";
+            case "US-1":
+                return "15.204.152.11";
+            case "US-2":
+                return "15.204.152.34";
+        }
+        return "15.204.152.34";
+    }
+
     public static class Login extends JFrame {
         private static final long serialVersionUID = 1L;
         public JLabel head;
-
+        public JComboBox<String> jcb1;
         public void init() {
             FlatLightLaf.setup();
             setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -105,6 +120,19 @@ public class Main {
             head = new JLabel("Login...");
             head.setBounds(100, 20, 275, 60);
             head.putClientProperty("FlatLaf.styleClass", "h0");
+
+            //Proxy
+            JLabel jl1 = new JLabel("Proxy:");
+            jl1.setBounds(30, 100, 200, 30);
+            jcb1 = new JComboBox<>();
+            jcb1.setBounds(100, 100, 150, 30);
+            jcb1.addItem("Japan-1");
+            jcb1.addItem("HK-1");
+            jcb1.addItem("US-2");
+            jcb1.addItem("US-1");
+            cp.add(jcb1);
+            cp.add(jl1);
+
             // 设置左侧用户名文字
             JLabel jl = new JLabel("Username:");
             jl.setBounds(30, 100, 200, 30);
