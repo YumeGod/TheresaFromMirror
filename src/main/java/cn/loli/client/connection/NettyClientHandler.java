@@ -2,6 +2,7 @@ package cn.loli.client.connection;
 
 import cn.loli.client.Main;
 import cn.loli.client.utils.misc.CrashUtils;
+import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.protection.HWIDUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -17,6 +18,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
 
     CrashUtils crashUtils = new CrashUtils();
     String ping;
+    TimeHelper alive = new TimeHelper();
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
@@ -24,6 +26,8 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
         ctx.channel().writeAndFlush(new String(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey),
                 PacketUtil.Type.PING, Main.INSTANCE.publicKey).pack().getBytes(), StandardCharsets.UTF_8));
 
+
+        alive.reset();
 
         new Thread(() -> {
             while (true) {
@@ -33,9 +37,12 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
                     e.printStackTrace();
                 }
                 if (Main.INSTANCE.hasKey) {
+                    if (alive.hasReached(8000)){
+                        Main.INSTANCE.println("Timeout, Process Dead...");
+                        Main.INSTANCE.doCrash();
+                    }
                     ping = "PING!" + crashUtils.AlphabeticRandom(10);
                     ctx.channel().writeAndFlush(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey), PacketUtil.Type.HEARTBEAT, ping).pack());
-
                 }
             }
         }).start();
@@ -67,6 +74,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
                 case COMMAND:
                 case HEARTBEAT:
                     String i = p.content.replace("PONG", "PING");
+                    alive.reset();
 
                     if (!Objects.equals(i, ping))
                         channelHandlerContext.close();

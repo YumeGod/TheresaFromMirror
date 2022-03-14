@@ -145,7 +145,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                         ctx.close();
                     } else {
                         if (!result.contains("success")) {
-                            System.out.println("Dont Pass");
+                            System.out.println("Dont Pass -> " + result);
                             ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.AUTHORIZE, "YouSuchANigger").pack());
                             ctx.close();
                         } else {

@@ -15,7 +15,6 @@ import net.minecraft.network.play.client.C03PacketPlayer;
 
 public class Fly extends Module {
 
-    private final BooleanValue edit = new BooleanValue("Edit", true);
     private final BooleanValue enduring = new BooleanValue("Enduring", false);
 
     private final ModeValue mode = new ModeValue("Mode", "Vanilla", "Vanilla", "Hypixel");
@@ -70,26 +69,25 @@ public class Fly extends Module {
                     if (enduring.getObject()) {
                         switch (stage) {
                             case 0:
+                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(), e.getY(), e.getZ(),true));
                                 for (int i = 0; i < 50; i++) {
-                                    mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.05, mc.thePlayer.posZ, false));
-                                    mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, true));
+                                    mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(),  e.getY() + 0.05, e.getZ(), false));
+                                    mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(),e.getY(), e.getZ(), true));
                                 }
                                 lastY = e.getY();
-                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook
-                                        (mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ , mc.thePlayer.rotationYaw , mc.thePlayer.rotationPitch, true));
+                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(), e.getY(), e.getZ(),true));
                                 stage++;
                                 break;
                             case 1:
                                 e.setOnGround(false);
                                 e.setY(mc.thePlayer.posY + 0.05);
-                                detect = true;
-                                mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.05, mc.thePlayer.posZ);
+                                mc.thePlayer.setPosition(e.getX(), mc.thePlayer.posY + 0.05, e.getZ());
                                 stage++;
                                 break;
                             case 2:
                             case 3:
-                                //    mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY - 0.22, mc.thePlayer.posZ, true));
-                                e.setOnGround(true);
+                            case 4:
+                                e.setOnGround(false);
                                 e.setY(mc.thePlayer.posY - 0.22);
                                 stage++;
                                 break;
@@ -126,18 +124,14 @@ public class Fly extends Module {
         if (e.getPacket() instanceof C03PacketPlayer && mode.getCurrentMode().equalsIgnoreCase("Hypixel") && !mc.thePlayer.isSpectator()) {
             if (!((C03PacketPlayer) e.getPacket()).isMoving() && !((C03PacketPlayer) e.getPacket()).getRotating())
                 e.setCancelled(true);
-
-            if (lastY == ((C03PacketPlayer) e.getPacket()).getPositionY()) {
-                if (detect) e.setCancelled(true);
-            }
         }
     }
 
     @EventTarget
     private void onMove(PlayerMoveEvent e) {
-        if (mode.getCurrentMode().equalsIgnoreCase("Hypixel") && !mc.thePlayer.isSpectator() && stage >= 1) {
+        if (mode.getCurrentMode().equalsIgnoreCase("Hypixel") && !mc.thePlayer.isSpectator() && ((enduring.getObject() && stage >= 1) || (!enduring.getObject() && clipped))) {
             e.setY(mc.thePlayer.motionY = 0.0);
-            moveUtils.setMotion(e, moveUtils.getBaseMoveSpeed(0.281, 0.2));
+            moveUtils.setMotion(e, moveUtils.getBaseMoveSpeed(0.271, 0.2));
         } else
             moveUtils.setMotion(e, 0);
     }

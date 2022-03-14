@@ -83,9 +83,9 @@ public class RSAUtils {
             Cipher cipher = Cipher.getInstance(RSA_ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);
             return Base64.encodeBase64URLSafeString(rsaSplitCodec(cipher, Cipher.ENCRYPT_MODE, data.getBytes(CHARSET), publicKey.getModulus().bitLength()));
-        }catch(Exception e){
-            throw new RuntimeException("加密字符串[" + data + "]时遇到异常", e);
+        }catch(Exception ignored){
         }
+        return null;
     }
 
     /**
@@ -100,9 +100,9 @@ public class RSAUtils {
             Cipher cipher = Cipher.getInstance(RSA_ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, privateKey);
             return new String(rsaSplitCodec(cipher, Cipher.DECRYPT_MODE, Base64.decodeBase64(data), privateKey.getModulus().bitLength()), CHARSET);
-        }catch(Exception e){
-            throw new RuntimeException("解密字符串[" + data + "]时遇到异常", e);
+        }catch(Exception ignored){
         }
+        return null;
     }
 
     /**
@@ -117,9 +117,9 @@ public class RSAUtils {
             Cipher cipher = Cipher.getInstance(RSA_ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, privateKey);
             return Base64.encodeBase64URLSafeString(rsaSplitCodec(cipher, Cipher.ENCRYPT_MODE, data.getBytes(CHARSET), privateKey.getModulus().bitLength()));
-        }catch(Exception e){
-            throw new RuntimeException("加密字符串[" + data + "]时遇到异常", e);
+        }catch(Exception ignored){
         }
+        return null;
     }
 
     /**
@@ -134,9 +134,9 @@ public class RSAUtils {
             Cipher cipher = Cipher.getInstance(RSA_ALGORITHM);
             cipher.init(Cipher.DECRYPT_MODE, publicKey);
             return new String(rsaSplitCodec(cipher, Cipher.DECRYPT_MODE, Base64.decodeBase64(data), publicKey.getModulus().bitLength()), CHARSET);
-        }catch(Exception e){
-            throw new RuntimeException("解密字符串[" + data + "]时遇到异常", e);
+        }catch(Exception ignored){
         }
+        return null;
     }
 
     private static byte[] rsaSplitCodec(Cipher cipher, int opmode, byte[] datas, int keySize){
@@ -161,8 +161,7 @@ public class RSAUtils {
                 i++;
                 offSet = i * maxBlock;
             }
-        }catch(Exception e){
-            throw new RuntimeException("加解密阀值为["+maxBlock+"]的数据时发生异常", e);
+        }catch(Exception ignored){
         }
         byte[] resultDatas = out.toByteArray();
         IOUtils.closeQuietly(out);

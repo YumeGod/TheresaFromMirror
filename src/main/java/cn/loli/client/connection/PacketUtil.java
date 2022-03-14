@@ -22,8 +22,7 @@ public class PacketUtil {
         try {
             strings[1] = RSAUtils.privateDecrypt(strings[1], RSAUtils.getPrivateKey(Main.INSTANCE.privateKey));
             i = new Packet(user, Type.valueOf(strings[1].split("@SKID@")[0]), strings[1].split("@SKID@")[1]);
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
         }
 
         return i;

@@ -45,17 +45,13 @@ object Loader {
 
         main.timer.reset()
 
-        thread {
-            while (!main.hasConnected)
-                if (main.timer.hasReached(8000)){
-                    main.println("Timeout reached, shutting down...")
-                    main.doCrash()
-                }
+        while (!main.hasConnected) {
+            if (main.timer.hasReached(8000)){
+                main.println("Timeout reached, shutting down...")
+                main.doCrash()
+            }
+            Thread.sleep(1000)
         }
-
-        while (!main.hasConnected)
-            Thread.sleep(1000);
-
 
         val host = "15.204.152.11"
         val port = 37721 //Port

@@ -15,11 +15,17 @@ public class Packet {
     }
 
     public String pack() {
-        if (PacketUtil.Type.PONG.equals(type))
-            return user + "@NIGGA@" + type.name() + "@SKID@" + content;
+        String packet = null;
 
-        return user + "@NIGGA@" +
-                RSAUtils.publicEncrypt(type.name() + "@SKID@" + content, Server.INSTANCE.userAuth.get(user).getKeyPair().getPublic());
+        try {
+            packet = PacketUtil.Type.PONG.equals(type) ? user + "@NIGGA@" + type.name() + "@SKID@" + content: user + "@NIGGA@" +
+                    RSAUtils.publicEncrypt(type.name() + "@SKID@" + content, Server.INSTANCE.userAuth.get(user).getKeyPair().getPublic());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("Packed: " + packet);
+        return packet;
     }
 
     public String getContent() {

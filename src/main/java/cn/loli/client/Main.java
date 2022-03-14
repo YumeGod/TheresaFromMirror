@@ -305,9 +305,7 @@ public class Main {
                             Thread.sleep(100L);
                             Minecraft.getMinecraft().displayGuiScreen((new GuiDisconnected(new GuiCrashMe(),
                                     "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "服务器校检失败 请重新启动客户端"))));
-                        } catch (InterruptedException e) {
-                            doCrash();
-                            attack();
+                        } catch (InterruptedException ignored) {
                         }
                     }
                 }).start();
