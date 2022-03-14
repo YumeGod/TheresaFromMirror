@@ -10,6 +10,7 @@ import cn.loli.client.events.PacketEvent;
 import cn.loli.client.events.TextEvent;
 import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.file.FileManager;
+import cn.loli.client.gui.guiscreen.GuiReconnectIRC;
 import cn.loli.client.gui.ttfr.FontLoaders;
 import cn.loli.client.module.ModuleManager;
 import cn.loli.client.protection.GuiCrashMe;
@@ -274,14 +275,13 @@ public class Main {
             }
         }).start();
     }
-
+    public Bootstrap bootstrap;
     private void IRC() {
         doLogin();
-
         new Thread(() -> {
             EventLoopGroup eventExecutors = new NioEventLoopGroup();
             try {
-                Bootstrap bootstrap = new Bootstrap();
+                bootstrap = new Bootstrap();
                 bootstrap.group(eventExecutors).channel(NioSocketChannel.class)
                         .handler(new ChannelInitializer<SocketChannel>() {
                             @Override
@@ -299,16 +299,9 @@ public class Main {
             } finally {
                 println("Client closed!");
                 eventExecutors.shutdownGracefully();
-                new Thread(() -> {
-                    while (true) {
-                        try {
-                            Thread.sleep(100L);
-                            Minecraft.getMinecraft().displayGuiScreen((new GuiDisconnected(new GuiCrashMe(),
-                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "服务器校检失败 请重新启动客户端"))));
-                        } catch (InterruptedException ignored) {
-                        }
-                    }
-                }).start();
+                Minecraft.getMinecraft().displayGuiScreen(new GuiReconnectIRC());
+//                            Minecraft.getMinecraft().displayGuiScreen((new GuiDisconnected(new GuiCrashMe(),
+//                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "服务器校检失败 请重新启动客户端"))));
             }
         }).start();
     }

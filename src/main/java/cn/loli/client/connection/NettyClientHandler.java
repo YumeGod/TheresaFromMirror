@@ -1,6 +1,7 @@
 package cn.loli.client.connection;
 
 import cn.loli.client.Main;
+import cn.loli.client.gui.guiscreen.GuiReconnectIRC;
 import cn.loli.client.utils.misc.CrashUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.protection.HWIDUtil;
@@ -9,10 +10,14 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
 
@@ -88,5 +93,34 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
         }
     }
 
+    @Override
+    public void channelInactive(final ChannelHandlerContext ctx) {
+       println("Connecting lost:" + ctx.channel().remoteAddress());
+    }
 
+
+    @Override
+    public void channelUnregistered(final ChannelHandlerContext ctx) throws Exception {
+        Minecraft.getMinecraft().displayGuiScreen(new GuiReconnectIRC());
+    }
+
+
+    public void println(String obj) {
+        Class<?> systemClass = null;
+        try {
+            systemClass = Class.forName("java.lang.System");
+            Field outField = null;
+            try {
+                outField = systemClass.getDeclaredField("out");
+            } catch (NoSuchFieldException e) {
+                e.printStackTrace();
+            }
+            Class<?> printStreamClass = Objects.requireNonNull(outField).getType();
+            Method printlnMethod = printStreamClass.getDeclaredMethod("println", String.class);
+            Object object = outField.get(null);
+            printlnMethod.invoke(object, obj);
+        } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
 }
