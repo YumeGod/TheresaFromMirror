@@ -1,5 +1,6 @@
 package me.superskidder;
 
+import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -8,10 +9,7 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.concurrent.GlobalEventExecutor;
-import me.superskidder.utils.Entity;
-import me.superskidder.utils.KeyPair;
-import me.superskidder.utils.RSAUtils;
-import me.superskidder.utils.UserAuth;
+import me.superskidder.utils.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -26,6 +24,8 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import static me.superskidder.PacketUtil.unpack;
 
@@ -112,46 +112,60 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
 
                 if (split.length == 3) {
                     String url = "https://api.m0jang.org/auth.php?user=" + split[0] + "&pass=" + split[1] + "&hwid=" + split[2];
-
-                    System.out.println(url);
-
                     String result = getStatus(url);
 
-                    System.out.println(result);
-
-                    if (!result.contains("success")) {
-                        System.out.println(split[0] + " Verify failed -> " + result);
+                    if (result == null){
+                        System.out.println("Authorize Failed");
                         ctx.close();
+                    } else {
+                        if (!result.contains("success")) {
+                            System.out.println(split[0] + " Verify failed -> " + result);
+                            ctx.close();
+                        } else
+                            channelGroup.writeAndFlush(new Packet(p.user, PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + split[0] + " login successfully").pack());
                     }
                 } else {
+                    System.out.println("Illegal Request");
                     ctx.close();
                 }
 
-                channelGroup.writeAndFlush(new Packet(p.user, PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + split[0] + " login successfully").pack());
                 break;
             case AUTHORIZE:
                 String[] strings = p.content.split("\\|");
-
                 System.out.println("Request for Authorize");
 
                 if (strings.length == 3) {
                     String url = "https://api.m0jang.org/auth.php?user=" + strings[0] + "&pass=" + strings[1] + "&hwid=" + strings[2];
-                    String result = getStatus(url);
-                    if (!result.contains("success")) ctx.close();
+                    String result;
+                    result = getStatus(url);
 
+                    if (result == null){
+                        System.out.println("Authorize Failed");
+                        ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.AUTHORIZE, "AuthFailed").pack());
+                        ctx.close();
+                    } else {
+                        if (!result.contains("success")) {
+                            System.out.println("Dont Pass");
+                            ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.AUTHORIZE, "YouSuchANigger").pack());
+                            ctx.close();
+                        } else {
+                            System.out.println("Success to Login");
+                            Server.INSTANCE.userAuth.giveAccess(p.user, true);
+                            ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.AUTHORIZE, p.user + p.user).pack());
+                            ctx.close();
+                        }
+                    }
                 } else {
+                    System.out.println("Illegal Request");
+                    ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.AUTHORIZE, "YouSuchABITCH").pack());
                     ctx.close();
                 }
 
-                Server.INSTANCE.userAuth.giveAccess(p.user, true);
-                ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.AUTHORIZE, p.user + p.user).pack());
-                ctx.close();
                 break;
             case COMMAND:
                 break;
             case HEARTBEAT:
                 String i = p.content.replace("PING", "PONG");
-                ;
                 ctx.channel().pipeline().writeAndFlush(new Packet(p.user, PacketUtil.Type.HEARTBEAT, i).pack());
                 break;
             case EXIT:

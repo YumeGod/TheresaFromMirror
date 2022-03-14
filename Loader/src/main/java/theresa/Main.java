@@ -12,6 +12,7 @@ import io.netty.handler.codec.string.StringEncoder;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import sun.misc.Unsafe;
 import theresa.connection.NettyClientHandler;
+import theresa.connection.Timer;
 import theresa.protection.RSAUtils;
 
 import javax.swing.*;
@@ -41,10 +42,13 @@ public class Main {
     public String publicKey;
 
     public boolean hasKey;
+    public boolean hasConnected;
 
     public String name, password;
     public static ChannelFuture cf;
     public Login login;
+
+    public Timer timer;
 
     public Main() {
         INSTANCE = this;
@@ -57,6 +61,7 @@ public class Main {
             try {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
 
@@ -88,7 +93,7 @@ public class Main {
         public JLabel head;
 
         public void init() {
-            FlatLightLaf.install();
+            FlatLightLaf.setup();
             setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             setAlwaysOnTop(true);
             // 设置顶部提示文字和主窗体的宽，高，x值，y值
@@ -127,56 +132,55 @@ public class Main {
 
             // 确定按钮
             JButton jb = new JButton("Login"); // 添加一个确定按钮
-            jb.addActionListener(new ActionListener() { // 为确定按钮添加监听事件
-                public void actionPerformed(ActionEvent arg0) {
-                    Main.INSTANCE.name = name.getText();
-                    Main.INSTANCE.password = (new String(password.getPassword()));
+            // 为确定按钮添加监听事件
+            jb.addActionListener(actionEvent -> {
+                Main.INSTANCE.name = name.getText();
+                Main.INSTANCE.password = (new String(password.getPassword()));
 
-                    Map<String, String> keyMap = RSAUtils.createKeys(2048);
-                    Main.INSTANCE.publicKey = keyMap.get("publicKey");
-                    Main.INSTANCE.privateKey = keyMap.get("privateKey");
-                    //Get The Auto-Login System By Theresa.exe
+                Map<String, String> keyMap = RSAUtils.createKeys(2048);
+                Main.INSTANCE.publicKey = keyMap.get("publicKey");
+                Main.INSTANCE.privateKey = keyMap.get("privateKey");
+                //Get The Auto-Login System By Theresa.exe
+                Main.INSTANCE.timer = new Timer();
 
+                // Hide all the components
+                head.setVisible(false);
+                jl.setVisible(false);
+                name.setVisible(false);
+                jl2.setVisible(false);
+                password.setVisible(false);
+                jb.setVisible(false);
+                progressBar.setVisible(true);
 
-                    // Hide all the components
-                    head.setVisible(false);
-                    jl.setVisible(false);
-                    name.setVisible(false);
-                    jl2.setVisible(false);
-                    password.setVisible(false);
-                    jb.setVisible(false);
-                    progressBar.setVisible(true);
-
-                    //New Thread SUS
-                    new Thread(() -> {
-                        ServerSocket serverSocket = null;
+                //New Thread SUS
+                new Thread(() -> {
+                    ServerSocket serverSocket = null;
+                    try {
+                        serverSocket = new ServerSocket(12580);
+                        Socket socket = serverSocket.accept();
+                        DataInputStream input = null;
+                        DataOutputStream output = null;
                         try {
-                            serverSocket = new ServerSocket(12580);
-                            Socket socket = serverSocket.accept();
-                            DataInputStream input = null;
-                            DataOutputStream output = null;
-                            try {
-                                input = new DataInputStream(socket.getInputStream());
-                                output = new DataOutputStream(socket.getOutputStream());
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            while (!serverSocket.isClosed()) {
-                                String received = Objects.requireNonNull(input).readUTF();
-                                if (received.equals("FuckYou"))
-                                    Objects.requireNonNull(output).writeUTF(INSTANCE.name + ":" + INSTANCE.password);
-                            }
-
+                            input = new DataInputStream(socket.getInputStream());
+                            output = new DataOutputStream(socket.getOutputStream());
                         } catch (IOException e) {
-                            try {
-                                serverSocket.close();
-                            } catch (IOException ex) {
-                                ex.printStackTrace();
-                            }
+                            e.printStackTrace();
                         }
-                    }).start();
+                        while (!serverSocket.isClosed()) {
+                            String received = Objects.requireNonNull(input).readUTF();
+                            if (received.equals("FuckYou"))
+                                Objects.requireNonNull(output).writeUTF(INSTANCE.name + ":" + INSTANCE.password);
+                        }
 
-                }
+                    } catch (IOException e) {
+                        try {
+                            serverSocket.close();
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }).start();
+
             });
             jb.setBounds(90, 240, 140, 35); // 设置确定按钮的宽，高，x值，y值
             cp.add(jb); // 将确定按钮添加到cp容器中
@@ -188,7 +192,7 @@ public class Main {
             addWindowListener(new WindowAdapter() {
 
                 public void windowClosing(WindowEvent e) {
-                    FMLCommonHandler.instance().exitJava(0, true);
+                  Main.INSTANCE.doCrash();
                 }
 
             });

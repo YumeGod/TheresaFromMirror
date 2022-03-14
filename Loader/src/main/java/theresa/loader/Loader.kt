@@ -17,6 +17,7 @@ import java.net.Socket
 import java.nio.charset.StandardCharsets
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
+import kotlin.concurrent.thread
 
 object Loader {
 //URLClassLoader(arrayOf(), Launch.classLoader)
@@ -42,7 +43,17 @@ object Loader {
         val main = Main();
         main.IRC()
 
-        while (!main.hasKey)
+        main.timer.reset()
+
+        thread {
+            while (!main.hasConnected)
+                if (main.timer.hasReached(8000)){
+                    main.println("Timeout reached, shutting down...")
+                    main.doCrash()
+                }
+        }
+
+        while (!main.hasConnected)
             Thread.sleep(1000);
 
 

@@ -58,9 +58,9 @@ interface AntiDump {
         }
 
         override fun setPackageNameFilter() {
-            val bytes = createDummyClass("cn/hanabi/loader/antidump/MaliciousClassFilter")
-            unsafe.defineClass("cn.hanabi.loader.antidump.MaliciousClassFilter", bytes, 0, bytes.size, null, null)
-            System.setProperty("sun.jvm.hotspot.tools.jcore.filter", "cn.hanabi.loader.antidump.MaliciousClassFilter")
+            val bytes = createDummyClass("theresa/antidump/MaliciousClassFilter")
+            unsafe.defineClass("theresa.antidump.MaliciousClassFilter", bytes, 0, bytes.size, null, null)
+            System.setProperty("sun.jvm.hotspot.tools.jcore.filter", "theresa.antidump.MaliciousClassFilter")
         }
 
         override fun dissasembleStructs() {
