@@ -27,7 +27,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-
+        Main.INSTANCE.connected = true;
         ctx.channel().writeAndFlush(new String(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey),
                 PacketUtil.Type.PING, Main.INSTANCE.publicKey).pack().getBytes(), StandardCharsets.UTF_8));
 
@@ -42,7 +42,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
                     e.printStackTrace();
                 }
                 if (Main.INSTANCE.hasKey) {
-                    if (alive.hasReached(8000)){
+                    if (alive.hasReached(8000)) {
                         Main.INSTANCE.println("Timeout, Process Dead...");
                         Main.INSTANCE.doCrash();
                     }
@@ -74,7 +74,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
                     Main.INSTANCE.println("Client connected!");
                     break;
                 case AUTHORIZE:
-                        break;
+                    break;
                 case LOGIN:
                 case COMMAND:
                 case HEARTBEAT:
@@ -95,13 +95,8 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     public void channelInactive(final ChannelHandlerContext ctx) {
-       println("Connecting lost:" + ctx.channel().remoteAddress());
-    }
-
-
-    @Override
-    public void channelUnregistered(final ChannelHandlerContext ctx) throws Exception {
-        Minecraft.getMinecraft().displayGuiScreen(new GuiReconnectIRC());
+        println("Connecting lost:" + ctx.channel().remoteAddress());
+        Main.INSTANCE.connected = false;
     }
 
 

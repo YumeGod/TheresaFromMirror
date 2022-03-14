@@ -110,6 +110,7 @@ public class Main {
     public String publicKey;
 
     public boolean hasKey;
+    public boolean connected;
 
     public Main() {
         INSTANCE = this;
@@ -250,6 +251,8 @@ public class Main {
         new Thread(() -> {
             try {
                 while (true) {
+                    if(!connected)
+                        Minecraft.getMinecraft().displayGuiScreen(new GuiReconnectIRC());
                     Thread.sleep(1000L); //-1s
                     if (ProtectionThread.getInstance().runChecks()) {
                         println("检测到非法行为，已自动踢出");
@@ -298,8 +301,7 @@ public class Main {
             } catch (InterruptedException ignored) {
             } finally {
                 println("Client closed!");
-                eventExecutors.shutdownGracefully();
-                Minecraft.getMinecraft().displayGuiScreen(new GuiReconnectIRC());
+//                eventExecutors.shutdownGracefully();
 //                            Minecraft.getMinecraft().displayGuiScreen((new GuiDisconnected(new GuiCrashMe(),
 //                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "服务器校检失败 请重新启动客户端"))));
             }
