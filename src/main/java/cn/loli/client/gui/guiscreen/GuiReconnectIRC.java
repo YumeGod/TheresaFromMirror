@@ -72,8 +72,7 @@ public class GuiReconnectIRC extends GuiScreen {
                         break;
                 }
 
-
-                mc.displayGuiScreen(new GuiMainMenu());
+                mc.displayGuiScreen(Main.INSTANCE.guiScreen);
             }
             x1 += 100;
             if (x1 > scaledResolution.getScaledWidth() - 68) {

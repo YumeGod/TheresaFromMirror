@@ -14,9 +14,7 @@ import cn.loli.client.gui.guiscreen.GuiReconnectIRC;
 import cn.loli.client.gui.ttfr.FontLoaders;
 import cn.loli.client.module.ModuleManager;
 import cn.loli.client.protection.GuiCrashMe;
-import cn.loli.client.protection.KeyPair;
 import cn.loli.client.protection.ProtectionThread;
-import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.ExploitFix;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.others.SoundFxPlayer;
@@ -33,6 +31,7 @@ import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiDisconnected;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S01PacketJoinGame;
 import net.minecraft.network.play.server.S07PacketRespawn;
@@ -59,9 +58,6 @@ import java.lang.reflect.Method;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.InvalidKeySpecException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -111,6 +107,7 @@ public class Main {
 
     public boolean hasKey;
     public boolean connected;
+    public GuiScreen guiScreen;
 
     public Main() {
         INSTANCE = this;
@@ -299,6 +296,7 @@ public class Main {
                 cf.channel().closeFuture().sync();
             } catch (InterruptedException ignored) {
             } finally {
+                guiScreen = Minecraft.getMinecraft().currentScreen;
                 println("Client closed!");
             }
         }).start();
