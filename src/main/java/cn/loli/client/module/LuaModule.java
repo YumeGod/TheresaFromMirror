@@ -3,6 +3,7 @@ package cn.loli.client.module;
 import cn.loli.client.events.*;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
+import net.minecraft.util.FrameTimer;
 import org.luaj.vm2.Globals;
 
 public class LuaModule extends Module {
@@ -19,27 +20,15 @@ public class LuaModule extends Module {
 
     @EventTarget
     private void onUpdate(UpdateEvent event) {
-        try {
-            this.globals.get("on_update").invoke();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        invoke("on_update");
     }
 
     @EventTarget
     private void onUpdate(MotionUpdateEvent event) {
         if (event.getEventType() == EventType.PRE) {
-            try {
-                this.globals.get("on_pre_update").invoke();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            invoke("on_pre_update");
         } else {
-            try {
-                this.globals.get("on_post_update").invoke();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            invoke("on_post_update");
         }
 
     }
@@ -47,165 +36,101 @@ public class LuaModule extends Module {
     @EventTarget
     private void onPacket(PacketEvent event) {
         if (event.getEventType() == EventType.SEND) {
-            try {
-                this.globals.get("on_packet_post").invoke();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            invoke("on_packet_post");
         } else {
-            try {
-                this.globals.get("on_packet_receive").invoke();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            invoke("on_packet_receive");
         }
     }
 
     @EventTarget
     private void onTick(TickEvent event) {
-        try {
-            this.globals.get("on_tick").invoke();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        invoke("on_tick");
     }
 
     @EventTarget
     private void onRender(RenderEvent event) {
-        try {
-            this.globals.get("on_render").invoke();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        invoke("on_render");
     }
 
     @EventTarget
     private void onRender(Render2DEvent event) {
-        try {
-            this.globals.get("on_render_2d").invoke();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        invoke("on_render_2d");
     }
 
     @EventTarget
     private void onRender(RenderSREvent event) {
-        try {
-            this.globals.get("on_render_sr").invoke();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        invoke("on_render_sr");
     }
 
     @EventTarget
     private void onBlockReach(BlockReachEvent event) {
-        try {
-            this.globals.get("on_block_reach").invoke();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        invoke("on_block_reach");
     }
 
     @EventTarget
     private void onCollision(CollisionEvent event) {
-        try {
-            this.globals.get("on_collision_block").invoke();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        invoke("on_collision_block");
     }
 
     @EventTarget
     private void onMouseOver(MouseOverEvent event) {
-        try {
-            this.globals.get("on_mouse_over").invoke();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        invoke("on_mouse_over");
     }
 
     @EventTarget
     private void onMoveFly(MoveFlyEvent event) {
-        try {
-            this.globals.get("on_move_fly").invoke();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        invoke("on_move_fly");
     }
 
     @EventTarget
     private void onJump(JumpYawEvent event) {
-        try {
-            this.globals.get("on_jump_yaw").invoke();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        invoke("on_jump_yaw");
     }
 
     @EventTarget
     private void onChat(ChatEvent event) {
-        try {
-            this.globals.get("on_chat").invoke();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        invoke("on_chat");
     }
 
     @EventTarget
     private void onKey(KeyEvent event) {
-        try {
-            this.globals.get("on_key").invoke();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        invoke("on_key");
     }
 
     @EventTarget
     private void onMove(PlayerMoveEvent event) {
-        try {
-            this.globals.get("on_move").invoke();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        invoke("on_move");
     }
 
     @EventTarget
     private void onAttack(AttackEvent event) {
-        try {
-            this.globals.get("on_attack").invoke();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        invoke("on_attack");
     }
 
     @EventTarget
     private void onJump(JumpEvent event) {
-        try {
-            this.globals.get("on_jump").invoke();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        invoke("on_jump");
     }
-
 
 
     @Override
     public void onDisable() {
-        try {
-            this.globals.get("on_enable").invoke();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        invoke("on_disable");
     }
 
     @Override
     public void onEnable() {
+        invoke("on_enable");
+    }
+
+
+    protected void invoke(String method) {
         try {
-            this.globals.get("on_disable").invoke();
+            if (!globals.get(method).isnil())
+                globals.get(method).invoke();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 
 }
