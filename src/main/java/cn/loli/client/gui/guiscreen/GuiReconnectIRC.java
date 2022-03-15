@@ -51,7 +51,7 @@ public class GuiReconnectIRC extends GuiScreen {
                 int y = scaledResolution.getScaledHeight() - 70 - by * 30;
                 RenderUtils.drawRoundedRect(x1 + 15, y, width - 30, 20, 2, new Color(79, 129, 255).getRGB());
                 Main.INSTANCE.fontLoaders.fonts.get("roboto18").drawString(name + "-" + by, x1 + width / 2f - Main.INSTANCE.fontLoaders.fonts.get("roboto18").getStringWidth(name) / 2f, y + 5, new Color(255, 255, 255).getRGB());
-                if (isHovered(x1 + 15, y, width - 30, 20, mouseX, mouseY) && Mouse.isButtonDown(0)) {
+                if (isHovered(x1 + 15, y, x1+width - 30, y+20, mouseX, mouseY) && Mouse.isButtonDown(0)) {
                     Main.INSTANCE.bootstrap.connect(ip, 9822);
                     Minecraft.getMinecraft().displayGuiScreen(parent);
                 }
