@@ -69,13 +69,13 @@ public class Fly extends Module {
                     if (enduring.getObject()) {
                         switch (stage) {
                             case 0:
-                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(), e.getY(), e.getZ(),true));
+                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(), e.getY(), e.getZ(), true));
                                 for (int i = 0; i < 50; i++) {
-                                    mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(),  e.getY() + 0.05, e.getZ(), false));
-                                    mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(),e.getY(), e.getZ(), true));
+                                    mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(), e.getY() + 0.05, e.getZ(), false));
+                                    mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(), e.getY(), e.getZ(), true));
                                 }
                                 lastY = e.getY();
-                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(), e.getY(), e.getZ(),true));
+                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(), e.getY(), e.getZ(), true));
                                 stage++;
                                 break;
                             case 1:
@@ -131,9 +131,13 @@ public class Fly extends Module {
     private void onMove(PlayerMoveEvent e) {
         if (mode.getCurrentMode().equalsIgnoreCase("Hypixel") && !mc.thePlayer.isSpectator() && ((enduring.getObject() && stage >= 1) || (!enduring.getObject() && clipped))) {
             e.setY(mc.thePlayer.motionY = 0.0);
-            moveUtils.setMotion(e, moveUtils.getBaseMoveSpeed(0.271, 0.2));
-        } else
-            moveUtils.setMotion(e, 0);
+            moveUtils.setMotion(e, moveUtils.getBaseMoveSpeed(0.281, 0.2));
+        } else {
+            if (mode.getCurrentMode().equalsIgnoreCase("Vanilla")){
+
+            } else
+                moveUtils.setMotion(e, 0);
+        }
     }
 
     private void setEdit(MotionUpdateEvent event) {
