@@ -30,7 +30,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiDisconnected;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.network.Packet;
@@ -108,6 +107,7 @@ public class Main {
 
     public boolean hasKey;
     public boolean connected;
+    public GuiScreen guiScreen;
 
     public Main() {
         INSTANCE = this;
@@ -248,8 +248,9 @@ public class Main {
         new Thread(() -> {
             try {
                 while (true) {
-                    GuiScreen guiScreen = Minecraft.getMinecraft().currentScreen;
-                    if(!connected) Minecraft.getMinecraft().displayGuiScreen(new GuiReconnectIRC(guiScreen));
+                    if(!connected)
+                        Minecraft.getMinecraft().displayGuiScreen(new GuiReconnectIRC(guiScreen));
+
                     Thread.sleep(1000L); //-1s
                     if (ProtectionThread.getInstance().runChecks()) {
                         println("检测到非法行为，已自动踢出");
