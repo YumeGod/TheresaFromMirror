@@ -101,7 +101,7 @@ public class Main {
     public int realPosX;
     public int realPosY;
     public int realPosZ;
-    public static ChannelFuture cf;
+    public ChannelFuture cf;
 
     boolean isDead = true;
 

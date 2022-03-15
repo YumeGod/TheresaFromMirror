@@ -3,6 +3,7 @@ package cn.loli.client.gui.guiscreen;
 import cn.loli.client.Main;
 import cn.loli.client.connection.RSAUtils;
 import cn.loli.client.utils.render.RenderUtils;
+import io.netty.bootstrap.Bootstrap;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
@@ -47,6 +48,7 @@ public class GuiReconnectIRC extends GuiScreen {
             }
 
             if (isHovered(x1, y1, x1 + 64, y1 + 80, mouseX, mouseY) && Mouse.isButtonDown(0)) {
+                Bootstrap bootstrap;
                 //Init
                 Main.INSTANCE.hasKey = false;
 
@@ -57,18 +59,20 @@ public class GuiReconnectIRC extends GuiScreen {
 
                 switch (i) {
                     case 0:
-                        Main.INSTANCE.bootstrap.connect(getIP("Japan-1"), 9822);
+                        Main.INSTANCE.cf = Main.INSTANCE.bootstrap.connect(getIP("Japan-1"), 9822);
                         break;
                     case 1:
-                        Main.INSTANCE.bootstrap.connect(getIP("HK-1"), 9822);
+                        Main.INSTANCE.cf = Main.INSTANCE.bootstrap.connect(getIP("HK-1"), 9822);
                         break;
                     case 2:
-                        Main.INSTANCE.bootstrap.connect(getIP("US-1"), 9822);
+                        Main.INSTANCE.cf = Main.INSTANCE.bootstrap.connect(getIP("US-1"), 9822);
                         break;
                     case 3:
-                        Main.INSTANCE.bootstrap.connect(getIP("US-2"), 9822);
+                        Main.INSTANCE.cf = Main.INSTANCE.bootstrap.connect(getIP("US-2"), 9822);
                         break;
                 }
+
+
                 mc.displayGuiScreen(new GuiMainMenu());
             }
             x1 += 100;

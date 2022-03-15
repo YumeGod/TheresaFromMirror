@@ -19,7 +19,8 @@ public class NoRotate extends Module {
     public void onPacket(PacketEvent event) {
         if (event.getPacket() instanceof S08PacketPlayerPosLook) {
             if (mc.thePlayer != null && mc.theWorld != null) {
-                if (!Main.INSTANCE.moduleManager.getModule(Abuser.class).getState() && mc.thePlayer.rotationPitch == 0.0F)
+                if (!Main.INSTANCE.moduleManager.getModule(Abuser.class).getState() && mc.thePlayer.rotationPitch == 0.0F
+                        || mc.isSingleplayer())
                     return;
 
                 double d0 = ((S08PacketPlayerPosLook) event.getPacket()).getX();

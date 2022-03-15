@@ -125,7 +125,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                             System.out.println(split[0] + " Verify Successful");
 
                             for (Channel i : Server.INSTANCE.userAuth.getChannelMap().keySet())
-                                if (i.isActive() && Server.INSTANCE.userAuth.getName(i) != null)
+                                if (i.isOpen() && Server.INSTANCE.userAuth.getName(i) != null)
                                     i.writeAndFlush(new Packet(Server.INSTANCE.userAuth.getName(i), PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + split[0] + " login successfully").pack());
                         }
                     }
@@ -179,7 +179,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                 break;
             case MESSAGE:
                 for (Channel channel : Server.INSTANCE.userAuth.getChannelMap().keySet())
-                    if (channel.isActive() && Server.INSTANCE.userAuth.getName(channel) != null)
+                    if (channel.isOpen() && Server.INSTANCE.userAuth.getName(channel) != null)
                         channel.writeAndFlush(new Packet(Server.INSTANCE.userAuth.getName(channel), PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + p.content).pack());
                 break;
         }
