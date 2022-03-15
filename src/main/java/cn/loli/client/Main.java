@@ -107,7 +107,6 @@ public class Main {
 
     public boolean hasKey;
     public boolean connected;
-    public GuiScreen guiScreen;
 
     public Main() {
         INSTANCE = this;

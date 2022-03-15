@@ -92,7 +92,6 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
     @Override
     public void channelInactive(final ChannelHandlerContext ctx) {
         println("Connecting lost:" + ctx.channel().remoteAddress());
-        Main.INSTANCE.guiScreen = Minecraft.getMinecraft().currentScreen;
         Main.INSTANCE.connected = false;
     }
 

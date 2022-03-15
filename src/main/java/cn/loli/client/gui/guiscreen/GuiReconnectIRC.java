@@ -37,7 +37,6 @@ public class GuiReconnectIRC extends GuiScreen {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
-//        Main.INSTANCE.bootstrap.connect();
         ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
         RenderUtils.drawRoundedRect(0, 0, scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight(), 2, new Color(240, 240, 240).getRGB());
         Main.INSTANCE.fontLoaders.fonts.get("roboto23").drawString("Your Connection has been lost.Please reconnect!", scaledResolution.getScaledWidth() / 2f - Main.INSTANCE.fontLoaders.fonts.get("roboto23").getStringWidth("Your Connection has been lost.Please reconnect!") / 2f, 30, new Color(79, 129, 255).getRGB());
@@ -52,7 +51,16 @@ public class GuiReconnectIRC extends GuiScreen {
                 RenderUtils.drawRoundedRect(x1 + 15, y, width - 30, 20, 2, new Color(79, 129, 255).getRGB());
                 Main.INSTANCE.fontLoaders.fonts.get("roboto18").drawString(name + "-" + by, x1 + width / 2f - Main.INSTANCE.fontLoaders.fonts.get("roboto18").getStringWidth(name) / 2f, y + 5, new Color(255, 255, 255).getRGB());
                 if (isHovered(x1 + 15, y, x1+width - 30, y+20, mouseX, mouseY) && Mouse.isButtonDown(0)) {
-                    Main.INSTANCE.bootstrap.connect(ip, 9822);
+                    new Thread(() -> {
+                        //Init
+                        Main.INSTANCE.hasKey = false;
+                        //Re Generate RSA
+                        Map<String, String> keyMap = RSAUtils.createKeys(2048);
+                        Main.INSTANCE.publicKey = keyMap.get("publicKey");
+                        Main.INSTANCE.privateKey = keyMap.get("privateKey");
+
+                        Main.INSTANCE.cf = Main.INSTANCE.bootstrap.connect(ip, 9822);
+                    }).start();
                     Minecraft.getMinecraft().displayGuiScreen(parent);
                 }
                 by++;
