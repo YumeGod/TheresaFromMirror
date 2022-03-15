@@ -1,6 +1,5 @@
 package me.superskidder;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -9,13 +8,17 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.util.concurrent.GlobalEventExecutor;
-import me.superskidder.utils.*;
+import me.superskidder.utils.Entity;
+import me.superskidder.utils.KeyPair;
+import me.superskidder.utils.RSAUtils;
+import me.superskidder.utils.UserAuth;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import sun.applet.Main;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -24,8 +27,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import static me.superskidder.PacketUtil.unpack;
 
@@ -90,8 +91,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                 Map<String, String> rsaKey = RSAUtils.createKeys(1024);
 
                 //Try to get the entity from the database
-                System.out.println("Private Key for this boi: " + RSAUtils.getPrivateKey(rsaKey.get("privateKey")));
-
                 Entity entity = new Entity(p.user);
 
                 //Get the Key and put to map
@@ -114,15 +113,21 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                     String url = "https://api.m0jang.org/auth.php?user=" + split[0] + "&pass=" + split[1] + "&hwid=" + split[2];
                     String result = getStatus(url);
 
-                    if (result == null){
+                    if (result == null) {
                         System.out.println("Authorize Failed");
                         ctx.close();
                     } else {
                         if (!result.contains("success")) {
                             System.out.println(split[0] + " Verify failed -> " + result);
                             ctx.close();
-                        } else
-                            channelGroup.writeAndFlush(new Packet(p.user, PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + split[0] + " login successfully").pack());
+                        } else {
+                            Server.INSTANCE.userAuth.giveAccess(ctx.channel(), p.user);
+                            System.out.println(split[0] + " Verify Successful");
+
+                            for (Channel i : Server.INSTANCE.userAuth.getChannelMap().keySet())
+                                if (i.isActive() && Server.INSTANCE.userAuth.getName(i) != null)
+                                    i.writeAndFlush(new Packet(Server.INSTANCE.userAuth.getName(i), PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + split[0] + " login successfully").pack());
+                        }
                     }
                 } else {
                     System.out.println("Illegal Request");
@@ -139,7 +144,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                     String result;
                     result = getStatus(url);
 
-                    if (result == null){
+                    if (result == null) {
                         System.out.println("Authorize Failed");
                         ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.AUTHORIZE, "AuthFailed").pack());
                         ctx.close();
@@ -150,7 +155,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                             ctx.close();
                         } else {
                             System.out.println("Success to Login");
-                            Server.INSTANCE.userAuth.giveAccess(p.user, true);
                             ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.AUTHORIZE, p.user + p.user).pack());
                             ctx.close();
                         }
@@ -174,7 +178,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                 ctx.close();
                 break;
             case MESSAGE:
-                channelGroup.writeAndFlush(new Packet(p.user, PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + p.content).pack());
+                for (Channel channel : Server.INSTANCE.userAuth.getChannelMap().keySet())
+                    if (channel.isActive() && Server.INSTANCE.userAuth.getName(channel) != null)
+                        channel.writeAndFlush(new Packet(Server.INSTANCE.userAuth.getName(channel), PacketUtil.Type.MESSAGE, "\2476" + "[Theresa IRC]" + "\247r" + p.content).pack());
                 break;
         }
 
@@ -183,13 +189,18 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
         Channel channel = ctx.channel();
+        System.out.println("Client " + channel.remoteAddress() + " connected");
         channelGroup.writeAndFlush(sdf.format(new Date()) + ": Client " + ctx.channel().remoteAddress() + " joined IRC.");
         channelGroup.add(channel);
     }
 
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
+        Channel channel = ctx.channel();
+        System.out.println("Client " + channel.remoteAddress() + " removed");
         channelGroup.writeAndFlush(sdf.format(new Date()) + ": Client " + ctx.channel().remoteAddress() + " exit IRC.");
+        Server.INSTANCE.userAuth.removeAccess(ctx.channel());
+        channelGroup.remove(channel);
     }
 
     @Override

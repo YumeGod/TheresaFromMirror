@@ -1,5 +1,7 @@
 package me.superskidder.utils;
 
+import io.netty.channel.Channel;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,7 +9,7 @@ public class Handler {
 
     Map<String, UserAuth> map;
 
-    Map<String, Boolean> map2;
+    Map<Channel, String> map2;
 
     public Handler() {
         this.map = new HashMap<>();
@@ -22,6 +24,11 @@ public class Handler {
         return map;
     }
 
+    public Map<Channel, String> getChannelMap() {
+        return map2;
+    }
+
+
     public UserAuth get(String user) {
         return map.get(user);
     }
@@ -30,15 +37,13 @@ public class Handler {
         map.remove(user);
     }
 
-    public void giveAccess(String user, Boolean access) {
-        map2.put(user, access);
+    public void giveAccess(Channel channel, String access) {
+        map2.put(channel, access);
     }
 
-    public void removeAccess(String user) {
+    public void removeAccess(Channel user) {
         map2.remove(user);
     }
 
-    public boolean getAccess(String user) {
-        return map2.get(user);
-    }
+    public String getName(Channel channel) {return map2.get(channel);}
 }

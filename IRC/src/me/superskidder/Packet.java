@@ -24,7 +24,6 @@ public class Packet {
             e.printStackTrace();
         }
 
-        System.out.println("Packed: " + packet);
         return packet;
     }
 
