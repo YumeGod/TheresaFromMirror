@@ -24,7 +24,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Criticals extends Module {
     private final ModeValue mode = new ModeValue("Mode", "Edit", "Edit", "Packet");
-    private final ModeValue offsetvalue = new ModeValue("Offset Value", "NCP", "NCP", "Mini", "Negative", "Positive");
+    private final ModeValue offsetvalue = new ModeValue("Offset Value", "NCP", "NCP", "Mini", "Less", "Negative", "Positive");
     private final BooleanValue packetsWhenNoMove = new BooleanValue("packets when no move", false);
     private final BooleanValue always = new BooleanValue("Always", false);
     int counter = 0;
@@ -74,7 +74,7 @@ public class Criticals extends Module {
             switch (offsetvalue.getCurrentMode()) {
                 case "NCP":
                     offset = new double[]{
-                            ThreadLocalRandom.current().nextDouble(.0232422909396, .02432422909396),
+                            ThreadLocalRandom.current().nextDouble(.0675, .0775),
                             ThreadLocalRandom.current().nextDouble(.0172422909396, .0182422909396),
                             ThreadLocalRandom.current().nextDouble(.0112422909396, .0122422909396)};
                     break;
@@ -87,15 +87,21 @@ public class Criticals extends Module {
                 case "Negative":
                     offset = new double[]{
                             ThreadLocalRandom.current().nextDouble(.00317, .00326),
-                            ThreadLocalRandom.current().nextDouble(0.0001, 0.0006),
+                            ThreadLocalRandom.current().nextDouble(.0001, .0002),
                             ThreadLocalRandom.current().nextDouble(.00417, .00526),
+                    };
+                    break;
+                case "Less":
+                    offset = new double[]{
+                            ThreadLocalRandom.current().nextDouble(.0675, .0775),
+                            ThreadLocalRandom.current().nextDouble(.0317, .0375),
                     };
                     break;
                 case "Positive":
                     offset = new double[]{
                             ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396),
                             ThreadLocalRandom.current().nextDouble(.00317, .00526),
-                            ThreadLocalRandom.current().nextDouble(0.0009, 0.005)
+                            ThreadLocalRandom.current().nextDouble(.0009, .005)
                     };
                     break;
             }
@@ -108,7 +114,7 @@ public class Criticals extends Module {
                 if (mc.thePlayer.onGround) {
                     if (always.getObject() || entity.hurtResistantTime != 20)
                         if (playerUtils.isMoving2()) {
-                            if (speed.getState()) offset[counter] *= 3e-4;
+                            if (speed.getState()) offset[counter] *= 1e-4;
                             e.setY(e.getY() + (offset[counter]));
                             e.setOnGround(false);
                             counter++;
