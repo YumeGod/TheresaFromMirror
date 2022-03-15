@@ -135,15 +135,15 @@ public class Main {
 
             // 设置左侧用户名文字
             JLabel jl = new JLabel("Username:");
-            jl.setBounds(30, 100, 200, 30);
+            jl.setBounds(30, 140, 200, 30);
             final JTextField name = new JTextField(); // 用户名框
-            name.setBounds(100, 100, 150, 30); // 设置用户名框的宽，高，x值，y值
+            name.setBounds(100, 140, 150, 30); // 设置用户名框的宽，高，x值，y值
 
             // 设置左侧密码文字
             JLabel jl2 = new JLabel("Password:");
-            jl2.setBounds(30, 160, 200, 30);
+            jl2.setBounds(30, 180, 200, 30);
             final JPasswordField password = new JPasswordField(); // 密码框：为加密的***
-            password.setBounds(100, 160, 150, 30); // 设置密码框的宽，高，x值，y值
+            password.setBounds(100, 180, 150, 30); // 设置密码框的宽，高，x值，y值
             password.putClientProperty(FlatClientProperties.STYLE, "showRevealButton: true");
 
             JProgressBar progressBar = new JProgressBar();
