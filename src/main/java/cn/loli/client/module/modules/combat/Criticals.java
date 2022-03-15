@@ -93,8 +93,8 @@ public class Criticals extends Module {
                     break;
                 case "Less":
                     offset = new double[]{
-                            ThreadLocalRandom.current().nextDouble(.01525, .01625),
-                            ThreadLocalRandom.current().nextDouble(.00317, .00375),
+                            ThreadLocalRandom.current().nextDouble(.06525, .07625),
+                            ThreadLocalRandom.current().nextDouble(.01317, .01375),
                     };
                     break;
                 case "Positive":
