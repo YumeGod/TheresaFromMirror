@@ -5,7 +5,6 @@ import cn.loli.client.connection.ProxyEntry;
 import cn.loli.client.connection.RSAUtils;
 import cn.loli.client.utils.render.RenderUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.ResourceLocation;
@@ -13,16 +12,17 @@ import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 public class GuiReconnectIRC extends GuiScreen {
 
     ArrayList<ProxyEntry> proxys = new ArrayList<>();
     GuiScreen parent;
+    boolean isSelected = false;
 
     public GuiReconnectIRC(GuiScreen perscreen) {
         parent = perscreen;
+        isSelected = false;
     }
 
     @Override
@@ -48,8 +48,9 @@ public class GuiReconnectIRC extends GuiScreen {
             for (String ip : proxy.proxyList) {
                 int y = scaledResolution.getScaledHeight() - 70 - by * 30;
                 RenderUtils.drawRoundedRect(x1 + 15, y, width - 30, 20, 2, new Color(79, 129, 255).getRGB());
-                Main.INSTANCE.fontLoaders.fonts.get("roboto18").drawString(name + "-" + by + 1, x1 + width / 2f - Main.INSTANCE.fontLoaders.fonts.get("roboto18").getStringWidth(name) / 2f, y + 5, new Color(255, 255, 255).getRGB());
-                if (isHovered(x1 + 15, y, x1+width - 30, y+20, mouseX, mouseY) && Mouse.isButtonDown(0)) {
+                Main.INSTANCE.fontLoaders.fonts.get("roboto18").drawString(name + "-" + (by + 1), x1 + width / 2f - Main.INSTANCE.fontLoaders.fonts.get("roboto18").getStringWidth(name) / 2f, y + 5, new Color(255, 255, 255).getRGB());
+                if (isHovered(x1 + 15, y, x1 + width - 30, y + 20, mouseX, mouseY) && Mouse.isButtonDown(0)) {
+                    if (isSelected) return;
                     //Init
                     Main.INSTANCE.hasKey = false;
                     //Re Generate RSA
@@ -57,11 +58,13 @@ public class GuiReconnectIRC extends GuiScreen {
                     Main.INSTANCE.publicKey = keyMap.get("publicKey");
                     Main.INSTANCE.privateKey = keyMap.get("privateKey");
 
-                    Main.INSTANCE.println("1234");
                     new Thread(() -> {
                         Main.INSTANCE.cf = Main.INSTANCE.bootstrap.connect(ip, 9822);
+                        Main.INSTANCE.println("Reconnected");
                     }).start();
+
                     Minecraft.getMinecraft().displayGuiScreen(parent);
+                    isSelected = true;
                 }
                 by++;
             }
