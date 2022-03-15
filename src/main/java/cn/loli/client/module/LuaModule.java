@@ -3,7 +3,6 @@ package cn.loli.client.module;
 import cn.loli.client.events.*;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
-import net.minecraft.util.FrameTimer;
 import org.luaj.vm2.Globals;
 
 public class LuaModule extends Module {
@@ -15,7 +14,9 @@ public class LuaModule extends Module {
     public LuaModule(String name, String description, Globals globals) {
         super(name, description, ModuleCategory.LUA);
         this.globals = globals;
-        globals.get("init").call();
+
+        if (!globals.get("on_enable").isnil())
+            globals.get("init").call();
     }
 
     @EventTarget
