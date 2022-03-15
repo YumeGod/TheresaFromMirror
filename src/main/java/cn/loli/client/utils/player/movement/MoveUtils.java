@@ -240,22 +240,13 @@ public class MoveUtils extends Utils {
     }
 
     public void getDamage(final EntityPlayerSP player) {
-        double x = player.posX;
-        double y = player.posY;
-        double z = player.posZ;
-
-        float minDmgDist = getMinFallDist(player);
-
-        double inc = 0.0625;
-
-        while (minDmgDist > 0.0F) {
-            double lo = Math.random() * 0.001F;
-            double hi = inc - lo;
-            player.sendQueue.addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(x, y + hi, z, false));
-            player.sendQueue.addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(x, y + lo, z, false));
-            minDmgDist -= hi - lo;
+        if (player != null) {
+            for (int i = 0; i < 101; i++) {
+                player.sendQueue.addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(player.posX, player.posY + 0.03, player.posZ, false));
+                player.sendQueue.addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(player.posX, player.posY, player.posZ, false));
+            }
+            player.sendQueue.addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(player.posX, player.posY, player.posZ, true));
         }
-        player.sendQueue.addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(x, y, z, true));
     }
 
     public static MoveUtils getInstance() {

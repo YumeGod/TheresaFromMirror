@@ -129,7 +129,7 @@ public class InvCleaner extends Module {
         if (is.getItem() instanceof ItemFishingRod && !keepRod.getObject())
             return true;
         if (is.getItem().getUnlocalizedName().contains("potion"))
-            return isBadPotion(is);
+            return !inventoryUtil.isBuffPotion(is);
 
         if (keepTools.getObject()) {
             if (is.getItem() instanceof ItemAxe && is != bestAxe() && (preferSword.getObject() || is != bestWeapon()))
@@ -149,18 +149,6 @@ public class InvCleaner extends Module {
         return false;
     }
 
-    boolean isBadPotion(final ItemStack stack) {
-        if (stack != null && stack.getItem() instanceof ItemPotion) {
-            final ItemPotion potion = (ItemPotion) stack.getItem();
-            for (final PotionEffect o : potion.getEffects(stack)) {
-                if (o.getPotionID() == Potion.poison.getId() || o.getPotionID() == Potion.moveSlowdown.getId()
-                        || o.getPotionID() == Potion.harm.getId()) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 
     ItemStack bestWeapon() {
         ItemStack bestWeapon = null;

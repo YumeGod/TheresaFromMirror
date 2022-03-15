@@ -20,8 +20,8 @@ public class AntiFall extends Module {
     public void onFall(MotionUpdateEvent event) {
         if (event.getEventType() == EventType.PRE) {
             if (mc.thePlayer.fallDistance > falldistance.getObject() && playerUtils.isOverVoid(mc)) {
-                event.setX(event.getX() + playerUtils.randomInRange(0.49, 1.01));
-                event.setZ(event.getZ() - playerUtils.randomInRange(0.49, 1.01));
+                event.setX(event.getX() + playerUtils.randomInRange(0.19, 0.49));
+                event.setZ(event.getZ() - playerUtils.randomInRange(0.19, 0.49));
             }
         }
 

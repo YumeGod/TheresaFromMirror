@@ -2,12 +2,13 @@ package cn.loli.client.utils.player;
 
 import cn.loli.client.utils.Utils;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.*;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.PotionEffect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +64,7 @@ public class InventoryUtil extends Utils {
             mc.getNetHandler().getNetworkManager().sendPacket(new C09PacketHeldItemChange(i));
         }
     }
+
 
     public ArrayList<Integer> calculateSwitch(int start, int end) {
         int expandedDistance = start - (end + 9);
@@ -140,6 +142,14 @@ public class InventoryUtil extends Utils {
         return searchItem(itm, 0, 8);
     }
 
+    public ItemStack searchInInventory(Item itm) {
+        return searchItem(itm, 9, 45);
+    }
+
+    public int searchSlotInventory(Item itm) {
+        return searchItemSlot(itm, 9, 45);
+    }
+
     public int searchSlotInHotbar(Item itm) {
         return searchItemSlot(itm, 0, 8);
     }
@@ -193,10 +203,39 @@ public class InventoryUtil extends Utils {
         return null;
     }
 
+    public void swap(int slot1, int hotbarSlot) {
+        mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, slot1, hotbarSlot, 2, mc.thePlayer);
+    }
+
+    public boolean isBuffPotion(final ItemStack stack) {
+        final ItemPotion potion = (ItemPotion) stack.getItem();
+        final List<PotionEffect> effects = potion.getEffects(stack);
+
+        for (final PotionEffect effect : effects)
+            if (Potion.potionTypes[effect.getPotionID()].isBadEffect())
+                return false;
+
+        return true;
+    }
+
     public static InventoryUtil getInstance() {
         if(inventoryUtil == null) {
             inventoryUtil = new InventoryUtil();
         }
         return inventoryUtil;
+    }
+
+    public abstract class WindowClickRequest {
+        private boolean completed;
+
+        public abstract void performRequest();
+
+        public boolean isCompleted() {
+            return this.completed;
+        }
+
+        public void onCompleted() {
+            this.completed = true;
+        }
     }
 }

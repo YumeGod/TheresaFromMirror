@@ -27,7 +27,7 @@ public class IrcCommand extends Command {
             sb.append(arg).append(" ");
         }
 
-        Main.cf.channel().writeAndFlush(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey), PacketUtil.Type.MESSAGE,
+        Main.INSTANCE.cf.channel().writeAndFlush(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey), PacketUtil.Type.MESSAGE,
                 Main.INSTANCE.name + ChatFormatting.WHITE + ": " + ChatFormatting.GRAY + sb).pack());
     }
 

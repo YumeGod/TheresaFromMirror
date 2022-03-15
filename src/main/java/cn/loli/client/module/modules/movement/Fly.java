@@ -12,10 +12,16 @@ import cn.loli.client.value.ModeValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.network.play.client.C03PacketPlayer;
+import net.minecraft.network.play.client.C07PacketPlayerDigging;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 
 public class Fly extends Module {
 
     private final BooleanValue enduring = new BooleanValue("Enduring", false);
+
+    //TODO : Use Damage to make fly further? idk.
+    private final BooleanValue damage = new BooleanValue("Damage", false);
 
     private final ModeValue mode = new ModeValue("Mode", "Vanilla", "Vanilla", "Hypixel");
 
@@ -69,13 +75,16 @@ public class Fly extends Module {
                     if (enduring.getObject()) {
                         switch (stage) {
                             case 0:
-                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(), e.getY(), e.getZ(),true));
-                                for (int i = 0; i < 50; i++) {
-                                    mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(),  e.getY() + 0.05, e.getZ(), false));
-                                    mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(),e.getY(), e.getZ(), true));
+                                if (damage.getObject()) {
+                                    moveUtils.getDamage(mc.thePlayer);
+                                } else {
+                                    for (int i = 0; i < 50; i++) {
+                                        mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(), e.getY() + 0.05, e.getZ(), false));
+                                        mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(), e.getY(), e.getZ(), true));
+                                    }
                                 }
+                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(), e.getY(), e.getZ(), true));
                                 lastY = e.getY();
-                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(), e.getY(), e.getZ(),true));
                                 stage++;
                                 break;
                             case 1:
@@ -132,8 +141,12 @@ public class Fly extends Module {
         if (mode.getCurrentMode().equalsIgnoreCase("Hypixel") && !mc.thePlayer.isSpectator() && ((enduring.getObject() && stage >= 1) || (!enduring.getObject() && clipped))) {
             e.setY(mc.thePlayer.motionY = 0.0);
             moveUtils.setMotion(e, moveUtils.getBaseMoveSpeed(0.271, 0.2));
-        } else
-            moveUtils.setMotion(e, 0);
+        } else {
+            if (mode.getCurrentMode().equalsIgnoreCase("Vanilla")) {
+
+            } else
+                moveUtils.setMotion(e, 0);
+        }
     }
 
     private void setEdit(MotionUpdateEvent event) {

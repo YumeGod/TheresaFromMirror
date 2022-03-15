@@ -303,4 +303,18 @@ public class Utils {
         return yaw + MathHelper.wrapAngleTo180_float(var1 - yaw);
     }
 
+    protected double distance(final double srcX, final double srcY, final double srcZ,
+                                  final double dstX, final double dstY, final double dstZ) {
+        final double xDist = dstX - srcX;
+        final double yDist = dstY - srcY;
+        final double zDist = dstZ - srcZ;
+        return Math.sqrt(xDist * xDist + yDist * yDist + zDist * zDist);
+    }
+
+    public double distance(final double srcX, final double srcZ,
+                           final double dstX, final double dstZ) {
+        final double xDist = dstX - srcX;
+        final double zDist = dstZ - srcZ;
+        return Math.sqrt(xDist * xDist + zDist * zDist);
+    }
 }

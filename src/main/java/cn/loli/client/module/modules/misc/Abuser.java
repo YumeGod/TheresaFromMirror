@@ -51,6 +51,8 @@ public class Abuser extends Module {
 
     @EventTarget
     private void onPost(PacketEvent event) {
+        if (mc.isSingleplayer()) return;
+
         if (range.getObject()) {
             if (event.getPacket() instanceof C0FPacketConfirmTransaction) {
                 if (((C0FPacketConfirmTransaction) event.getPacket()).getWindowId() >= 0)
@@ -136,6 +138,8 @@ public class Abuser extends Module {
 
     @EventTarget
     private void onTick(TickEvent event) {
+        if (mc.isSingleplayer()) return;
+
         if (hypixel.getObject()) {
             if (mc.currentScreen instanceof GuiDownloadTerrain && (mc.thePlayer != null))
                 mc.thePlayer.closeScreen();
@@ -144,6 +148,7 @@ public class Abuser extends Module {
 
     @EventTarget
     private void onMotionUpdate(MotionUpdateEvent event) {
+        if (mc.isSingleplayer()) return;
         if (event.getEventType() == EventType.PRE) {
             if (hypixel.getObject()) {
                 if (!hasDisable && timer.hasReached(2000)) {
@@ -158,6 +163,8 @@ public class Abuser extends Module {
 
     @EventTarget
     private void onUpdate(UpdateEvent event) {
+        if (mc.isSingleplayer()) return;
+
         if (ncp.getObject()) {
             if (mc.thePlayer.ticksExisted % 30 == 0) {
                 mc.getNetHandler().getNetworkManager().sendPacket

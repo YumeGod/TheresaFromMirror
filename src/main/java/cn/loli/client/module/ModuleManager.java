@@ -34,6 +34,7 @@ public class ModuleManager {
         addModule(new AimBot());
         addModule(new Aura());
         addModule(new AutoClicker());
+        addModule(new AutoPot());
         addModule(new BackTrack());
         addModule(new BowAimbot());
         addModule(new Criticals());
