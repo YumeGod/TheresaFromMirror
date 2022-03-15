@@ -136,6 +136,9 @@ public class Scaffold extends Module {
     @Override
     public void onDisable() {
 
+        if (slient.getObject())
+            mc.getNetHandler().getNetworkManager().sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+
         switchTimer.reset();
     }
 
