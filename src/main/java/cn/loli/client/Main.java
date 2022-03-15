@@ -15,6 +15,7 @@ import cn.loli.client.gui.ttfr.FontLoaders;
 import cn.loli.client.module.ModuleManager;
 import cn.loli.client.protection.GuiCrashMe;
 import cn.loli.client.protection.ProtectionThread;
+import cn.loli.client.script.lua.LuaManager;
 import cn.loli.client.utils.misc.ExploitFix;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.others.SoundFxPlayer;
@@ -87,7 +88,7 @@ public class Main {
     public ModuleManager moduleManager;
     public CommandManager commandManager;
     public ValueManager valueManager;
-    private FileManager fileManager;
+    public FileManager fileManager;
 
     public Queue<Packet<?>> packetQueue;
     TimeHelper ms = new TimeHelper();
@@ -108,6 +109,7 @@ public class Main {
     public boolean hasKey;
     public boolean connected;
     public GuiScreen guiScreen;
+    public LuaManager luaManager;
 
     public Main() {
         INSTANCE = this;
@@ -138,7 +140,6 @@ public class Main {
         valueManager = new ValueManager();
         commandManager = new CommandManager();
         moduleManager = new ModuleManager();
-
         commandManager.addCommands();
         moduleManager.addModules();
         fileManager.load();
@@ -150,7 +151,8 @@ public class Main {
         packetQueue = new ConcurrentLinkedQueue<>();
         ms.reset();
         timing = 100L;
-
+        luaManager = new LuaManager();
+        luaManager.init();
         new SoundFxPlayer().playSound(SoundFxPlayer.SoundType.SPECIAL, -2);
     }
 
@@ -248,7 +250,7 @@ public class Main {
         new Thread(() -> {
             try {
                 while (true) {
-                    if(!connected)
+                    if (!connected)
                         Minecraft.getMinecraft().displayGuiScreen(new GuiReconnectIRC(guiScreen));
 
                     Thread.sleep(1000L); //-1s
@@ -276,7 +278,9 @@ public class Main {
             }
         }).start();
     }
+
     public Bootstrap bootstrap;
+
     private void IRC() {
         doLogin();
         new Thread(() -> {

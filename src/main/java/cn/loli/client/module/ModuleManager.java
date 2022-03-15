@@ -114,7 +114,7 @@ public class ModuleManager {
 
     }
 
-    private void addModule(@NotNull Module module) {
+    public void addModule(@NotNull Module module) {
         modules.add(module);
         Main.INSTANCE.valueManager.registerObject(module.getName(), module);
     }
@@ -142,6 +142,5 @@ public class ModuleManager {
     private void onKey(@NotNull KeyEvent event) {
         for (Module module : modules) if (module.getKeybind() == event.getKey()) module.setState(!module.getState());
     }
-
 
 }

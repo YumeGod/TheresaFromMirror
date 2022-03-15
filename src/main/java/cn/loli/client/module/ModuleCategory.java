@@ -8,7 +8,8 @@ public enum ModuleCategory {
     MOVEMENT("Movement"),
     PLAYER("Player"),
     WORLD("World"),
-    MISC("Misc");
+    MISC("Misc"),
+    LUA("Lua");
 
     //TODO: SkyBlocks and other mods
 
