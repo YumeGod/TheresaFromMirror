@@ -78,8 +78,8 @@ public class LuaManager {
             String name, desc;
 
             try {
-                name = g.get("getModuleName").call().toString();
-                desc = g.get("getDescription").call().toString();
+                name = g.get("get_name").call().toString();
+                desc = g.get("get_desc").call().toString();
                 Main.INSTANCE.moduleManager.addModule(new LuaModule(name, desc, g));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -94,8 +94,8 @@ public class LuaManager {
         Globals globals = JsePlatform.standardGlobals();
         LuaValue chunk = globals.load(script);
         chunk.call();
-        scripts.put(String.valueOf(globals.get("getLuaName").call()), globals);
-        System.out.println("Put script: " + globals.get("getLuaName").call());
+        scripts.put(String.valueOf(globals.get("get_lua_name").call()), globals);
+        System.out.println("Put script: " + globals.get("get_lua_name").call());
         System.out.println("Size: " + scripts.size());
     }
 
