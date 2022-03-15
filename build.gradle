@@ -71,6 +71,7 @@ dependencies {
         exclude module: "launchwrapper"
     }
     implementation 'org.jetbrains:annotations:15.0'
+    implementation 'org.luaj:luaj-jme:3.0.1'
     implementation group: 'com.google.zxing', name: 'core', version: '2.1'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
@@ -122,6 +123,7 @@ shadowJar {
     dependencies {
         include(dependency('org.spongepowered:mixin'))
         include(dependency('com.google.zxing:core'))
+        include(dependency('org.luaj:luaj-jme:3.0.1'))
         include(dependency('com.github.Vazkii:MineTunes'))
     }
 

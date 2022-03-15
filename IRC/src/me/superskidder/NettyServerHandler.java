@@ -154,7 +154,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                             ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.AUTHORIZE, "YouSuchANigger").pack());
                             ctx.close();
                         } else {
-                            System.out.println("Success to Login");
+                            System.out.println("Success to Authorize");
                             ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.AUTHORIZE, p.user + p.user).pack());
                             ctx.close();
                         }

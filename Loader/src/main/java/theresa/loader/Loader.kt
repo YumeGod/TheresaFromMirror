@@ -17,7 +17,6 @@ import java.net.Socket
 import java.nio.charset.StandardCharsets
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
-import kotlin.concurrent.thread
 
 object Loader {
 //URLClassLoader(arrayOf(), Launch.classLoader)
@@ -46,14 +45,14 @@ object Loader {
         main.timer.reset()
 
         while (!main.hasConnected) {
-            if (main.timer.hasReached(8000)){
+            if (main.timer.hasReached(8000)) {
                 main.println("Timeout reached, shutting down...")
                 main.doCrash()
             }
             Thread.sleep(1000)
         }
 
-        val host = "15.204.152.11"
+        val host = main.ip
         val port = 37721 //Port
 
         val fileSocket = Socket(host, port)

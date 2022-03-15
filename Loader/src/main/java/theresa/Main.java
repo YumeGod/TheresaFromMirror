@@ -50,6 +50,7 @@ public class Main {
     public Login login;
 
     public Timer timer;
+    public String ip;
 
     public Main() {
         INSTANCE = this;
@@ -66,6 +67,8 @@ public class Main {
             }
         }
 
+        ip = getip((String) Objects.requireNonNull(login.jcb1.getSelectedItem()));
+
         new Thread(() -> {
             EventLoopGroup eventExecutors = new NioEventLoopGroup();
             try {
@@ -79,7 +82,7 @@ public class Main {
                                 socketChannel.pipeline().addLast(new NettyClientHandler());
                             }
                         }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(1024*1024));
-                cf = bootstrap.connect(getip((String) Objects.requireNonNull(login.jcb1.getSelectedItem())), 9822).sync();
+                cf = bootstrap.connect(ip, 9822).sync();
                 println("Client started!");
                 cf.channel().closeFuture().sync();
             } catch (InterruptedException ignored) {
