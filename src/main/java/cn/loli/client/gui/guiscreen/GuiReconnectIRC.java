@@ -48,29 +48,31 @@ public class GuiReconnectIRC extends GuiScreen {
             }
 
             if (isHovered(x1, y1, x1 + 64, y1 + 80, mouseX, mouseY) && Mouse.isButtonDown(0)) {
-                Bootstrap bootstrap;
                 //Init
                 Main.INSTANCE.hasKey = false;
+                int action = i;
 
                 //Re Generate RSA
                 Map<String, String> keyMap = RSAUtils.createKeys(2048);
                 Main.INSTANCE.publicKey = keyMap.get("publicKey");
                 Main.INSTANCE.privateKey = keyMap.get("privateKey");
 
-                switch (i) {
-                    case 0:
-                        Main.INSTANCE.cf = Main.INSTANCE.bootstrap.connect(getIP("Japan-1"), 9822);
-                        break;
-                    case 1:
-                        Main.INSTANCE.cf = Main.INSTANCE.bootstrap.connect(getIP("HK-1"), 9822);
-                        break;
-                    case 2:
-                        Main.INSTANCE.cf = Main.INSTANCE.bootstrap.connect(getIP("US-1"), 9822);
-                        break;
-                    case 3:
-                        Main.INSTANCE.cf = Main.INSTANCE.bootstrap.connect(getIP("US-2"), 9822);
-                        break;
-                }
+                new Thread(() -> {
+                    switch (action) {
+                        case 0:
+                            Main.INSTANCE.cf = Main.INSTANCE.bootstrap.connect(getIP("Japan-1"), 9822);
+                            break;
+                        case 1:
+                            Main.INSTANCE.cf = Main.INSTANCE.bootstrap.connect(getIP("HK-1"), 9822);
+                            break;
+                        case 2:
+                            Main.INSTANCE.cf = Main.INSTANCE.bootstrap.connect(getIP("US-1"), 9822);
+                            break;
+                        case 3:
+                            Main.INSTANCE.cf = Main.INSTANCE.bootstrap.connect(getIP("US-2"), 9822);
+                            break;
+                    }
+                }).start();
 
                 mc.displayGuiScreen(Main.INSTANCE.guiScreen);
             }

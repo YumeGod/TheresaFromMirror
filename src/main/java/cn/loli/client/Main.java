@@ -296,7 +296,6 @@ public class Main {
                 cf.channel().closeFuture().sync();
             } catch (InterruptedException ignored) {
             } finally {
-                guiScreen = Minecraft.getMinecraft().currentScreen;
                 println("Client closed!");
             }
         }).start();
