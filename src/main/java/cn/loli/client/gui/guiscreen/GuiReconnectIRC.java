@@ -60,6 +60,7 @@ public class GuiReconnectIRC extends GuiScreen {
 
                     new Thread(() -> {
                         Main.INSTANCE.cf = Main.INSTANCE.bootstrap.connect(ip, 9822);
+                        Main.INSTANCE.println("Reconnected");
                     }).start();
 
                     Minecraft.getMinecraft().displayGuiScreen(parent);
