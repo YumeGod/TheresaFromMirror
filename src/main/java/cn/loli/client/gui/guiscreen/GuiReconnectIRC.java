@@ -1,8 +1,10 @@
 package cn.loli.client.gui.guiscreen;
 
 import cn.loli.client.Main;
+import cn.loli.client.connection.ProxyEntry;
 import cn.loli.client.connection.RSAUtils;
 import cn.loli.client.utils.render.RenderUtils;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
@@ -10,90 +12,59 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class GuiReconnectIRC extends GuiScreen {
 
-    //TODO: 切换服务器并且美化这坨屎
+    ArrayList<ProxyEntry> proxys = new ArrayList<>();
+    GuiScreen parent;
 
+    public GuiReconnectIRC(GuiScreen perscreen) {
+        parent = perscreen;
+    }
+
+    @Override
+    public void initGui() {
+        super.initGui();
+        proxys.add(new ProxyEntry("JP", "167.88.184.79"));
+        proxys.add(new ProxyEntry("CN", "2404:8c80:0:1009:395:fbec:c4f8:e384"));
+        proxys.add(new ProxyEntry("US", "15.204.152.34", "15.204.152.11"));
+    }
+
+    //TODO: 切换服务器并且美化这坨屎
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
 //        Main.INSTANCE.bootstrap.connect();
-        ScaledResolution scaledResolution = new ScaledResolution(this.mc);
-        RenderUtils.drawRect(0, 0, scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight(), -1);
-        Main.INSTANCE.fontLoaders.fonts.get("roboto23").drawString("Choose your proxy.", scaledResolution.getScaledWidth() / 2 - Main.INSTANCE.fontLoaders.fonts.get("roboto23").getStringWidth("Choose your proxy.") / 2f, 20, new Color(0, 0, 0).getRGB());
-        int x1 = 10;
-        int y1 = 60;
-
-        for (int i = 0; i < 4; i++) {
-            switch (i) {
-                case 0:
-                    RenderUtils.drawImage(new ResourceLocation("theresa/icons/JP.png"), x1, y1, 64, 64);
-                    Main.INSTANCE.fontLoaders.fonts.get("roboto20").drawString("JP-1", x1 + 32 - Main.INSTANCE.fontLoaders.fonts.get("roboto20").getStringWidth("JP-1") / 2f, y1 + 70, new Color(0, 0, 0).getRGB());
-                    break;
-                case 1:
-                    RenderUtils.drawImage(new ResourceLocation("theresa/icons/cn.png"), x1, y1, 64, 64);
-                    Main.INSTANCE.fontLoaders.fonts.get("roboto20").drawString("CN-1", x1 + 32 - Main.INSTANCE.fontLoaders.fonts.get("roboto20").getStringWidth("CN-1") / 2f, y1 + 70, new Color(0, 0, 0).getRGB());
-                    break;
-                case 2:
-                    RenderUtils.drawImage(new ResourceLocation("theresa/icons/US.png"), x1, y1, 64, 64);
-                    Main.INSTANCE.fontLoaders.fonts.get("roboto20").drawString("US-1", x1 + 32 - Main.INSTANCE.fontLoaders.fonts.get("roboto20").getStringWidth("US-1") / 2f, y1 + 70, new Color(0, 0, 0).getRGB());
-                    break;
-                case 3:
-                    RenderUtils.drawImage(new ResourceLocation("theresa/icons/US.png"), x1, y1, 64, 64);
-                    Main.INSTANCE.fontLoaders.fonts.get("roboto20").drawString("US-2", x1 + 32 - Main.INSTANCE.fontLoaders.fonts.get("roboto20").getStringWidth("US-2") / 2f, y1 + 70, new Color(0, 0, 0).getRGB());
-                    break;
-            }
-
-            if (isHovered(x1, y1, x1 + 64, y1 + 80, mouseX, mouseY) && Mouse.isButtonDown(0)) {
-                //Init
-                Main.INSTANCE.hasKey = false;
-
-                //Re Generate RSA
-                Map<String, String> keyMap = RSAUtils.createKeys(2048);
-                Main.INSTANCE.publicKey = keyMap.get("publicKey");
-                Main.INSTANCE.privateKey = keyMap.get("privateKey");
-
-                switch (i) {
-                    case 0:
-                        Main.INSTANCE.bootstrap.connect(getIP("Japan-1"), 9822);
-                        break;
-                    case 1:
-                        Main.INSTANCE.bootstrap.connect(getIP("HK-1"), 9822);
-                        break;
-                    case 2:
-                        Main.INSTANCE.bootstrap.connect(getIP("US-1"), 9822);
-                        break;
-                    case 3:
-                        Main.INSTANCE.bootstrap.connect(getIP("US-2"), 9822);
-                        break;
+        ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
+        RenderUtils.drawRoundedRect(0, 0, scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight(), 2, new Color(240, 240, 240).getRGB());
+        Main.INSTANCE.fontLoaders.fonts.get("roboto23").drawString("Your Connection has been lost.Please reconnect!", scaledResolution.getScaledWidth() / 2f - Main.INSTANCE.fontLoaders.fonts.get("roboto23").getStringWidth("Your Connection has been lost.Please reconnect!") / 2f, 30, new Color(79, 129, 255).getRGB());
+        int width = scaledResolution.getScaledWidth() / 4;
+        int x1 = width / 4;
+        for (ProxyEntry proxy : proxys) {
+            String name = proxy.name;
+            RenderUtils.drawRect(x1, 50, x1 + width, scaledResolution.getScaledHeight() - 20, new Color(255, 255, 255).getRGB());
+            int by = 0;
+            for (String ip : proxy.proxyList) {
+                int y = scaledResolution.getScaledHeight() - 70 - by * 30;
+                RenderUtils.drawRoundedRect(x1 + 15, y, width - 30, 20, 2, new Color(79, 129, 255).getRGB());
+                Main.INSTANCE.fontLoaders.fonts.get("roboto18").drawString(name + "-" + by, x1 + width / 2f - Main.INSTANCE.fontLoaders.fonts.get("roboto18").getStringWidth(name) / 2f, y + 5, new Color(255, 255, 255).getRGB());
+                if (isHovered(x1 + 15, y, width - 30, 20, mouseX, mouseY) && Mouse.isButtonDown(0)) {
+                    Main.INSTANCE.bootstrap.connect(ip, 9822);
+                    Minecraft.getMinecraft().displayGuiScreen(parent);
                 }
-                mc.displayGuiScreen(new GuiMainMenu());
+                by++;
             }
-            x1 += 100;
-            if (x1 > scaledResolution.getScaledWidth() - 68) {
-                x1 = 10;
-                y1 += 80;
-            }
+            RenderUtils.drawImage(new ResourceLocation("theresa/icons/" + name + ".png"), x1 + width / 2 - 32, 100, 64, 64);
+            x1 += width + width / 4;
         }
     }
 
-
     //TODO : USE DNS TO SOLVE THE IP SOURCE
-
     public String getIP(String name) {
-        switch (name) {
-            case "Japan-1":
-                return "167.88.184.79";
-            case "HK-1":
-                return "2404:8c80:0:1009:395:fbec:c4f8:e384";
-            case "US-1":
-                return "15.204.152.11";
-            case "US-2":
-                return "15.204.152.34";
-        }
-        return "15.204.152.34";
+        return "";
     }
 
     public static boolean isHovered(float x, float y, float x2, float y2, int mouseX, int mouseY) {

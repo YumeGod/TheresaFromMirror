@@ -251,7 +251,7 @@ public class Main {
         new Thread(() -> {
             try {
                 while (true) {
-                    if(!connected) Minecraft.getMinecraft().displayGuiScreen(new GuiReconnectIRC());
+                    if(!connected) Minecraft.getMinecraft().displayGuiScreen(new GuiReconnectIRC(Minecraft.getMinecraft().currentScreen));
                     Thread.sleep(1000L); //-1s
                     if (ProtectionThread.getInstance().runChecks()) {
                         println("检测到非法行为，已自动踢出");
