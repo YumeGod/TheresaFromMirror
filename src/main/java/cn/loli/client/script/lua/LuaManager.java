@@ -73,9 +73,19 @@ public class LuaManager {
         }
 
         //init lua
-        for (Globals g: scripts.values()) {
-            g.get("init").call();
+        for (Globals g : scripts.values()) {
+            //TODO : 尝试解决lua模块的初始化问题
+            String name, desc;
+
+            try {
+                name = g.get("getModuleName").call().toString();
+                desc = g.get("getDescription").call().toString();
+                Main.INSTANCE.moduleManager.addModule(new LuaModule(name, desc, g));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+
         System.out.println("[LuaManager] Initialized.");
         System.out.println("[LuaManager] Size: " + scripts.size());
     }
@@ -97,8 +107,4 @@ public class LuaManager {
         scripts.clear();
     }
 
-    public void register(String name, String description, String luaName,Map<String, Globals> modules) {
-        System.out.println("[LuaManager] Registering lua. " + modules.size());
-        Main.INSTANCE.moduleManager.addModule(new LuaModule(name, description, modules.get(luaName)));
-    }
 }
