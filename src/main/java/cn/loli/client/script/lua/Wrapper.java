@@ -1,5 +1,6 @@
 package cn.loli.client.script.lua;
 
+import cn.loli.client.Main;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.multiplayer.WorldClient;
@@ -11,7 +12,7 @@ public class Wrapper {
     static WorldClient world = null;
 
     public Wrapper(){
-        System.out.println("Wrapper init");
+        Main.INSTANCE.println("Wrapper init");
         player = mc.thePlayer;
         world = mc.theWorld;
     }

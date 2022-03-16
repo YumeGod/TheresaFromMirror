@@ -142,10 +142,7 @@ public class Main {
         fileManager = new FileManager();
         valueManager = new ValueManager();
         commandManager = new CommandManager();
-        pluginsManager = new PluginsManager();
         moduleManager = new ModuleManager();
-
-
         commandManager.addCommands();
         moduleManager.addModules();
         fileManager.load();
@@ -158,8 +155,10 @@ public class Main {
         ms.reset();
         timing = 100L;
 
+        //Addon Loader
         luaManager = new LuaManager();
         luaManager.init();
+        pluginsManager = new PluginsManager();
 
         new SoundFxPlayer().playSound(SoundFxPlayer.SoundType.SPECIAL, -2);
     }

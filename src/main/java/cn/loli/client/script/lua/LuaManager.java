@@ -64,13 +64,13 @@ public class LuaManager {
     }
 
     public void init() {
-        System.out.println("[LuaManager] Initializing...");
+        Main.INSTANCE.println("[LuaManager] Initializing...");
         // add scripts
         for (File file : getFiles(Main.INSTANCE.fileManager.scriptsDir.getAbsolutePath())) {
             try {
                 if (file.getName().endsWith(".lua")){
                     addScript(readFile(file));
-                    System.out.println("[LuaManager] Loaded script: " + file.getName());
+                    Main.INSTANCE.println("[LuaManager] Loaded script: " + file.getName());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -91,8 +91,8 @@ public class LuaManager {
             }
         }
 
-        System.out.println("[LuaManager] Initialized.");
-        System.out.println("[LuaManager] Size: " + scripts.size());
+        Main.INSTANCE.println("[LuaManager] Initialized.");
+        Main.INSTANCE.println("[LuaManager] Size: " + scripts.size());
     }
 
     public void addScript(String script) {
@@ -100,8 +100,8 @@ public class LuaManager {
         LuaValue chunk = globals.load(script);
         chunk.call();
         scripts.put(String.valueOf(globals.get("get_lua_name").call()), globals);
-        System.out.println("Put script: " + globals.get("get_lua_name").call());
-        System.out.println("Size: " + scripts.size());
+        Main.INSTANCE.println("Put script: " + globals.get("get_lua_name").call());
+        Main.INSTANCE.println("Size: " + scripts.size());
     }
 
     public void removeScript(String name) {
@@ -110,6 +110,16 @@ public class LuaManager {
 
     public void clear() {
         scripts.clear();
+    }
+
+    public void register(String name, String description, String luaName, Map<String, Globals> modules) {
+        Main.INSTANCE.println("[LuaManager] Key: " + scripts.keySet());
+        Main.INSTANCE.println("[LuaManager] Registering lua. " + scripts.size());
+        try {
+            Main.INSTANCE.moduleManager.addModule(new LuaModule(name, description, modules.get(luaName)));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

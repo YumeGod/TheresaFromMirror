@@ -18,7 +18,7 @@ public class IrcCommand extends Command {
     @Override
     public void run(String alias, @NotNull String[] args) {
         if (args.length == 0) {
-            System.out.println("Usage: .irc <content>");
+            Main.INSTANCE.println("Usage: .irc <content>");
             return;
         }
 

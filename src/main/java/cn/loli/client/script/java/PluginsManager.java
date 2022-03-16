@@ -1,6 +1,7 @@
 package cn.loli.client.script.java;
 
 import cn.loli.client.Main;
+import cn.loli.client.module.ModuleManager;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -10,16 +11,17 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class PluginsManager {
-    public List<JavaPlugin> plugins = new ArrayList<>();
-    public List<String> classes = new ArrayList<>();
+
+    public ModuleManager moduleManager = null; //TODO: Implement
+    public Map<Class<? extends SubModule>, SubModule> modules = new HashMap<>();
     public URLClassLoader urlCL;
 
     public PluginsManager() {
@@ -32,7 +34,7 @@ public class PluginsManager {
         // 检测及创建插件目录
         if (!scriptDir.exists()) {
             if (!scriptDir.mkdirs()) {
-                System.err.println("Create Plugin Folder Failed!");
+                System.err.println("[LuaManager] Create Plugin Folder Failed!");
             }
         }
 
@@ -47,53 +49,54 @@ public class PluginsManager {
 
         for (int i = 0; i < files.length; i++) {
             try {
-                urls[i] = new URL("file:" + files[i].getPath());
+                urls[i] = files[i].toURI().toURL();
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
         }
-        // 用Classloader逐个获取实例
 
         urlCL = new URLClassLoader(urls, this.getClass().getClassLoader());
 
-        classes.forEach((s) -> {
+        // 用Classloader逐个获取实例
+        for (File f : files) {
+            String s = getActiveClass(f, true);
             Class<?> clazz;
             try {
-                if (s == null) {
-                    return;
-                }
+                if (s == null) return;
 
                 clazz = urlCL.loadClass(s);
 
-                JavaPlugin instance = (JavaPlugin) clazz.newInstance();
+                SubModule instance = (SubModule) clazz.newInstance();
 
-                // 防止多次载入同一款插件
-//                if (plugins.contains(instance)) {
-//                    return;
-//                }
+                modules.compute(instance.getClass(), (javaPluginClass, javaPlugin) -> {
+                    if (javaPlugin == null) {
+                        return instance;
+                    } else {
+                        return javaPlugin;
+                    }
+                });
 
-                // 防止载入同一个插件的不同版本
-//                for (JavaPlugin oldPlugin : plugins) {
-//                    if (oldPlugin.pluginName.equals(instance.pluginName)) {
-//                        float oldPluginVersion = oldPlugin.version;
-//                        float newPluginVersion = instance.version;
-//                        if (oldPluginVersion >= newPluginVersion) {
-//                            return;
-//                        } else {
-//                            plugins.remove(oldPlugin);
-//                            break;
-//                        }
-//                    }
-//                }
-                System.out.println("Loaded Plugin: " + instance.pluginName + " " + instance.version);
-                plugins.add(instance);
+                Main.INSTANCE.moduleManager.addModule(instance);
+                Main.INSTANCE.println("[LuaManager]Loaded Plugin: " + instance.getName() + " " + instance.getCategory());
             } catch (NoClassDefFoundError | Exception e) {
                 e.printStackTrace();
             }
-        });
+        }
+
+        // 用Classloader逐个获取实例
+        for (File f : files) {
+            String s = getActiveClass(f, false);
+            try {
+                if (s == null) return;
+                urlCL.loadClass(s).newInstance();
+                Main.INSTANCE.println("[LuaManager] Get ur utils active: " + s);
+            } catch (NoClassDefFoundError | Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    public String getMain(File file) {
+    public String getActiveClass(File file, boolean isModules) {
         try {
             ZipFile zip = new ZipFile(file);
             Enumeration<? extends ZipEntry> entries = zip.entries();
@@ -105,8 +108,9 @@ public class PluginsManager {
                     ClassReader cr = new ClassReader(input);
                     ClassNode cn = new ClassNode();
                     cr.accept(cn, ClassReader.SKIP_FRAMES);
-                    if (Objects.equals(cn.superName, "cn/loli/client/script/java/JavaPlugin")) {
-                        System.out.println("Found Plugin Main: " + cn.name);
+                    String i = isModules ? "cn/loli/client/script/java/SubModule" : "cn/loli/client/script/java/ActiveUtils";
+                    if (Objects.equals(cn.superName, i)) {
+                        Main.INSTANCE.println("Found Plugin Main: " + cn.name);
                         return entry.getName().replaceAll("/", ".").replaceAll(".class", "");
                     }
                 }

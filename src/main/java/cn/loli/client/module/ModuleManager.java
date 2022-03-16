@@ -105,8 +105,6 @@ public class ModuleManager {
         addModule(new HUD()); // Needs to be second last
         addModule(new ClickGUIModule()); // Needs to be last
 
-        Main.INSTANCE.pluginsManager.loadModules();
-
         // sort by alphabets
         modules.sort((mod, mod1) -> {
             int char0 = mod.getName().charAt(0);

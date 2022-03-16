@@ -1,5 +1,6 @@
 package cn.loli.client.module.modules.misc;
 
+import cn.loli.client.Main;
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.module.Module;
@@ -109,14 +110,14 @@ public class AntiBot extends Module {
                     final ArrayList<EntityPlayer> entities = getPlayersByName(entity.getName());
                     final ArrayList<NetworkPlayerInfo> tabList = searchPlayers(entity.getName());
                     if (tabList.size() > 1 && entities.size() < tabList.size()) {
-                        System.out.println(tabList.size() + entities.size() + " " + entity.getName());
+                        Main.INSTANCE.println(tabList.size() + entities.size() + " " + entity.getName());
                         if (!duplicates.contains(entity)) {
                             duplicates.add(entity);
                         }
                         continue;
                     } else if (tabList.size() > 1) {
                         if (entity != mc.theWorld.getPlayerEntityByName(entity.getName())) {
-                            System.out.println(tabList.size() + entities.size() + " " + entity.getName());
+                            Main.INSTANCE.println(tabList.size() + entities.size() + " " + entity.getName());
                             if (!duplicates.contains(entity)) {
                                 duplicates.add(entity);
                             }
