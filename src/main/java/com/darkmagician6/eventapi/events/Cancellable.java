@@ -1,4 +1,4 @@
-package eventapi.events;
+package com.darkmagician6.eventapi.events;
 
 /**
  * Simple interface which should be implemented in events that can be cancelled.

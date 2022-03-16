@@ -1,4 +1,4 @@
-package eventapi;
+package com.darkmagician6.eventapi;
 
 import com.darkmagician6.eventapi.types.Priority;
 

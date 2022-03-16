@@ -8,27 +8,40 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package eventapi.events;
-
+package com.darkmagician6.eventapi.events;
 
 /**
- * Simple interface that should be implemented in typed events.
- * A typed event is an event that can be called on multiple places
- * with the type defining where it was called.
- * <p/>
- * The type should be defined in the constructor when the new instance
- * of the event is created.
+ * The most basic form of an stoppable Event.
+ * Stoppable events are called seperate from other events and the calling of methods is stopped
+ * as soon as the EventStoppable is stopped.
  *
  * @author DarkMagician6
- * @since August 27, 2013
+ * @since 26-9-13
  */
-public interface Typed {
+public abstract class EventStoppable implements Event {
+
+    private boolean stopped;
 
     /**
-     * Gets the current type of the event.
-     *
-     * @return The type ID of the event.
+     * No need for the constructor to be public.
      */
-    byte getType();
+    protected EventStoppable() {
+    }
+
+    /**
+     * Sets the stopped state to true.
+     */
+    public void stop() {
+        stopped = true;
+    }
+
+    /**
+     * Checks the stopped boolean.
+     *
+     * @return True if the EventStoppable is stopped.
+     */
+    public boolean isStopped() {
+        return stopped;
+    }
 
 }

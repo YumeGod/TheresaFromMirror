@@ -22,7 +22,7 @@
  *
  * @Todo Improve/update the wiki.
  */
-package eventapi;
+package com.darkmagician6.eventapi;
 
 /**
  * Main class for the API.
