@@ -1,24 +1,18 @@
 package cn.loli.client.script.lua;
 
-import org.luaj.vm2.Globals;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.jse.JsePlatform;
-
+import javax.script.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class LuaManager {
-    Map<String, Globals> scripts = new HashMap<>();
+    Map<String, CompiledScript> scripts = new HashMap<>();
     public static LuaManager INSTANCE = new LuaManager();
+    public ScriptEngine engine;
 
     public static void main(String[] args) {
         INSTANCE.init();
-
-        while (true) {
-            Event.onUpdate();
-        }
     }
 
     // get files form a folder
@@ -55,25 +49,36 @@ public class LuaManager {
     }
 
     public void init() {
+        ScriptEngineManager sem = new ScriptEngineManager();
+        engine = sem.getEngineByName("luaj");
+//        ScriptEngineFactory f = e.getFactory();
+
         // add scripts
         for (File file : getFiles("C:\\Users\\Super\\Desktop\\luas")) {
             addScript(file.getName(), readFile(file));
         }
 
         //init lua
-        for (Map.Entry<String, Globals> entry : scripts.entrySet()) {
-            Globals globals = entry.getValue();
-            globals.get("init").call();
-//            System.out.println(globals.get("getLuaName").call());
-            System.out.println("loaded name:" + globals.get("getLuaName").call() + " author:" + globals.get("getAuthor").call() + " description:" + globals.get("getDescription").call());
+        for (Map.Entry<String, CompiledScript> entry : scripts.entrySet()) {
+            try {
+                entry.getValue().getEngine().eval("init()");
+            } catch (ScriptException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public void addScript(String name, String script) {
-        Globals globals = JsePlatform.standardGlobals();
-        LuaValue chunk = globals.load(script);
-        chunk.call();
-        scripts.put(name, globals);
+        try {
+            if (engine == null) {
+                System.out.println("engine is null");
+            } else {
+                CompiledScript cs = ((Compilable) engine).compile(script);
+                scripts.put(name, cs);
+            }
+        } catch (ScriptException e) {
+            e.printStackTrace();
+        }
     }
 
     public void removeScript(String name) {
@@ -84,8 +89,8 @@ public class LuaManager {
         scripts.clear();
     }
 
-    public void register(String name,String description,String category){
-        System.out.println("register name:"+name+" description:"+description+" category:"+category);
+    public void register(String name, String description, String category) {
+        System.out.println("register name:" + name + " description:" + description + " category:" + category);
 
     }
 
