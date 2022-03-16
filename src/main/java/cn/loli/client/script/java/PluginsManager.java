@@ -112,6 +112,7 @@ public class PluginsManager {
                 }
             }
 
+
             zip.close();
         } catch (IOException e) {
             e.printStackTrace();
