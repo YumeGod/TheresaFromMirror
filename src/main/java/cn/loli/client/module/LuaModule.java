@@ -15,7 +15,7 @@ public class LuaModule extends Module {
         super(name, description, ModuleCategory.LUA);
         this.globals = globals;
 
-        if (!globals.get("on_enable").isnil())
+        if (!globals.get("init").isnil())
             globals.get("init").call();
     }
 

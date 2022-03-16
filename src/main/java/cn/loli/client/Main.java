@@ -16,6 +16,7 @@ import cn.loli.client.module.ModuleManager;
 import cn.loli.client.protection.GuiCrashMe;
 import cn.loli.client.protection.ProtectionThread;
 import cn.loli.client.script.lua.LuaManager;
+import cn.loli.client.script.lua.Wrapper;
 import cn.loli.client.utils.misc.ExploitFix;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.others.SoundFxPlayer;
@@ -151,6 +152,7 @@ public class Main {
         packetQueue = new ConcurrentLinkedQueue<>();
         ms.reset();
         timing = 100L;
+
         luaManager = new LuaManager();
         luaManager.init();
         new SoundFxPlayer().playSound(SoundFxPlayer.SoundType.SPECIAL, -2);

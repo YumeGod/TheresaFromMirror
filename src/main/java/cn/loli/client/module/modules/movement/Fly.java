@@ -12,9 +12,6 @@ import cn.loli.client.value.ModeValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraft.network.play.client.C07PacketPlayerDigging;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
 
 public class Fly extends Module {
 
