@@ -6,7 +6,7 @@ import cn.loli.client.Main;
 import cn.loli.client.events.KeyEvent;
 import cn.loli.client.module.modules.combat.*;
 import cn.loli.client.module.modules.misc.*;
-import cn.loli.client.module.modules.misc.skyblock.*;
+import cn.loli.client.module.modules.misc.skyblock.AutoFarm;
 import cn.loli.client.module.modules.movement.*;
 import cn.loli.client.module.modules.player.*;
 import cn.loli.client.module.modules.render.*;
@@ -104,6 +104,8 @@ public class ModuleManager {
         addModule(new IgnoreCommands());
         addModule(new HUD()); // Needs to be second last
         addModule(new ClickGUIModule()); // Needs to be last
+
+        Main.INSTANCE.pluginsManager.loadModules();
 
         // sort by alphabets
         modules.sort((mod, mod1) -> {

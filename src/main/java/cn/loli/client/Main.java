@@ -15,6 +15,7 @@ import cn.loli.client.gui.ttfr.FontLoaders;
 import cn.loli.client.module.ModuleManager;
 import cn.loli.client.protection.GuiCrashMe;
 import cn.loli.client.protection.ProtectionThread;
+import cn.loli.client.script.java.PluginsManager;
 import cn.loli.client.script.lua.LuaManager;
 import cn.loli.client.script.lua.Wrapper;
 import cn.loli.client.utils.misc.ExploitFix;
@@ -111,6 +112,7 @@ public class Main {
     public boolean connected;
     public GuiScreen guiScreen;
     public LuaManager luaManager;
+    public PluginsManager pluginsManager;
 
     public Main() {
         INSTANCE = this;
@@ -141,6 +143,8 @@ public class Main {
         valueManager = new ValueManager();
         commandManager = new CommandManager();
         moduleManager = new ModuleManager();
+        pluginsManager = new PluginsManager();
+
         commandManager.addCommands();
         moduleManager.addModules();
         fileManager.load();
@@ -155,6 +159,7 @@ public class Main {
 
         luaManager = new LuaManager();
         luaManager.init();
+
         new SoundFxPlayer().playSound(SoundFxPlayer.SoundType.SPECIAL, -2);
     }
 

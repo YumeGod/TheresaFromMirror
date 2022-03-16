@@ -17,7 +17,4 @@ public class JavaPlugin {
     public void onModuleManagerLoad(ModuleManager modManager) {
     }
 
-//    public void onCommandManagerLoad(String commandManager){
-//        System.out.println(1);
-//    }
 }

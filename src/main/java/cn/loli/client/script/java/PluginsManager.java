@@ -1,7 +1,7 @@
 package cn.loli.client.script.java;
 
 import cn.loli.client.Main;
-import cn.loli.client.module.ModuleManager;
+import cn.loli.client.script.shadow.ShadowModuleManager;
 import jdk.internal.org.objectweb.asm.ClassReader;
 import jdk.internal.org.objectweb.asm.tree.ClassNode;
 
@@ -12,41 +12,29 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 
-/**
- * @description: Java插件管理
- * @author: QianXia
- * @create: 2020/10/5 15:54
- **/
 public class PluginsManager {
     public List<JavaPlugin> plugins = new ArrayList<>();
     public Map<URLClassLoader, String> urlCL = new HashMap<>();
 
     public PluginsManager() {
-        this.loadPlugins(false);
+        this.loadPlugins();
     }
 
-    public static void main(String[] args) {
-        PluginsManager manager = new PluginsManager();
-        manager.loadPlugins(true);
-    }
-
-    public void loadPlugins(boolean reload) {
+    public void loadPlugins() {
         try {
-            File luneDir = Main.INSTANCE.fileManager.scriptsDir;
-            File pluginDir = new File(luneDir, "Plugins");
+            File scriptDir = Main.INSTANCE.fileManager.scriptsDir;
 
             // 检测及创建插件目录
-            if (!pluginDir.exists()) {
-                if (!pluginDir.mkdirs()) {
+            if (!scriptDir.exists()) {
+                if (!scriptDir.mkdirs()) {
                     System.err.println("Create Plugin Folder Failed!");
                 }
             }
 
             // 列出全部的jar包
-            File[] files = pluginDir.listFiles((dir, name) -> name.endsWith(".jar"));
+            File[] files = scriptDir.listFiles((dir, name) -> name.endsWith(".jar"));
 
             if (files == null) {
                 return;
@@ -95,18 +83,12 @@ public class PluginsManager {
                 }
             }
 
-            // 重载需要重新调用这些函数
-//            if(reload){
-//                this.onModuleManagerLoad(Lune.moduleManager, true);
-//                this.onCommandManagerLoad(Lune.commandManager);
-//            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public String getMain(File file) {
-        String main = null;
         try {
             ZipFile zip = new ZipFile(file);
             Enumeration<? extends ZipEntry> entries = zip.entries();
@@ -124,145 +106,18 @@ public class PluginsManager {
                 }
             }
 
-
             zip.close();
-        } catch (ZipException e) {
-            e.printStackTrace();
-            return null;
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
-        return main;
+        return null;
     }
 
     public void loadModules() {
         for (JavaPlugin plugin : plugins) {
-            plugin.onModuleManagerLoad(Main.INSTANCE.moduleManager);
+            plugin.onModuleManagerLoad(new ShadowModuleManager());
         }
     }
-//
-//    public boolean isPluginEnabled(JavaPlugin plugin){
-//        for (Object value : ModuleManager.pluginModsList.values()) {
-//            if (value instanceof JavaPlugin) {
-//                if (value.equals(plugin)) {
-//                    return true;
-//                }
-//            }
-//        }
-//
-//        for (Object value : CommandManager.pluginCommands.values()) {
-//            if (value instanceof JavaPlugin) {
-//                if (value.equals(plugin)) {
-//                    return true;
-//                }
-//            }
-//        }
-//        return false;
-//    }
-//
-//    public void setPluginState(LunePlugin plugin, boolean state) {
-//        AtomicReference<Mod> tempMod = new AtomicReference<>();
-//        AtomicReference<Command> tempCmd = new AtomicReference<>();
-//
-//        if (state) {
-//            ModuleManager.disabledPluginList.forEach((mod, value) -> {
-//                if (value instanceof LunePlugin) {
-//                    if (value.equals(plugin)) {
-//                        tempMod.set(mod);
-//                    }
-//                }
-//            });
-//
-//            ModuleManager.disabledPluginList.remove(tempMod.get());
-//            ModuleManager.pluginModsList.put(tempMod.get(), plugin);
-//            ModuleManager.modList.add(tempMod.get());
-//
-//            CommandManager.disabledPluginCommands.forEach((cmd, value) -> {
-//                if (value instanceof LunePlugin) {
-//                    if (value.equals(plugin)) {
-//                        tempCmd.set(cmd);
-//                    }
-//                }
-//            });
-//
-//            CommandManager.disabledPluginCommands.remove(tempCmd.get());
-//            CommandManager.pluginCommands.put(tempCmd.get(), plugin);
-//            CommandManager.commands.add(tempCmd.get());
-//        } else {
-//            ModuleManager.pluginModsList.forEach((mod, value) -> {
-//                if (value instanceof LunePlugin) {
-//                    if (value.equals(plugin)) {
-//                        tempMod.set(mod);
-//                    }
-//                }
-//            });
-//
-//            ModuleManager.pluginModsList.remove(tempMod.get());
-//            ModuleManager.modList.remove(tempMod.get());
-//            ModuleManager.disabledPluginList.put(tempMod.get(), plugin);
-//
-//
-//            CommandManager.pluginCommands.forEach((cmd, value) -> {
-//                if (value instanceof LunePlugin) {
-//                    if (value.equals(plugin)) {
-//                        tempCmd.set(cmd);
-//                    }
-//                }
-//            });
-//
-//            CommandManager.pluginCommands.remove(tempCmd.get());
-//            CommandManager.commands.remove(tempCmd.get());
-//            CommandManager.disabledPluginCommands.put(tempCmd.get(), plugin);
-//        }
-//        Lune.moduleManager.sortModules();
-//    }
-//
-//    public void onModuleManagerLoad(ModuleManager modManager, boolean reload){
-//        for (LunePlugin plugin : plugins) {
-//            plugin.onModuleManagerLoad(modManager);
-//        }
-//        if(reload) {
-//            Lune.moduleManager.sortModules();
-//        }
-//    }
-//
-//    public void onCommandManagerLoad(CommandManager commandManager){
-//        for (LunePlugin plugin : plugins) {
-//            plugin.onCommandManagerLoad(commandManager);
-//        }
-//    }
-//
-//    public void onClientStart(Lune lune){
-//        for (LunePlugin plugin : plugins) {
-//            plugin.onClientStart(lune);
-//        }
-//    }
-//
-//    public void onClientStop(Lune lune){
-//        for (LunePlugin plugin : plugins) {
-//            plugin.onClientStop(lune);
-//        }
-//    }
 
-    public static class Check extends Thread {
-        private Thread thread;
-
-        public Check(Thread thread) {
-            this.thread = thread;
-        }
-
-        @Override
-        public void run() {
-            while (thread.isAlive()) {
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-//            Main.needReload = true;
-            this.interrupt();
-        }
-    }
 }

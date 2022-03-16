@@ -1,7 +1,6 @@
 package cn.loli.client.script.lua;
 
 import cn.loli.client.Main;
-import cn.loli.client.module.LuaModule;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import org.luaj.vm2.Globals;

@@ -34,7 +34,7 @@ public class HUD extends Module {
     private final BooleanValue reverse = new BooleanValue("Sort Reverse", false);
 
     private final ModeValue mode = new ModeValue("Mode", "Normal", "Normal");
-    private final ModeValue font = new ModeValue("Font", "Minecraft", "Minecraft", "Genshin", "Ubuntu");
+    private final ModeValue font = new ModeValue("Font", "Minecraft", "Minecraft", "Genshin", "Ubuntu", "Dos");
 
     private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -66,8 +66,11 @@ public class HUD extends Module {
 
         if (font.getCurrentMode().equals("Genshin")) {
             fontRenderer = Main.INSTANCE.fontLoaders.get("genshin16");
-        } else
+        } else if (font.getCurrentMode().equals("Ubuntu"))
             fontRenderer = Main.INSTANCE.fontLoaders.get("ubuntu16");
+        else
+            fontRenderer = Main.INSTANCE.fontLoaders.get("dos18");
+
 
         if (!sorted) {
             sort.sort(Comparator.comparingInt(m -> mcfont ? mc.fontRendererObj.getStringWidth(m.getName())
@@ -103,9 +106,10 @@ public class HUD extends Module {
                 if (m.getState()) {
                     String s = m.getName();
                     if (mcfont)
-                        mc.fontRendererObj.drawStringWithShadow(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, rainbow(50));
+                        mc.fontRendererObj.drawStringWithShadow(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, rainbow(25));
                     else
                         fontRenderer.drawStringWithShadow(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, rainbow(50), 150);
+
                     m.arraylist_animY = AnimationUtils.smoothAnimation(m.arraylist_animY, i + ArrayListYPos.getObject().intValue(), 50, .3f);
                     m.arraylist_animX = AnimationUtils.smoothAnimation(m.arraylist_animX, (mcfont ? mc.fontRendererObj.getStringWidth(s) : fontRenderer.getStringWidth(s)) + ArrayListXPos.getObject().intValue(), 50, .4f);
                     i += 12;
@@ -121,7 +125,7 @@ public class HUD extends Module {
     private static int rainbow(int delay) {
         double rainbowState = Math.ceil((System.currentTimeMillis() + delay) / 20.0);
         rainbowState %= 360;
-        return Color.getHSBColor((float) (rainbowState / 360.0f), 0.4f, 1.0f).getRGB();
+        return Color.getHSBColor((float) (rainbowState / 360.0f), 0.45f, 0.9f).getRGB();
     }
 
     @Override

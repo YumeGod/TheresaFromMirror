@@ -43,6 +43,9 @@ public class FontLoaders {
         for (int i = 12; i <= 18; ++i) {
             fonts.put("genshin" + i, getFont("genshin", i));
         }
+        for (int i = 12; i <= 18; ++i) {
+            fonts.put("dos" + i, getFont("dos", i));
+        }
         Main.INSTANCE.println("Fonts loading used " + (System.currentTimeMillis() - time) / 1000d + " seconds");
     }
 

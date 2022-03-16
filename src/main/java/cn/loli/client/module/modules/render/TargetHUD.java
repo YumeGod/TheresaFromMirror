@@ -55,7 +55,7 @@ public class TargetHUD extends Module {
     private final FloatBuffer modelMatrix = GLAllocation.createDirectFloatBuffer(16);
     private final FloatBuffer projectionMatrix = GLAllocation.createDirectFloatBuffer(16);
 
-    private final ModeValue font = new ModeValue("Font", "Genshin", "Genshin", "Ubuntu");
+    private final ModeValue font = new ModeValue("Font", "Genshin", "Genshin", "Ubuntu", "Dos");
     private final NumberValue<Integer> targetAmount = new NumberValue<>("Display Amount", 5, 1, 6);
     private final ModeValue sort = new ModeValue("Display", "Normal", "Normal", "Player");
 
@@ -197,10 +197,14 @@ public class TargetHUD extends Module {
             if (font.getCurrentMode().equals("Genshin")) {
                 fontRenderer = Main.INSTANCE.fontLoaders.get("genshin16");
                 fontRenderer2 = Main.INSTANCE.fontLoaders.get("genshin14");
-            } else {
+            } else if (font.getCurrentMode().equals("Ubuntu")) {
                 fontRenderer = Main.INSTANCE.fontLoaders.get("ubuntu16");
                 fontRenderer2 = Main.INSTANCE.fontLoaders.get("ubuntu14");
+            } else {
+                fontRenderer = Main.INSTANCE.fontLoaders.get("dos18");
+                fontRenderer2 = Main.INSTANCE.fontLoaders.get("dos14");
             }
+
 
             String healthStr = Math.round(ent.getHealth() * 10) / 10d + " hp";
             float width = Math.max(85, fontRenderer.getStringWidth(playerName.replaceAll("\247.", "")) + 45);
