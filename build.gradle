@@ -48,7 +48,7 @@ repositories {
         url = 'https://jitpack.io'
     }
 
-    maven { url 'http://172.105.231.97/' }
+    maven { url 'http://172.105.231.97/releases' }
 
 
 }
@@ -75,7 +75,7 @@ dependencies {
     }
     implementation 'org.jetbrains:annotations:15.0'
     implementation 'org.luaj:luaj-jse:3.0.1'
-    implementation 'theresa:sdk:1.0.0'
+    implementation("cn.loli:sdk:1.0.0")
     implementation group: 'com.google.zxing', name: 'core', version: '2.1'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 }
