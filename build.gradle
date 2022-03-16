@@ -127,9 +127,8 @@ shadowJar {
     dependencies {
         include(dependency('org.spongepowered:mixin'))
         include(dependency('com.google.zxing:core'))
-        include(dependency('theresa:sdk:1.0.0'))
+        include(dependency('cn.loli:sdk:1.0.0'))
         include(dependency('org.luaj:luaj-jse:3.0.1'))
-        include(dependency('com.github.Vazkii:MineTunes'))
     }
 
     exclude 'dummyThing'
