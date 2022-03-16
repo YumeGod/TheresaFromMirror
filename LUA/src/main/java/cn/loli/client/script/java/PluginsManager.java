@@ -1,6 +1,5 @@
 package cn.loli.client.script.java;
 
-import cn.loli.client.script.java.JavaPlugin;
 import jdk.internal.org.objectweb.asm.ClassReader;
 import jdk.internal.org.objectweb.asm.tree.ClassNode;
 

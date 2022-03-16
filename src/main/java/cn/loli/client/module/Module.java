@@ -44,8 +44,9 @@ public abstract class Module {
     public float arraylist_animX;
     public float arraylist_animY;
 
-
-
+    protected Module(String name, String description, String moduleCategory) {
+        this(name, description, ModuleCategory.getCategory(moduleCategory) , true, false, Keyboard.KEY_NONE);
+    }
 
     protected Module(String name, String description, ModuleCategory moduleCategory) {
         this(name, description, moduleCategory, true, false, Keyboard.KEY_NONE);

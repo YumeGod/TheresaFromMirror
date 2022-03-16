@@ -19,7 +19,18 @@ public enum ModuleCategory {
         this.name = name;
     }
 
+    String getName() {
+        return name;
+    }
 
+    public static ModuleCategory getCategory(String name) {
+        for (ModuleCategory category : values()) {
+            if (category.getName().equals(name)) {
+                return category;
+            }
+        }
+        return null;
+    }
 
     @Override
     public String toString() {

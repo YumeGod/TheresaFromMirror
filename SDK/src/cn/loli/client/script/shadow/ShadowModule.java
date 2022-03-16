@@ -1,11 +1,12 @@
 package cn.loli.client.script.shadow;
 
 import cn.loli.client.module.Module;
-import cn.loli.client.module.ModuleCategory;
 
 public abstract class ShadowModule extends Module {
 
-    protected ShadowModule(String name, String description, ModuleCategory moduleCategory) {
+    //Module Category
+    //Combat Render Movement Player World Misc Lua
+    protected ShadowModule(String name, String description, String moduleCategory) {
         super(name, description, moduleCategory);
     }
 

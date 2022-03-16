@@ -55,7 +55,12 @@ public class PluginsManager {
                     if (pluginMain == null) {
                         continue;
                     }
+
                     clazz = loader.loadClass(pluginMain);
+
+                    System.out.println(clazz.getTypeName());
+                    System.out.println(JavaPlugin.class.getTypeName());
+
                     JavaPlugin instance = (JavaPlugin) clazz.newInstance();
 
                     // 防止多次载入同一款插件
@@ -101,6 +106,7 @@ public class PluginsManager {
                     ClassNode cn = new ClassNode();
                     cr.accept(cn, ClassReader.SKIP_FRAMES);
                     if ("cn/loli/client/script/java/JavaPlugin".equals(cn.superName)) {
+                        System.out.println("Found Plugin Main: " + cn.name);
                         return entry.getName().replaceAll("/", ".").replaceAll(".class", "");
                     }
                 }
@@ -116,7 +122,7 @@ public class PluginsManager {
 
     public void loadModules() {
         for (JavaPlugin plugin : plugins) {
-            plugin.onModuleManagerLoad(new ShadowModuleManager());
+            plugin.onModuleManagerLoad(new ShadowModuleManager(){});
         }
     }
 

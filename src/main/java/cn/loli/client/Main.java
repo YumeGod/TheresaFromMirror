@@ -142,8 +142,9 @@ public class Main {
         fileManager = new FileManager();
         valueManager = new ValueManager();
         commandManager = new CommandManager();
-        moduleManager = new ModuleManager();
         pluginsManager = new PluginsManager();
+        moduleManager = new ModuleManager();
+
 
         commandManager.addCommands();
         moduleManager.addModules();

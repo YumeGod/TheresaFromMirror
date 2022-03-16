@@ -59,6 +59,5 @@
         </SOURCES>
       </library>
     </orderEntry>
-    <orderEntry type="library" name="Gradle: com.formdev:flatlaf:2.0.2" level="project" />
   </component>
 </module>

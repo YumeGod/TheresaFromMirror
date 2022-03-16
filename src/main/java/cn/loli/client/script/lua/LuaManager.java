@@ -68,11 +68,13 @@ public class LuaManager {
         // add scripts
         for (File file : getFiles(Main.INSTANCE.fileManager.scriptsDir.getAbsolutePath())) {
             try {
-                addScript(readFile(file));
+                if (file.getName().endsWith(".lua")){
+                    addScript(readFile(file));
+                    System.out.println("[LuaManager] Loaded script: " + file.getName());
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            System.out.println("[LuaManager] Loaded script: " + file.getName());
         }
 
         //init lua

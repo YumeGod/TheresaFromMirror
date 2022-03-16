@@ -22,7 +22,7 @@ public class AimBot extends Module {
     private final NumberValue<Float> maxPitch = new NumberValue<>("MaxAngleVertical", 180f, 0f, 180f);
 
     public AimBot() {
-        super("AimBot", "Snaps your aim to the nearest enemy.", ModuleCategory.COMBAT);
+        super("AimBot", "Snaps your aim to the nearest enemy.", "Combat");
     }
 
     @EventTarget
