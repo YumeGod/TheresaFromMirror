@@ -132,8 +132,13 @@ public class ScriptLoader {
     }
 
     public void addJScript(String script) {
-        JSTranfromer transformer = new JSTranfromer(script);
-        Main.INSTANCE.moduleManager.addModule(new JSModule(transformer.getName(), transformer.getDesc(), transformer.getInvocable()));
+        try {
+            JSTranfromer transformer = new JSTranfromer(script);
+            Main.INSTANCE.moduleManager.addModule(new JSModule(transformer.getName(), transformer.getDesc(), transformer.getInvocable()));
+        } catch (Exception e) {
+            Main.INSTANCE.println("[LuaManager] Failed to load JS script.");
+        }
+
     }
 
 }
