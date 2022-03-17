@@ -7,15 +7,20 @@ import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
 import org.luaj.vm2.Globals;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LuaModule extends Module {
 
     //TODO : 补全更多的方法
 
     public Globals globals;
+    private final List<String> blacklist;
 
     public LuaModule(String name, String description, Globals globals) {
         super(name, description, ModuleCategory.LUA);
         this.globals = globals;
+        blacklist = new ArrayList<>();
 
         if (!globals.get("init").isnil())
             globals.get("init").call();
@@ -129,8 +134,11 @@ public class LuaModule extends Module {
 
     protected void invoke(String method) {
         try {
-            if (!globals.get(method).isnil())
+            if (!globals.get(method).isnil()
+                    && !blacklist.contains(method))
                 globals.get(method).invoke();
+            else
+                blacklist.add(method);
         } catch (Exception e) {
             e.printStackTrace();
         }

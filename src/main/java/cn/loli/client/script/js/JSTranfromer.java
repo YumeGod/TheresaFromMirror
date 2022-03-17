@@ -9,20 +9,20 @@ import javax.script.ScriptException;
 
 public class JSTranfromer {
 
-    private final Invocable invocable;
-    private final String name,desc;
+    private Invocable invocable;
+    private String name,desc;
 
     public JSTranfromer(String source){
         ScriptEngine ee = new ScriptEngineManager().getEngineByName("Nashorn");
+        Main.INSTANCE.println("[JSTranfromer] Loading script: " + source);
         try {
             ee.eval(source);
+            this.name = (String) ee.get("name");
+            this.desc = (String) ee.get("desc");
+            this.invocable = (Invocable) ee;
         } catch (ScriptException e) {
-            Main.INSTANCE.println("[JS] "+ "Error while loading script");
+            e.printStackTrace();
         }
-
-        this.name = (String) ee.get("name");
-        this.desc = (String) ee.get("version");
-        this.invocable = (Invocable) ee;
     }
 
     public String getName(){

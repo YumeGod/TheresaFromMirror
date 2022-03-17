@@ -12,6 +12,7 @@ import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.file.FileManager;
 import cn.loli.client.gui.guiscreen.GuiReconnectIRC;
 import cn.loli.client.gui.ttfr.FontLoaders;
+import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleManager;
 import cn.loli.client.protection.GuiCrashMe;
 import cn.loli.client.protection.ProtectionThread;
@@ -142,10 +143,6 @@ public class Main {
         valueManager = new ValueManager();
         commandManager = new CommandManager();
         moduleManager = new ModuleManager();
-        //Plugins and Scripts
-        scriptLoader = new ScriptLoader();
-        scriptLoader.init();
-        pluginsManager = new PluginsManager();
 
         commandManager.addCommands();
         moduleManager.addModules();
@@ -158,6 +155,14 @@ public class Main {
         packetQueue = new ConcurrentLinkedQueue<>();
         ms.reset();
         timing = 100L;
+
+        //Plugins and Scripts
+        pluginsManager = new PluginsManager();
+        scriptLoader = new ScriptLoader();
+        scriptLoader.init();
+
+        for (Module module : moduleManager.getModules())
+        Main.INSTANCE.println(module.getName() + " loaded");
 
         new SoundFxPlayer().playSound(SoundFxPlayer.SoundType.SPECIAL, -2);
     }
