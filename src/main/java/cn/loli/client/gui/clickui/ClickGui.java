@@ -12,6 +12,7 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
+import org.lwjgl.Sys;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
@@ -190,6 +191,7 @@ public class ClickGui extends GuiScreen {
                         showValueX = AnimationUtils.smoothAnimation(showValueX, width / 3, ANIMATION_SPEED * 2, ANIMATION_SCALE);
                         valuesY = y + 55 + values_wheel;
                         // TODO: 2022/2/14 这里写的又臭又长，有时间分开写
+
 
                         for (Value v : Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName()))) {
                             Main.INSTANCE.fontLoaders.get("roboto18").drawString(v.getName(), x + width - showValueX + 5, valuesY + 1, theme.value_name.getRGB());

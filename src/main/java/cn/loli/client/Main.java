@@ -144,6 +144,11 @@ public class Main {
         commandManager = new CommandManager();
         moduleManager = new ModuleManager();
 
+        //Plugins and Scripts
+        pluginsManager = new PluginsManager();
+        scriptLoader = new ScriptLoader();
+        scriptLoader.init();
+
         commandManager.addCommands();
         moduleManager.addModules();
         fileManager.load();
@@ -155,14 +160,6 @@ public class Main {
         packetQueue = new ConcurrentLinkedQueue<>();
         ms.reset();
         timing = 100L;
-
-        //Plugins and Scripts
-        pluginsManager = new PluginsManager();
-        scriptLoader = new ScriptLoader();
-        scriptLoader.init();
-
-        for (Module module : moduleManager.getModules())
-        Main.INSTANCE.println(module.getName() + " loaded");
 
         new SoundFxPlayer().playSound(SoundFxPlayer.SoundType.SPECIAL, -2);
     }

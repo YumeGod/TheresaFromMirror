@@ -119,6 +119,10 @@ public class ModuleManager {
         Main.INSTANCE.valueManager.registerObject(module.getName(), module);
     }
 
+    public void addModuleNoReg(@NotNull Module module) {
+        modules.add(module);
+    }
+
     @NotNull
     public List<Module> getModules() {
         return modules;

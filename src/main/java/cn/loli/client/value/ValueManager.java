@@ -2,6 +2,7 @@
 
 package cn.loli.client.value;
 
+import cn.loli.client.Main;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,12 +43,15 @@ public class ValueManager {
      * @param object The Value-object
      * this method will add the value to the owner if it doesn't exist
      */
-    public void register(String name, @NotNull Value<?> object) {
+    public void register(String name, @NotNull Value object) {
         List<Value> values = new ArrayList<>();
         if (valueMap.get(name) != null)
             values = valueMap.get(name);
+
         values.add(object);
+        Main.INSTANCE.println("Registered value: " + object.getName() + " to " + name);
         valueMap.put(name, values);
+        Main.INSTANCE.println("Get Key Set: " + valueMap.keySet());
     }
 
     /**

@@ -19,6 +19,7 @@ public class ScriptLoader {
     public static Map<String, Globals> scripts = new HashMap<>();
 
     public static ScriptLoader INSTANCE = new ScriptLoader();
+    ArrayList<Module> addons = new ArrayList<>();
 
     // get files form a folder
     public ArrayList<File> getFiles(String path) {
@@ -93,7 +94,7 @@ public class ScriptLoader {
             try {
                 name = g.get("get_name").call().toString();
                 desc = g.get("get_desc").call().toString();
-                Main.INSTANCE.moduleManager.addModule(new LuaModule(name, desc, g));
+                Main.INSTANCE.moduleManager.addModuleNoReg(new LuaModule(name, desc, g));
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -121,19 +122,17 @@ public class ScriptLoader {
     }
 
     public void register(String name, String description, String luaName, Map<String, Globals> modules) {
-        Main.INSTANCE.println("[LuaManager] Key: " + scripts.keySet());
-        Main.INSTANCE.println("[LuaManager] Registering lua. " + scripts.size());
         try {
-            Main.INSTANCE.moduleManager.addModule(new LuaModule(name, description, modules.get(luaName)));
+            Main.INSTANCE.moduleManager.addModuleNoReg(new LuaModule(name, description, modules.get(luaName)));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void addJScript(String script) {
+    public void addJScript(String script ) {
         try {
             JSTransformer transformer = new JSTransformer(script);
-            Main.INSTANCE.moduleManager.addModule(new JSModule(transformer.getName(), transformer.getDesc(), transformer.getInvocable()));
+            Main.INSTANCE.moduleManager.addModuleNoReg(new JSModule(transformer.getName(), transformer.getDesc(), transformer.getInvocable()));
             Main.INSTANCE.println("[LuaManager] Loaded .js script: " + transformer.getName());
         } catch (Exception e) {
             e.printStackTrace();
