@@ -17,7 +17,7 @@ public abstract class Value<T> {
     private Predicate<T> validator;
     private IValueCallback<T> callback = null;
 
-    Value(String name, T defaultVal, Predicate<T> validator) {
+    protected Value(String name, T defaultVal, Predicate<T> validator) {
         this.name = name;
         this.object = defaultVal;
         this.defaultVal = defaultVal;

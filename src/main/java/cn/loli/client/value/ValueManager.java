@@ -40,7 +40,6 @@ public class ValueManager {
      * @param name The name of the owner
      * @return If there's an owner with this name (the case is ignored) it will return all values of it else it will return null
      */
-    @Nullable
     public List<Value> getAllValuesFrom(String name) {
         for (Map.Entry<String, List<Value>> stringListEntry : valueMap.entrySet()) {
             if (stringListEntry.getKey().equalsIgnoreCase(name)) return stringListEntry.getValue();
@@ -48,8 +47,7 @@ public class ValueManager {
         return null;
     }
 
-    @NotNull
-    public HashMap<String, List<Value>> getAllValues() {
+    public @NotNull HashMap<String, List<Value>> getAllValues() {
         return valueMap;
     }
 
