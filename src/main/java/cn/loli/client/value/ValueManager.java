@@ -36,6 +36,20 @@ public class ValueManager {
         valueMap.put(name, values);
     }
 
+
+    /**
+     * @param name   The name of the owner
+     * @param object The Value-object
+     * this method will add the value to the owner if it doesn't exist
+     */
+    public void register(String name, @NotNull Value<?> object) {
+        List<Value> values = new ArrayList<>();
+        if (valueMap.get(name) != null)
+            values = valueMap.get(name);
+        values.add(object);
+        valueMap.put(name, values);
+    }
+
     /**
      * @param name The name of the owner
      * @return If there's an owner with this name (the case is ignored) it will return all values of it else it will return null

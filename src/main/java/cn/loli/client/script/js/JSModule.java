@@ -4,10 +4,12 @@ import cn.loli.client.Main;
 import cn.loli.client.events.*;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
 
 import javax.script.Invocable;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -139,4 +141,5 @@ public class JSModule extends Module {
             Main.INSTANCE.println("[JS] " + this.name + ": " + funcName + " error");
         }
     }
+
 }

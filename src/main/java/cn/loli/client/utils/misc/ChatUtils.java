@@ -16,6 +16,7 @@ public class ChatUtils {
     public static void send(final String s) {
         JsonObject object = new JsonObject();
         object.addProperty("text", s);
+        if (Minecraft.getMinecraft().thePlayer != null)
         Minecraft.getMinecraft().thePlayer.addChatMessage(IChatComponent.Serializer.jsonToComponent(object.toString()));
     }
 
