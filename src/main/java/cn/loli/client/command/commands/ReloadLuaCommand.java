@@ -2,7 +2,6 @@ package cn.loli.client.command.commands;
 
 import cn.loli.client.Main;
 import cn.loli.client.command.Command;
-import cn.loli.client.script.lua.LuaManager;
 
 import java.util.List;
 
@@ -14,7 +13,7 @@ public class ReloadLuaCommand extends Command {
     @Override
     public void run(String alias, String[] args) {
         if (args[0].equals("reload")) {
-            Main.INSTANCE.luaManager.reload();
+            Main.INSTANCE.scriptLoader.reload();
         }
     }
 

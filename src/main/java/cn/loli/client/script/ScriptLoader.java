@@ -1,8 +1,11 @@
-package cn.loli.client.script.lua;
+package cn.loli.client.script;
 
 import cn.loli.client.Main;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import cn.loli.client.script.js.JSModule;
+import cn.loli.client.script.js.JSTranfromer;
+import cn.loli.client.script.lua.LuaModule;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.JsePlatform;
@@ -12,14 +15,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LuaManager {
+public class ScriptLoader {
     public static Map<String, Globals> scripts = new HashMap<>();
 
-    public static LuaManager INSTANCE = new LuaManager();
+    public static ScriptLoader INSTANCE = new ScriptLoader();
 
     // get files form a folder
     public ArrayList<File> getFiles(String path) {
-        ArrayList<File> list = new ArrayList();
+        ArrayList<File> list = new ArrayList<>();
         File file = new File(path);
         File[] files = file.listFiles();
         for (File f : files) {
@@ -52,7 +55,7 @@ public class LuaManager {
 
     // reload the lua manager
     public void reload() {
-        ArrayList<Module> remove = new ArrayList();
+        ArrayList<Module> remove = new ArrayList<>();
         for (Module module : Main.INSTANCE.moduleManager.getModules()) {
             if (module.getCategory() == ModuleCategory.LUA) {
                 remove.add(module);
@@ -64,13 +67,19 @@ public class LuaManager {
     }
 
     public void init() {
-        Main.INSTANCE.println("[LuaManager] Initializing...");
+        Main.INSTANCE.println("[LuaManager] Lua Initializing...");
         // add scripts
         for (File file : getFiles(Main.INSTANCE.fileManager.scriptsDir.getAbsolutePath())) {
             try {
-                if (file.getName().endsWith(".lua")){
+                if (file.getName().endsWith(".lua")) {
                     addScript(readFile(file));
-                    Main.INSTANCE.println("[LuaManager] Loaded script: " + file.getName());
+                    Main.INSTANCE.println("[LuaManager] Loaded .lua script: " + file.getName());
+                }
+
+                if (file.getName().endsWith(".js")) {
+                    //TODO: Read JavaScript
+                    addJScript(readFile(file));
+                    Main.INSTANCE.println("[LuaManager] Loaded .js script: " + file.getName());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -120,6 +129,11 @@ public class LuaManager {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void addJScript(String script) {
+        JSTranfromer transformer = new JSTranfromer(script);
+        Main.INSTANCE.moduleManager.addModule(new JSModule(transformer.getName(), transformer.getDesc(), transformer.getInvocable()));
     }
 
 }

@@ -15,9 +15,8 @@ import cn.loli.client.gui.ttfr.FontLoaders;
 import cn.loli.client.module.ModuleManager;
 import cn.loli.client.protection.GuiCrashMe;
 import cn.loli.client.protection.ProtectionThread;
+import cn.loli.client.script.ScriptLoader;
 import cn.loli.client.script.java.PluginsManager;
-import cn.loli.client.script.lua.LuaManager;
-import cn.loli.client.script.lua.Wrapper;
 import cn.loli.client.utils.misc.ExploitFix;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.others.SoundFxPlayer;
@@ -111,7 +110,7 @@ public class Main {
     public boolean hasKey;
     public boolean connected;
     public GuiScreen guiScreen;
-    public LuaManager luaManager;
+    public ScriptLoader scriptLoader;
     public PluginsManager pluginsManager;
 
     public Main() {
@@ -143,6 +142,11 @@ public class Main {
         valueManager = new ValueManager();
         commandManager = new CommandManager();
         moduleManager = new ModuleManager();
+        //Plugins and Scripts
+        scriptLoader = new ScriptLoader();
+        scriptLoader.init();
+        pluginsManager = new PluginsManager();
+
         commandManager.addCommands();
         moduleManager.addModules();
         fileManager.load();
@@ -154,11 +158,6 @@ public class Main {
         packetQueue = new ConcurrentLinkedQueue<>();
         ms.reset();
         timing = 100L;
-
-        //Addon Loader
-        luaManager = new LuaManager();
-        luaManager.init();
-        pluginsManager = new PluginsManager();
 
         new SoundFxPlayer().playSound(SoundFxPlayer.SoundType.SPECIAL, -2);
     }
