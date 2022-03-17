@@ -223,7 +223,7 @@ public class FileManager {
                 backup(backupReasons);
             }
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            Main.INSTANCE.println(e.getMessage());
         }
     }
 
@@ -258,7 +258,7 @@ public class FileManager {
             outputStream.close();
         } catch (Exception e) {
             Main.INSTANCE.logger.error("Failed to backup");
-            e.printStackTrace();
+            Main.INSTANCE.println(e.getMessage());
         }
     }
 

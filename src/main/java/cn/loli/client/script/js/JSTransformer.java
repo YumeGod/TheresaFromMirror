@@ -2,12 +2,12 @@ package cn.loli.client.script.js;
 
 import cn.loli.client.Main;
 import cn.loli.client.utils.misc.ChatUtils;
-import cn.loli.client.value.*;
 import net.minecraft.client.Minecraft;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.util.function.Consumer;
 
 public class JSTransformer {
@@ -31,8 +31,8 @@ public class JSTransformer {
             this.name = (String) engine.get("name");
             this.desc = (String) engine.get("desc");
             this.invocable = (Invocable) engine;
-        } catch (Exception e) {
-          e.printStackTrace();
+        } catch (ScriptException e) {
+            Main.INSTANCE.println(e.getMessage());
         }
     }
 

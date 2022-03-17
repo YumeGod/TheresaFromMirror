@@ -147,7 +147,7 @@ public class Aura extends Module {
         try {
             update();
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.INSTANCE.println(e.getMessage());
         }
 
         /*

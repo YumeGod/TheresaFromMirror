@@ -49,9 +49,7 @@ public class ValueManager {
             values = valueMap.get(name);
 
         values.add(object);
-        Main.INSTANCE.println("Registered value: " + object.getName() + " to " + name);
         valueMap.put(name, values);
-        Main.INSTANCE.println("Get Key Set: " + valueMap.keySet());
     }
 
     /**

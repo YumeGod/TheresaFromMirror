@@ -82,7 +82,7 @@ public class ScriptLoader {
                     addJScript(readFile(file));
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                Main.INSTANCE.println(e.getMessage());
             }
         }
 
@@ -96,7 +96,7 @@ public class ScriptLoader {
                 desc = g.get("get_desc").call().toString();
                 Main.INSTANCE.moduleManager.addModuleNoReg(new LuaModule(name, desc, g));
             } catch (Exception e) {
-                e.printStackTrace();
+                Main.INSTANCE.println(e.getMessage());
             }
         }
 
@@ -125,7 +125,7 @@ public class ScriptLoader {
         try {
             Main.INSTANCE.moduleManager.addModuleNoReg(new LuaModule(name, description, modules.get(luaName)));
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.INSTANCE.println(e.getMessage());
         }
     }
 
@@ -135,7 +135,7 @@ public class ScriptLoader {
             Main.INSTANCE.moduleManager.addModuleNoReg(new JSModule(transformer.getName(), transformer.getDesc(), transformer.getInvocable()));
             Main.INSTANCE.println("[LuaManager] Loaded .js script: " + transformer.getName());
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.INSTANCE.println(e.getMessage());
             Main.INSTANCE.println("[LuaManager] Failed to load JS script.");
         }
 

@@ -48,7 +48,7 @@ public class PluginsManager {
             try {
                 urls[i] = files[i].toURI().toURL();
             } catch (MalformedURLException e) {
-                e.printStackTrace();
+                Main.INSTANCE.println(e.getMessage());
             }
         }
 
@@ -76,7 +76,7 @@ public class PluginsManager {
                     Main.INSTANCE.println("[LuaManager]Loaded Plugin: " + instance.getName() + " " + instance.getCategory());
                 }
             } catch (NoClassDefFoundError | Exception e) {
-                e.printStackTrace();
+                Main.INSTANCE.println(e.getMessage());
             }
         }
 
@@ -92,7 +92,7 @@ public class PluginsManager {
                             (ActiveUtils) clazz.newInstance();
                 }
             } catch (NoClassDefFoundError | Exception e) {
-                e.printStackTrace();
+                Main.INSTANCE.println(e.getMessage());
             }
         }
     }
@@ -120,7 +120,7 @@ public class PluginsManager {
 
             zip.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Main.INSTANCE.println(e.getMessage());
             return null;
         }
         return activeClass;
