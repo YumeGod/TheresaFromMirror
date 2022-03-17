@@ -4,7 +4,7 @@ import cn.loli.client.Main;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.script.js.JSModule;
-import cn.loli.client.script.js.JSTranfromer;
+import cn.loli.client.script.js.JSTransformer;
 import cn.loli.client.script.lua.LuaModule;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaValue;
@@ -79,7 +79,6 @@ public class ScriptLoader {
                 if (file.getName().endsWith(".js")) {
                     //TODO: Read JavaScript
                     addJScript(readFile(file));
-                    Main.INSTANCE.println("[LuaManager] Loaded .js script: " + file.getName());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -133,9 +132,11 @@ public class ScriptLoader {
 
     public void addJScript(String script) {
         try {
-            JSTranfromer transformer = new JSTranfromer(script);
+            JSTransformer transformer = new JSTransformer(script);
             Main.INSTANCE.moduleManager.addModule(new JSModule(transformer.getName(), transformer.getDesc(), transformer.getInvocable()));
+            Main.INSTANCE.println("[LuaManager] Loaded .js script: " + transformer.getName());
         } catch (Exception e) {
+            e.printStackTrace();
             Main.INSTANCE.println("[LuaManager] Failed to load JS script.");
         }
 

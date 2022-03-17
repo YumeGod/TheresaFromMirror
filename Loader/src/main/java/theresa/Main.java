@@ -95,15 +95,15 @@ public class Main {
     public String getip(String name){
         switch (name){
             case "Japan-1":
-                return "167.88.184.79";
+                return "jp1.nigger.party";
             case "HK-2":
-                return "45.94.41.7";
+                return "cn1.nigger.party";
             case "US-1":
-                return "15.204.152.11";
+                return "us1.nigger.party";
             case "US-2":
-                return "15.204.152.34";
+                return "us2.nigger.party";
         }
-        return "15.204.152.34";
+        return "my.nigger.party";
     }
 
     public static class Login extends JFrame {

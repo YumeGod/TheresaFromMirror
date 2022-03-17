@@ -25,7 +25,6 @@ public class JSModule extends Module {
         invoke("init");
     }
 
-
     @EventTarget
     private void onUpdate(UpdateEvent event) {
         invoke("on_update", event);

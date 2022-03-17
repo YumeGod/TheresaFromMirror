@@ -29,9 +29,11 @@ public class HUD extends Module {
     private final BooleanValue showLogo = new BooleanValue("Logo", true);
     private final BooleanValue showArrayList = new BooleanValue("ArrayList", true);
     private final BooleanValue showNotifications = new BooleanValue("Notifications", true);
+    private final BooleanValue onlyKeyBind = new BooleanValue("Only KeyBind", false);
     private final NumberValue<Number> ArrayListXPos = new NumberValue<>("ArrayListXPos", 0, 0, 15);
     private final NumberValue<Number> ArrayListYPos = new NumberValue<>("ArrayListYPos", 0, 0, 15);
     private final BooleanValue reverse = new BooleanValue("Sort Reverse", false);
+
 
     private final ModeValue mode = new ModeValue("Mode", "Normal", "Normal");
     private final ModeValue font = new ModeValue("Font", "Minecraft", "Minecraft", "Genshin", "Ubuntu", "Dos");
@@ -46,6 +48,7 @@ public class HUD extends Module {
         setState(true);
         sort.addAll(Main.INSTANCE.moduleManager.getModules());
     }
+
 
     //反转ArrayList
     private static ArrayList<Module> reverse(List<Module> list) {
@@ -132,5 +135,12 @@ public class HUD extends Module {
     public void onEnable() {
         if (sorted) sorted = false;
 
+        //Shit Code but i dont wanna change it
+        sort.clear();
+
+        sort.addAll(Main.INSTANCE.moduleManager.getModules());
+
+        //Only for testing with keybind one
+        if (onlyKeyBind.getObject()) sort.removeIf(m -> m.getKeybind() == 0x00);
     }
 }
