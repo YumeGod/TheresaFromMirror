@@ -11,10 +11,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -59,25 +56,25 @@ public class PluginsManager {
 
         // 用Classloader逐个获取实例
         for (File f : files) {
-            String s = getActiveClass(f, true);
+            List<String> s = getActiveClass(f, true);
             Class<?> clazz;
             try {
                 if (s == null) return;
+                for (String name : s) {
+                    clazz = urlCL.loadClass(name);
+                    SubModule instance = (SubModule) clazz.newInstance();
 
-                clazz = urlCL.loadClass(s);
+                    modules.compute(instance.getClass(), (javaPluginClass, javaPlugin) -> {
+                        if (javaPlugin == null) {
+                            return instance;
+                        } else {
+                            return javaPlugin;
+                        }
+                    });
 
-                SubModule instance = (SubModule) clazz.newInstance();
-
-                modules.compute(instance.getClass(), (javaPluginClass, javaPlugin) -> {
-                    if (javaPlugin == null) {
-                        return instance;
-                    } else {
-                        return javaPlugin;
-                    }
-                });
-
-                Main.INSTANCE.moduleManager.addModule(instance);
-                Main.INSTANCE.println("[LuaManager]Loaded Plugin: " + instance.getName() + " " + instance.getCategory());
+                    Main.INSTANCE.moduleManager.addModule(instance);
+                    Main.INSTANCE.println("[LuaManager]Loaded Plugin: " + instance.getName() + " " + instance.getCategory());
+                }
             } catch (NoClassDefFoundError | Exception e) {
                 e.printStackTrace();
             }
@@ -85,10 +82,15 @@ public class PluginsManager {
 
         // 用Classloader逐个获取实例
         for (File f : files) {
-            String s = getActiveClass(f, false);
+            List<String> s = getActiveClass(f, false);
+            Class<?> clazz;
             try {
                 if (s == null) return;
-                urlCL.loadClass(s).newInstance();
+                for (String name : s) {
+                    clazz = urlCL.loadClass(name);
+                    ActiveUtils newInstance =
+                            (ActiveUtils) clazz.newInstance();
+                }
                 Main.INSTANCE.println("[LuaManager] Get ur utils active: " + s);
             } catch (NoClassDefFoundError | Exception e) {
                 e.printStackTrace();
@@ -96,7 +98,8 @@ public class PluginsManager {
         }
     }
 
-    public String getActiveClass(File file, boolean isModules) {
+    public List<String> getActiveClass(File file, boolean isModules) {
+        List<String> activeClass = new ArrayList<>();
         try {
             ZipFile zip = new ZipFile(file);
             Enumeration<? extends ZipEntry> entries = zip.entries();
@@ -111,18 +114,17 @@ public class PluginsManager {
                     String i = isModules ? "cn/loli/client/script/java/SubModule" : "cn/loli/client/script/java/ActiveUtils";
                     if (Objects.equals(cn.superName, i)) {
                         Main.INSTANCE.println("Found Plugin Main: " + cn.name);
-                        return entry.getName().replaceAll("/", ".").replaceAll(".class", "");
+                        activeClass.add(entry.getName().replaceAll("/", ".").replaceAll(".class", ""));
                     }
                 }
             }
-
 
             zip.close();
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
-        return null;
+        return activeClass;
     }
 
 
