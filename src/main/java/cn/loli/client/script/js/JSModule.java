@@ -138,7 +138,7 @@ public class JSModule extends Module {
         } catch (final NoSuchMethodException ignored) {
             blacklist.add(funcName);
         } catch (final Exception e) {
-            Main.INSTANCE.println("[JS] " + this.name + ": " + funcName + " error");
+            Main.INSTANCE.println("[ERROR] " + this.name + ": " + funcName + " error");
         }
     }
 

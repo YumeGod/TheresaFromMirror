@@ -91,7 +91,6 @@ public class PluginsManager {
                     ActiveUtils newInstance =
                             (ActiveUtils) clazz.newInstance();
                 }
-                Main.INSTANCE.println("[LuaManager] Get ur utils active: " + s);
             } catch (NoClassDefFoundError | Exception e) {
                 e.printStackTrace();
             }

@@ -27,7 +27,6 @@ public class JSTransformer {
             engine.put("player", Minecraft.getMinecraft().thePlayer);
             engine.put("PI", Math.PI);
             engine.put("value", Main.INSTANCE.valueManager);
-            engine.put("booleanValue", booleanValue());
             engine.eval(source);
             this.name = (String) engine.get("name");
             this.desc = (String) engine.get("desc");
@@ -49,7 +48,4 @@ public class JSTransformer {
         return this.invocable;
     }
 
-    public BooleanValue booleanValue(){
-        return new BooleanValue("Test" , false);
-    }
 }
