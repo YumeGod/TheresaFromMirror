@@ -8,16 +8,14 @@ import cn.loli.client.injection.mixins.IAccessorEntityPlayer;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import cn.loli.client.utils.player.rotation.RotationHook;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.network.play.client.C03PacketPlayer;
-import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.potion.Potion;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 
 public class Speed extends Module {
@@ -31,6 +29,8 @@ public class Speed extends Module {
     int stage;
     double speed, less;
     boolean wasOnGround;
+    float yaw;
+    int failTimes;
 
     public Speed() {
         super("Speed", "Just You Speed Boost", ModuleCategory.MOVEMENT);
@@ -124,6 +124,7 @@ public class Speed extends Module {
 
                     speed = Math.max(speed, baseMoveSpeed);
 
+                    if (failTimes > 0) speed = speed * 0.9;
                     moveUtils.setMotion(event, speed);
                 }
                 break;
@@ -154,6 +155,10 @@ public class Speed extends Module {
                     double xDist = mc.thePlayer.posX - mc.thePlayer.lastTickPosX;
                     double zDist = mc.thePlayer.posZ - mc.thePlayer.lastTickPosZ;
                     distance = Math.sqrt(xDist * xDist + zDist * zDist);
+                    float yaw = (float) (Math.toDegrees(Math.atan2(zDist, xDist)) - 90.0);
+                    if ((Math.abs(this.yaw - yaw)) > 45) failTimes = 3;
+                    this.yaw = yaw;
+                    if (failTimes > 0) failTimes --;
                     break;
                 }
             }

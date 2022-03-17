@@ -26,7 +26,7 @@ public class JSTransformer {
             engine.put("mc", Minecraft.getMinecraft());
             engine.put("player", Minecraft.getMinecraft().thePlayer);
             engine.put("PI", Math.PI);
-            engine.put("value", Main.INSTANCE.valueManager);
+            engine.put("value", Wrapper.getInstance());
             engine.eval(source);
             this.name = (String) engine.get("name");
             this.desc = (String) engine.get("desc");

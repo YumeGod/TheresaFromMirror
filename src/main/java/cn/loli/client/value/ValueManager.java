@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class ValueManager {
     @NotNull
-    private final HashMap<String, List<Value>> valueMap = new HashMap<>();
+    public final HashMap<String, List<Value>> valueMap = new HashMap<>();
 
     /**
      * @param name   The name of the owner
