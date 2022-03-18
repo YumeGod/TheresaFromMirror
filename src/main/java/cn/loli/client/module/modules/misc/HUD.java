@@ -46,7 +46,11 @@ public class HUD extends Module {
     public HUD() {
         super("HUD", "The heads up display overlay", ModuleCategory.MISC);
         setState(true);
+        //Shit Code but i dont wanna change it
+        sort.clear();
         sort.addAll(Main.INSTANCE.moduleManager.getModules());
+        //Only for testing with keybind one
+        if (onlyKeyBind.getObject()) sort.removeIf(m -> m.getKeybind() == 0x00);
     }
 
 
@@ -137,9 +141,7 @@ public class HUD extends Module {
 
         //Shit Code but i dont wanna change it
         sort.clear();
-
         sort.addAll(Main.INSTANCE.moduleManager.getModules());
-
         //Only for testing with keybind one
         if (onlyKeyBind.getObject()) sort.removeIf(m -> m.getKeybind() == 0x00);
     }

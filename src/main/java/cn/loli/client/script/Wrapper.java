@@ -1,7 +1,7 @@
-package cn.loli.client.script.js;
+package cn.loli.client.script;
 
 import cn.loli.client.Main;
-import cn.loli.client.utils.player.PlayerUtils;
+import cn.loli.client.module.Module;
 import cn.loli.client.value.Value;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,5 +32,20 @@ public class Wrapper {
 
         values.add(object);
         Main.INSTANCE.valueManager.valueMap.put(name, values);
+    }
+
+    //GOTO : ModuleManager.java
+    /**
+     * this method will displayed all the modules
+     */
+    public List<Module> getModules() {
+        return Main.INSTANCE.moduleManager.getModules();
+    }
+
+    /**
+     * this method will get the details of the module
+     */
+    public Module getModule(@NotNull String name, boolean caseSensitive) {
+        return getModules().stream().filter(mod -> !caseSensitive && name.equalsIgnoreCase(mod.getName()) || name.equals(mod.getName())).findFirst().orElse(null);
     }
 }

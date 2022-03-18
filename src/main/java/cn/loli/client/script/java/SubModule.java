@@ -72,8 +72,9 @@ public class SubModule extends Module {
         return keybind;
     }
 
+    @Override
     public void setKeybind(int keybind) {
-        super.setKeybind(keybind);
+        this.keybind = keybind;
     }
 
     public boolean getState() {

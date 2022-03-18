@@ -1,6 +1,7 @@
 package cn.loli.client.script.js;
 
 import cn.loli.client.Main;
+import cn.loli.client.script.Wrapper;
 import cn.loli.client.utils.misc.ChatUtils;
 import net.minecraft.client.Minecraft;
 
