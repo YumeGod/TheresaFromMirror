@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class Wrapper {
 
@@ -20,10 +21,11 @@ public class Wrapper {
     }
 
     //GOTO : ValueManager.java
+
     /**
      * @param name   The name of the owner
      * @param object The Value-object
-     * this method will add the value to the owner if it doesn't exist
+     *               this method will add the value to the owner if it doesn't exist
      */
     public void register(String name, @NotNull Value object) {
         List<Value> values = new ArrayList<>();
@@ -35,17 +37,44 @@ public class Wrapper {
     }
 
     //GOTO : ModuleManager.java
+
     /**
      * this method will displayed all the modules
      */
-    public List<Module> getModules() {
-        return Main.INSTANCE.moduleManager.getModules();
+    public List<String> getModulesList() {
+        List<String> modules = new ArrayList<>();
+        for (Module module : Main.INSTANCE.moduleManager.getModules())
+            modules.add(module.getName());
+        return modules;
     }
 
     /**
-     * this method will get the details of the module
+     * this method will get the module if enabled
      */
-    public Module getModule(@NotNull String name, boolean caseSensitive) {
-        return getModules().stream().filter(mod -> !caseSensitive && name.equalsIgnoreCase(mod.getName()) || name.equals(mod.getName())).findFirst().orElse(null);
+    public boolean getModuleStatus(@NotNull String name, boolean caseSensitive) {
+        return Objects.requireNonNull(Main.INSTANCE.moduleManager.getModules()
+                .stream().filter(mod -> !caseSensitive &&
+                        name.equalsIgnoreCase(mod.getName()) || name.equals(mod.getName())).findFirst().orElse(null)).getState();
+    }
+
+    /**
+     * this method will get the module's keybind
+     */
+    public int getModuleKeyBind(@NotNull String name, boolean caseSensitive) {
+        return Objects.requireNonNull(Main.INSTANCE.moduleManager.getModules()
+                .stream().filter(mod -> !caseSensitive &&
+                        name.equalsIgnoreCase(mod.getName()) || name.equals(mod.getName())).findFirst().orElse(null)).getKeybind();
+    }
+
+    /**
+     * this method will get the modules enabled list
+     */
+    public List<String> getModulesEnabledList() {
+        List<String> modules = new ArrayList<>();
+        for (Module module : Main.INSTANCE.moduleManager.getModules())
+            if (module.getState())
+                modules.add(module.getName());
+
+        return modules;
     }
 }
