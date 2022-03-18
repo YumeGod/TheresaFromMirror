@@ -56,7 +56,7 @@ public class Criticals extends Module {
         switch (mode.getCurrentMode()) {
             case "Packet":
                 if (always.getObject() || entity.hurtResistantTime != 20){
-                    if (!i.hasReached(350)) return;
+                    if (!i.hasReached(250)) return;
                     for (double i : offset) sendPacket(i);
                     i.reset();
                 }
@@ -81,7 +81,7 @@ public class Criticals extends Module {
             switch (offsetvalue.getCurrentMode()) {
                 case "NCP":
                     offset = new double[]{
-                            ThreadLocalRandom.current().nextDouble(.0675, .0775),
+                            ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396),
                             ThreadLocalRandom.current().nextDouble(.0172422909396, .0182422909396),
                             ThreadLocalRandom.current().nextDouble(.0112422909396, .0122422909396)};
                     break;
@@ -115,7 +115,7 @@ public class Criticals extends Module {
 
 
             if ("Recall".equalsIgnoreCase(mode.getCurrentMode())) {
-                if (i.hasReached(350) && stage == 2) {
+                if (i.hasReached(200) && stage == 2) {
                     stage = 0;
                     i.reset();
                 }
@@ -147,7 +147,7 @@ public class Criticals extends Module {
                 if (counter == offset.length) {
                     counter = 0;
                 }
-                if (i.hasReached(350) && stage == 1) {
+                if (i.hasReached(200) && stage == 1) {
                     stage = 0;
                     i.reset();
                 }

@@ -72,14 +72,9 @@ public class Fly extends Module {
                     if (enduring.getObject()) {
                         switch (stage) {
                             case 0:
-                                if (damage.getObject()) {
+                                if (damage.getObject())
                                     moveUtils.getDamage(mc.thePlayer);
-                                } else {
-                                    for (int i = 0; i < 50; i++) {
-                                        mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.05, mc.thePlayer.posZ, false));
-                                        mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, true));
-                                    }
-                                }
+
                                 mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX,mc.thePlayer.posY,mc.thePlayer.posZ, true));
                                 lastY = e.getY();
                                 stage++;
