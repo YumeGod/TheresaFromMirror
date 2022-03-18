@@ -8,6 +8,7 @@ import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.player.NoRotate;
+import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.value.BooleanValue;
 import com.darkmagician6.eventapi.EventTarget;
@@ -29,10 +30,12 @@ public class Abuser extends Module {
     private final BooleanValue ncp = new BooleanValue("NCP Flag", false);
     private final BooleanValue redesky = new BooleanValue("Rede Sky", false);
     private final BooleanValue hypixel = new BooleanValue("Hypixel-Semi", false);
+    private final BooleanValue choke = new BooleanValue("Choke", false);
 
     public boolean hasDisable;
     public double x, y, z;
     public TimeHelper timer = new TimeHelper();
+    int invaild;
 
     public Abuser() {
         super("Abuser", "Abuse Something which you can bypass some anti cheat", ModuleCategory.MISC);
@@ -119,14 +122,23 @@ public class Abuser extends Module {
 
             if (event.getPacket() instanceof S32PacketConfirmTransaction) {
                 if (((S32PacketConfirmTransaction) event.getPacket()).getWindowId() == 0
-                        && ((S32PacketConfirmTransaction) event.getPacket()).getActionNumber() < 0)
-                    if (!hasDisable)
+                        && ((S32PacketConfirmTransaction) event.getPacket()).getActionNumber() < 0) {
+                    if (!hasDisable) {
                         hasDisable = true;
+                        invaild = 0;
+                    }
+
+                    if (invaild >= 14) {
+                        invaild = 0;
+                    }
+                    invaild++;
+                }
+
             }
 
             if (event.getPacket() instanceof C03PacketPlayer) {
                 //event.setCancelled(!hasDisable);
-                if (hasDisable){
+                if (hasDisable) {
                     if (x == ((C03PacketPlayer) event.getPacket()).getPositionX() && y == ((C03PacketPlayer) event.getPacket()).getPositionY() && z == ((C03PacketPlayer) event.getPacket()).getPositionZ()) {
                         event.setPacket(new C03PacketPlayer.C04PacketPlayerPosition(x, y, z, false));
                     }

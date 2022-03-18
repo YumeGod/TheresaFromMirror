@@ -76,25 +76,23 @@ public class Fly extends Module {
                                     moveUtils.getDamage(mc.thePlayer);
                                 } else {
                                     for (int i = 0; i < 50; i++) {
-                                        mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(), e.getY() + 0.05, e.getZ(), false));
-                                        mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(), e.getY(), e.getZ(), true));
+                                        mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + 0.05, mc.thePlayer.posZ, false));
+                                        mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY, mc.thePlayer.posZ, true));
                                     }
                                 }
-                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(), e.getY(), e.getZ(), true));
+                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX,mc.thePlayer.posY,mc.thePlayer.posZ, true));
                                 lastY = e.getY();
                                 stage++;
                                 break;
                             case 1:
-                                e.setOnGround(false);
-                                e.setY(mc.thePlayer.posY + 0.05);
-                                mc.thePlayer.setPosition(e.getX(), mc.thePlayer.posY + 0.05, e.getZ());
+                                e.setOnGround(true);
+                                e.setY(mc.thePlayer.posY + 0.0625);
+                                mc.thePlayer.setPosition(e.getX(), mc.thePlayer.posY + 0.0625, e.getZ());
                                 stage++;
                                 break;
                             case 2:
-                            case 3:
-                            case 4:
                                 e.setOnGround(false);
-                                e.setY(mc.thePlayer.posY - 0.22);
+                                e.setY(mc.thePlayer.posY - 0.1425);
                                 stage++;
                                 break;
                             default:
@@ -128,8 +126,6 @@ public class Fly extends Module {
     @EventTarget
     private void onPacket(PacketEvent e) {
         if (e.getPacket() instanceof C03PacketPlayer && mode.getCurrentMode().equalsIgnoreCase("Hypixel") && !mc.thePlayer.isSpectator()) {
-            if (!((C03PacketPlayer) e.getPacket()).isMoving() && !((C03PacketPlayer) e.getPacket()).getRotating())
-                e.setCancelled(true);
         }
     }
 
@@ -137,7 +133,7 @@ public class Fly extends Module {
     private void onMove(PlayerMoveEvent e) {
         if (mode.getCurrentMode().equalsIgnoreCase("Hypixel") && !mc.thePlayer.isSpectator() && ((enduring.getObject() && stage >= 1) || (!enduring.getObject() && clipped))) {
             e.setY(mc.thePlayer.motionY = 0.0);
-            moveUtils.setMotion(e, moveUtils.getBaseMoveSpeed(0.271, 0.2));
+            moveUtils.setMotion(e, moveUtils.getBaseMoveSpeed(0.2871, 0.2));
         } else {
             if (mode.getCurrentMode().equalsIgnoreCase("Vanilla")) {
 

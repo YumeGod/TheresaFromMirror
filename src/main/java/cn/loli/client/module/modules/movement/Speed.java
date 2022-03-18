@@ -106,10 +106,10 @@ public class Speed extends Module {
                 if (playerUtils.isMoving2()) {
                     double baseMoveSpeed = moveUtils.getBaseMoveSpeed(0.2871, 0.2);
                     boolean shouldLowhop = !mc.gameSettings.keyBindJump.isKeyDown() &&
-                            !mc.thePlayer.isPotionActive(Potion.jump) && !mc.thePlayer.isCollidedHorizontally && moveUtils.simJumpShouldDoLowHop(baseMoveSpeed);
+                            !mc.thePlayer.isPotionActive(Potion.jump) && !mc.thePlayer.isCollidedHorizontally;
 
                     if (!mc.thePlayer.onGround && shouldLowhop && mc.thePlayer.fallDistance < 0.54)
-                        event.setY(mc.thePlayer.motionY = lowHopYModification(mc.thePlayer.motionY, moveUtils.round(mc.thePlayer.posY - (int) mc.thePlayer.posY, 0.001)));
+                       event.setY(mc.thePlayer.motionY = lowHopYModification(mc.thePlayer.motionY, moveUtils.round(mc.thePlayer.posY - (int) mc.thePlayer.posY, 0.001)));
 
                     if (mc.thePlayer.onGround && mc.thePlayer.isCollidedVertically && !wasOnGround) {
                         speed = baseMoveSpeed * 1.7;
@@ -125,13 +125,12 @@ public class Speed extends Module {
 
                     speed = Math.max(speed, baseMoveSpeed);
 
-                    if (failTimes > 0) {
-                        speed = speed * (0.7 + (0.1 * failTimes) * playerUtils.randomInRange(0.9 , 1.0));
-                        ChatUtils.info("Failed " + failTimes + " times");
-                    }
+                    if (failTimes > 0 && failTimes % 2 == 0) speed = speed * 0.9;
 
                     moveUtils.setMotion(event, speed);
+
                 }
+
                 break;
             }
         }
@@ -162,7 +161,7 @@ public class Speed extends Module {
                     distance = Math.sqrt(xDist * xDist + zDist * zDist);
                     if (failTimes > 0) failTimes--;
                     float yaw = (float) (Math.toDegrees(Math.atan2(zDist, xDist)) - 90.0);
-                    if ((Math.abs(this.yaw - yaw)) >= 45) failTimes = 3;
+                    if ((Math.abs(this.yaw - yaw)) >= 45) failTimes = 5;
                     this.yaw = yaw;
                     break;
                 }
