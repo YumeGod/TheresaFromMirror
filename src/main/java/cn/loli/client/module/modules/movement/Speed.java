@@ -8,6 +8,7 @@ import cn.loli.client.injection.mixins.IAccessorEntityPlayer;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.player.rotation.RotationHook;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
@@ -105,7 +106,7 @@ public class Speed extends Module {
                 if (playerUtils.isMoving2()) {
                     double baseMoveSpeed = moveUtils.getBaseMoveSpeed(0.2871, 0.2);
                     boolean shouldLowhop = !mc.gameSettings.keyBindJump.isKeyDown() &&
-                            !mc.thePlayer.isPotionActive(Potion.jump) && !mc.thePlayer.isCollidedHorizontally;
+                            !mc.thePlayer.isPotionActive(Potion.jump) && !mc.thePlayer.isCollidedHorizontally && moveUtils.simJumpShouldDoLowHop(baseMoveSpeed);
 
                     if (!mc.thePlayer.onGround && shouldLowhop && mc.thePlayer.fallDistance < 0.54)
                         event.setY(mc.thePlayer.motionY = lowHopYModification(mc.thePlayer.motionY, moveUtils.round(mc.thePlayer.posY - (int) mc.thePlayer.posY, 0.001)));
@@ -124,7 +125,11 @@ public class Speed extends Module {
 
                     speed = Math.max(speed, baseMoveSpeed);
 
-                    if (failTimes > 0) speed = speed * 0.9;
+                    if (failTimes > 0) {
+                        speed = speed * (0.7 + (0.1 * failTimes) * playerUtils.randomInRange(0.9 , 1.0));
+                        ChatUtils.info("Failed " + failTimes + " times");
+                    }
+
                     moveUtils.setMotion(event, speed);
                 }
                 break;
@@ -155,10 +160,10 @@ public class Speed extends Module {
                     double xDist = mc.thePlayer.posX - mc.thePlayer.lastTickPosX;
                     double zDist = mc.thePlayer.posZ - mc.thePlayer.lastTickPosZ;
                     distance = Math.sqrt(xDist * xDist + zDist * zDist);
+                    if (failTimes > 0) failTimes--;
                     float yaw = (float) (Math.toDegrees(Math.atan2(zDist, xDist)) - 90.0);
-                    if ((Math.abs(this.yaw - yaw)) > 45) failTimes = 3;
+                    if ((Math.abs(this.yaw - yaw)) >= 45) failTimes = 3;
                     this.yaw = yaw;
-                    if (failTimes > 0) failTimes --;
                     break;
                 }
             }

@@ -94,7 +94,7 @@ public class ScriptLoader {
             try {
                 name = g.get("get_name").call().toString();
                 desc = g.get("get_desc").call().toString();
-                Main.INSTANCE.moduleManager.addModuleNoReg(new LuaModule(name, desc, g));
+                Main.INSTANCE.moduleManager.addModule(new LuaModule(name, desc, g));
             } catch (Exception e) {
                 Main.INSTANCE.println(e.getMessage());
             }
