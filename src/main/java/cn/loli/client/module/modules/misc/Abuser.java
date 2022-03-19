@@ -37,6 +37,7 @@ public class Abuser extends Module {
     private final BooleanValue hypixel = new BooleanValue("Hypixel-Semi", false);
     private final BooleanValue packetChoke = new BooleanValue("Hypixel-Obfuscation", false);
     private final BooleanValue packetBrust = new BooleanValue("Brust", false);
+    private final BooleanValue lesspacket = new BooleanValue("Less-Packet", false);
 
     public boolean hasDisable;
     public double x, y, z;
@@ -154,15 +155,11 @@ public class Abuser extends Module {
                 }
             }
 
-            if (event.getPacket() instanceof C0FPacketConfirmTransaction) {
-                if (((C0FPacketConfirmTransaction) event.getPacket()).getWindowId() == 0
-                        && ((C0FPacketConfirmTransaction) event.getPacket()).getUid() < 0) {
-                }
-            }
 
             if (event.getPacket() instanceof C03PacketPlayer)
-                if (!((C03PacketPlayer) event.getPacket()).isMoving() && !((C03PacketPlayer) event.getPacket()).getRotating())
-                    event.setCancelled(true);
+                if (lesspacket.getObject())
+                    if (!((C03PacketPlayer) event.getPacket()).isMoving() && !((C03PacketPlayer) event.getPacket()).getRotating())
+                        event.setCancelled(true);
 
 
             if (event.getPacket() instanceof C03PacketPlayer.C06PacketPlayerPosLook) {
