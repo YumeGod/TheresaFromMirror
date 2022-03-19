@@ -17,8 +17,8 @@ import net.minecraft.client.gui.GuiDownloadTerrain;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
+import net.minecraft.network.play.INetHandlerPlayClient;
 import net.minecraft.network.play.client.*;
 import net.minecraft.network.play.server.S00PacketKeepAlive;
 import net.minecraft.network.play.server.S07PacketRespawn;
@@ -35,14 +35,16 @@ public class Abuser extends Module {
     private final BooleanValue ncp = new BooleanValue("NCP Flag", false);
     private final BooleanValue redesky = new BooleanValue("Rede Sky", false);
     private final BooleanValue hypixel = new BooleanValue("Hypixel-Semi", false);
-    private final BooleanValue choke = new BooleanValue("Brust", false);
+    private final BooleanValue packetChoke = new BooleanValue("Hypixel-Obfuscation", false);
+    private final BooleanValue packetBrust = new BooleanValue("Brust", false);
 
     public boolean hasDisable;
     public double x, y, z;
     public TimeHelper timer = new TimeHelper();
     private final TimeHelper brust = new TimeHelper();
-    private final ArrayList<Packet<INetHandler>> packets = new ArrayList<>();
+    private final ArrayList<Packet<INetHandlerPlayClient>> packets = new ArrayList<>();
     long delay = 150;
+    int invalid = 0;
 
     public Abuser() {
         super("Abuser", "Abuse Something which you can bypass some anti cheat", ModuleCategory.MISC);
@@ -129,7 +131,7 @@ public class Abuser extends Module {
 
             if (event.getPacket() instanceof S00PacketKeepAlive) {
                 if (hasDisable) {
-                    if (choke.getObject() || hypixel.getObject()) {
+                    if (packetBrust.getObject() || hypixel.getObject()) {
                         packets.add(event.getPacket());
                         event.setCancelled(true);
                     }
@@ -142,14 +144,26 @@ public class Abuser extends Module {
                     if (!hasDisable) {
                         hasDisable = true;
                         brust.reset();
+                        invalid = 0;
                     }
-                    if (choke.getObject() || hypixel.getObject()) {
+
+                    if (packetBrust.getObject() || hypixel.getObject()) {
                         packets.add(event.getPacket());
                         event.setCancelled(true);
                     }
                 }
-
             }
+
+            if (event.getPacket() instanceof C0FPacketConfirmTransaction) {
+                if (((C0FPacketConfirmTransaction) event.getPacket()).getWindowId() == 0
+                        && ((C0FPacketConfirmTransaction) event.getPacket()).getUid() < 0) {
+                }
+            }
+
+            if (event.getPacket() instanceof C03PacketPlayer)
+                if (!((C03PacketPlayer) event.getPacket()).isMoving() && !((C03PacketPlayer) event.getPacket()).getRotating())
+                    event.setCancelled(true);
+
 
             if (event.getPacket() instanceof C03PacketPlayer.C06PacketPlayerPosLook) {
                 if (hasDisable) {
@@ -172,10 +186,10 @@ public class Abuser extends Module {
                 mc.thePlayer.closeScreen();
         }
 
-        if (choke.getObject() || hypixel.getObject()) {
+        if (packetBrust.getObject() || hypixel.getObject()) {
             if (!brust.hasReached(delay)) return;
-            resetPackets(mc.getNetHandler().getNetworkManager().getNetHandler());
-            if (delay > 300) delay = 50;
+            resetPackets(mc.getNetHandler());
+            if (delay > 450) delay = 250;
             else delay += 25;
             brust.reset();
         }
@@ -222,12 +236,23 @@ public class Abuser extends Module {
 
 
     //Reset Packets
-    private void resetPackets(INetHandler netHandler) {
+    private void resetPackets(INetHandlerPlayClient netHandler) {
         if (packets.size() > 0) {
             synchronized (packets) {
                 while (packets.size() != 0) {
                     try {
                         packets.get(0).processPacket(netHandler);
+                        if (packets.get(0) instanceof S32PacketConfirmTransaction) {
+                            if (packetChoke.getObject()) {
+                                if (invalid > 14) {
+                                    mc.getNetHandler().getNetworkManager().sendPacket(new C0FPacketConfirmTransaction(1, ((S32PacketConfirmTransaction) packets.get(0)).getActionNumber(), true));
+                                    invalid = 0;
+                                    delay = 50;
+                                }
+                                invalid++;
+                            }
+                        }
+
                     } catch (Exception ignored) {
                     }
                     packets.remove(packets.get(0));
