@@ -129,7 +129,7 @@ public class Abuser extends Module {
 
             if (event.getPacket() instanceof S00PacketKeepAlive) {
                 if (hasDisable) {
-                    if (choke.getObject()) {
+                    if (choke.getObject() || hypixel.getObject()) {
                         packets.add(event.getPacket());
                         event.setCancelled(true);
                     }
@@ -143,7 +143,7 @@ public class Abuser extends Module {
                         hasDisable = true;
                         brust.reset();
                     }
-                    if (choke.getObject()) {
+                    if (choke.getObject() || hypixel.getObject()) {
                         packets.add(event.getPacket());
                         event.setCancelled(true);
                     }
@@ -172,7 +172,7 @@ public class Abuser extends Module {
                 mc.thePlayer.closeScreen();
         }
 
-        if (choke.getObject()) {
+        if (choke.getObject() || hypixel.getObject()) {
             if (!brust.hasReached(delay)) return;
             resetPackets(mc.getNetHandler().getNetworkManager().getNetHandler());
             if (delay > 300) delay = 50;
