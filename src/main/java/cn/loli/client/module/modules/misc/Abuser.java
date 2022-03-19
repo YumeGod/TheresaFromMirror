@@ -17,11 +17,16 @@ import net.minecraft.client.gui.GuiDownloadTerrain;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.INetHandler;
+import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.*;
+import net.minecraft.network.play.server.S00PacketKeepAlive;
 import net.minecraft.network.play.server.S07PacketRespawn;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.network.play.server.S32PacketConfirmTransaction;
 import net.minecraft.util.BlockPos;
+
+import java.util.ArrayList;
 
 public class Abuser extends Module {
 
@@ -30,12 +35,14 @@ public class Abuser extends Module {
     private final BooleanValue ncp = new BooleanValue("NCP Flag", false);
     private final BooleanValue redesky = new BooleanValue("Rede Sky", false);
     private final BooleanValue hypixel = new BooleanValue("Hypixel-Semi", false);
-    private final BooleanValue choke = new BooleanValue("Choke", false);
+    private final BooleanValue choke = new BooleanValue("Brust", false);
 
     public boolean hasDisable;
     public double x, y, z;
     public TimeHelper timer = new TimeHelper();
-    int invaild;
+    private final TimeHelper brust = new TimeHelper();
+    private final ArrayList<Packet<INetHandler>> packets = new ArrayList<>();
+    long delay = 150;
 
     public Abuser() {
         super("Abuser", "Abuse Something which you can bypass some anti cheat", ModuleCategory.MISC);
@@ -120,27 +127,35 @@ public class Abuser extends Module {
                 }
             }
 
+            if (event.getPacket() instanceof S00PacketKeepAlive) {
+                if (hasDisable) {
+                    if (choke.getObject()) {
+                        packets.add(event.getPacket());
+                        event.setCancelled(true);
+                    }
+                }
+            }
+
             if (event.getPacket() instanceof S32PacketConfirmTransaction) {
                 if (((S32PacketConfirmTransaction) event.getPacket()).getWindowId() == 0
                         && ((S32PacketConfirmTransaction) event.getPacket()).getActionNumber() < 0) {
                     if (!hasDisable) {
                         hasDisable = true;
-                        invaild = 0;
+                        brust.reset();
                     }
-
-                    if (invaild >= 14) {
-                        invaild = 0;
+                    if (choke.getObject()) {
+                        packets.add(event.getPacket());
+                        event.setCancelled(true);
                     }
-                    invaild++;
                 }
 
             }
 
-            if (event.getPacket() instanceof C03PacketPlayer) {
-                //event.setCancelled(!hasDisable);
+            if (event.getPacket() instanceof C03PacketPlayer.C06PacketPlayerPosLook) {
                 if (hasDisable) {
-                    if (x == ((C03PacketPlayer) event.getPacket()).getPositionX() && y == ((C03PacketPlayer) event.getPacket()).getPositionY() && z == ((C03PacketPlayer) event.getPacket()).getPositionZ()) {
-                        event.setPacket(new C03PacketPlayer.C04PacketPlayerPosition(x, y, z, false));
+                    if (x == ((C03PacketPlayer.C06PacketPlayerPosLook) event.getPacket()).getPositionX() && y == ((C03PacketPlayer.C06PacketPlayerPosLook) event.getPacket()).getPositionY()
+                            && z == ((C03PacketPlayer.C06PacketPlayerPosLook) event.getPacket()).getPositionZ()) {
+                        ChatUtils.info("Call");
                     }
                 }
 
@@ -155,6 +170,14 @@ public class Abuser extends Module {
         if (hypixel.getObject()) {
             if (mc.currentScreen instanceof GuiDownloadTerrain && (mc.thePlayer != null))
                 mc.thePlayer.closeScreen();
+        }
+
+        if (choke.getObject()) {
+            if (!brust.hasReached(delay)) return;
+            resetPackets(mc.getNetHandler().getNetworkManager().getNetHandler());
+            if (delay > 300) delay = 50;
+            else delay += 25;
+            brust.reset();
         }
     }
 
@@ -197,7 +220,20 @@ public class Abuser extends Module {
         }
     }
 
-    //来点色图
 
+    //Reset Packets
+    private void resetPackets(INetHandler netHandler) {
+        if (packets.size() > 0) {
+            synchronized (packets) {
+                while (packets.size() != 0) {
+                    try {
+                        packets.get(0).processPacket(netHandler);
+                    } catch (Exception ignored) {
+                    }
+                    packets.remove(packets.get(0));
+                }
+            }
+        }
+    }
 
 }
