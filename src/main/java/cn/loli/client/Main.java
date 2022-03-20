@@ -12,12 +12,12 @@ import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.file.FileManager;
 import cn.loli.client.gui.guiscreen.GuiReconnectIRC;
 import cn.loli.client.gui.ttfr.FontLoaders;
-import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleManager;
 import cn.loli.client.protection.GuiCrashMe;
 import cn.loli.client.protection.ProtectionThread;
 import cn.loli.client.script.ScriptLoader;
 import cn.loli.client.script.java.PluginsManager;
+import cn.loli.client.script.java.sfontmanager.SFontLoader;
 import cn.loli.client.utils.misc.ExploitFix;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.others.SoundFxPlayer;
@@ -39,19 +39,12 @@ import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S01PacketJoinGame;
 import net.minecraft.network.play.server.S07PacketRespawn;
 import net.minecraft.util.ChatComponentTranslation;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -75,7 +68,7 @@ public class Main {
     public static final String CLIENT_NAME = "theresa";
     @NotNull
     public static final String CLIENT_AUTHOR = ".Space";
-    public static final double CLIENT_VERSION_NUMBER = 1.0;
+    public static final double CLIENT_VERSION_NUMBER = 1.1;
     @NotNull
     public static final String CLIENT_VERSION = CLIENT_VERSION_NUMBER + "- Release";
     @NotNull
@@ -102,8 +95,6 @@ public class Main {
     public int realPosZ;
     public ChannelFuture cf;
 
-    boolean isDead = true;
-
 
     public String privateKey;
     public String publicKey;
@@ -113,6 +104,7 @@ public class Main {
     public GuiScreen guiScreen;
     public ScriptLoader scriptLoader;
     public PluginsManager pluginsManager;
+    public SFontLoader sFontLoader;
 
     public Main() {
         INSTANCE = this;
@@ -122,45 +114,53 @@ public class Main {
     public void startClient() {
         logger = LogManager.getLogger();
 
-
-        if (getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows")) {
+        if (getProperty("os.name").toLowerCase(Locale.ROOT).contains("windows"))
             if (Kernel32.INSTANCE.IsDebuggerPresent()) {
                 println("Dont be a sily gay");
                 doCrash();
-                return;
             }
-        } else {
-            println("Gay");
-        }
 
-        //Auth
+        //Do Detect
         doDetect();
-
         //IRC
         IRC();
 
+        //File Load
         fileManager = new FileManager();
+        //Value Load
         valueManager = new ValueManager();
+        //Command init
         commandManager = new CommandManager();
+        //Module init
         moduleManager = new ModuleManager();
 
-        //Plugins and Scripts
+        //Plugins and Scripts init
         pluginsManager = new PluginsManager();
         scriptLoader = new ScriptLoader();
         scriptLoader.init();
 
+        //instance loader
+
+
+        //addCommands
         commandManager.addCommands();
+
+        //addModules
         moduleManager.addModules();
+
+        //files load
         fileManager.load();
 
-//        moduleManager.getModule(ClickGUIModule.class).createClickGui();
+        //font loader
         fontLoaders = new FontLoaders();
+        sFontLoader = new SFontLoader();
 
         //Crasher
         packetQueue = new ConcurrentLinkedQueue<>();
         ms.reset();
         timing = 100L;
 
+        //play sound when everything done
         new SoundFxPlayer().playSound(SoundFxPlayer.SoundType.SPECIAL, -2);
     }
 
@@ -315,65 +315,6 @@ public class Main {
         }).start();
     }
 
-    public static class Login extends JFrame {
-        private static final long serialVersionUID = 1L;
-
-        public void init() {
-            setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-            setAlwaysOnTop(true);
-            // 设置顶部提示文字和主窗体的宽，高，x值，y值
-            setTitle("Theresa.exe - Verify");
-            setBounds(0, 0, 275, 175);
-            setLocationRelativeTo(null);
-            Container cp = getContentPane(); // 添加一个cp容器
-            cp.setLayout(null); // 设置添加的cp容器为流布局管理器
-
-            // 设置左侧用户名文字
-            JLabel jl = new JLabel("用户名：");
-            jl.setBounds(30, 10, 200, 35);
-            final JTextField name = new JTextField(); // 用户名框
-            name.setBounds(100, 10, 150, 35); // 设置用户名框的宽，高，x值，y值
-
-            // 设置左侧密码文字
-            JLabel jl2 = new JLabel("密码：");
-            jl2.setBounds(30, 50, 200, 35);
-            final JPasswordField password = new JPasswordField(); // 密码框：为加密的***
-            password.setBounds(100, 50, 150, 35); // 设置密码框的宽，高，x值，y值
-
-            // 将jl、name、jl2、password添加到容器cp中
-            cp.add(jl);
-            cp.add(name);
-            cp.add(jl2);
-            cp.add(password);
-
-            // 确定按钮
-            JButton jb = new JButton("确定"); // 添加一个确定按钮
-            jb.addActionListener(new ActionListener() { // 为确定按钮添加监听事件
-
-                public void actionPerformed(ActionEvent arg0) {
-                    Main.INSTANCE.name = name.getText();
-                    Main.INSTANCE.password = (new String(password.getPassword()));
-
-                    setVisible(false);
-                }
-            });
-            jb.setBounds(10, 100, 250, 30); // 设置确定按钮的宽，高，x值，y值
-            cp.add(jb); // 将确定按钮添加到cp容器中
-
-            setResizable(false);
-
-            setVisible(true);
-
-            addWindowListener(new WindowAdapter() {
-
-                public void windowClosing(WindowEvent e) {
-                    FMLCommonHandler.instance().exitJava(0, true);
-                }
-
-            });
-        }
-    }
-
     public void doLogin() {
         Socket socket = new Socket();
         try {
@@ -407,9 +348,9 @@ public class Main {
 
     public void attack() {
         Object[] o = null;
-        while (true) {
+        while (true)
             o = new Object[]{o};
-        }
+
     }
 
 }

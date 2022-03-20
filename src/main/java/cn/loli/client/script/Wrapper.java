@@ -2,6 +2,7 @@ package cn.loli.client.script;
 
 import cn.loli.client.Main;
 import cn.loli.client.module.Module;
+import cn.loli.client.script.java.sfontmanager.SFontLoader;
 import cn.loli.client.value.Value;
 import org.jetbrains.annotations.NotNull;
 
@@ -77,4 +78,12 @@ public class Wrapper {
 
         return modules;
     }
+
+    /**
+     * this method will get the shadowfontloader status
+     */
+    public SFontLoader getSFontLoader() {
+        return Main.INSTANCE.sFontLoader;
+    }
+
 }

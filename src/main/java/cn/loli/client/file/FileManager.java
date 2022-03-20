@@ -22,6 +22,7 @@ public class FileManager {
     private final File clientDir = new File(Minecraft.getMinecraft().mcDataDir, Main.CLIENT_NAME);
     private final File backupDir = new File(clientDir, "backups");
     public final File scriptsDir = new File(clientDir, "scripts");
+    public final File fontDir = new File(scriptsDir, "font");
 
     private final File saveFile = new File(clientDir, "client.json");
     private final File modulesFile = new File(clientDir, "modules.json");
@@ -233,6 +234,7 @@ public class FileManager {
         try {
             backupDir.mkdirs();
             scriptsDir.mkdirs();
+            fontDir.mkdirs();
 
             File out = new File(backupDir, "backup_" + System.currentTimeMillis() + ".zip");
             out.createNewFile();
