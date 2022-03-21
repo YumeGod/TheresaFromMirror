@@ -16,11 +16,17 @@ public class SFontLoader {
     public Map<String, FontRenderer> fonts = new HashMap<>();
 
     public SFontLoader() {
-
         long time = System.currentTimeMillis();
+        File fontDir = Main.INSTANCE.fileManager.fontDir;
+        // 检测及创建插件目录
+        if (!fontDir.exists()) {
+            if (!fontDir.mkdirs()) {
+                System.err.println("[FontLoader] Create SFont Folder Failed!");
+            }
+        }
 
         for (File file : getFiles(Main.INSTANCE.fileManager.fontDir.getAbsolutePath())) {
-            if (file.getName().endsWith(".ttf") || file.getName().endsWith(".otf")){
+            if (file.getName().endsWith(".ttf") || file.getName().endsWith(".otf")) {
                 for (int i = 12; i <= 32; ++i)
                     fonts.put(file.getName().replace(".ttf", "").replace(".otf", "") + i, getFont(file, i));
             }

@@ -44,7 +44,8 @@ public class Criticals extends Module {
             if (e.getPacket() instanceof C02PacketUseEntity) {
                 if (((C02PacketUseEntity) e.getPacket()).getAction() == C02PacketUseEntity.Action.ATTACK) {
                     Entity entity = ((C02PacketUseEntity) e.getPacket()).getEntityFromWorld(mc.theWorld);
-                    if (!(entity instanceof EntityLiving)) return;
+                    if (!(entity instanceof EntityLiving)) {
+                    }
                 }
             }
         }
@@ -57,7 +58,7 @@ public class Criticals extends Module {
         switch (mode.getCurrentMode()) {
             case "Packet":
                 if (always.getObject() || entity.hurtResistantTime != 20) {
-                    if (!i.hasReached(nodelay.getObject() ? 50 : 200)) return;
+                    if (!i.hasReached(nodelay.getObject() ? 25 : 150)) return;
                     for (double i : offset) sendPacket(i);
                     i.reset();
                 }
@@ -78,6 +79,7 @@ public class Criticals extends Module {
 
     @EventTarget
     public void onEdit(MotionUpdateEvent e) {
+        double pos = 0;
         if (e.getEventType() == EventType.PRE) {
             switch (offsetvalue.getCurrentMode()) {
                 case "NCP":
@@ -94,7 +96,7 @@ public class Criticals extends Module {
                     break;
                 case "Negative":
                     offset = new double[]{
-                            ThreadLocalRandom.current().nextDouble(.000117, .000126),
+                            ThreadLocalRandom.current().nextDouble(.00117, .00126),
                             ThreadLocalRandom.current().nextDouble(-.0001, -.00009),
                             ThreadLocalRandom.current().nextDouble(.00417, .00526),
                     };
@@ -109,17 +111,13 @@ public class Criticals extends Module {
                     offset = new double[]{
                             ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396),
                             ThreadLocalRandom.current().nextDouble(.00317, .00526),
-                            ThreadLocalRandom.current().nextDouble(.0009, .005)
+                            ThreadLocalRandom.current().nextDouble(.0009, .0015)
                     };
                     break;
             }
 
-
             if ("Recall".equalsIgnoreCase(mode.getCurrentMode())) {
-                if (i.hasReached(200) && stage == 2) {
-                    stage = 0;
-                    i.reset();
-                }
+                if (stage == 2) stage = 0;
                 if (counter == offset.length) counter = 0;
                 Speed speed = Main.INSTANCE.moduleManager.getModule(Speed.class);
                 Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
@@ -128,7 +126,7 @@ public class Criticals extends Module {
                     if (always.getObject() || entity.hurtResistantTime != 20)
                         if (playerUtils.isMoving2()) {
                             if (stage < 2) {
-                                if (speed.getState()) return;
+                                if (speed.getState()) for (int i = 0; i < offset.length; i++) offset[i] = offset[i] * 1e-5;
                                 mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(), e.getY() + offset[counter], e.getZ(), false));
                                 counter++;
                                 e.setY(e.getY() + (offset[counter]));
@@ -145,13 +143,8 @@ public class Criticals extends Module {
             }
 
             if ("Edit".equals(mode.getCurrentMode())) {
-                if (counter == offset.length) {
-                    counter = 0;
-                }
-                if (i.hasReached(200) && stage == 1) {
-                    stage = 0;
-                    i.reset();
-                }
+                if (counter == offset.length) counter = 0;
+                if (stage == 1) stage = 0;
                 Speed speed = Main.INSTANCE.moduleManager.getModule(Speed.class);
                 Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
                 if (entity == null) return;
@@ -162,8 +155,7 @@ public class Criticals extends Module {
                                 stage = 1;
                                 return;
                             }
-
-                            if (speed.getState() || stage == 1) return;
+                            if (speed.getState()) for (int i = 0; i < offset.length; i++) offset[i] = offset[i] * 1e-5;
                             e.setY(e.getY() + (offset[counter]));
                             e.setOnGround(false);
                             counter++;
