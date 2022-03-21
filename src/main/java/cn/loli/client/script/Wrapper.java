@@ -4,6 +4,7 @@ import cn.loli.client.Main;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
 import cn.loli.client.script.java.sfontmanager.SFontLoader;
+import cn.loli.client.utils.player.rotation.RotationHook;
 import cn.loli.client.value.Value;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Timer;
@@ -95,6 +96,19 @@ public class Wrapper {
      */
     public Timer getTimer() {
         return ((IAccessorMinecraft) Minecraft.getMinecraft()).getTimer();
+    }
+
+
+    /**
+     * this method will get the Current Yaw / Pitch
+     */
+
+    public float getCurrentYaw() {
+        return RotationHook.yaw;
+    }
+
+    public float getCurrentPitch() {
+        return RotationHook.pitch;
     }
 
 }

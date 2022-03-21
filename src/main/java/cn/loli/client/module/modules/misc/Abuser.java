@@ -166,7 +166,6 @@ public class Abuser extends Module {
                 if (hasDisable) {
                     if (x == ((C03PacketPlayer.C06PacketPlayerPosLook) event.getPacket()).getPositionX() && y == ((C03PacketPlayer.C06PacketPlayerPosLook) event.getPacket()).getPositionY()
                             && z == ((C03PacketPlayer.C06PacketPlayerPosLook) event.getPacket()).getPositionZ()) {
-                        ChatUtils.info("Call");
                     }
                 }
 

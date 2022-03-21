@@ -11,7 +11,6 @@ import cn.loli.client.module.modules.movement.Speed;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
-import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
@@ -29,6 +28,8 @@ public class Criticals extends Module {
     private final ModeValue offsetvalue = new ModeValue("Offset Value", "NCP", "NCP", "Mini", "Less", "Negative", "Positive");
     private final BooleanValue packetsWhenNoMove = new BooleanValue("packets when no move", false);
     private final BooleanValue always = new BooleanValue("Always", false);
+    private final BooleanValue nodelay = new BooleanValue("No Delay", false);
+
     int counter = 0, stage = 0;
     double[] offset = new double[3];
     TimeHelper i = new TimeHelper();
@@ -55,8 +56,8 @@ public class Criticals extends Module {
 
         switch (mode.getCurrentMode()) {
             case "Packet":
-                if (always.getObject() || entity.hurtResistantTime != 20){
-                    if (!i.hasReached(200)) return;
+                if (always.getObject() || entity.hurtResistantTime != 20) {
+                    if (!i.hasReached(nodelay.getObject() ? 50 : 200)) return;
                     for (double i : offset) sendPacket(i);
                     i.reset();
                 }
