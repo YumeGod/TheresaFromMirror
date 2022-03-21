@@ -56,7 +56,7 @@ public class Criticals extends Module {
         switch (mode.getCurrentMode()) {
             case "Packet":
                 if (always.getObject() || entity.hurtResistantTime != 20){
-                    if (!i.hasReached(250)) return;
+                    if (!i.hasReached(200)) return;
                     for (double i : offset) sendPacket(i);
                     i.reset();
                 }
@@ -93,8 +93,8 @@ public class Criticals extends Module {
                     break;
                 case "Negative":
                     offset = new double[]{
-                            ThreadLocalRandom.current().nextDouble(.00317, .00326),
-                            ThreadLocalRandom.current().nextDouble(.0001, .0002),
+                            ThreadLocalRandom.current().nextDouble(.000117, .000126),
+                            ThreadLocalRandom.current().nextDouble(-.0001, -.00009),
                             ThreadLocalRandom.current().nextDouble(.00417, .00526),
                     };
                     break;

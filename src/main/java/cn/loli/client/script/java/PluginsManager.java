@@ -54,6 +54,22 @@ public class PluginsManager {
 
         urlCL = new URLClassLoader(urls, this.getClass().getClassLoader());
 
+
+        // 用Classloader逐个获取实例
+        for (File f : files) {
+            List<String> s = getActiveClass(f, false);
+            Class<?> clazz;
+            try {
+                if (s == null) return;
+                for (String name : s) {
+                    clazz = urlCL.loadClass(name);
+                   ActiveUtils utils = (ActiveUtils) clazz.newInstance();
+                }
+            } catch (NoClassDefFoundError | Exception e) {
+                Main.INSTANCE.println(e.getMessage());
+            }
+        }
+
         // 用Classloader逐个获取实例
         for (File f : files) {
             List<String> s = getActiveClass(f, true);
@@ -80,21 +96,6 @@ public class PluginsManager {
             }
         }
 
-        // 用Classloader逐个获取实例
-        for (File f : files) {
-            List<String> s = getActiveClass(f, false);
-            Class<?> clazz;
-            try {
-                if (s == null) return;
-                for (String name : s) {
-                    clazz = urlCL.loadClass(name);
-                    ActiveUtils newInstance =
-                            (ActiveUtils) clazz.newInstance();
-                }
-            } catch (NoClassDefFoundError | Exception e) {
-                Main.INSTANCE.println(e.getMessage());
-            }
-        }
     }
 
     public List<String> getActiveClass(File file, boolean isModules) {
@@ -112,7 +113,7 @@ public class PluginsManager {
                     cr.accept(cn, ClassReader.SKIP_FRAMES);
                     String i = isModules ? "cn/loli/client/script/java/SubModule" : "cn/loli/client/script/java/ActiveUtils";
                     if (Objects.equals(cn.superName, i)) {
-                        Main.INSTANCE.println("Found Plugin Main: " + cn.name);
+                        Main.INSTANCE.println("Found: " + (isModules ? "Module" : "Instance") + cn.name);
                         activeClass.add(entry.getName().replaceAll("/", ".").replaceAll(".class", ""));
                     }
                 }

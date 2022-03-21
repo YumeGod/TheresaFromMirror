@@ -1,9 +1,12 @@
 package cn.loli.client.script;
 
 import cn.loli.client.Main;
+import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
 import cn.loli.client.script.java.sfontmanager.SFontLoader;
 import cn.loli.client.value.Value;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.Timer;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -84,6 +87,14 @@ public class Wrapper {
      */
     public SFontLoader getSFontLoader() {
         return Main.INSTANCE.sFontLoader;
+    }
+
+
+    /**
+     * this method will get the timer  status
+     */
+    public Timer getTimer() {
+        return ((IAccessorMinecraft) Minecraft.getMinecraft()).getTimer();
     }
 
 }
