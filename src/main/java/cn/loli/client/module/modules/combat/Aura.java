@@ -8,6 +8,7 @@ import cn.loli.client.injection.implementations.IEntityPlayer;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.misc.AntiBot;
+import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.BooleanValue;
@@ -26,6 +27,7 @@ import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemSword;
+import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
@@ -62,6 +64,7 @@ public class Aura extends Module {
     private final BooleanValue multi = new BooleanValue("Multi", false);
 
     private final ModeValue mode = new ModeValue("Priority", "Angle", "Armor", "Range", "Fov", "Angle", "Health", "Hurt Time");
+    private final ModeValue blockMode = new ModeValue("Block Mode", "Hypixel", "Hypixel", "Always", "Legit", "Vanilla", "NCP", "Semi-Vanilla");
     private final ModeValue esp = new ModeValue("Target ESP", "Box", "Box", "2D", "Icarus");
 
     private final BooleanValue autoBlock = new BooleanValue("AutoBlock", true);
@@ -252,12 +255,7 @@ public class Aura extends Module {
                 }
             }
 
-            if (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
-                    && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() && isBlocking) {
-                ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
-                mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
-                isBlocking = false;
-            }
+            handleAutoBlock(true);
 
             //Pre Attack
             if (mc.thePlayer.getDistanceToEntity(target) < range.getObject()) {
@@ -276,12 +274,7 @@ public class Aura extends Module {
 
         if (event.getEventType() == EventType.POST) {
             if (target == null) return;
-
-            if ((mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() || mc.thePlayer.isBlocking()) && !isBlocking) {
-                ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
-                mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
-                isBlocking = true;
-            }
+            handleAutoBlock(false);
         }
     }
 
@@ -335,6 +328,58 @@ public class Aura extends Module {
             switchTimer.reset();
             ++index;
         }
+    }
+
+
+    private void handleAutoBlock(boolean unblock) {
+        if (unblock) {
+            if (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
+                    && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() && isBlocking) {
+                ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
+                switch (blockMode.getCurrentMode().toLowerCase()) {
+                    case "hypixel":
+                        mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                        isBlocking = false;
+                        break;
+                    case "always":
+                    case "semi-vanilla":
+                        ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
+                        break;
+                    case "legit":
+                        isBlocking = false;
+                        break;
+                    case "ncp":
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+                        isBlocking = false;
+                        break;
+                    case "vanilla":
+                        mc.playerController.onStoppedUsingItem(mc.thePlayer);
+                        isBlocking = false;
+                        break;
+                }
+            }
+        } else {
+            if ((mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() || mc.thePlayer.isBlocking()) && !isBlocking) {
+                ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
+                switch (blockMode.getCurrentMode().toLowerCase()) {
+                    case "ncp":
+                    case "hypixel":
+                    case "always":
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                        break;
+                    case "legit":
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.INTERACT));
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                        break;
+                    case "vanilla":
+                    case "semi-vanilla":
+                        mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem());
+                        break;
+                }
+                isBlocking = true;
+            }
+        }
+
     }
 
 

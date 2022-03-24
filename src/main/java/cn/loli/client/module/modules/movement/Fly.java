@@ -91,7 +91,7 @@ public class Fly extends Module {
                                 stage++;
                                 break;
                             default:
-                                e.setOnGround(true);
+                                e.setOnGround(false);
                                 break;
                         }
                     } else {
