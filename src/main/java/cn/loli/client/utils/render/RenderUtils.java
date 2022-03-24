@@ -1,5 +1,6 @@
 package cn.loli.client.utils.render;
 
+import cn.loli.client.events.RenderEvent;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.injection.mixins.IAccessorRenderManager;
 import cn.loli.client.utils.Utils;

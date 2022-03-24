@@ -98,7 +98,6 @@ public class Aura extends Module {
     private static final NumberValue<Integer> rotationSpeed = new NumberValue<>("Rotation Speed", 180, 0, 180);
 
     private final BooleanValue show = new BooleanValue("Show-Target", true);
-    private final BooleanValue targetHud = new BooleanValue("Target-Hud", false);
 
     private final ColorValue espColor = new ColorValue("ESP-Color", Color.BLUE);
 

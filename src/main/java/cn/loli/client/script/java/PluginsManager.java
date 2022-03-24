@@ -66,7 +66,7 @@ public class PluginsManager {
                    ActiveUtils utils = (ActiveUtils) clazz.newInstance();
                 }
             } catch (NoClassDefFoundError | Exception e) {
-                Main.INSTANCE.println(e.getMessage());
+                Main.INSTANCE.println("Init Utils Error: " + e.getMessage());
             }
         }
 
@@ -92,7 +92,7 @@ public class PluginsManager {
                     Main.INSTANCE.println("[LuaManager]Loaded Plugin: " + instance.getName() + " " + instance.getCategory());
                 }
             } catch (NoClassDefFoundError | Exception e) {
-                Main.INSTANCE.println(e.getMessage());
+                Main.INSTANCE.println("Init Modules Error: " + e.getMessage());
             }
         }
 
@@ -113,7 +113,7 @@ public class PluginsManager {
                     cr.accept(cn, ClassReader.SKIP_FRAMES);
                     String i = isModules ? "cn/loli/client/script/java/SubModule" : "cn/loli/client/script/java/ActiveUtils";
                     if (Objects.equals(cn.superName, i)) {
-                        Main.INSTANCE.println("Found: " + (isModules ? "Module" : "Instance") + cn.name);
+                        Main.INSTANCE.println("Found: " + (isModules ? "Module" : "Instance" + " ") + cn.name);
                         activeClass.add(entry.getName().replaceAll("/", ".").replaceAll(".class", ""));
                     }
                 }

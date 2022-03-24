@@ -1,6 +1,7 @@
 package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
+import cn.loli.client.events.AttackEvent;
 import cn.loli.client.events.BlockReachEvent;
 import cn.loli.client.injection.implementations.IPlayerControllerMP;
 import cn.loli.client.module.modules.combat.Criticals;
@@ -30,6 +31,7 @@ public class MixinPlayerControllerMP implements IPlayerControllerMP {
 
     @Inject(method = "attackEntity",  at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/PlayerControllerMP;syncCurrentPlayItem()V", shift = At.Shift.AFTER))
     private void attackEntity(EntityPlayer playerIn, Entity targetEntity, CallbackInfo ci){
+        EventManager.call(new AttackEvent(targetEntity));
     }
 
     @Override

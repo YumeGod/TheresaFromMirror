@@ -111,4 +111,32 @@ public class Wrapper {
         return RotationHook.pitch;
     }
 
+    /*
+     * this method will get the Current animation
+     */
+
+    public float getArraylistAnimationX(@NotNull String name, boolean caseSensitive) {
+        return Objects.requireNonNull(Main.INSTANCE.moduleManager.getModules()
+                .stream().filter(mod -> !caseSensitive &&
+                        name.equalsIgnoreCase(mod.getName()) || name.equals(mod.getName())).findFirst().orElse(null)).animX;
+    }
+
+    public float getArraylistAnimationY(@NotNull String name, boolean caseSensitive) {
+        return Objects.requireNonNull(Main.INSTANCE.moduleManager.getModules()
+                .stream().filter(mod -> !caseSensitive &&
+                        name.equalsIgnoreCase(mod.getName()) || name.equals(mod.getName())).findFirst().orElse(null)).animY;
+    }
+
+    public void setArraylistAnimationX(@NotNull String name, boolean caseSensitive, float value) {
+        Objects.requireNonNull(Main.INSTANCE.moduleManager.getModules()
+                .stream().filter(mod -> !caseSensitive &&
+                        name.equalsIgnoreCase(mod.getName()) || name.equals(mod.getName())).findFirst().orElse(null)).animX = value;
+    }
+
+    public void setArraylistAnimationY(@NotNull String name, boolean caseSensitive, float value) {
+        Objects.requireNonNull(Main.INSTANCE.moduleManager.getModules()
+                .stream().filter(mod -> !caseSensitive &&
+                        name.equalsIgnoreCase(mod.getName()) || name.equals(mod.getName())).findFirst().orElse(null)).animY = value;
+    }
+
 }

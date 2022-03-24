@@ -185,7 +185,7 @@ public class Abuser extends Module {
         if (packetBrust.getObject() || hypixel.getObject()) {
             if (!brust.hasReached(delay)) return;
             resetPackets(mc.getNetHandler());
-            if (delay > 450) delay = 250;
+            if (delay > 500) delay = 300;
             else delay += 25;
             brust.reset();
         }
@@ -240,10 +240,9 @@ public class Abuser extends Module {
                         packets.get(0).processPacket(netHandler);
                         if (packets.get(0) instanceof S32PacketConfirmTransaction) {
                             if (packetChoke.getObject()) {
-                                if (invalid > 14) {
+                                if (invalid > 8) {
                                     mc.getNetHandler().getNetworkManager().sendPacket(new C0FPacketConfirmTransaction(1, ((S32PacketConfirmTransaction) packets.get(0)).getActionNumber(), true));
                                     invalid = 0;
-                                    delay = 50;
                                 }
                                 invalid++;
                             }

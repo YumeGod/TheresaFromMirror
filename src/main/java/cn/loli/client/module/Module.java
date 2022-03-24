@@ -43,6 +43,8 @@ public abstract class Module {
     public float clickgui_animX;
     public float arraylist_animX;
     public float arraylist_animY;
+    public float animX;
+    public float animY;
 
     protected Module(String name, String description, String moduleCategory) {
         this(name, description, ModuleCategory.getCategory(moduleCategory) , true, false, Keyboard.KEY_NONE);
