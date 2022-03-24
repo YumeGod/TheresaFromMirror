@@ -14,6 +14,8 @@ import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.server.S30PacketWindowItems;
 
 public class NoSlowDown extends Module {
+
+    private final BooleanValue vanilla = new BooleanValue("Only Vanilla", false);
     private final BooleanValue itemswitch = new BooleanValue("New", false);
     private final BooleanValue onlyOnMove = new BooleanValue("Only on move", false);
 
@@ -29,6 +31,8 @@ public class NoSlowDown extends Module {
 
         if (!mc.thePlayer.isUsingItem() || (mc.thePlayer.getHeldItem().getItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemBow) || (onlyOnMove.getObject() && !playerUtils.isMoving2()))
             return;
+
+        if (vanilla.getObject()) return;
 
         if (event.getEventType() == EventType.PRE) {
             final int curSlot = mc.thePlayer.inventory.currentItem;
