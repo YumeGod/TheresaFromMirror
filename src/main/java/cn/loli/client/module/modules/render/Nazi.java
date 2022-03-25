@@ -26,7 +26,9 @@ public class Nazi extends Module {
     @EventTarget
     private void onEmote(EmoteEvent event){
         if (event.getEventType() == EventType.POST){
-            setBiped(event.getBiped());
+            if (event.entity == mc.thePlayer){
+                setBiped(event.getBiped());
+            }
         }
     }
 
@@ -36,9 +38,9 @@ public class Nazi extends Module {
             biped.bipedHead.rotateAngleX = 0F;
             biped.bipedHead.rotateAngleY = 0;
             biped.bipedRightArm.rotateAngleX = 2.7F;
-            biped.bipedRightArm.rotateAngleY = -1.25F;
+            biped.bipedRightArm.rotateAngleY = -0.25F;
             biped.bipedLeftArm.rotateAngleX = 2.7F;
-            biped.bipedLeftArm.rotateAngleY = 1.25F;
+            biped.bipedLeftArm.rotateAngleY = 0.25F;
         }
     }
 

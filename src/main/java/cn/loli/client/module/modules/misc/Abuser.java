@@ -243,6 +243,7 @@ public class Abuser extends Module {
                                 if (invalid > 8) {
                                     mc.getNetHandler().getNetworkManager().sendPacket(new C0FPacketConfirmTransaction(1, ((S32PacketConfirmTransaction) packets.get(0)).getActionNumber(), true));
                                     invalid = 0;
+                                    delay = 150;
                                 }
                                 invalid++;
                             }
