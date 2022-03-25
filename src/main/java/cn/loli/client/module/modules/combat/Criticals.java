@@ -25,7 +25,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class Criticals extends Module {
     private final ModeValue mode = new ModeValue("Mode", "Edit", "Edit", "Packet", "Recall");
-    private final ModeValue offsetvalue = new ModeValue("Offset Value", "NCP", "NCP", "Mini", "Less", "Negative", "Positive");
+    private final ModeValue offsetvalue = new ModeValue("Offset Value", "NCP", "NCP", "Mini", "Chill", "Negative", "Positive");
     private final BooleanValue packetsWhenNoMove = new BooleanValue("packets when no move", false);
     private final BooleanValue always = new BooleanValue("Always", false);
     private final BooleanValue nodelay = new BooleanValue("No Delay", false);
@@ -101,10 +101,12 @@ public class Criticals extends Module {
                             ThreadLocalRandom.current().nextDouble(.00417, .00526),
                     };
                     break;
-                case "Less":
+                case "Chill":
                     offset = new double[]{
+                            ThreadLocalRandom.current().nextDouble(.0325, .0335),
                             ThreadLocalRandom.current().nextDouble(.016, .018),
                             ThreadLocalRandom.current().nextDouble(.0325, .0335),
+                            ThreadLocalRandom.current().nextDouble(.016, .018),
                     };
                     break;
                 case "Positive":
