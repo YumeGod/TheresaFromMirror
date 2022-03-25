@@ -2,7 +2,7 @@
 
 package cn.loli.client.script.java.subvalue;
 
-import cn.loli.client.value.ModeValue;
+import cn.loli.client.value.Value;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -10,7 +10,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Predicate;
 
-public class ModeSubValue extends ModeValue {
+
+public class ModeSubValue extends Value<Integer> {
     private final String[] modes;
     public boolean open;
 
@@ -19,8 +20,9 @@ public class ModeSubValue extends ModeValue {
     }
 
     public ModeSubValue(String name, String defaultVal, Predicate<Integer> validator, String... modes) {
-        super(name, defaultVal, validator , modes);
+        super(name, 0, validator);
         this.modes = modes;
+
         setObject(defaultVal);
     }
 
@@ -32,7 +34,7 @@ public class ModeSubValue extends ModeValue {
         return modes;
     }
 
-    private void setObject(String s) {
+    protected void setObject(String s) {
         int object = -1;
 
         for (int i = 0; i < modes.length; i++) {

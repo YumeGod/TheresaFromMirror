@@ -4,5 +4,8 @@ public enum EventType {
 	PRE,
     POST,
     SEND,
-    RECEIVE
+    RECEIVE,
+    BOW,
+    BLOCK,
+    EAT
 }

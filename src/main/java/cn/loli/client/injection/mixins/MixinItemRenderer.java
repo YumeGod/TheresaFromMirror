@@ -3,7 +3,10 @@
 package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
+import cn.loli.client.events.AnimationEvent;
 import cn.loli.client.module.modules.render.BlockHit;
+import com.darkmagician6.eventapi.EventManager;
+import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -95,14 +98,23 @@ public abstract class MixinItemRenderer {
                         break;
                     case EAT:
                     case DRINK:
+                        AnimationEvent eatAnimation = new AnimationEvent(EventType.EAT, player, partialTicks, f, f1, false);
+                        EventManager.call(eatAnimation);
+                        if (eatAnimation.isCancelable()) break;
                         this.performDrinking(player, partialTicks);
                         this.transformFirstPersonItem(f, f4);
                         break;
                     case BLOCK:
+                        AnimationEvent blockAnimation = new AnimationEvent(EventType.BLOCK, player, partialTicks, f, f1, false);
+                        EventManager.call(blockAnimation);
+                        if (blockAnimation.isCancelable()) break;
                         this.transformFirstPersonItem(f, f4);
                         this.doBlockTransformations();
                         break;
                     case BOW:
+                        AnimationEvent bowAnimation = new AnimationEvent(EventType.BOW, player, partialTicks, f, f1, false);
+                        EventManager.call(bowAnimation);
+                        if (bowAnimation.isCancelable()) break;
                         this.transformFirstPersonItem(f, f4);
                         this.doBowTransformations(partialTicks, player);
                 }
@@ -121,8 +133,10 @@ public abstract class MixinItemRenderer {
         RenderHelper.disableStandardItemLighting();
     }
 
+
     @Inject(method = "transformFirstPersonItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;scale(FFF)V"))
     private void transformFirstPersonItem(float equipProgress, float swingProgress, CallbackInfo ci) {
         Main.INSTANCE.moduleManager.getModule(cn.loli.client.module.modules.render.ItemRenderer.class).transform();
     }
+
 }
