@@ -93,6 +93,7 @@ public abstract class MixinMinecraft {
 
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;isUsingItem()Z", ordinal = 0, shift = At.Shift.BEFORE))
     private void onAttack(CallbackInfo ci) {
+        EventManager.call(new TickAttackEvent());
     }
 
     @Inject(method = "shutdown", at = @At("HEAD"))

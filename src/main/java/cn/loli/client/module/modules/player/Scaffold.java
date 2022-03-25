@@ -216,7 +216,7 @@ public class Scaffold extends Module {
     }
 
     @EventTarget
-    private void onWorking(AttackEvent e) {
+    private void onWorking(TickAttackEvent e) {
 
         final double y = sameY.getObject() && playerUtils.isMoving2() ? startY : mc.thePlayer.posY;
 
