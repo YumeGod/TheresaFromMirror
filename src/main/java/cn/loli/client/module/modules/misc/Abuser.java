@@ -185,7 +185,7 @@ public class Abuser extends Module {
         if (packetBrust.getObject() || hypixel.getObject()) {
             if (!brust.hasReached(delay)) return;
             resetPackets(mc.getNetHandler());
-            if (delay > 500) delay = 300;
+            if (delay > 450) delay = 250;
             else delay += 25;
             brust.reset();
         }

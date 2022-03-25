@@ -35,12 +35,13 @@ public class Nazi extends Module {
 
     public void setBiped(ModelBiped biped) {
         if (mc.gameSettings.thirdPersonView > 0) {
-            biped.bipedHead.rotateAngleX = 0F;
-            biped.bipedHead.rotateAngleY = 0;
-            biped.bipedRightArm.rotateAngleX = 2.7F;
-            biped.bipedRightArm.rotateAngleY = -0.25F;
-            biped.bipedLeftArm.rotateAngleX = 2.7F;
-            biped.bipedLeftArm.rotateAngleY = 0.25F;
+            biped.bipedHead.rotateAngleY = (float) playerUtils.randomInRange(-0.1, 0.1);
+            biped.bipedRightArm.rotateAngleX = 0.5F;
+            biped.bipedRightArm.rotateAngleY = -2.25F;
+            biped.bipedLeftArm.rotateAngleX = 0.5F;
+            biped.bipedLeftArm.rotateAngleY = 2.25F;
+            biped.aimedBow = true;
+            biped.isChild = true;
         }
     }
 
