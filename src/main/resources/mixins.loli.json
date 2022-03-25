@@ -26,6 +26,7 @@
     "MixinItemRenderer",
     "MixinLayerHeldItem",
     "MixinMinecraft",
+    "MixinModelBiped",
     "MixinNetworkManager",
     "MixinPlayerControllerMP",
     "MixinRenderer",

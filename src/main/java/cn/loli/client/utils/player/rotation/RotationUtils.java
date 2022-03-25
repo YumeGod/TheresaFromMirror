@@ -126,7 +126,7 @@ public class RotationUtils extends Utils {
             deltaPitch -= deltaPitch % 0.5 + 0.25;
         }
         float f = sensitivity * 0.6F + 0.2F;
-        float f1 = f * f * f * 8F;
+        float f1 = (float) (Math.pow(f, 3.0) * 8F);
         float f2 = (float) deltaYaw * f1;
         float f3 = (float) deltaPitch * f1;
 

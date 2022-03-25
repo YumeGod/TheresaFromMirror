@@ -86,6 +86,7 @@ public class ModuleManager {
         addModule(new Trajectories());
         addModule(new Trail());
         addModule(new ViewClip());
+        addModule(new Nazi());
 
         //World
         addModule(new Eagle());

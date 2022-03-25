@@ -536,13 +536,4 @@ public class Aura extends Module {
         final float pitch = (float) (-(Math.atan2(diffY, dist) * 180.0 / Math.PI));
         return new float[]{yaw, pitch};
     }
-
-    void resetRotations(float yaw, float pitch, boolean silent) {
-        if (silent) {
-            mc.thePlayer.rotationYaw = yaw - yaw % 360 + mc.thePlayer.rotationYaw % 360;
-        } else {
-            mc.thePlayer.rotationYaw = yaw;
-            mc.thePlayer.rotationPitch = pitch;
-        }
-    }
 }
