@@ -15,9 +15,6 @@ import org.lwjgl.input.Keyboard;
 import java.util.Random;
 
 public class SubModule extends Module {
-    protected static final Minecraft mc = Minecraft.getMinecraft();
-    protected static final GameSettings game = mc.gameSettings;
-    protected static final Random r = new Random();
 
     private final String name;
     private final String description;
@@ -119,14 +116,17 @@ public class SubModule extends Module {
     }
 
 
+    @Override
     protected void onEnable() {
         super.onEnable();
     }
 
+    @Override
     protected void onDisable() {
         super.onDisable();
     }
 
+    @Override
     protected void onToggle() {
         super.onToggle();
     }

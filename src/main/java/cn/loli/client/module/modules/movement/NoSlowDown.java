@@ -4,6 +4,7 @@ import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.player.PlayerUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;

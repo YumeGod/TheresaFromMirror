@@ -64,12 +64,16 @@ public class Aura extends Module {
 
     private final ModeValue mode = new ModeValue("Priority", "Angle", "Armor", "Range", "Fov", "Angle", "Health", "Hurt Time");
 
+
     public static final NumberValue<Integer> unBlockTweak = new NumberValue<>("UnBlock Tweak", 0, 0, 100);
-    private final ModeValue blockMode = new ModeValue("Block Mode", "Hypixel", "Hypixel", "Always", "Legit", "Vanilla", "NCP", "Semi-Vanilla", "Semi-Switch", "Switch");
+    private final ModeValue blockMode = new ModeValue("Block Mode", "Hypixel", "Hypixel", "Always", "Legit", "Vanilla", "NCP", "Semi-Vanilla", "Semi-Switch", "Switch" , "Null");
+    private final ModeValue blockWhen = new ModeValue("Block when", "On Attack", "On Attack", "On Tick", "Sync");
+    private final ModeValue attackWhen = new ModeValue("Attack when", "Pre", "Pre", "Post", "Tick");
+
     private final ModeValue esp = new ModeValue("Target ESP", "Box", "Box", "2D", "Icarus");
 
     private final BooleanValue autoBlock = new BooleanValue("AutoBlock", true);
-    private static final BooleanValue invisibles = new BooleanValue("Invisibles", false);
+    private static final BooleanValue invisible = new BooleanValue("Invisible", false);
     private static final BooleanValue players = new BooleanValue("Players", true);
     private static final BooleanValue animals = new BooleanValue("Animals", false);
     private static final BooleanValue mobs = new BooleanValue("Mobs", true);
@@ -236,50 +240,63 @@ public class Aura extends Module {
 
     @EventTarget
     private void onMotionUpdate(MotionUpdateEvent event) {
-        if (event.getEventType() == EventType.PRE) {
-            if (target == null) {
-                curYaw = mc.thePlayer.rotationYaw;
-                curPitch = mc.thePlayer.rotationPitch;
+        if (target == null) {
+            curYaw = mc.thePlayer.rotationYaw;
+            curPitch = mc.thePlayer.rotationPitch;
 
-                if (mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword
-                        && autoBlock.getObject() && isBlocking) {
-                    ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
-                    mc.thePlayer.sendQueue.addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
-                    isBlocking = false;
-                }
-                return;
+            if (mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword
+                    && autoBlock.getObject() && isBlocking) {
+                ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
+                mc.thePlayer.sendQueue.addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+                isBlocking = false;
             }
+            return;
+        }
 
+        if (event.getEventType() == EventType.PRE) {
             if (rotations.getObject()) {
                 if (slient.getObject()) {
                     event.setYaw(curYaw);
                     event.setPitch(curPitch);
                 }
             }
-
-            handleAutoBlock(true);
-
-            //Pre Attack
-            if (mc.thePlayer.getDistanceToEntity(target) < range.getObject()) {
-                while (cps > 0) {
-                    attack(target);
-
-                    if (multi.getObject())
-                        targets.stream().filter(target -> target != this.target &&
-                                target.hurtResistantTime <= hurttime.getObject()).forEach(this::attack);
-
-                    cps--;
-                }
-            }
-
-        }
-
-        if (event.getEventType() == EventType.POST) {
-            if (target == null) return;
-            handleAutoBlock(false);
+            if (blockWhen.getCurrentMode().equals("On Tick")) handleAutoBlock(true);
+            if (attackWhen.getCurrentMode().equals("Pre")) attemptAttack();
+        } else if (event.getEventType() == EventType.POST) {
+            if (attackWhen.getCurrentMode().equals("Post")) attemptAttack();
+            if (blockWhen.getCurrentMode().equals("On Tick") || blockWhen.getCurrentMode().equals("Sync"))
+                handleAutoBlock(false);
         }
     }
 
+    @EventTarget
+    private void onAttack(TickAttackEvent event) {
+        if (target == null) return;
+        if (attackWhen.getCurrentMode().equals("Tick")) attemptAttack();
+    }
+
+    //尝试进行Attack
+    private void attemptAttack() {
+        if (target == null) return;
+        //Pre Attack
+        if (mc.thePlayer.getDistanceToEntity(target) < range.getObject()) {
+            if (blockWhen.getCurrentMode().equals("On Attack") || blockWhen.getCurrentMode().equals("Sync"))
+                handleAutoBlock(false);
+
+            while (cps > 0) {
+                attack(target);
+                if (multi.getObject())
+                    targets.stream().filter(target -> target != this.target &&
+                            target.hurtResistantTime <= hurttime.getObject()).forEach(this::attack);
+                cps--;
+            }
+            if (blockWhen.getCurrentMode().equals("On Attack"))
+                handleAutoBlock(false);
+        }
+    }
+
+
+    //具体的Attack方式
     private void attack(Entity entity) {
         if (mc.currentScreen != null && noInv.getObject()) {
             if (autoCloseInv.getObject())
@@ -295,13 +312,14 @@ public class Aura extends Module {
             mc.thePlayer.swingItem();
             mc.playerController.attackEntity(mc.thePlayer, entity);
         } else {
-            //    ChatUtils.info("Miss");
+            //不打人
             mc.thePlayer.swingItem();
         }
 
     }
 
 
+    //更新实体状态
     private void update() {
         try {
             targets.removeIf(ent -> !canAttack(ent));
@@ -333,10 +351,11 @@ public class Aura extends Module {
     }
 
 
+    //确定他妈的是否格挡
     private void handleAutoBlock(boolean unblock) {
+        final int curSlot = mc.thePlayer.inventory.currentItem;
         if (unblock) {
             if (!unblockTimer.hasReached(unBlockTweak.getObject())) return;
-
             unblockTimer.reset();
 
             if (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
@@ -353,13 +372,19 @@ public class Aura extends Module {
                         break;
                     case "legit":
                     case "semi-switch":
+                        isBlocking = false;
+                        break;
                     case "switch":
+                        final int spoof = curSlot == 0 ? 1 : -1;
+                        mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot + spoof));
                         isBlocking = false;
                         break;
                     case "ncp":
                         mc.getNetHandler().getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
                         isBlocking = false;
                         break;
+                    case "null":
+                        isBlocking = false;
                     case "vanilla":
                         mc.playerController.onStoppedUsingItem(mc.thePlayer);
                         isBlocking = false;
@@ -383,14 +408,14 @@ public class Aura extends Module {
                     case "semi-vanilla":
                         mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem());
                         break;
+                    case "null":
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(null));
+                        break;
                     case "semi-switch":
                         mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                         mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                         break;
                     case "switch":
-                        final int curSlot = mc.thePlayer.inventory.currentItem;
-                        final int spoof = curSlot == 0 ? 1 : -1;
-                        mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot + spoof));
                         mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot));
                         mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                         break;
@@ -398,7 +423,6 @@ public class Aura extends Module {
                 isBlocking = true;
             }
         }
-
     }
 
 
@@ -463,7 +487,6 @@ public class Aura extends Module {
         return (long) ((Math.random() * (1000 / minCPS - 1000 / maxCPS) + 1) + 1000 / maxCPS);
     }
 
-
     //限制
     private static boolean canAttack(EntityLivingBase target) {
         if (target instanceof EntityPlayer || target instanceof EntityAnimal || target instanceof EntityMob || target instanceof INpc) {
@@ -476,7 +499,7 @@ public class Aura extends Module {
         }
         if (target instanceof EntityArmorStand) return false;
         if (playerUtils.isOnSameTeam(target) && team.getObject()) return false;
-        if (target.isInvisible() && !invisibles.getObject()) return false;
+        if (target.isInvisible() && !invisible.getObject()) return false;
         if (!isInFOV(target, fov.getObject())) return false;
         if (Main.INSTANCE.moduleManager.getModule(AntiBot.class).getState() && Main.INSTANCE.moduleManager.getModule(AntiBot.class).isBot(target))
             return false;
@@ -489,7 +512,6 @@ public class Aura extends Module {
         double angleDiff = getAngleDifference(mc.thePlayer.rotationYaw, getRotations(entity.posX, entity.posY, entity.posZ)[0]);
         return (angleDiff > 0 && angleDiff < angle) || (-angle < angleDiff && angleDiff < 0);
     }
-
 
     //优先级
     public static float getDistanceBetweenAngles(float angle1, float angle2) {
