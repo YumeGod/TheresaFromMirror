@@ -10,10 +10,9 @@ import net.minecraft.client.model.ModelBiped;
 
 public class Nazi extends Module {
     public int heilY;
-    private TimeHelper timer = new TimeHelper();
 
     public Nazi() {
-        super("Nazi", "Yes Yes So nazi", ModuleCategory.RENDER);
+        super("Loli", "Loli Loli", ModuleCategory.RENDER);
     }
 
 
@@ -35,7 +34,6 @@ public class Nazi extends Module {
 
     public void setBiped(ModelBiped biped) {
         if (mc.gameSettings.thirdPersonView > 0) {
-            biped.bipedHead.rotateAngleY = (float) playerUtils.randomInRange(-0.1, 0.1);
             biped.bipedRightArm.rotateAngleX = 0.5F;
             biped.bipedRightArm.rotateAngleY = -2.25F;
             biped.bipedLeftArm.rotateAngleX = 0.5F;
