@@ -51,14 +51,14 @@ public class Aura extends Module {
     private static final NumberValue<Integer> ticksExisted = new NumberValue<>("TicksExisted", 20, 0, 500);
     private static final NumberValue<Integer> fov = new NumberValue<>("FOV", 360, 0, 360);
     private static final NumberValue<Float> range = new NumberValue<>("Range", 3f, 1f, 6f);
-    private static final NumberValue<Float> blockrange = new NumberValue<>("BlockRange", 2f, 0f, 3f);
+    private static final NumberValue<Float> blockRange = new NumberValue<>("BlockRange", 2f, 0f, 3f);
 
     //   private static final NumberValue<Float> mouseSpeed = new NumberValue<>("Mouse Speed", 5f, 0f, 6f);
     private static final NumberValue<Float> inaccuracy = new NumberValue<>("Inaccuracy", 0f, 0f, 1f);
-    public static final NumberValue<Integer> switchsize = new NumberValue<>("Targets Amount", 1, 1, 5);
+    public static final NumberValue<Integer> target_Amount = new NumberValue<>("Targets Amount", 1, 1, 5);
     public static final NumberValue<Integer> switchDelay = new NumberValue<>("Switch Delay", 100, 0, 500);
 
-    public static final NumberValue<Integer> hurttime = new NumberValue<>("Multi Hurt Time", 20, 0, 20);
+    public static final NumberValue<Integer> hurtTime = new NumberValue<>("Multi Hurt Time", 20, 0, 20);
 
     private final BooleanValue multi = new BooleanValue("Multi", false);
 
@@ -85,7 +85,7 @@ public class Aura extends Module {
 
     private final BooleanValue rotations = new BooleanValue("Rotations", false);
 
-    private final BooleanValue slient = new BooleanValue("Slient", true);
+    private final BooleanValue silent = new BooleanValue("Silent", true);
 
     private final BooleanValue noInv = new BooleanValue("No Inv", true);
     private final BooleanValue autoCloseInv = new BooleanValue("Auto Close Inv", false);
@@ -184,7 +184,7 @@ public class Aura extends Module {
                 curPitch = mc.thePlayer.rotationPitch;
             }
 
-            if (!slient.getObject()) {
+            if (!silent.getObject()) {
                 mc.thePlayer.rotationYaw = curYaw;
                 mc.thePlayer.rotationPitch = curPitch;
             }
@@ -255,7 +255,7 @@ public class Aura extends Module {
 
         if (event.getEventType() == EventType.PRE) {
             if (rotations.getObject()) {
-                if (slient.getObject()) {
+                if (silent.getObject()) {
                     event.setYaw(curYaw);
                     event.setPitch(curPitch);
                 }
@@ -287,7 +287,7 @@ public class Aura extends Module {
                 attack(target);
                 if (multi.getObject())
                     targets.stream().filter(target -> target != this.target &&
-                            target.hurtResistantTime <= hurttime.getObject()).forEach(this::attack);
+                            target.hurtResistantTime <= hurtTime.getObject()).forEach(this::attack);
                 cps--;
             }
             if (blockWhen.getCurrentMode().equals("On Attack"))
@@ -478,7 +478,7 @@ public class Aura extends Module {
         if (Keyboard.isKeyDown(Keyboard.KEY_LMENU))
             Collections.reverse(list);
 
-        return list.subList(0, Math.min(list.size(), switchsize.getObject()));
+        return list.subList(0, Math.min(list.size(), target_Amount.getObject()));
 
     }
 
@@ -493,7 +493,7 @@ public class Aura extends Module {
             if (target instanceof EntityPlayer && !players.getObject()) return false;
             if (target instanceof EntityAnimal && !animals.getObject()) return false;
             if (target instanceof EntityWither && boss.getObject())
-                return mc.thePlayer.getDistanceToEntity(target) <= range.getObject() + blockrange.getObject(); // true
+                return mc.thePlayer.getDistanceToEntity(target) <= range.getObject() + blockRange.getObject(); // true
             if (target instanceof EntityMob && !mobs.getObject()) return false;
             if (target instanceof INpc && !villagers.getObject()) return false;
         }
@@ -504,7 +504,7 @@ public class Aura extends Module {
         if (Main.INSTANCE.moduleManager.getModule(AntiBot.class).getState() && Main.INSTANCE.moduleManager.getModule(AntiBot.class).isBot(target))
             return false;
 
-        return target != mc.thePlayer && target.isEntityAlive() && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() + blockrange.getObject() && target.ticksExisted > ticksExisted.getObject();
+        return target != mc.thePlayer && target.isEntityAlive() && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() + blockRange.getObject() && target.ticksExisted > ticksExisted.getObject();
     }
 
     private static boolean isInFOV(EntityLivingBase entity, double angle) {

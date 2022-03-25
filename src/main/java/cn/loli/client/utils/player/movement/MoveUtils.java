@@ -1,6 +1,7 @@
 package cn.loli.client.utils.player.movement;
 
 import cn.loli.client.events.PlayerMoveEvent;
+import cn.loli.client.module.modules.combat.TargetStrafe;
 import cn.loli.client.utils.Utils;
 import cn.loli.client.utils.player.rotation.RotationUtils;
 import net.minecraft.client.Minecraft;
@@ -130,6 +131,54 @@ public class MoveUtils extends Utils {
         return rotationYaw + yaw;
     }
 
+    public void setSpeed(final EntityPlayerSP player,
+                                final PlayerMoveEvent event,
+                                final TargetStrafe targetStrafe,
+                                double speed) {
+        if (targetStrafe.shouldStrafe()) {
+            if (targetStrafe.shouldAdaptSpeed())
+                speed = Math.min(speed, targetStrafe.getAdaptedSpeed());
+            targetStrafe.setSpeed(event, speed);
+            return;
+        }
+
+        setSpeed(event, speed, player.moveForward, player.moveStrafing, player.rotationYaw);
+    }
+
+    public void setSpeed(final PlayerMoveEvent moveEvent,
+                                final double speed,
+                                float forward,
+                                float strafing,
+                                float yaw) {
+        if (forward == 0.0F && strafing == 0.0F) return;
+
+        yaw = getMovementDirection(forward, strafing, yaw);
+
+        final double movementDirectionRads = Math.toRadians(yaw);
+        final double x = -Math.sin(movementDirectionRads) * speed;
+        final double z = Math.cos(movementDirectionRads) * speed;
+        moveEvent.setX(x);
+        moveEvent.setZ(z);
+    }
+
+    public float getMovementDirection(final float forward,
+                                             final float strafing,
+                                             float yaw) {
+        if (forward == 0.0F && strafing == 0.0F) return yaw;
+
+        boolean reversed = forward < 0.0f;
+        float strafingYaw = 90.0f *
+                (forward > 0.0f ? 0.5f : reversed ? -0.5f : 1.0f);
+
+        if (reversed)
+            yaw += 180.0f;
+        if (strafing > 0.0f)
+            yaw -= strafingYaw;
+        else if (strafing < 0.0f)
+            yaw += strafingYaw;
+
+        return yaw;
+    }
 
     public void addMotion(double speed, float yaw) {
         mc.thePlayer.motionX -= (MathHelper.sin((float) Math.toRadians(yaw)) * speed);

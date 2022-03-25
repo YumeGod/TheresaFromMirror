@@ -41,6 +41,7 @@ public class ModuleManager {
         addModule(new KeepSprint());
         addModule(new Range());
         addModule(new Velocity());
+        addModule(new TargetStrafe());
 
         //Movement
         addModule(new AntiFall());

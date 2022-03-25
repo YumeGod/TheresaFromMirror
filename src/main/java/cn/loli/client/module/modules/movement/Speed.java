@@ -1,5 +1,6 @@
 package cn.loli.client.module.modules.movement;
 
+import cn.loli.client.Main;
 import cn.loli.client.events.JumpEvent;
 import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PlayerMoveEvent;
@@ -8,8 +9,7 @@ import cn.loli.client.injection.mixins.IAccessorEntityPlayer;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.utils.misc.ChatUtils;
-import cn.loli.client.utils.player.rotation.RotationHook;
+import cn.loli.client.module.modules.combat.TargetStrafe;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
@@ -109,7 +109,7 @@ public class Speed extends Module {
                             !mc.thePlayer.isPotionActive(Potion.jump) && !mc.thePlayer.isCollidedHorizontally;
 
                     if (!mc.thePlayer.onGround && shouldLowhop && mc.thePlayer.fallDistance < 0.54)
-                       event.setY(mc.thePlayer.motionY = lowHopYModification(mc.thePlayer.motionY, moveUtils.round(mc.thePlayer.posY - (int) mc.thePlayer.posY, 0.001)));
+                        event.setY(mc.thePlayer.motionY = lowHopYModification(mc.thePlayer.motionY, moveUtils.round(mc.thePlayer.posY - (int) mc.thePlayer.posY, 0.001)));
 
                     if (mc.thePlayer.onGround && mc.thePlayer.isCollidedVertically && !wasOnGround) {
                         speed = baseMoveSpeed * 1.7;
@@ -127,8 +127,7 @@ public class Speed extends Module {
 
                     if (failTimes > 0 && failTimes % 2 == 0) speed = speed * 0.9;
 
-                    moveUtils.setMotion(event, speed);
-
+                    moveUtils.setSpeed(mc.thePlayer, event, targetStrafeInstance, speed);
                 }
 
                 break;

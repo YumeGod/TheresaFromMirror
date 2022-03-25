@@ -21,6 +21,7 @@ import org.lwjgl.util.glu.Cylinder;
 import java.awt.*;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL14.glBlendFuncSeparate;
 
 public class RenderUtils extends Utils {
     static int animationX;
@@ -67,12 +68,19 @@ public class RenderUtils extends Utils {
         GL11.glHint(3155, 4352);
     }
 
-    private static void setColor(int colorHex) {
+    public static void setColor(int colorHex) {
         float alpha = (float) (colorHex >> 24 & 255) / 255.0F;
         float red = (float) (colorHex >> 16 & 255) / 255.0F;
         float green = (float) (colorHex >> 8 & 255) / 255.0F;
         float blue = (float) (colorHex & 255) / 255.0F;
         GL11.glColor4f(red, green, blue, alpha == 0.0F ? 1.0F : alpha);
+    }
+
+    public static void glColour(final int color) {
+        glColor4ub((byte) (color >> 16 & 0xFF),
+                (byte) (color >> 8 & 0xFF),
+                (byte) (color & 0xFF),
+                (byte) (color >> 24 & 0xFF));
     }
 
     public static void drawBlockESP(double x, double y, double z, int mainColor, int borderColor, float alpha, float lineWidth) {
@@ -803,6 +811,114 @@ public class RenderUtils extends Utils {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glEnable(GL11.GL_TEXTURE_2D);
         GL11.glPopMatrix();
+    }
+
+    public static boolean glEnableBlend() {
+        final boolean wasEnabled = glIsEnabled(GL_BLEND);
+
+        if (!wasEnabled) {
+            glEnable(GL_BLEND);
+            glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, 1, 0);
+        }
+
+        return wasEnabled;
+    }
+
+    public static void glRestoreBlend(final boolean wasEnabled) {
+        if (!wasEnabled) {
+            glDisable(GL_BLEND);
+        }
+    }
+    public static void glDrawBoundingBox(final AxisAlignedBB bb,
+                                         final float lineWidth,
+                                         final boolean filled) {
+        if (filled) {
+            // 4 sides
+            glBegin(GL_QUAD_STRIP);
+            {
+                glVertex3d(bb.minX, bb.minY, bb.minZ);
+                glVertex3d(bb.minX, bb.maxY, bb.minZ);
+
+                glVertex3d(bb.maxX, bb.minY, bb.minZ);
+                glVertex3d(bb.maxX, bb.maxY, bb.minZ);
+
+                glVertex3d(bb.maxX, bb.minY, bb.maxZ);
+                glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
+
+                glVertex3d(bb.minX, bb.minY, bb.maxZ);
+                glVertex3d(bb.minX, bb.maxY, bb.maxZ);
+
+                glVertex3d(bb.minX, bb.minY, bb.minZ);
+                glVertex3d(bb.minX, bb.maxY, bb.minZ);
+            }
+            glEnd();
+
+            // Bottom
+            glBegin(GL_QUADS);
+            {
+                glVertex3d(bb.minX, bb.minY, bb.minZ);
+                glVertex3d(bb.maxX, bb.minY, bb.minZ);
+                glVertex3d(bb.maxX, bb.minY, bb.maxZ);
+                glVertex3d(bb.minX, bb.minY, bb.maxZ);
+            }
+            glEnd();
+
+            glCullFace(GL_FRONT);
+
+            // Top
+            glBegin(GL_QUADS);
+            {
+                glVertex3d(bb.minX, bb.maxY, bb.minZ);
+                glVertex3d(bb.maxX, bb.maxY, bb.minZ);
+                glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
+                glVertex3d(bb.minX, bb.maxY, bb.maxZ);
+            }
+            glEnd();
+
+            glCullFace(GL_BACK);
+        }
+
+
+        if (lineWidth > 0) {
+            glLineWidth(lineWidth);
+
+            glEnable(GL_LINE_SMOOTH);
+            glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+
+            glBegin(GL_LINE_STRIP);
+            {
+                // Bottom
+                glVertex3d(bb.minX, bb.minY, bb.minZ);
+                glVertex3d(bb.maxX, bb.minY, bb.minZ);
+                glVertex3d(bb.maxX, bb.minY, bb.maxZ);
+                glVertex3d(bb.minX, bb.minY, bb.maxZ);
+                glVertex3d(bb.minX, bb.minY, bb.minZ);
+
+                // Top
+                glVertex3d(bb.minX, bb.maxY, bb.minZ);
+                glVertex3d(bb.maxX, bb.maxY, bb.minZ);
+                glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
+                glVertex3d(bb.minX, bb.maxY, bb.maxZ);
+                glVertex3d(bb.minX, bb.maxY, bb.minZ);
+            }
+            glEnd();
+
+            glBegin(GL_LINES);
+            {
+                glVertex3d(bb.maxX, bb.minY, bb.minZ);
+                glVertex3d(bb.maxX, bb.maxY, bb.minZ);
+
+                glVertex3d(bb.maxX, bb.minY, bb.maxZ);
+                glVertex3d(bb.maxX, bb.maxY, bb.maxZ);
+
+                glVertex3d(bb.minX, bb.minY, bb.maxZ);
+                glVertex3d(bb.minX, bb.maxY, bb.maxZ);
+            }
+            glEnd();
+
+            glDisable(GL_LINE_SMOOTH);
+            glHint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
+        }
     }
 
     private static void translateRotate(Entity entity) {

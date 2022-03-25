@@ -3,6 +3,7 @@
 package cn.loli.client.module;
 
 import cn.loli.client.Main;
+import cn.loli.client.module.modules.combat.TargetStrafe;
 import cn.loli.client.module.modules.misc.HUD;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
@@ -26,6 +27,7 @@ public abstract class Module {
     protected final static RotationUtils rotationUtils = RotationUtils.getInstance();
     protected final static InventoryUtil inventoryUtil = InventoryUtil.getInstance();
     protected final static MoveUtils moveUtils = MoveUtils.getInstance();
+    protected static TargetStrafe targetStrafeInstance;
 
     private final String name;
     private final String description;

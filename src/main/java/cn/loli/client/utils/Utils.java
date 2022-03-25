@@ -292,11 +292,11 @@ public class Utils {
                 rotationVec.zCoord * reach);
     }
 
-    protected float calculateYawFromSrcToDst(final float yaw,
-                                                 final double srcX,
-                                                 final double srcZ,
-                                                 final double dstX,
-                                                 final double dstZ) {
+    public float calculateYawFromSrcToDst(final float yaw,
+                                          final double srcX,
+                                          final double srcZ,
+                                          final double dstX,
+                                          final double dstZ) {
         final double xDist = dstX - srcX;
         final double zDist = dstZ - srcZ;
         final float var1 = (float) (StrictMath.atan2(zDist, xDist) * 180.0 / Math.PI) - 90.0F;
