@@ -8,7 +8,6 @@ import cn.loli.client.injection.implementations.IEntityPlayer;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.misc.AntiBot;
-import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.BooleanValue;
@@ -64,7 +63,9 @@ public class Aura extends Module {
     private final BooleanValue multi = new BooleanValue("Multi", false);
 
     private final ModeValue mode = new ModeValue("Priority", "Angle", "Armor", "Range", "Fov", "Angle", "Health", "Hurt Time");
-    private final ModeValue blockMode = new ModeValue("Block Mode", "Hypixel", "Hypixel", "Always", "Legit", "Vanilla", "NCP", "Semi-Vanilla");
+
+    public static final NumberValue<Integer> unBlockTweak = new NumberValue<>("UnBlock Tweak", 0, 0, 100);
+    private final ModeValue blockMode = new ModeValue("Block Mode", "Hypixel", "Hypixel", "Always", "Legit", "Vanilla", "NCP", "Semi-Vanilla", "Semi-Switch", "Switch");
     private final ModeValue esp = new ModeValue("Target ESP", "Box", "Box", "2D", "Icarus");
 
     private final BooleanValue autoBlock = new BooleanValue("AutoBlock", true);
@@ -106,8 +107,9 @@ public class Aura extends Module {
 
     public EntityLivingBase target;
 
-    private final TimeHelper attacktimer = new TimeHelper();
+    private final TimeHelper attackTimer = new TimeHelper();
     private final TimeHelper switchTimer = new TimeHelper();
+    private final TimeHelper unblockTimer = new TimeHelper();
 
     public static ArrayList<Entity> entities = new ArrayList<>();
     public static List<EntityLivingBase> targets = new ArrayList<>();
@@ -156,9 +158,9 @@ public class Aura extends Module {
          *  CPS 运算
          */
         if (target != null && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() &&
-                attacktimer.hasReached(randomClickDelay(Math.min(minCps.getObject(), maxCps.getObject()), Math.max(minCps.getObject(), maxCps.getObject())))) {
+                attackTimer.hasReached(randomClickDelay(Math.min(minCps.getObject(), maxCps.getObject()), Math.max(minCps.getObject(), maxCps.getObject())))) {
             cps++;
-            attacktimer.reset();
+            attackTimer.reset();
         }
 
         /*
@@ -333,6 +335,10 @@ public class Aura extends Module {
 
     private void handleAutoBlock(boolean unblock) {
         if (unblock) {
+            if (!unblockTimer.hasReached(unBlockTweak.getObject())) return;
+
+            unblockTimer.reset();
+
             if (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() && isBlocking) {
                 ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
@@ -346,6 +352,8 @@ public class Aura extends Module {
                         ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
                         break;
                     case "legit":
+                    case "semi-switch":
+                    case "switch":
                         isBlocking = false;
                         break;
                     case "ncp":
@@ -374,6 +382,17 @@ public class Aura extends Module {
                     case "vanilla":
                     case "semi-vanilla":
                         mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem());
+                        break;
+                    case "semi-switch":
+                        mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                        break;
+                    case "switch":
+                        final int curSlot = mc.thePlayer.inventory.currentItem;
+                        final int spoof = curSlot == 0 ? 1 : -1;
+                        mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot + spoof));
+                        mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot));
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                         break;
                 }
                 isBlocking = true;
