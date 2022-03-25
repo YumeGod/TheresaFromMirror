@@ -18,7 +18,7 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 
 public class NoSlowDown extends Module {
-    private final ModeValue mode = new ModeValue("Mode","Vanilla","Vanilla","Packet","Semi-Packet");
+    private final ModeValue mode = new ModeValue("Mode","Packet","Vanilla" ,"Packet" ,"Tweak");
     private final BooleanValue itemswitch = new BooleanValue("New", false);
     private final BooleanValue onlyOnMove = new BooleanValue("Only on move", false);
 
@@ -39,7 +39,7 @@ public class NoSlowDown extends Module {
             case "Packet":
                 doPacketMode(event);
                 break;
-            case "Semi-Packet":
+            case "Tweak":
                 if (mc.thePlayer.ticksExisted % 2 != 0) return;
                 doPacketMode(event);
             case "Vanilla":
