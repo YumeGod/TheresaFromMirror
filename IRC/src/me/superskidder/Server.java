@@ -5,6 +5,8 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -70,11 +72,11 @@ public class Server {
                 ServerBootstrap bootstrap = new ServerBootstrap();
                 bootstrap.group(bossGroup, workerGroup).channel(NioServerSocketChannel.class)
                         .option(ChannelOption.SO_BACKLOG, 128)
-                        .option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(65535))
                         .childOption(ChannelOption.SO_KEEPALIVE, true)
                         .childHandler(new ChannelInitializer<SocketChannel>() {
                             @Override
                             protected void initChannel(SocketChannel socketChannel) throws Exception {
+                                socketChannel.pipeline().addLast(new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
                                 socketChannel.pipeline().addLast(new StringEncoder(Charset.forName("GBK")));
                                 socketChannel.pipeline().addLast(new StringDecoder(StandardCharsets.UTF_8));
                                 socketChannel.pipeline().addLast(new IdleStateHandler(10, 20, 25, TimeUnit.SECONDS));

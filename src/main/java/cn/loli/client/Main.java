@@ -30,6 +30,8 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import net.minecraft.client.Minecraft;
@@ -299,12 +301,12 @@ public class Main {
                         .handler(new ChannelInitializer<SocketChannel>() {
                             @Override
                             protected void initChannel(SocketChannel socketChannel) {
+                                socketChannel.pipeline().addLast(new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
                                 socketChannel.pipeline().addLast(new StringEncoder(StandardCharsets.UTF_8));
                                 socketChannel.pipeline().addLast(new StringDecoder(Charset.forName("GBK")));
                                 socketChannel.pipeline().addLast(new NettyClientHandler());
                             }
-                        }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(65535));
-                ;
+                        }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator( 2048));
                 cf = bootstrap.connect("my.nigger.party", 9822).sync();
                 println("Client started!");
                 cf.channel().closeFuture().sync();
