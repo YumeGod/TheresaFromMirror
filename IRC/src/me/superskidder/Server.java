@@ -55,13 +55,6 @@ public class Server {
 
         //Split args and for smh
         port = Integer.parseInt(args[0]);
-        db = args[1];
-        db_userName = args[2];
-        db_password = args[3];
-        String[] rs = args[4].split(";");
-        for (String r : rs) {
-            ranks.put(r.split(",")[0], r.split(",")[1]);
-        }
 
         //Start Server Thread
 
