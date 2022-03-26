@@ -71,7 +71,6 @@ public class Server {
                             protected void initChannel(SocketChannel socketChannel) throws Exception {
                                 socketChannel.pipeline().addLast(new StringEncoder(Charset.forName("GBK")));
                                 socketChannel.pipeline().addLast(new StringDecoder(StandardCharsets.UTF_8));
-                                socketChannel.pipeline().addLast(new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
                                 socketChannel.pipeline().addLast(new IdleStateHandler(10, 20, 25, TimeUnit.SECONDS));
                                 socketChannel.pipeline().addLast(new NettyServerHandler());
                             }

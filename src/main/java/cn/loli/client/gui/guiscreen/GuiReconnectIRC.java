@@ -28,9 +28,10 @@ public class GuiReconnectIRC extends GuiScreen {
     @Override
     public void initGui() {
         super.initGui();
-        proxys.add(new ProxyEntry("JP", "jp1.nigger.party"));
-        proxys.add(new ProxyEntry("CN", "cn1.nigger.party"));
+        proxys.add(new ProxyEntry("JP", "jp1.nigger.party", "103.170.233.101"));
+        proxys.add(new ProxyEntry("HK", "cn1.nigger.party"));
         proxys.add(new ProxyEntry("US", "us1.nigger.party", "us2.nigger.party"));
+        proxys.add(new ProxyEntry("Russia", "185.22.152.2", "46.29.161.218"));
     }
 
     @Override
@@ -39,8 +40,8 @@ public class GuiReconnectIRC extends GuiScreen {
         ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
         RenderUtils.drawRoundedRect(0, 0, scaledResolution.getScaledWidth(), scaledResolution.getScaledHeight(), 2, new Color(240, 240, 240).getRGB());
         Main.INSTANCE.fontLoaders.fonts.get("roboto23").drawString("Your Connection has been lost.Please reconnect!", scaledResolution.getScaledWidth() / 2f - Main.INSTANCE.fontLoaders.fonts.get("roboto23").getStringWidth("Your Connection has been lost.Please reconnect!") / 2f, 30, new Color(79, 129, 255).getRGB());
-        int width = scaledResolution.getScaledWidth() / 4;
-        int x1 = width / 4;
+        int width = scaledResolution.getScaledWidth() / 5;
+        int x1 = width / 5;
         for (ProxyEntry proxy : proxys) {
             String name = proxy.name;
             RenderUtils.drawRect(x1, 50, x1 + width, scaledResolution.getScaledHeight() - 20, new Color(255, 255, 255).getRGB());
@@ -68,15 +69,11 @@ public class GuiReconnectIRC extends GuiScreen {
                 }
                 by++;
             }
-            RenderUtils.drawImage(new ResourceLocation("theresa/icons/" + name + ".png"), x1 + width / 2 - 32, 100, 64, 64);
-            x1 += width + width / 4;
+            RenderUtils.drawImage(new ResourceLocation("theresa/icons/" + name.toLowerCase() + ".png"), x1 + width / 2f - 32, 100, 64, 64);
+            x1 += width + width / 5;
         }
     }
 
-    //TODO : USE DNS TO SOLVE THE IP SOURCE
-    public String getIP(String name) {
-        return "";
-    }
 
     public static boolean isHovered(float x, float y, float x2, float y2, int mouseX, int mouseY) {
         return mouseX >= x && mouseX <= x2 && mouseY >= y && mouseY <= y2;

@@ -303,7 +303,6 @@ public class Main {
                             protected void initChannel(SocketChannel socketChannel) {
                                 socketChannel.pipeline().addLast(new StringEncoder(StandardCharsets.UTF_8));
                                 socketChannel.pipeline().addLast(new StringDecoder(Charset.forName("GBK")));
-                                socketChannel.pipeline().addLast(new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
                                 socketChannel.pipeline().addLast(new NettyClientHandler());
                             }
                         }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator( 2048));

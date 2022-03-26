@@ -3,7 +3,9 @@ package theresa;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatLightLaf;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -11,7 +13,6 @@ import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import sun.misc.Unsafe;
 import theresa.connection.NettyClientHandler;
 import theresa.connection.Timer;
@@ -19,8 +20,6 @@ import theresa.protection.RSAUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.DataInputStream;
@@ -33,7 +32,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.AbstractMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -95,8 +93,8 @@ public class Main {
         }).start();
     }
 
-    public String getip(String name){
-        switch (name){
+    public String getip(String name) {
+        switch (name) {
             case "Japan-1":
                 return "jp1.nigger.party";
             case "HK-2":
@@ -105,6 +103,12 @@ public class Main {
                 return "us1.nigger.party";
             case "US-2":
                 return "us2.nigger.party";
+            case "Japan-2":
+                return "103.170.233.101";
+            case "Russia-1":
+                return "185.22.152.2";
+            case "Russia-2":
+                return "46.29.161.218";
         }
         return "my.nigger.party";
     }
@@ -113,6 +117,7 @@ public class Main {
         private static final long serialVersionUID = 1L;
         public JLabel head;
         public JComboBox<String> jcb1;
+
         public void init() {
             FlatLightLaf.setup();
             setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -133,9 +138,13 @@ public class Main {
             jcb1 = new JComboBox<>();
             jcb1.setBounds(100, 100, 150, 30);
             jcb1.addItem("Japan-1");
+            jcb1.addItem("Japan-2");
             jcb1.addItem("HK-1");
-            jcb1.addItem("US-2");
             jcb1.addItem("US-1");
+            jcb1.addItem("US-2");
+            jcb1.addItem("Russia-1");
+            jcb1.addItem("Russia-2");
+
             cp.add(jcb1);
             cp.add(jl1);
 
@@ -180,6 +189,7 @@ public class Main {
                 // Hide all the components
                 head.setVisible(false);
                 jl.setVisible(false);
+                jcb1.setVisible(false);
                 name.setVisible(false);
                 jl2.setVisible(false);
                 password.setVisible(false);
@@ -226,7 +236,7 @@ public class Main {
             addWindowListener(new WindowAdapter() {
 
                 public void windowClosing(WindowEvent e) {
-                  Main.INSTANCE.doCrash();
+                    Main.INSTANCE.doCrash();
                 }
 
             });
