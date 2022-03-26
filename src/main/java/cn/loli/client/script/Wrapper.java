@@ -1,9 +1,12 @@
 package cn.loli.client.script;
 
 import cn.loli.client.Main;
+import cn.loli.client.events.PlayerMoveEvent;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
+import cn.loli.client.module.modules.combat.TargetStrafe;
 import cn.loli.client.script.java.sfontmanager.SFontLoader;
+import cn.loli.client.utils.player.movement.MoveUtils;
 import cn.loli.client.utils.player.rotation.RotationHook;
 import cn.loli.client.value.Value;
 import net.minecraft.client.Minecraft;
@@ -139,4 +142,8 @@ public class Wrapper {
                         name.equalsIgnoreCase(mod.getName()) || name.equals(mod.getName())).findFirst().orElse(null)).animY = value;
     }
 
+    //Set Speed with TargetStrafe Enable
+    public void setMotion(PlayerMoveEvent event, float speed) {
+        MoveUtils.getInstance().setSpeed(Minecraft.getMinecraft().thePlayer, event, Main.INSTANCE.moduleManager.getModule(TargetStrafe.class), speed);
+    }
 }
