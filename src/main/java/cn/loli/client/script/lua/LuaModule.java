@@ -120,6 +120,15 @@ public class LuaModule extends Module {
         invoke("on_jump");
     }
 
+    @EventTarget
+    private void onEmote(EmoteEvent event) {
+        invoke("on_emote");
+    }
+
+    @EventTarget
+    private void onAnimation(AnimationEvent event) {
+        invoke("on_animation");
+    }
 
     @Override
     public void onDisable() {
