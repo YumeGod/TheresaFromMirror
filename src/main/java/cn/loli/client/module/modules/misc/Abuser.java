@@ -10,6 +10,7 @@ import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.player.NoRotate;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.value.BooleanValue;
+import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.client.gui.GuiDownloadTerrain;
@@ -30,15 +31,16 @@ import java.util.List;
 
 public class Abuser extends Module {
 
-    private final BooleanValue fly = new BooleanValue("Fly Bypass", false);
-    private final BooleanValue range = new BooleanValue("Reach Bypass", false);
-    private final BooleanValue ncp = new BooleanValue("NCP Flag", false);
-    private final BooleanValue redesky = new BooleanValue("Rede Sky", false);
+    private final BooleanValue fly = new BooleanValue("OldVerus-Fly-Bypass", false);
+    private final BooleanValue range = new BooleanValue("Simple-Reach-Bypass", false);
+    private final BooleanValue ncp = new BooleanValue("NCP-Timer-Flag", false);
+    private final BooleanValue redesky = new BooleanValue("Rede-Sky-Semi", false);
     private final BooleanValue hypixel = new BooleanValue("Hypixel-Semi", false);
     private final BooleanValue packetChoke = new BooleanValue("Hypixel-Obfuscation", false);
     private final BooleanValue packetBrust = new BooleanValue("Brust", false);
     private final BooleanValue lesspacket = new BooleanValue("Less-Packet", false);
     private final BooleanValue packetDormant = new BooleanValue("Position-Dormant", false);
+    private static final NumberValue<Integer> collectTimer = new NumberValue<>("Dormant-Collect-Timer", 10, 1, 30);
 
     public boolean hasDisable;
     public double x, y, z;
@@ -171,7 +173,7 @@ public class Abuser extends Module {
                     if (!choke.hasReached(1000)) return;
                     dormant.add(event.getPacket());
                     event.setCancelled(true);
-                    if (choke.hasReached(2000)) choke.reset();
+                    if (choke.hasReached(1000 + collectTimer.getObject().longValue() * 100)) choke.reset();
                 }
             }
 
