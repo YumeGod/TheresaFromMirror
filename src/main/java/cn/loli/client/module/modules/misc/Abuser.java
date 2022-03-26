@@ -45,6 +45,7 @@ public class Abuser extends Module {
     public TimeHelper timer = new TimeHelper();
     private final TimeHelper brust = new TimeHelper();
     private final TimeHelper dormantTimer = new TimeHelper();
+    private final TimeHelper choke = new TimeHelper();
     private final ArrayList<Packet<INetHandlerPlayClient>> packets = new ArrayList<>();
     private final List<Packet<?>> dormant = new ArrayList<>();
     long delay = 150;
@@ -166,8 +167,10 @@ public class Abuser extends Module {
                         event.setCancelled(true);
 
                 if (!event.isCancelled() && packetDormant.getObject() && mc.thePlayer.ticksExisted > 32) {
+                    if (!choke.hasReached(1000)) return;
                     dormant.add(event.getPacket());
                     event.setCancelled(true);
+                    if (choke.hasReached(1800)) choke.reset();
                 }
             }
 
