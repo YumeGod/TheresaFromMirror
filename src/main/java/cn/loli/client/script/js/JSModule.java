@@ -4,12 +4,10 @@ import cn.loli.client.Main;
 import cn.loli.client.events.*;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
 
 import javax.script.Invocable;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,6 +118,15 @@ public class JSModule extends Module {
         invoke("on_jump", event);
     }
 
+    @EventTarget
+    private void onEmote(EmoteEvent event) {
+        invoke("on_emote", event);
+    }
+
+    @EventTarget
+    private void onAnimation(AnimationEvent event) {
+        invoke("on_animation", event);
+    }
 
     @Override
     public void onDisable() {
