@@ -2,16 +2,14 @@
 
 package cn.loli.client.script.java.subvalue;
 
-import cn.loli.client.value.Value;
-import com.google.gson.JsonElement;
+import cn.loli.client.value.ModeValue;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Predicate;
 
 
-public class ModeSubValue extends Value<Integer> {
+public class ModeSubValue extends ModeValue {
     private final String[] modes;
     public boolean open;
 
@@ -20,11 +18,10 @@ public class ModeSubValue extends Value<Integer> {
     }
 
     public ModeSubValue(String name, String defaultVal, Predicate<Integer> validator, String... modes) {
-        super(name, 0, validator);
+        super(name, defaultVal, validator, modes);
         this.modes = modes;
-
-        setObject(defaultVal);
     }
+
 
     public String getCurrentMode() {
         return getModes()[getObject()];
@@ -34,19 +31,6 @@ public class ModeSubValue extends Value<Integer> {
         return modes;
     }
 
-    protected void setObject(String s) {
-        int object = -1;
-
-        for (int i = 0; i < modes.length; i++) {
-            String mode = modes[i];
-
-            if (mode.equalsIgnoreCase(s)) object = i;
-        }
-
-        if (object == -1) throw new IllegalArgumentException("Value '" + object + "' wasn't found");
-
-        setObjectWithoutCallback(object);
-    }
 
     @Override
     public boolean setObject(Integer object) {
@@ -56,31 +40,15 @@ public class ModeSubValue extends Value<Integer> {
         return super.setObject(object);
     }
 
-    @Override
     public boolean setObjectWithoutCallback(Integer object) {
-        if (object < 0 || modes.length <= object)
-            throw new IllegalArgumentException(object + " is not valid (max: " + (modes.length - 1) + ")");
-
         return super.setObjectWithoutCallback(object);
     }
 
-    @Override
     public void addToJsonObject(@NotNull JsonObject obj) {
-        obj.addProperty(getName(), getObject());
+        super.addToJsonObject(obj);
     }
 
-    @Override
     public void fromJsonObject(@NotNull JsonObject obj) {
-        if (obj.has(getName())) {
-            JsonElement element = obj.get(getName());
-
-            if (element instanceof JsonPrimitive && ((JsonPrimitive) element).isNumber()) {
-                setObject(element.getAsInt());
-            } else {
-                throw new IllegalArgumentException("Entry '" + getName() + "' is not valid");
-            }
-        } else {
-            throw new IllegalArgumentException("Object does not have '" + getName() + "'");
-        }
+        super.fromJsonObject(obj);
     }
 }

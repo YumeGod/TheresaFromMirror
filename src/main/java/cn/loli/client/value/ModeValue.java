@@ -32,7 +32,7 @@ public class ModeValue extends Value<Integer> {
         return modes;
     }
 
-    protected void setObject(String s) {
+    private void setObject(String s) {
         int object = -1;
 
         for (int i = 0; i < modes.length; i++) {

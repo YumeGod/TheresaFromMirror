@@ -8,7 +8,6 @@ import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.player.NoRotate;
-import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.value.BooleanValue;
 import com.darkmagician6.eventapi.EventTarget;
@@ -27,6 +26,7 @@ import net.minecraft.network.play.server.S32PacketConfirmTransaction;
 import net.minecraft.util.BlockPos;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Abuser extends Module {
 
@@ -38,13 +38,17 @@ public class Abuser extends Module {
     private final BooleanValue packetChoke = new BooleanValue("Hypixel-Obfuscation", false);
     private final BooleanValue packetBrust = new BooleanValue("Brust", false);
     private final BooleanValue lesspacket = new BooleanValue("Less-Packet", false);
+    private final BooleanValue packetDormant = new BooleanValue("Position-Dormant", false);
 
     public boolean hasDisable;
     public double x, y, z;
     public TimeHelper timer = new TimeHelper();
     private final TimeHelper brust = new TimeHelper();
+    private final TimeHelper dormantTimer = new TimeHelper();
     private final ArrayList<Packet<INetHandlerPlayClient>> packets = new ArrayList<>();
+    private final List<Packet<?>> dormant = new ArrayList<>();
     long delay = 150;
+    long dormantDelay = 200;
     int invalid = 0;
 
     public Abuser() {
@@ -156,10 +160,16 @@ public class Abuser extends Module {
             }
 
 
-            if (event.getPacket() instanceof C03PacketPlayer)
+            if (event.getPacket() instanceof C03PacketPlayer) {
                 if (lesspacket.getObject())
                     if (!((C03PacketPlayer) event.getPacket()).isMoving() && !((C03PacketPlayer) event.getPacket()).getRotating())
                         event.setCancelled(true);
+
+                if (!event.isCancelled() && packetDormant.getObject() && mc.thePlayer.ticksExisted > 32) {
+                    dormant.add(event.getPacket());
+                    event.setCancelled(true);
+                }
+            }
 
 
             if (event.getPacket() instanceof C03PacketPlayer.C06PacketPlayerPosLook) {
@@ -185,9 +195,17 @@ public class Abuser extends Module {
         if (packetBrust.getObject() || hypixel.getObject()) {
             if (!brust.hasReached(delay)) return;
             resetPackets(mc.getNetHandler());
-            if (delay > 450) delay = 200;
+            if (delay > 450) delay = 300;
             else delay += 25;
             brust.reset();
+        }
+
+        if (packetDormant.getObject()) {
+            if (!dormantTimer.hasReached(dormantDelay)) return;
+            dormantTimer.reset();
+            resetPacket();
+            if (dormantDelay > 450) dormantDelay = 200;
+            else dormantDelay += 25;
         }
     }
 
@@ -240,10 +258,10 @@ public class Abuser extends Module {
                         packets.get(0).processPacket(netHandler);
                         if (packets.get(0) instanceof S32PacketConfirmTransaction) {
                             if (packetChoke.getObject()) {
-                                if (invalid > 8) {
+                                if (invalid > 7) {
                                     mc.getNetHandler().getNetworkManager().sendPacket(new C0FPacketConfirmTransaction(1, ((S32PacketConfirmTransaction) packets.get(0)).getActionNumber(), true));
                                     invalid = 0;
-                                    delay = 100;
+                                    delay = 200;
                                 }
                                 invalid++;
                             }
@@ -252,6 +270,21 @@ public class Abuser extends Module {
                     } catch (Exception ignored) {
                     }
                     packets.remove(packets.get(0));
+                }
+            }
+        }
+    }
+
+    //Reset Packets
+    private void resetPacket() {
+        if (dormant.size() > 0) {
+            synchronized (dormant) {
+                while (dormant.size() != 0) {
+                    try {
+                        mc.getNetHandler().getNetworkManager().sendPacket(dormant.get(0), null);
+                    } catch (Exception ignored) {
+                    }
+                    dormant.remove(dormant.get(0));
                 }
             }
         }
