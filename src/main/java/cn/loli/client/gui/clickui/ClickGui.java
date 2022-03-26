@@ -245,7 +245,7 @@ public class ClickGui extends GuiScreen {
                                 valuesY += 8;
                             } else if (v instanceof ModeValue) {
                                 // Mode value
-                                HFontRenderer font = Main.INSTANCE.fontLoaders.get("roboto16");
+                                HFontRenderer font = Main.INSTANCE.fontLoaders.get("roboto17");
                                 float width2 = 0;
 
                                 for (String mode : ((ModeValue) v).getModes()) {

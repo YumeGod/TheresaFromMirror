@@ -5,10 +5,7 @@ import cn.loli.client.script.Wrapper;
 import cn.loli.client.utils.misc.ChatUtils;
 import net.minecraft.client.Minecraft;
 
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import javax.script.*;
 import java.util.function.Consumer;
 
 public class JSTransformer {
