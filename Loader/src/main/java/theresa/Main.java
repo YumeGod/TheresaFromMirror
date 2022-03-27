@@ -69,7 +69,13 @@ public class Main {
 
         try {
             ip = InetAddress.getByName(getip((String) Objects.requireNonNull(login.jcb1.getSelectedItem()))).getHostAddress();
+            Main.INSTANCE.println(ip);
             println("Resolved IP");
+            if (ip.startsWith("198.8")){
+                ip = "us1.nigger.party";
+                println("Resolved IP");
+
+            }
         } catch (UnknownHostException e) {
             println("Resolved Failed");
             doCrash();
