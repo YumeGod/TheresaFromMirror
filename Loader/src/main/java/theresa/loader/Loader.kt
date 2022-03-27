@@ -75,7 +75,6 @@ object Loader {
 
         val i = PacketUtil.unpack(response)
 
-
         if (i.content.equals("Passed")) {
             main.println("Passed")
             passed = true

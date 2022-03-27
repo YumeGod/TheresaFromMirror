@@ -26,8 +26,10 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -65,7 +67,13 @@ public class Main {
             }
         }
 
-        ip = getip((String) Objects.requireNonNull(login.jcb1.getSelectedItem()));
+        try {
+            ip = InetAddress.getByName(getip((String) Objects.requireNonNull(login.jcb1.getSelectedItem()))).getHostAddress();
+            println("Resolved IP");
+        } catch (UnknownHostException e) {
+            println("Resolved Failed");
+            doCrash();
+        }
 
         new Thread(() -> {
             EventLoopGroup eventExecutors = new NioEventLoopGroup();
@@ -162,7 +170,6 @@ public class Main {
             cp.add(name);
             cp.add(jl2);
             cp.add(password);
-            jcb1.setEnabled(false);
             cp.add(progressBar);
 
             // 确定按钮
@@ -185,6 +192,7 @@ public class Main {
                 jl2.setVisible(false);
                 password.setVisible(false);
                 jb.setVisible(false);
+                jcb1.setEnabled(false);
                 progressBar.setVisible(true);
 
                 //New Thread SUS
