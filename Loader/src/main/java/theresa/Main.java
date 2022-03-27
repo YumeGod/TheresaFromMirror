@@ -162,6 +162,7 @@ public class Main {
             cp.add(name);
             cp.add(jl2);
             cp.add(password);
+            jcb1.setEnabled(false);
             cp.add(progressBar);
 
             // 确定按钮
