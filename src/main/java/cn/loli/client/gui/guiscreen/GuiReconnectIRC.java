@@ -28,10 +28,10 @@ public class GuiReconnectIRC extends GuiScreen {
     @Override
     public void initGui() {
         super.initGui();
-        proxys.add(new ProxyEntry("JP", "jp1.nigger.party", "103.170.233.101"));
-        proxys.add(new ProxyEntry("HK", "cn1.nigger.party" , "194.104.147.10"));
-        proxys.add(new ProxyEntry("US", "us1.nigger.party", "us2.nigger.party" , "209.209.57.142"));
-        proxys.add(new ProxyEntry("Russia", "185.22.152.2", "46.29.161.218" , "45.142.246.156"));
+        proxys.add(new ProxyEntry("JP", "jp1.nigger.party", "jp2.nigger.party"));
+        proxys.add(new ProxyEntry("HK", "hk1.nigger.party" , "hk2.nigger.party"));
+        proxys.add(new ProxyEntry("US", "us1.nigger.party", "us2.nigger.party" , "us3.nigger.party"));
+        proxys.add(new ProxyEntry("Russia", "ru1.nigger.party", "ru2.nigger.party" , "ru3.nigger.party"));
     }
 
     @Override

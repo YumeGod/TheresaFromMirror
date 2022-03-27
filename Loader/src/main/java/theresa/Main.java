@@ -9,8 +9,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
 import sun.misc.Unsafe;
@@ -94,27 +92,16 @@ public class Main {
 
     public String getip(String name) {
         switch (name) {
-            case "Japan-1":
-                return "jp1.nigger.party";
-            case "Japan-2":
-                return "103.170.233.101";
-            case "HK-1":
-                return "194.104.147.10";
-            case "HK-2":
-                return "cn1.nigger.party";
-            case "US-1":
-                return "us1.nigger.party";
-            case "US-2":
-                return "us2.nigger.party";
-            case "US-3":
-                return "209.209.57.142";
-            case "Russia-1":
-                return "185.22.152.2";
-            case "Russia-2":
-                return "46.29.161.218";
-            case "Russia-3":
-                return "45.142.246.156";
-
+            case "Auto":
+                return "my.nigger.party";
+            case "Japan":
+                return "jp.nigger.party";
+            case "HongKong":
+                return "hk.nigger.party";
+            case "US":
+                return "us.nigger.party";
+            case "Russia":
+                return "ru.nigger.party";
         }
         return "my.nigger.party";
     }
@@ -143,16 +130,11 @@ public class Main {
             jl1.setBounds(30, 100, 200, 30);
             jcb1 = new JComboBox<>();
             jcb1.setBounds(100, 100, 150, 30);
-            jcb1.addItem("Japan-1");
-            jcb1.addItem("Japan-2");
-            jcb1.addItem("HK-1");
-            jcb1.addItem("HK-2");
-            jcb1.addItem("US-1");
-            jcb1.addItem("US-2");
-            jcb1.addItem("US-3");
-            jcb1.addItem("Russia-1");
-            jcb1.addItem("Russia-2");
-            jcb1.addItem("Russia-3");
+            jcb1.addItem("Auto");
+            jcb1.addItem("HongKong");
+            jcb1.addItem("US");
+            jcb1.addItem("Russia");
+            jcb1.addItem("Japan");
 
             cp.add(jcb1);
             cp.add(jl1);
