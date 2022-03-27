@@ -18,7 +18,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import sun.applet.Main;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -81,8 +80,10 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
         Packet p = unpack(o);
 
         //Check if the Packet Available
-        if (p == null)
-            throw new Exception("Packet is null");
+        if (p == null) {
+            System.out.println("Packet is null But it should not be");
+            return;
+        }
 
         // Get the Packet Info
         switch (p.type) {
