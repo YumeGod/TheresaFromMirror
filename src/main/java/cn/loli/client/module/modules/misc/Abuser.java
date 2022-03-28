@@ -171,10 +171,10 @@ public class Abuser extends Module {
 
             if (!event.isCancelled() && packetDormant.getObject() && mc.thePlayer.ticksExisted > 32) {
                 //Collect Packets for 1 second
-                if (!choke.hasReached(1000)) return;
+                if (!choke.hasReached(10000)) return;
                 dormant.add(event.getPacket());
                 event.setCancelled(true);
-                if (choke.hasReached(1000 + collectTimer.getObject().longValue() * 100)) choke.reset();
+                if (choke.hasReached(10000 + collectTimer.getObject().longValue() * 100)) choke.reset();
             }
         }
     }
