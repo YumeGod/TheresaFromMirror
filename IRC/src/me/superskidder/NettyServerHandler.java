@@ -40,7 +40,7 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
             IdleStateEvent ent = (IdleStateEvent) evt;
             if (ent.state() == IdleState.READER_IDLE) {
                 ctx.writeAndFlush(sdf.format(new Date()) + ": You have heart disease");
-                System.out.println("User" + ctx.channel().remoteAddress() + "Disconnected");
+                System.out.println("Remote Session -from " + ctx.channel().remoteAddress() + " disconnected due to timeout");
                 ctx.close();
             }
         }
@@ -81,7 +81,8 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
 
         //Check if the Packet Available
         if (p == null) {
-            System.out.println("Packet is null But it should not be");
+            System.out.println("Packet is null but it shouldn't be" + " -it from " + ctx.channel().remoteAddress());
+            System.out.println("Reason Should be" + "SSL Error or Packet is failed to decrypt");
             return;
         }
 
@@ -102,28 +103,30 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                 //Then send the Public Key to the Client
                 ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.PONG, RSAUtils.publicEncrypt(rsaKey.get("publicKey"), Server.INSTANCE.userAuth.get(p.user).getKeyPair().getPublic())).pack());
 
-                System.out.println("Successful for Handle");
+                System.out.println("Request for new KeyPair : " + p.user);
+                System.out.println("Status : " + "Connecting");
                 break;
             case LOGIN:
                 //Get the Info
                 String[] split = p.content.split("\\|");
 
-                System.out.println("Request for Login");
+                System.out.println("Request for Login : " + p.user);
+                System.out.println("Status : " + "Connecting");
 
                 if (split.length == 3) {
                     String url = "https://api.m0jang.org/auth.php?user=" + split[0] + "&pass=" + split[1] + "&hwid=" + split[2];
                     String result = getStatus(url);
 
                     if (result == null) {
-                        System.out.println("Authorize Failed");
+                        System.out.println("Status : " + "Login Session Authorize Failed" + " -for user " + p.user + " -it from " + ctx.channel().remoteAddress() + " -Reason : " + "Time out");
                         ctx.close();
                     } else {
                         if (!result.contains("success")) {
-                            System.out.println(split[0] + " Verify failed -> " + result);
+                            System.out.println("Status : " + "Login Session Authorize Failed" + " -for user " + p.user + " -it from " + ctx.channel().remoteAddress() + " -Reason : " + result);
                             ctx.close();
                         } else {
                             Server.INSTANCE.userAuth.giveAccess(ctx.channel(), p.user);
-                            System.out.println(split[0] + " Verify Successful");
+                            System.out.println("Status : " + "Login Session Authorize Successful" + " -for user " + p.user + " -it from " + ctx.channel().remoteAddress());
 
                             for (Channel i : Server.INSTANCE.userAuth.getChannelMap().keySet())
                                 if (i.isOpen() && Server.INSTANCE.userAuth.getName(i) != null)
@@ -131,14 +134,16 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                         }
                     }
                 } else {
-                    System.out.println("Illegal Request");
+                    System.out.println("Status : " + "Illegal Request" + " -for user " + p.user + " -it from " + ctx.channel().remoteAddress());
                     ctx.close();
                 }
 
                 break;
             case AUTHORIZE:
                 String[] strings = p.content.split("\\|");
-                System.out.println("Request for Authorize");
+
+                System.out.println("Request for Authorize : " + p.user);
+                System.out.println("Status : " + "Requesting");
 
                 if (strings.length == 3) {
                     String url = "https://api.m0jang.org/auth.php?user=" + strings[0] + "&pass=" + strings[1] + "&hwid=" + strings[2];
@@ -146,22 +151,22 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                     result = getStatus(url);
 
                     if (result == null) {
-                        System.out.println("Authorize Failed");
+                        System.out.println("Status : " + "Authorization Session Authorize Failed" + " -for user " + p.user + " -it from " + ctx.channel().remoteAddress() + " -Reason : " + "Time out");
                         ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.AUTHORIZE, "AuthFailed").pack());
                         ctx.close();
                     } else {
                         if (!result.contains("success")) {
-                            System.out.println("Dont Pass -> " + result);
+                            System.out.println("Status : " + "Authorization Session Authorize Failed" + " -for user " + p.user + " -it from " + ctx.channel().remoteAddress() + " -Reason : " + result);
                             ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.AUTHORIZE, "YouSuchANigger").pack());
                             ctx.close();
                         } else {
-                            System.out.println("Success to Authorize");
+                            System.out.println("Status : " + "Authorization Session Authorize Successful" + " -for user " + p.user + " -it from " + ctx.channel().remoteAddress());
                             ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.AUTHORIZE, p.user + p.user).pack());
                             ctx.close();
                         }
                     }
                 } else {
-                    System.out.println("Illegal Request");
+                    System.out.println("Status : " + "Illegal Request" + " -for user " + p.user + " -it from " + ctx.channel().remoteAddress());
                     ctx.writeAndFlush(new Packet(p.user, PacketUtil.Type.AUTHORIZE, "YouSuchABITCH").pack());
                     ctx.close();
                 }
@@ -190,16 +195,16 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
         Channel channel = ctx.channel();
-        System.out.println("Client " + channel.remoteAddress() + " connected");
-        channelGroup.writeAndFlush(sdf.format(new Date()) + ": Client " + ctx.channel().remoteAddress() + " joined IRC.");
+        System.out.println("Remote Session -from " + channel.remoteAddress() + " connected");
+        //   channelGroup.writeAndFlush(sdf.format(new Date()) + ": Client " + ctx.channel().remoteAddress() + " joined IRC.");
         channelGroup.add(channel);
     }
 
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
         Channel channel = ctx.channel();
-        System.out.println("Client " + channel.remoteAddress() + " removed");
-        channelGroup.writeAndFlush(sdf.format(new Date()) + ": Client " + ctx.channel().remoteAddress() + " exit IRC.");
+        System.out.println("Remote Session -from " + channel.remoteAddress() + " removed");
+        //   channelGroup.writeAndFlush(sdf.format(new Date()) + ": Client " + ctx.channel().remoteAddress() + " exit IRC.");
         Server.INSTANCE.userAuth.removeAccess(ctx.channel());
         channelGroup.remove(channel);
     }

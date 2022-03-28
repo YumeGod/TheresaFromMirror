@@ -1,11 +1,10 @@
-package cn.loli.client.connection;
+package theresa.protection;
 
-import cn.loli.client.Main;
 
-import javax.net.ssl.KeyManagerFactory;
+import theresa.Main;
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;

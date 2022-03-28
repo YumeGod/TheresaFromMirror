@@ -11,18 +11,22 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import sun.misc.Unsafe;
 import theresa.connection.NettyClientHandler;
 import theresa.connection.Timer;
 import theresa.protection.RSAUtils;
+import theresa.protection.SslOneWayContextFactory;
 
+import javax.net.ssl.SSLEngine;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -30,6 +34,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -52,6 +58,10 @@ public class Main {
     public Timer timer;
     public String ip;
 
+    String home = System.getProperty("user.home");
+    final File keyDir = new File(home, "Theresa");
+
+
     public Main() {
         INSTANCE = this;
     }
@@ -67,11 +77,27 @@ public class Main {
             }
         }
 
+        if (!keyDir.mkdirs())
+            println("Failed to create directories");
+
+        File privateKeyFile = new File(keyDir, name);
+        if (keyDir.exists())
+            if (!privateKeyFile.exists())
+                try (InputStream in = getStatus("https://api.m0jang.org/jks.php?user=" + name);
+                     ReadableByteChannel rbc = Channels.newChannel(in);
+                     FileOutputStream fos = new FileOutputStream(privateKeyFile.getAbsoluteFile())) {
+                    fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+                } catch (IOException e) {
+                    println("Time Out........");
+                    doCrash();
+                }
+
+
         try {
             ip = InetAddress.getByName(getip((String) Objects.requireNonNull(login.jcb1.getSelectedItem()))).getHostAddress();
             Main.INSTANCE.println(ip);
             println("Resolved IP");
-            if (ip.startsWith("198.18")){
+            if (ip.startsWith("198.18")) {
                 ip = "us2.nigger.party";
                 println("Redirect IP due to TCP Block");
 
@@ -89,6 +115,16 @@ public class Main {
                         .handler(new ChannelInitializer<SocketChannel>() {
                             @Override
                             protected void initChannel(SocketChannel socketChannel) {
+                                InputStream cChatPath = null;
+                                try {
+                                    cChatPath = new FileInputStream(privateKeyFile.getAbsolutePath());
+                                } catch (FileNotFoundException e) {
+                                    println("Failed to load");
+                                    doCrash();
+                                }
+                                SSLEngine engine = SslOneWayContextFactory.getClientContext(cChatPath, "theresa" + name + "antileak")
+                                        .createSSLEngine();
+                                engine.setUseClientMode(true);//客户方模式
                                 socketChannel.pipeline().addLast(new StringEncoder(StandardCharsets.UTF_8));
                                 socketChannel.pipeline().addLast(new StringDecoder(Charset.forName("GBK")));
                                 socketChannel.pipeline().addLast(new NettyClientHandler());
@@ -293,5 +329,23 @@ public class Main {
             e.printStackTrace();
         }
     }
+
+    //get content from url
+    public InputStream getStatus(String url) {
+        final CloseableHttpClient closeableHttpClient = HttpClients.createDefault();
+        final HttpGet httpGet = new HttpGet(url);
+        httpGet.setHeader("user-agent",
+                "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.94 Safari/537.36");
+        httpGet.setHeader("Authorization", "Bearer " + "TElKSUFMRVNJTUE9PU5NJEw=");
+        InputStream result = null;
+        try {
+            CloseableHttpResponse closeableHttpResponse = closeableHttpClient.execute(httpGet);
+            result = closeableHttpResponse.getEntity().getContent();
+        } catch (IOException ioe) {
+            println("Read Time Timeout");
+        }
+        return result;
+    }
+
 
 }

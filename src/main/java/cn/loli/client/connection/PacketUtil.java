@@ -13,7 +13,7 @@ public class PacketUtil {
         Packet i;
 
         try {
-            i = new Packet(user, Type.valueOf(strings[1].split("@SKID@")[0]), strings[1].split("@SKID@")[1]);
+            i = new Packet(user, Type.valueOf(strings[1].split("@THERESA1337@")[0]), strings[1].split("@THERESA1337@")[1]);
             return i;
         } catch (Exception e) {
             i = null;
@@ -21,7 +21,7 @@ public class PacketUtil {
 
         try {
             strings[1] = RSAUtils.privateDecrypt(strings[1], RSAUtils.getPrivateKey(Main.INSTANCE.privateKey));
-            i = new Packet(user, Type.valueOf(strings[1].split("@SKID@")[0]), strings[1].split("@SKID@")[1]);
+            i = new Packet(user, Type.valueOf(strings[1].split("@THERESA1337@")[0]), strings[1].split("@THERESA1337@")[1]);
         } catch (Exception ignored) {
         }
 

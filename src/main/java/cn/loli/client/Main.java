@@ -19,7 +19,6 @@ import cn.loli.client.protection.ProtectionThread;
 import cn.loli.client.script.ScriptLoader;
 import cn.loli.client.script.java.PluginsManager;
 import cn.loli.client.script.java.sfontmanager.SFontLoader;
-import cn.loli.client.utils.Utils;
 import cn.loli.client.utils.misc.ExploitFix;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.others.SoundFxPlayer;
@@ -49,10 +48,7 @@ import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
 import javax.net.ssl.SSLEngine;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -111,6 +107,9 @@ public class Main {
     public PluginsManager pluginsManager;
     public SFontLoader sFontLoader;
 
+    String home = System.getProperty("user.home");
+    File keyDir = new File(home, "Theresa");
+
     public Main() {
         INSTANCE = this;
         EventManager.register(this);
@@ -145,7 +144,6 @@ public class Main {
         scriptLoader.init();
 
         //instance loader
-
 
         //addCommands
         commandManager.addCommands();
@@ -297,6 +295,8 @@ public class Main {
 
     private void IRC() {
         doLogin();
+
+        File privateKeyFile = new File(keyDir, name);
         new Thread(() -> {
             EventLoopGroup eventExecutors = new NioEventLoopGroup();
             try {
@@ -305,8 +305,14 @@ public class Main {
                         .handler(new ChannelInitializer<SocketChannel>() {
                             @Override
                             protected void initChannel(SocketChannel socketChannel) {
-                                InputStream cChatPath = Utils.getFileFromResourceAsStream("theresa/key/" + "m0jang_client.jks");
-                                SSLEngine engine = SslOneWayContextFactory.getClientContext(cChatPath)
+                                InputStream cChatPath = null;
+                                try {
+                                    cChatPath = new FileInputStream(privateKeyFile.getAbsolutePath());
+                                } catch (FileNotFoundException e) {
+                                    println("Failed to load");
+                                    doCrash();
+                                }
+                                SSLEngine engine = SslOneWayContextFactory.getClientContext(cChatPath, "theresa" + name + "antileak")
                                         .createSSLEngine();
                                 engine.setUseClientMode(true);//客户方模式
                                 socketChannel.pipeline().addLast("ssl", new SslHandler(engine));

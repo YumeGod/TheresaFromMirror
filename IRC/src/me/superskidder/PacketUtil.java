@@ -15,7 +15,7 @@ public class PacketUtil {
 
         try {
             packet = new Packet(strings[0],
-                    Type.valueOf(strings[1].split("@SKID@")[0]), strings[1].split("@SKID@")[1]);
+                    Type.valueOf(strings[1].split("@THERESA1337@")[0]), strings[1].split("@THERESA1337@")[1]);
         } catch (Throwable e) {
             packet = null;
         }
@@ -24,7 +24,7 @@ public class PacketUtil {
             if (packet == null) {
                 RSAPrivateKey privateKey = Server.INSTANCE.userAuth.get(strings[0]).getKeyPair().getPrivate();
                 strings[1] = RSAUtils.privateDecrypt(strings[1], privateKey);
-                packet = new Packet(strings[0], Type.valueOf(strings[1].split("@SKID@")[0]), strings[1].split("@SKID@")[1]);
+                packet = new Packet(strings[0], Type.valueOf(strings[1].split("@THERESA1337@")[0]), strings[1].split("@THERESA1337@")[1]);
             }
         } catch (Throwable e) {
             e.printStackTrace();

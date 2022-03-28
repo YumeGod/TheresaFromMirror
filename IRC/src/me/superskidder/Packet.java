@@ -18,8 +18,8 @@ public class Packet {
         String packet = null;
 
         try {
-            packet = PacketUtil.Type.PONG.equals(type) ? user + "@NIGGA@" + type.name() + "@SKID@" + content: user + "@NIGGA@" +
-                    RSAUtils.publicEncrypt(type.name() + "@SKID@" + content, Server.INSTANCE.userAuth.get(user).getKeyPair().getPublic());
+            packet = PacketUtil.Type.PONG.equals(type) ? user + "@NIGGA@" + type.name() + "@THERESA1337@" + content: user + "@NIGGA@" +
+                    RSAUtils.publicEncrypt(type.name() + "@THERESA1337@" + content, Server.INSTANCE.userAuth.get(user).getKeyPair().getPublic());
         } catch (Exception e) {
             e.printStackTrace();
         }

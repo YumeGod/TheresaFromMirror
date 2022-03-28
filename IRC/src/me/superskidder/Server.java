@@ -16,7 +16,6 @@ import me.loader.Loader;
 import me.superskidder.utils.Handler;
 import me.superskidder.utils.SslOneWayContextFactory;
 
-import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +34,6 @@ public class Server {
     static Handler userAuth;
     static Loader loader;
 
-    static SSLContext SERVER_CONTEXT;
     private static final File keyDir = new File("Theresa", "Keys");
 
     public Server() {

@@ -19,11 +19,11 @@ public class Packet {
 
     public String pack() {
         if (!user.hasKey())
-            return user.getName() + "@NIGGA@" + type.name() + "@SKID@" + content;
+            return user.getName() + "@NIGGA@" + type.name() + "@THERESA1337@" + content;
 
         try {
             return user.getName() + "@NIGGA@" +
-                    RSAUtils.publicEncrypt(type.name() + "@SKID@" + content, RSAUtils.getPublicKey(Main.INSTANCE.publicKey));
+                    RSAUtils.publicEncrypt(type.name() + "@THERESA1337@" + content, RSAUtils.getPublicKey(Main.INSTANCE.publicKey));
         } catch (NoSuchAlgorithmException | InvalidKeySpecException ignored) {
         }
 
