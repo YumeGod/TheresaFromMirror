@@ -5,6 +5,7 @@ package cn.loli.client;
 import cn.loli.client.command.CommandManager;
 import cn.loli.client.connection.NettyClientHandler;
 import cn.loli.client.connection.RSAUtils;
+import cn.loli.client.connection.SslOneWayContextFactory;
 import cn.loli.client.events.LoopEvent;
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.events.TextEvent;
@@ -18,6 +19,7 @@ import cn.loli.client.protection.ProtectionThread;
 import cn.loli.client.script.ScriptLoader;
 import cn.loli.client.script.java.PluginsManager;
 import cn.loli.client.script.java.sfontmanager.SFontLoader;
+import cn.loli.client.utils.Utils;
 import cn.loli.client.utils.misc.ExploitFix;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.others.SoundFxPlayer;
@@ -30,10 +32,9 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.ssl.SslHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiDisconnected;
 import net.minecraft.client.gui.GuiScreen;
@@ -47,9 +48,11 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import sun.misc.Unsafe;
 
+import javax.net.ssl.SSLEngine;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -291,6 +294,7 @@ public class Main {
 
     public Bootstrap bootstrap;
 
+
     private void IRC() {
         doLogin();
         new Thread(() -> {
@@ -301,11 +305,16 @@ public class Main {
                         .handler(new ChannelInitializer<SocketChannel>() {
                             @Override
                             protected void initChannel(SocketChannel socketChannel) {
+                                InputStream cChatPath = Utils.getFileFromResourceAsStream("theresa/key/" + "m0jang_client.jks");
+                                SSLEngine engine = SslOneWayContextFactory.getClientContext(cChatPath)
+                                        .createSSLEngine();
+                                engine.setUseClientMode(true);//客户方模式
+                                socketChannel.pipeline().addLast("ssl", new SslHandler(engine));
                                 socketChannel.pipeline().addLast(new StringEncoder(StandardCharsets.UTF_8));
                                 socketChannel.pipeline().addLast(new StringDecoder(Charset.forName("GBK")));
                                 socketChannel.pipeline().addLast(new NettyClientHandler());
                             }
-                        }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator( 2048));
+                        }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(2048));
                 cf = bootstrap.connect("my.nigger.party", 9822).sync();
                 println("Client started!");
                 cf.channel().closeFuture().sync();

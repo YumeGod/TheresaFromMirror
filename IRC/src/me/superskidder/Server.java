@@ -1,39 +1,42 @@
 package me.superskidder;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import me.loader.Loader;
 import me.superskidder.utils.Handler;
+import me.superskidder.utils.SslOneWayContextFactory;
 
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
+
 
 public class Server {
     public static ChannelFuture cf;
     public static int port;
-    public static String db;
-    public static String db_userName;
-    public static String db_password;
-
-    public static Map<String, String> ranks = new HashMap<>();
 
     public static Server INSTANCE;
 
     static Handler userAuth;
     static Loader loader;
+
+    static SSLContext SERVER_CONTEXT;
+    private static final File keyDir = new File("Theresa", "Keys");
 
     public Server() {
         INSTANCE = this;
@@ -42,6 +45,9 @@ public class Server {
     public static void main(String[] args) {
         // 初始化Handle
         userAuth = new Handler();
+
+        if (!keyDir.exists() && !keyDir.mkdirs())
+            System.out.println("Failed to create key directory");
 
         new Thread(
                 () -> {
@@ -57,6 +63,7 @@ public class Server {
         port = Integer.parseInt(args[0]);
 
         //Start Server Thread
+        File certificate = new File(keyDir, "m0jang_org.jks");  // 证书
 
         Thread thread = new Thread(() -> {
             EventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -69,6 +76,10 @@ public class Server {
                         .childHandler(new ChannelInitializer<SocketChannel>() {
                             @Override
                             protected void initChannel(SocketChannel socketChannel) throws Exception {
+                                String sChatPath = certificate.getAbsolutePath();
+                                SSLEngine engine = SslOneWayContextFactory.getServerContext(sChatPath).createSSLEngine();
+                                engine.setUseClientMode(false);//设置为服务器模式
+                                socketChannel.pipeline().addLast("ssl", new SslHandler(engine));
                                 socketChannel.pipeline().addLast(new StringEncoder(Charset.forName("GBK")));
                                 socketChannel.pipeline().addLast(new StringDecoder(StandardCharsets.UTF_8));
                                 socketChannel.pipeline().addLast(new IdleStateHandler(10, 20, 25, TimeUnit.SECONDS));
