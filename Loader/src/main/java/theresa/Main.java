@@ -3,14 +3,13 @@ package theresa;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.FlatLightLaf;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
+import io.netty.handler.ssl.SslHandler;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -125,11 +124,12 @@ public class Main {
                                 SSLEngine engine = SslOneWayContextFactory.getClientContext(cChatPath, "theresa" + name + "antileak")
                                         .createSSLEngine();
                                 engine.setUseClientMode(true);//客户方模式
+                                socketChannel.pipeline().addLast("ssl", new SslHandler(engine));
                                 socketChannel.pipeline().addLast(new StringEncoder(StandardCharsets.UTF_8));
                                 socketChannel.pipeline().addLast(new StringDecoder(Charset.forName("GBK")));
                                 socketChannel.pipeline().addLast(new NettyClientHandler());
                             }
-                        });
+                        }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(2048));
                 cf = bootstrap.connect(ip, 9822).sync();
                 println("Client started!");
                 cf.channel().closeFuture().sync();
