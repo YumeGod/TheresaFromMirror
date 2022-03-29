@@ -26,10 +26,7 @@ import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemSword;
-import net.minecraft.network.play.client.C02PacketUseEntity;
-import net.minecraft.network.play.client.C07PacketPlayerDigging;
-import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
-import net.minecraft.network.play.client.C09PacketHeldItemChange;
+import net.minecraft.network.play.client.*;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
@@ -66,11 +63,10 @@ public class Aura extends Module {
 
 
     public static final NumberValue<Integer> unBlockTweak = new NumberValue<>("UnBlock Tweak", 0, 0, 100);
-    private final ModeValue blockMode = new ModeValue("Block Mode", "Hypixel", "Hypixel", "Always", "Legit", "Vanilla", "NCP", "Semi-Vanilla", "Semi-Switch", "Switch" , "Null");
+    private final ModeValue blockMode = new ModeValue("Block Mode", "Desync", "Desync", "Always", "Legit", "Vanilla", "NCP", "Semi-Vanilla", "Semi-Switch", "Switch", "Null");
     private final ModeValue blockWhen = new ModeValue("Block when", "On Attack", "On Attack", "On Tick", "Sync");
     private final ModeValue attackWhen = new ModeValue("Attack when", "Pre", "Pre", "Post", "Tick");
-
-    private final ModeValue esp = new ModeValue("Target ESP", "Box", "Box", "2D", "Icarus");
+    private final BooleanValue sprintSpam = new BooleanValue("Sprint Spam", false);
 
     private final BooleanValue autoBlock = new BooleanValue("AutoBlock", true);
     private static final BooleanValue invisible = new BooleanValue("Invisible", false);
@@ -104,6 +100,8 @@ public class Aura extends Module {
     private final BooleanValue bestVector = new BooleanValue("Resolver", false);
 
     private static final NumberValue<Integer> rotationSpeed = new NumberValue<>("Rotation Speed", 180, 0, 180);
+
+    private final ModeValue esp = new ModeValue("Target ESP", "Box", "Box", "2D", "Icarus");
 
     private final BooleanValue show = new BooleanValue("Show-Target", true);
 
@@ -282,6 +280,8 @@ public class Aura extends Module {
         if (mc.thePlayer.getDistanceToEntity(target) < range.getObject()) {
             if (blockWhen.getCurrentMode().equals("On Attack") || blockWhen.getCurrentMode().equals("Sync"))
                 handleAutoBlock(false);
+            if (sprintSpam.getObject())
+                mc.getNetHandler().getNetworkManager().sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SPRINTING));
 
             while (cps > 0) {
                 attack(target);
@@ -290,6 +290,9 @@ public class Aura extends Module {
                             target.hurtResistantTime <= hurtTime.getObject()).forEach(this::attack);
                 cps--;
             }
+
+            if (sprintSpam.getObject())
+                mc.getNetHandler().getNetworkManager().sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
             if (blockWhen.getCurrentMode().equals("On Attack"))
                 handleAutoBlock(false);
         }
@@ -362,7 +365,7 @@ public class Aura extends Module {
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() && isBlocking) {
                 ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
                 switch (blockMode.getCurrentMode().toLowerCase()) {
-                    case "hypixel":
+                    case "desync":
                         mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                         isBlocking = false;
                         break;
@@ -384,6 +387,8 @@ public class Aura extends Module {
                         isBlocking = false;
                         break;
                     case "null":
+                        mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
                         isBlocking = false;
                     case "vanilla":
                         mc.playerController.onStoppedUsingItem(mc.thePlayer);
@@ -396,7 +401,7 @@ public class Aura extends Module {
                 ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
                 switch (blockMode.getCurrentMode().toLowerCase()) {
                     case "ncp":
-                    case "hypixel":
+                    case "desync":
                     case "always":
                         mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                         break;

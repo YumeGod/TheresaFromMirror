@@ -25,6 +25,7 @@ public class Speed extends Module {
     private final NumberValue<Float> multiply = new NumberValue<>("Multiply", 1f, 1f, 2f);
     private final BooleanValue boost = new BooleanValue("Boost", true);
     private final BooleanValue clips = new BooleanValue("Clips", true);
+    private final BooleanValue ySpoof = new BooleanValue("Y Spoof", true);
 
     double distance;
     int stage;
@@ -165,8 +166,10 @@ public class Speed extends Module {
                     break;
                 }
             }
-        } else {
 
+            if (ySpoof.getObject())
+                if (mc.thePlayer.onGround)
+                    event.setY(event.getY() + 2.40201E-6D);
         }
 
 

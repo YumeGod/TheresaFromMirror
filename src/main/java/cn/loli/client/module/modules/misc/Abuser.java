@@ -42,6 +42,7 @@ public class Abuser extends Module {
     private final BooleanValue packetDormant = new BooleanValue("Position-Dormant", false);
     private final NumberValue<Integer> collectTimer = new NumberValue<>("Dormant-Collect-Timer", 10, 1, 30);
     private final NumberValue<Integer> dormantLatency = new NumberValue<>("Dormant-Collect-Latency", 4, 1, 20);
+    private final BooleanValue positionSpoof = new BooleanValue("Position-Spoof", false);
 
     public boolean hasDisable;
     public double x, y, z;
@@ -169,12 +170,27 @@ public class Abuser extends Module {
                 if (!((C03PacketPlayer) event.getPacket()).isMoving() && !((C03PacketPlayer) event.getPacket()).getRotating())
                     event.setCancelled(true);
 
-            if (!event.isCancelled() && packetDormant.getObject() && mc.thePlayer.ticksExisted > 32) {
-                //Collect Packets for 1 second
-                if (!choke.hasReached(10000)) return;
-                dormant.add(event.getPacket());
-                event.setCancelled(true);
-                if (choke.hasReached(10000 + collectTimer.getObject().longValue() * 100)) choke.reset();
+            if (!event.isCancelled()) {
+                if (packetDormant.getObject() && mc.thePlayer.ticksExisted > 32) {
+                    //Collect Packets for 1 second
+                    if (!choke.hasReached(10000)) return;
+
+                    if (!positionSpoof.getObject() || !(((C03PacketPlayer) event.getPacket()).isMoving() && ((C03PacketPlayer) event.getPacket()).getRotating()))
+                        dormant.add(event.getPacket());
+                    else
+                        dormant.add(new C03PacketPlayer.C04PacketPlayerPosition(x, y, z, ((C03PacketPlayer) event.getPacket()).isOnGround()));
+
+                    event.setCancelled(true);
+                    if (choke.hasReached(10000 + collectTimer.getObject().longValue() * 100)) choke.reset();
+                }
+
+                if (positionSpoof.getObject())
+                    if (((C03PacketPlayer) event.getPacket()).isMoving() && ((C03PacketPlayer) event.getPacket()).getRotating())
+                        if (!packetDormant.getObject()) {
+                            mc.getNetHandler().getNetworkManager().sendPacket
+                                    (new C03PacketPlayer.C04PacketPlayerPosition(x, y, z, ((C03PacketPlayer) event.getPacket()).isOnGround()), null);
+                            event.setCancelled(true);
+                        }
             }
         }
     }
@@ -200,7 +216,7 @@ public class Abuser extends Module {
             if (!dormantTimer.hasReached(dormantDelay)) return;
             dormantTimer.reset();
             resetPacket();
-            if (dormantDelay > dormantLatency.getObject() * 100) dormantDelay = 200;
+            if (dormantDelay > dormantLatency.getObject() * 100) dormantDelay = 50;
             else dormantDelay += 25;
         }
     }

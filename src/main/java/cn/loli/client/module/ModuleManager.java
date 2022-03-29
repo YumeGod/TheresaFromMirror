@@ -16,10 +16,7 @@ import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.EventTarget;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.*;
 
 public class ModuleManager {
     @NotNull
@@ -39,9 +36,9 @@ public class ModuleManager {
         addModule(new BowAimbot());
         addModule(new Criticals());
         addModule(new KeepSprint());
+        addModule(new TargetStrafe());
         addModule(new Range());
         addModule(new Velocity());
-        addModule(new TargetStrafe());
 
         //Movement
         addModule(new AntiFall());
@@ -62,6 +59,7 @@ public class ModuleManager {
         addModule(new ChestStealer());
         addModule(new DamnBridge());
         addModule(new InvCleaner());
+        addModule(new InventoryWalk());
         addModule(new MurderMystery());
         addModule(new NoFall());
         addModule(new NoRightClickDelay());
@@ -108,6 +106,7 @@ public class ModuleManager {
         addModule(new ClickGUIModule()); // Needs to be last
 
         // sort by alphabets
+        modules.removeIf(Objects::isNull);
         modules.sort((mod, mod1) -> {
             int char0 = mod.getName().charAt(0);
             int char1 = mod1.getName().charAt(0);
