@@ -3,10 +3,7 @@
 package cn.loli.client.injection.mixins;
 
 import cn.loli.client.Main;
-import cn.loli.client.events.MouseOverEvent;
-import cn.loli.client.events.Render3DEvent;
-import cn.loli.client.events.RenderEvent;
-import cn.loli.client.events.RenderWorldLastEvent;
+import cn.loli.client.events.*;
 import cn.loli.client.module.modules.combat.KeepSprint;
 import cn.loli.client.module.modules.render.NoFov;
 import cn.loli.client.module.modules.render.ViewClip;
@@ -15,13 +12,12 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.shader.ShaderGroup;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.util.*;
 import org.lwjgl.opengl.GL11;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -38,19 +34,14 @@ public abstract class MixinEntityRenderer {
     @Shadow
     private float fovModifierHand;
 
-    @Final
-    @Shadow
-    private int[] lightmapColors;
-
-    @Final
-    @Shadow
-    private DynamicTexture lightmapTexture;
-
-    @Shadow
-    private boolean lightmapUpdateNeeded;
-
     @Shadow
     private Entity pointedEntity;
+
+    @Shadow
+    private ShaderGroup theShaderGroup;
+
+    @Shadow
+    private boolean useShader;
 
     @Inject(method = "renderWorldPass", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/ForgeHooksClient;dispatchRenderLast(Lnet/minecraft/client/renderer/RenderGlobal;F)V"))
     private void onRenderWorldPass(int pass, float partialTicks, long finishTimeNano, CallbackInfo ci) {
@@ -81,16 +72,12 @@ public abstract class MixinEntityRenderer {
         }
     }
 
-    @Inject(method = "updateCameraAndRender", at = @At(value = "FIELD", target = "Lnet/minecraft/client/settings/GameSettings;smoothCamera:Z", shift = At.Shift.BEFORE))
-    private void onRotationHook(CallbackInfo callbackInfo) {
-   /*     RotationHook.prevYaw = RotationHook.yaw;
-        RotationHook.prevPitch = RotationHook.pitch;
-        final RotationEvent rotationEvent = new RotationEvent(Minecraft.getMinecraft().thePlayer.rotationYaw, Minecraft.getMinecraft().thePlayer.rotationPitch);
-        EventManager.call(rotationEvent);
-        RotationHook.yaw = rotationEvent.getYaw();
-        RotationHook.pitch = rotationEvent.getPitch();
-
-    */
+    @Inject(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/RenderGlobal;renderEntityOutlineFramebuffer()V", shift = At.Shift.AFTER))
+    private void onShader(CallbackInfo callbackInfo) {
+        ShaderEvent shaderEvent = new ShaderEvent(theShaderGroup, useShader);
+        EventManager.call(shaderEvent);
+        theShaderGroup = shaderEvent.getShader();
+        useShader = shaderEvent.isUseShader();
     }
 
     @ModifyVariable(method = {"orientCamera"}, ordinal = 3, at = @At(value = "STORE", ordinal = -1), require = 1)
