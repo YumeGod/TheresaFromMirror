@@ -382,11 +382,7 @@ public class Aura extends Module {
                         break;
                     case "legit":
                     case "semi-switch":
-                        isBlocking = false;
-                        break;
                     case "switch":
-                        final int spoof = curSlot == 0 ? 1 : -1;
-                        mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot + spoof));
                         isBlocking = false;
                         break;
                     case "ncp":
@@ -424,7 +420,9 @@ public class Aura extends Module {
                         mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(null));
                         break;
                     case "semi-switch":
+                        final int spoof = curSlot == 0 ? 1 : -1;
                         mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                        mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot + spoof));
                         mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                         break;
                     case "switch":
