@@ -314,7 +314,7 @@ public class Aura extends Module {
             entity = rotationUtils.rayCastedEntity(range.getObject(), curYaw, curPitch);
 
         if (entity != null) {
-            if (!durable.getCurrentMode().equals("Disable")) dura(durable.getCurrentMode().equals("Switch"));
+            if (!durable.getCurrentMode().equals("Disable")) handleDura(durable.getCurrentMode().equals("Switch"));
             if (crit.getState()) crit.onCrit(entity);
             mc.thePlayer.swingItem();
             mc.playerController.attackEntity(mc.thePlayer, entity);
@@ -435,8 +435,8 @@ public class Aura extends Module {
         }
     }
 
-    //handle the dura
-    private void dura(boolean isSwap) {
+    //handle the handleDura
+    private void handleDura(boolean isSwap) {
         final Slot held = mc.thePlayer.inventoryContainer.getSlotFromInventory(mc.thePlayer.inventory, mc.thePlayer.inventory.currentItem);
         if (isSwap)
             for (final Slot slot : mc.thePlayer.inventoryContainer.inventorySlots)
