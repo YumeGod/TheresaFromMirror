@@ -107,9 +107,6 @@ public class Main {
     public PluginsManager pluginsManager;
     public SFontLoader sFontLoader;
 
-    String home = System.getProperty("user.home");
-    File keyDir = new File(home, "Theresa");
-
     public Main() {
         INSTANCE = this;
         EventManager.register(this);
@@ -296,7 +293,6 @@ public class Main {
     private void IRC() {
         doLogin();
 
-        File privateKeyFile = new File(keyDir, name);
         new Thread(() -> {
             EventLoopGroup eventExecutors = new NioEventLoopGroup();
             try {
@@ -307,6 +303,9 @@ public class Main {
                             protected void initChannel(SocketChannel socketChannel) {
                                 InputStream cChatPath = null;
                                 try {
+                                    String home = System.getProperty("user.home");
+                                    File keyDir = new File(home, "Theresa");
+                                    File privateKeyFile = new File(keyDir, name);
                                     cChatPath = new FileInputStream(privateKeyFile.getAbsolutePath());
                                 } catch (FileNotFoundException e) {
                                     println("Failed to load");
@@ -355,6 +354,7 @@ public class Main {
         } catch (IOException e) {
             try {
                 socket.close();
+                doCrash();
             } catch (IOException ex) {
                 ex.printStackTrace();
             }

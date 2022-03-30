@@ -86,7 +86,7 @@ public class Criticals extends Module {
                     offset = new double[]{
                             ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396),
                             ThreadLocalRandom.current().nextDouble(.0172422909396, .0182422909396),
-                            ThreadLocalRandom.current().nextDouble(.0112422909396, .0122422909396)};
+                            ThreadLocalRandom.current().nextDouble(.00099158065143, .00109158065143)};
                     break;
                 case "Mini":
                     offset = new double[]{
@@ -98,75 +98,76 @@ public class Criticals extends Module {
                     offset = new double[]{
                             ThreadLocalRandom.current().nextDouble(.00117, .00126),
                             ThreadLocalRandom.current().nextDouble(-.0001, -.00009),
-                            ThreadLocalRandom.current().nextDouble(.00417, .00526),
+                            ThreadLocalRandom.current().nextDouble(.01032422909396, .01232422909396),
                     };
                     break;
                 case "Chill":
                     offset = new double[]{
                             ThreadLocalRandom.current().nextDouble(.0325, .0335),
-                            ThreadLocalRandom.current().nextDouble(.016, .018),
+                            ThreadLocalRandom.current().nextDouble(.00099158065143, .00109158065143),
                             ThreadLocalRandom.current().nextDouble(.0325, .0335),
-                            ThreadLocalRandom.current().nextDouble(.016, .018),
-                    };
-                    break;
-                case "Positive":
-                    offset = new double[]{
-                            ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396),
-                            ThreadLocalRandom.current().nextDouble(.00317, .00526),
-                            ThreadLocalRandom.current().nextDouble(.0009, .0015)
-                    };
-                    break;
-            }
+                            ThreadLocalRandom.current().nextDouble(.00099158065143, .00109158065143)};
+            break;
+            case "Positive":
+                offset = new double[]{
+                        ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396),
+                        ThreadLocalRandom.current().nextDouble(.00317, .00526),
+                        ThreadLocalRandom.current().nextDouble(-.0001, -.00009),
+                        ThreadLocalRandom.current().nextDouble(.00099158065143, .00099158065143)
+                };
+                break;
+        }
 
-            if ("Recall".equalsIgnoreCase(mode.getCurrentMode())) {
-                if (stage == 2) stage = 0;
-                if (counter == offset.length) counter = 0;
-                Speed speed = Main.INSTANCE.moduleManager.getModule(Speed.class);
-                Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
-                if (entity == null) return;
-                if (mc.thePlayer.onGround) {
-                    if (always.getObject() || entity.hurtResistantTime != 20)
-                        if (playerUtils.isMoving2()) {
-                            if (stage < 2) {
-                                if (speed.getState()) for (int i = 0; i < offset.length; i++) offset[i] = offset[i] * 1e-5;
-                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(), e.getY() + offset[counter], e.getZ(), false));
-                                counter++;
-                                e.setY(e.getY() + (offset[counter]));
-                                e.setOnGround(false);
-                                counter++;
-                                stage++;
-                            }
-                        } else {
-                            counter = 0;
-                        }
-                    else
-                        counter = 0;
-                }
-            }
-
-            if ("Edit".equals(mode.getCurrentMode())) {
-                if (counter == offset.length) counter = 0;
-                if (stage == 1) stage = 0;
-                Speed speed = Main.INSTANCE.moduleManager.getModule(Speed.class);
-                Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
-                if (entity == null) return;
-                if (mc.thePlayer.onGround) {
-                    if (always.getObject() || entity.hurtResistantTime != 20)
-                        if (playerUtils.isMoving2()) {
-                            if (counter == offset.length) {
-                                stage = 1;
-                                return;
-                            }
-                            if (speed.getState()) for (int i = 0; i < offset.length; i++) offset[i] = offset[i] * 1e-5;
+        if ("Recall".equalsIgnoreCase(mode.getCurrentMode())) {
+            if (stage == 2) stage = 0;
+            if (counter == offset.length) counter = 0;
+            Speed speed = Main.INSTANCE.moduleManager.getModule(Speed.class);
+            Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
+            if (entity == null) return;
+            if (mc.thePlayer.onGround) {
+                if (always.getObject() || entity.hurtResistantTime != 20)
+                    if (playerUtils.isMoving2()) {
+                        if (stage < 2) {
+                            if (speed.getState())
+                                for (int i = 0; i < offset.length; i++) offset[i] = offset[i] * 1e-5;
+                            mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(e.getX(), e.getY() + offset[counter], e.getZ(), false));
+                            counter++;
                             e.setY(e.getY() + (offset[counter]));
                             e.setOnGround(false);
                             counter++;
+                            stage++;
                         }
-                }
+                    } else {
+                        counter = 0;
+                    }
+                else
+                    counter = 0;
             }
         }
 
+        if ("Edit".equals(mode.getCurrentMode())) {
+            if (counter == offset.length) counter = 0;
+            if (stage == 1) stage = 0;
+            Speed speed = Main.INSTANCE.moduleManager.getModule(Speed.class);
+            Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
+            if (entity == null) return;
+            if (mc.thePlayer.onGround) {
+                if (always.getObject() || entity.hurtResistantTime != 20)
+                    if (playerUtils.isMoving2()) {
+                        if (counter == offset.length) {
+                            stage = 1;
+                            return;
+                        }
+                        if (speed.getState()) for (int i = 0; i < offset.length; i++) offset[i] = offset[i] * 1e-5;
+                        e.setY(e.getY() + (offset[counter]));
+                        e.setOnGround(false);
+                        counter++;
+                    }
+            }
+        }
     }
+
+}
 }
 
 
