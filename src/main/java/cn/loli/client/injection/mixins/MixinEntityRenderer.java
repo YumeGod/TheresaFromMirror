@@ -90,6 +90,26 @@ public abstract class MixinEntityRenderer {
         return (Main.INSTANCE.moduleManager.getModule(ViewClip.class).getState() && Main.INSTANCE.moduleManager.getModule(ViewClip.class).extend.getObject()) ? Main.INSTANCE.moduleManager.getModule(ViewClip.class).dis.getObject() : (Main.INSTANCE.moduleManager.getModule(ViewClip.class).getState() && !Main.INSTANCE.moduleManager.getModule(ViewClip.class).extend.getObject()) ? 4.0 : value;
     }
 
+    @Inject(method = "orientCamera", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getRenderViewEntity()Lnet/minecraft/entity/Entity;", ordinal = 0, shift = At.Shift.AFTER), cancellable = true)
+    private void onOrientCamera(float partialTicks, CallbackInfo ci) {
+        CameraEvent event = new CameraEvent
+                (Minecraft.getMinecraft().getRenderViewEntity().posX, Minecraft.getMinecraft().getRenderViewEntity().posY, Minecraft.getMinecraft().getRenderViewEntity().posZ,
+                        Minecraft.getMinecraft().getRenderViewEntity().prevPosX, Minecraft.getMinecraft().getRenderViewEntity().prevPosY, Minecraft.getMinecraft().getRenderViewEntity().prevPosZ,
+                        Minecraft.getMinecraft().getRenderViewEntity().rotationYaw, Minecraft.getMinecraft().getRenderViewEntity().rotationPitch, Minecraft.getMinecraft().getRenderViewEntity().prevRotationYaw, Minecraft.getMinecraft().getRenderViewEntity().prevRotationPitch);
+
+        EventManager.call(event);
+        Minecraft.getMinecraft().getRenderViewEntity().rotationYaw = event.getYaw();
+        Minecraft.getMinecraft().getRenderViewEntity().rotationPitch = event.getPitch();
+        Minecraft.getMinecraft().getRenderViewEntity().prevRotationYaw = event.getPrevYaw();
+        Minecraft.getMinecraft().getRenderViewEntity().prevRotationPitch = event.getPrevPitch();
+        Minecraft.getMinecraft().getRenderViewEntity().posX = event.getPosX();
+        Minecraft.getMinecraft().getRenderViewEntity().posY = event.getPosY();
+        Minecraft.getMinecraft().getRenderViewEntity().posZ = event.getPosZ();
+        Minecraft.getMinecraft().getRenderViewEntity().prevPosX = event.getPrevPosX();
+        Minecraft.getMinecraft().getRenderViewEntity().prevPosY = event.getPrevPosY();
+        Minecraft.getMinecraft().getRenderViewEntity().prevPosZ = event.getPrevPosZ();
+    }
+
     /**
      * @author ASOUL!
      */

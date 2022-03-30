@@ -74,6 +74,7 @@ public class ModuleManager {
 
         //Render
         addModule(new BlockHit());
+      //  addModule(new CamaraDebug());
         addModule(new FullBright());
         addModule(new ItemESP());
         addModule(new ItemRenderer());
