@@ -25,7 +25,6 @@ import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.*;
 import net.minecraft.util.BlockPos;
@@ -437,16 +436,11 @@ public class Aura extends Module {
 
     //handle the handleDura
     private void handleDura(boolean isSwap) {
-        final Slot held = mc.thePlayer.inventoryContainer.getSlotFromInventory(mc.thePlayer.inventory, mc.thePlayer.inventory.currentItem);
-        if (isSwap)
-            for (final Slot slot : mc.thePlayer.inventoryContainer.inventorySlots)
-                if (!slot.getHasStack() && slot.slotNumber != held.slotNumber && slot.slotNumber > 8) {
-                    mc.getNetHandler().getNetworkManager().sendPacket(new C0EPacketClickWindow(0, slot.slotNumber, mc.thePlayer.inventory.currentItem, 2, slot.getStack(), mc.thePlayer.openContainer.getNextTransactionID(mc.thePlayer.inventory)));
-                    mc.getNetHandler().getNetworkManager().sendPacket(new C0EPacketClickWindow(0, slot.slotNumber, mc.thePlayer.inventory.currentItem, 2, slot.getStack(), mc.thePlayer.openContainer.getNextTransactionID(mc.thePlayer.inventory)));
-                }
-
+        int slot = mc.thePlayer.inventory.currentItem;
+        if (isSwap) mc.getNetHandler().getNetworkManager().sendPacket(new C09PacketHeldItemChange(slot + 1));
         mc.thePlayer.swingItem();
         mc.playerController.attackEntity(mc.thePlayer, target);
+        if (isSwap) mc.getNetHandler().getNetworkManager().sendPacket(new C09PacketHeldItemChange(slot));
     }
 
     //取实体
