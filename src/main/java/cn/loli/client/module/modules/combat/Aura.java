@@ -25,6 +25,7 @@ import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemSword;
 import net.minecraft.network.play.client.*;
 import net.minecraft.util.BlockPos;
@@ -66,6 +67,7 @@ public class Aura extends Module {
     private final ModeValue blockMode = new ModeValue("Block Mode", "Desync", "Desync", "Always", "Legit", "Vanilla", "NCP", "Semi-Vanilla", "Semi-Switch", "Switch", "Null");
     private final ModeValue blockWhen = new ModeValue("Block when", "On Attack", "On Attack", "On Tick", "Sync");
     private final ModeValue attackWhen = new ModeValue("Attack when", "Pre", "Pre", "Post", "Tick");
+    private final ModeValue durable = new ModeValue("Durable Status", "Disable", "Disable", "Sync", "Switch");
     private final BooleanValue sprintSpam = new BooleanValue("Sprint Spam", false);
 
     private final BooleanValue autoBlock = new BooleanValue("AutoBlock", true);
@@ -88,7 +90,7 @@ public class Aura extends Module {
     private final BooleanValue clampYaw = new BooleanValue("Clamp", true);
 
     private final BooleanValue moveFix = new BooleanValue("Move Fix", false);
-    private final BooleanValue silentMoveFix = new BooleanValue("Slient Fix", false);
+    private final BooleanValue silentMoveFix = new BooleanValue("Silent Fix", false);
 
     private final BooleanValue rayCast = new BooleanValue("Ray Cast", false);
 
@@ -258,8 +260,10 @@ public class Aura extends Module {
                     event.setPitch(curPitch);
                 }
             }
-            if (blockWhen.getCurrentMode().equals("On Tick")) handleAutoBlock(true);
-            if (attackWhen.getCurrentMode().equals("Pre")) attemptAttack();
+            if (blockWhen.getCurrentMode().equals("On Tick"))
+                handleAutoBlock(true);
+            if (attackWhen.getCurrentMode().equals("Pre"))
+                attemptAttack();
         } else if (event.getEventType() == EventType.POST) {
             if (attackWhen.getCurrentMode().equals("Post")) attemptAttack();
             if (blockWhen.getCurrentMode().equals("On Tick") || blockWhen.getCurrentMode().equals("Sync"))
@@ -279,7 +283,7 @@ public class Aura extends Module {
         //Pre Attack
         if (mc.thePlayer.getDistanceToEntity(target) < range.getObject()) {
             if (blockWhen.getCurrentMode().equals("On Attack") || blockWhen.getCurrentMode().equals("Sync"))
-                handleAutoBlock(false);
+                handleAutoBlock(true);
             if (sprintSpam.getObject())
                 mc.getNetHandler().getNetworkManager().sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SPRINTING));
 
@@ -293,8 +297,7 @@ public class Aura extends Module {
 
             if (sprintSpam.getObject())
                 mc.getNetHandler().getNetworkManager().sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
-            if (blockWhen.getCurrentMode().equals("On Attack"))
-                handleAutoBlock(false);
+            if (blockWhen.getCurrentMode().equals("On Attack")) handleAutoBlock(false);
         }
     }
 
@@ -311,6 +314,7 @@ public class Aura extends Module {
             entity = rotationUtils.rayCastedEntity(range.getObject(), curYaw, curPitch);
 
         if (entity != null) {
+            if (!durable.getCurrentMode().equals("Disable")) dura(durable.getCurrentMode().equals("Switch"));
             if (crit.getState()) crit.onCrit(entity);
             mc.thePlayer.swingItem();
             mc.playerController.attackEntity(mc.thePlayer, entity);
@@ -370,8 +374,11 @@ public class Aura extends Module {
                         isBlocking = false;
                         break;
                     case "always":
+                        ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
+                        break;
                     case "semi-vanilla":
                         ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
+                        isBlocking = false;
                         break;
                     case "legit":
                     case "semi-switch":
@@ -430,6 +437,19 @@ public class Aura extends Module {
         }
     }
 
+    //handle the dura
+    private void dura(boolean isSwap) {
+        final Slot held = mc.thePlayer.inventoryContainer.getSlotFromInventory(mc.thePlayer.inventory, mc.thePlayer.inventory.currentItem);
+        if (isSwap)
+            for (final Slot slot : mc.thePlayer.inventoryContainer.inventorySlots)
+                if (!slot.getHasStack() && slot.slotNumber != held.slotNumber && slot.slotNumber > 8) {
+                    mc.getNetHandler().getNetworkManager().sendPacket(new C0EPacketClickWindow(0, slot.slotNumber, mc.thePlayer.inventory.currentItem, 2, slot.getStack(), mc.thePlayer.openContainer.getNextTransactionID(mc.thePlayer.inventory)));
+                    mc.getNetHandler().getNetworkManager().sendPacket(new C0EPacketClickWindow(0, slot.slotNumber, mc.thePlayer.inventory.currentItem, 2, slot.getStack(), mc.thePlayer.openContainer.getNextTransactionID(mc.thePlayer.inventory)));
+                }
+
+        mc.thePlayer.swingItem();
+        mc.playerController.attackEntity(mc.thePlayer, target);
+    }
 
     //取实体
     private List<EntityLivingBase> getTargets() {
