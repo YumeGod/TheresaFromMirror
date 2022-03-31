@@ -225,9 +225,12 @@ public class Abuser extends Module {
         if (event.getEventType() == EventType.PRE) {
             if (hypixel.getObject()) {
                 if (!hasDisable && timer.hasReached(2000)) {
-                    event.setX(1993634.696969696969);
-                    event.setY(1993634.696969696969);
-                    event.setZ(1993634.696969696969);
+                    event.setX(1993634.696969696969
+                            + playerUtils.randomInRange(-1.0, 1.0));
+                    event.setY(1993634.696969696969
+                            + playerUtils.randomInRange(-1.0, 1.0));
+                    event.setZ(1993634.696969696969
+                            + playerUtils.randomInRange(-1.0, 1.0));
                     event.setOnGround(true);
                 }
             }
@@ -275,8 +278,8 @@ public class Abuser extends Module {
                         }
                     }
                     packets.remove(packets.get(0));
-                    if (delay > 450) delay = 250;
-                    else delay += 20;
+                    if (delay > 450) delay = 150;
+                    else delay += 50;
                 }
             }
         }
@@ -287,10 +290,7 @@ public class Abuser extends Module {
         if (dormant.size() > 0) {
             synchronized (dormant) {
                 while (dormant.size() != 0) {
-                    try {
-                        mc.getNetHandler().getNetworkManager().sendPacket(dormant.get(0), null);
-                    } catch (Exception ignored) {
-                    }
+                    mc.getNetHandler().getNetworkManager().sendPacket(dormant.get(0), null);
                     dormant.remove(dormant.get(0));
                 }
             }
