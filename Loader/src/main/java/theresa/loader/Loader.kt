@@ -45,7 +45,7 @@ object Loader {
         main.timer.reset()
 
         while (!main.hasConnected) {
-            if (main.timer.hasReached(8000)) {
+            if (main.timer.hasReached(10000)) {
                 main.println("Timeout reached, shutting down...")
                 main.doCrash()
             }

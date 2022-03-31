@@ -107,10 +107,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
 
                         try {
                             uid = (int) Math.pow(uid, 2) * 2;
-                            Main.INSTANCE.println(uid + " " + time);
-
                             if (!Objects.equals(uid, Integer.parseInt(time))) {
-                                Main.INSTANCE.println(uid + " " + Integer.parseInt(time));
                                 Main.INSTANCE.println("Keep Alive Broken " + "ordinal data error");
                                 channelHandlerContext.close();
                                 break;

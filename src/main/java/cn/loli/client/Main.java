@@ -185,9 +185,6 @@ public class Main {
             ms.reset();
         }
 
-        if (e.getPacket() instanceof S01PacketJoinGame)
-            new SoundFxPlayer().playSound(SoundFxPlayer.SoundType.EDITION, -18);
-
         new ExploitFix(e);
     }
 

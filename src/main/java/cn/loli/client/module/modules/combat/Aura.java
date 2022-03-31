@@ -401,6 +401,7 @@ public class Aura extends Module {
         } else {
             if ((mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() || mc.thePlayer.isBlocking()) && !isBlocking) {
                 ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
+
                 switch (blockMode.getCurrentMode().toLowerCase()) {
                     case "ncp":
                     case "desync":

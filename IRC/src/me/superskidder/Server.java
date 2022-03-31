@@ -32,7 +32,7 @@ public class Server {
 
     public static Server INSTANCE;
 
-    static Handler userAuth;
+    public static Handler userAuth;
     static Loader loader;
 
 

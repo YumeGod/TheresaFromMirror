@@ -104,11 +104,11 @@ class Client extends Thread {
             socket.close();
             StringBuilder stringBuilder = new StringBuilder().append("Finish sending file in ");
             String string = "%.3f";
-            Object[] objectArray = new Object[]{(double) (System.nanoTime() - startTime) / 1.0E9};
+            Object[] objectArray = new Object[]{(System.nanoTime() - startTime) / 1.0E9};
             String string2 = String.format(string, Arrays.copyOf(objectArray, objectArray.length));
-            System.out.println((Object) stringBuilder.append(string2).append(" seconds").toString());
+            System.out.println(stringBuilder.append(string2).append(" seconds"));
         } catch (IOException e) {
-            System.out.println((Object) "Connection reset, client disconnected");
+            System.out.println("Connection reset, client disconnected");
         }
     }
 }
