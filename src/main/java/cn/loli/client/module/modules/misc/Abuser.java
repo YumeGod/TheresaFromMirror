@@ -128,7 +128,7 @@ public class Abuser extends Module {
                     mc.thePlayer.setPositionAndRotation(d0, d1, d2,
                             mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
 
-                    if (!hasDisable && timer.hasReached(2000))
+                    if (!hasDisable && timer.hasReached(1000))
                         mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(13371337.696969, 13371337.696969,
                                 13371337.696969, true));
                     else
@@ -224,13 +224,10 @@ public class Abuser extends Module {
         if (mc.isSingleplayer()) return;
         if (event.getEventType() == EventType.PRE) {
             if (hypixel.getObject()) {
-                if (!hasDisable && timer.hasReached(2000)) {
-                    event.setX(1993634.696969696969
-                            + playerUtils.randomInRange(-1.0, 1.0));
-                    event.setY(1993634.696969696969
-                            + playerUtils.randomInRange(-1.0, 1.0));
-                    event.setZ(1993634.696969696969
-                            + playerUtils.randomInRange(-1.0, 1.0));
+                if (!hasDisable && timer.hasReached(1000)) {
+                    event.setX(1993634.696969696969);
+                    event.setY(1993634.696969696969);
+                    event.setZ(1993634.696969696969);
                     event.setOnGround(true);
                 }
             }
@@ -270,7 +267,7 @@ public class Abuser extends Module {
                     packets.get(0).processPacket(netHandler);
                     if (packets.get(0) instanceof S32PacketConfirmTransaction) {
                         if (packetChoke.getObject()) {
-                            if (invalid > 7) {
+                            if (invalid > 8) {
                                 mc.getNetHandler().getNetworkManager().sendPacket(new C0FPacketConfirmTransaction(1, ((S32PacketConfirmTransaction) packets.get(0)).getActionNumber(), true));
                                 invalid = 0;
                             }
@@ -278,7 +275,7 @@ public class Abuser extends Module {
                         }
                     }
                     packets.remove(packets.get(0));
-                    if (delay > 450) delay = 150;
+                    if (delay > 400) delay = 100;
                     else delay += 50;
                 }
             }

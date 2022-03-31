@@ -86,7 +86,7 @@ public class Criticals extends Module {
                     offset = new double[]{
                             ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396),
                             ThreadLocalRandom.current().nextDouble(.0172422909396, .0182422909396),
-                            ThreadLocalRandom.current().nextDouble(.00099158065143, .00109158065143)};
+                            ThreadLocalRandom.current().nextDouble(.01032422909396, .01232422909396)};
                     break;
                 case "Mini":
                     offset = new double[]{
@@ -105,15 +105,15 @@ public class Criticals extends Module {
                     offset = new double[]{
                             ThreadLocalRandom.current().nextDouble(.0325, .0335),
                             ThreadLocalRandom.current().nextDouble(.00099158065143, .00109158065143),
-                            ThreadLocalRandom.current().nextDouble(.0325, .0335),
-                            ThreadLocalRandom.current().nextDouble(.00099158065143, .00109158065143)};
+                            ThreadLocalRandom.current().nextDouble(.0525, .0535),
+                            ThreadLocalRandom.current().nextDouble(.01032422909396, .01232422909396)};
             break;
             case "Positive":
                 offset = new double[]{
                         ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396),
                         ThreadLocalRandom.current().nextDouble(.00317, .00526),
                         ThreadLocalRandom.current().nextDouble(-.0001, -.00009),
-                        ThreadLocalRandom.current().nextDouble(.00099158065143, .00099158065143)
+                        ThreadLocalRandom.current().nextDouble(.01032422909396, .01232422909396)
                 };
                 break;
         }

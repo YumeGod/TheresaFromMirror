@@ -26,6 +26,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
     int lastUid;
     final Base64.Encoder encoder = Base64.getEncoder();
     final Base64.Decoder decoder = Base64.getDecoder();
+    boolean toggled = false;
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
@@ -35,6 +36,8 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
         ctx.channel().writeAndFlush(new String(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey),
                 PacketUtil.Type.PING, Main.INSTANCE.publicKey).pack().getBytes(), StandardCharsets.UTF_8));
 
+
+        if (toggled) return;
 
         new Thread(() -> {
             while (true) {
@@ -53,7 +56,7 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
         new Thread(() -> {
             while (true) {
                 try {
-                    Thread.sleep(300L);
+                    Thread.sleep(500L);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -67,6 +70,8 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
                 }
             }
         }).start();
+
+        if (!toggled) toggled = true;
     }
 
 

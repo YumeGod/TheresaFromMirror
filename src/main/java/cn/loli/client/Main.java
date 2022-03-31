@@ -320,7 +320,7 @@ public class Main {
                                 socketChannel.pipeline().addLast(new NettyClientHandler());
                             }
                         });
-                cf = bootstrap.connect("us2.nigger.party", 9822).sync();
+                cf = bootstrap.connect("my.nigger.party", 9822).sync();
                 println("Connected");
                 cf.channel().closeFuture().sync();
             } catch (InterruptedException ignored) {
