@@ -9,7 +9,7 @@ import net.minecraft.network.play.client.C03PacketPlayer;
 
 public class AlwaysRotate extends Module {
     public AlwaysRotate() {
-        super("Packet Hook", "Hook the packet's motion", ModuleCategory.MISC);
+        super("Rotation Fix", "Hook the packet's motion", ModuleCategory.MISC);
     }
 
     @EventTarget

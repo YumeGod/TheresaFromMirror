@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +34,7 @@ public class Server {
 
     static Handler userAuth;
     static Loader loader;
+
 
     private static final File keyDir = new File("Theresa", "Keys");
 

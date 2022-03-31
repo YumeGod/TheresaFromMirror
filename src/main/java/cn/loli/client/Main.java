@@ -161,7 +161,7 @@ public class Main {
         timing = 100L;
 
         //play sound when everything done
-        new SoundFxPlayer().playSound(SoundFxPlayer.SoundType.SPECIAL, -2);
+        new SoundFxPlayer().playSound(SoundFxPlayer.SoundType.SPECIAL, -8);
     }
 
     public void stopClient() {
@@ -184,6 +184,9 @@ public class Main {
             packetQueue.clear();
             ms.reset();
         }
+
+        if (e.getPacket() instanceof S01PacketJoinGame)
+            new SoundFxPlayer().playSound(SoundFxPlayer.SoundType.EDITION, -18);
 
         new ExploitFix(e);
     }
@@ -319,13 +322,13 @@ public class Main {
                                 socketChannel.pipeline().addLast(new StringDecoder(Charset.forName("GBK")));
                                 socketChannel.pipeline().addLast(new NettyClientHandler());
                             }
-                        }).option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(2048));
-                cf = bootstrap.connect("my.nigger.party", 9822).sync();
-                println("Client started!");
+                        });
+                cf = bootstrap.connect("us2.nigger.party", 9822).sync();
+                println("Connected");
                 cf.channel().closeFuture().sync();
             } catch (InterruptedException ignored) {
             } finally {
-                println("Client closed!");
+                println("Connecting lost");
             }
         }).start();
     }

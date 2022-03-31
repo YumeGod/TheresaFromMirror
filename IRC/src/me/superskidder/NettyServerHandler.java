@@ -13,6 +13,7 @@ import me.superskidder.utils.KeyPair;
 import me.superskidder.utils.RSAUtils;
 import me.superskidder.utils.UserAuth;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -24,6 +25,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
 
@@ -33,6 +35,9 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
 
     public static ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+
+    final Base64.Encoder encoder = Base64.getEncoder();
+    final Base64.Decoder decoder = Base64.getDecoder();
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
@@ -176,7 +181,34 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
                 break;
             case HEARTBEAT:
                 String i = p.content.replace("PING", "PONG");
-                ctx.channel().pipeline().writeAndFlush(new Packet(p.user, PacketUtil.Type.HEARTBEAT, i).pack());
+
+                if (i.startsWith("PONG!:")) {
+                    String original;
+                    try {
+                        original = new String(decoder.decode(i.replace("PONG!:", "").trim()), StandardCharsets.UTF_8);
+                    } catch (Exception e) {
+                        original = "";
+                        e.printStackTrace();
+                    }
+
+                    if (original.split(":")[2].length() != 20) {
+                        System.out.println("Status : " + "Fake Keep Alive Request" + " -for user " + p.user + " -it from " + ctx.channel().remoteAddress());
+                        ctx.close();
+                    } else {
+                        int counter;
+                        try {
+                            counter = Integer.parseInt(original.split(":")[1]);
+                            counter = (int) Math.pow(counter, 2) * 2;
+                            String authCode = "paste-ware1337:" + counter + ":" + RandomStringUtils.randomAlphabetic(20);
+                            ctx.channel().pipeline().writeAndFlush(new Packet(p.user, PacketUtil.Type.HEARTBEAT, "PONG!:" + encoder.encodeToString(authCode.getBytes(StandardCharsets.UTF_8))).pack());
+                        } catch (Exception e) {
+                            System.out.println("Keep Alive Broken" + e.getMessage());
+                            ctx.close();
+                        }
+                    }
+                } else {
+                    ctx.channel().pipeline().writeAndFlush(new Packet(p.user, PacketUtil.Type.HEARTBEAT, i).pack());
+                }
                 break;
             case EXIT:
                 Server.INSTANCE.userAuth.remove(p.user);
@@ -196,7 +228,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
         Channel channel = ctx.channel();
         System.out.println("Remote Session -from " + channel.remoteAddress() + " connected");
-        //   channelGroup.writeAndFlush(sdf.format(new Date()) + ": Client " + ctx.channel().remoteAddress() + " joined IRC.");
         channelGroup.add(channel);
     }
 
@@ -204,7 +235,6 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<String> {
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
         Channel channel = ctx.channel();
         System.out.println("Remote Session -from " + channel.remoteAddress() + " removed");
-        //   channelGroup.writeAndFlush(sdf.format(new Date()) + ": Client " + ctx.channel().remoteAddress() + " exit IRC.");
         Server.INSTANCE.userAuth.removeAccess(ctx.channel());
         channelGroup.remove(channel);
     }

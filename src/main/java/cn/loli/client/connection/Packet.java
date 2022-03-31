@@ -25,6 +25,7 @@ public class Packet {
             return user.getName() + "@NIGGA@" +
                     RSAUtils.publicEncrypt(type.name() + "@THERESA1337@" + content, RSAUtils.getPublicKey(Main.INSTANCE.publicKey));
         } catch (NoSuchAlgorithmException | InvalidKeySpecException ignored) {
+            Main.INSTANCE.println("Failed to encrypt packet");
         }
 
         return null;

@@ -1,9 +1,8 @@
 package cn.loli.client.connection;
 
 import cn.loli.client.Main;
-import cn.loli.client.gui.guiscreen.GuiReconnectIRC;
 import cn.loli.client.utils.misc.CrashUtils;
-import cn.loli.client.utils.misc.timer.TimeHelper;
+import cn.loli.client.utils.misc.RandomUtil;
 import cn.loli.client.utils.protection.HWIDUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -16,34 +15,55 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Base64;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
 
     CrashUtils crashUtils = new CrashUtils();
     String ping;
-    TimeHelper alive = new TimeHelper();
+    int uid;
+    int lastUid;
+    final Base64.Encoder encoder = Base64.getEncoder();
+    final Base64.Decoder decoder = Base64.getDecoder();
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
         Main.INSTANCE.connected = true;
+        uid = RandomUtil.getInstance().getRandomInteger(-37581, -25581);
+
         ctx.channel().writeAndFlush(new String(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey),
                 PacketUtil.Type.PING, Main.INSTANCE.publicKey).pack().getBytes(), StandardCharsets.UTF_8));
 
 
-        alive.reset();
-
         new Thread(() -> {
             while (true) {
                 try {
-                    Thread.sleep(1000L);
+                    Thread.sleep(1500L);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 if (Main.INSTANCE.hasKey) {
-                    ping = "PING!" + crashUtils.AlphabeticRandom(10);
+                    ping = "PING!" + crashUtils.AlphabeticRandom(40);
                     ctx.channel().writeAndFlush(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey), PacketUtil.Type.HEARTBEAT, ping).pack());
+                }
+            }
+        }).start();
+
+        new Thread(() -> {
+            while (true) {
+                try {
+                    Thread.sleep(300L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (Main.INSTANCE.hasKey) {
+                    if (uid != lastUid) {
+                        String authcode = "paste-ware1337:" + uid + ":" + crashUtils.AlphabeticRandom(20);
+                        ctx.channel().writeAndFlush(new Packet(new Entity(Main.INSTANCE.name, null, Main.INSTANCE.hasKey), PacketUtil.Type.HEARTBEAT,
+                                "PING!:" + encoder.encodeToString(authcode.getBytes(StandardCharsets.UTF_8))).pack());
+                        lastUid = uid;
+                    }
                 }
             }
         }).start();
@@ -75,10 +95,40 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
                 case COMMAND:
                 case HEARTBEAT:
                     String i = p.content.replace("PONG", "PING");
-                    alive.reset();
 
-                    if (!Objects.equals(i, ping))
-                        channelHandlerContext.close();
+                    if (i.contains("PING!:")) {
+                        String time = new String(decoder.decode(i.split(":")[1]), StandardCharsets.UTF_8).split(":")[1];
+                        //
+                        if (new String(decoder.decode(i.split(":")[1]), StandardCharsets.UTF_8).split(":")[2].length() != 20) {
+                            Main.INSTANCE.println("Keep Alive Broken " + "Yes I know it's a bad idea to use a spoofer like this but you are such a gay");
+                            channelHandlerContext.close();
+                            break;
+                        }
+
+                        try {
+                            uid = (int) Math.pow(uid, 2) * 2;
+                            Main.INSTANCE.println(uid + " " + time);
+
+                            if (!Objects.equals(uid, Integer.parseInt(time))) {
+                                Main.INSTANCE.println(uid + " " + Integer.parseInt(time));
+                                Main.INSTANCE.println("Keep Alive Broken " + "ordinal data error");
+                                channelHandlerContext.close();
+                                break;
+                            }
+                            uid = uid + RandomUtil.getInstance().getRandomInteger(-1337, 1337);
+                        } catch (Exception e) {
+                            Main.INSTANCE.println("Keep Alive Broken" + e.getMessage());
+                            channelHandlerContext.close();
+                            break;
+                        }
+
+
+                    } else {
+                        if (!Objects.equals(i, ping)) {
+                            Main.INSTANCE.println("Keep Alive Broken " + "ordinal data error x2");
+                            channelHandlerContext.close();
+                        }
+                    }
                 case EXIT:
                     break;
                 case MESSAGE:
@@ -94,8 +144,17 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
         println("Connecting lost");
         Main.INSTANCE.guiScreen = Minecraft.getMinecraft().currentScreen;
         Main.INSTANCE.connected = false;
+        ctx.channel().close();
     }
 
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        println("Exception happened " + cause.getMessage());
+        Main.INSTANCE.guiScreen = Minecraft.getMinecraft().currentScreen;
+        Main.INSTANCE.connected = false;
+        ctx.channel().close();
+    }
 
     public void println(String obj) {
         Class<?> systemClass = null;
