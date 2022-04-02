@@ -7,6 +7,7 @@ import cn.loli.client.command.Command;
 import cn.loli.client.utils.misc.ChatUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class HelpCommand extends Command {
@@ -19,7 +20,7 @@ public class HelpCommand extends Command {
         ArrayList<String> commands = new ArrayList<>();
         Main.INSTANCE.commandManager.getCommands().forEach(command -> commands.addAll(command.getNameAndAliases()));
 
-        ChatUtils.info("Available commands: " + commands.stream().map(str -> "." + str));
+        ChatUtils.info("Available commands: " + Arrays.toString(commands.stream().map(str -> "." + str).toArray()));
     }
 
     @Override
