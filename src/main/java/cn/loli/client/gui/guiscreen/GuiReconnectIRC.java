@@ -58,12 +58,10 @@ public class GuiReconnectIRC extends GuiScreen {
                     Map<String, String> keyMap = RSAUtils.createKeys(2048);
                     Main.INSTANCE.publicKey = keyMap.get("publicKey");
                     Main.INSTANCE.privateKey = keyMap.get("privateKey");
-
                     new Thread(() -> {
                         Main.INSTANCE.cf = Main.INSTANCE.bootstrap.connect(ip, 9822);
                         Main.INSTANCE.println("Reconnected");
                     }).start();
-
                     Minecraft.getMinecraft().displayGuiScreen(parent);
                     isSelected = true;
                 }

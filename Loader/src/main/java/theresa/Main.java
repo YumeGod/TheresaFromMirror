@@ -77,7 +77,7 @@ public class Main {
         }
 
         if (!keyDir.mkdirs())
-            println("Failed to create directories");
+            println("It should be created");
 
         File privateKeyFile = new File(keyDir, name);
         if (keyDir.exists())
@@ -94,7 +94,6 @@ public class Main {
 
         try {
             ip = InetAddress.getByName(getip((String) Objects.requireNonNull(login.jcb1.getSelectedItem()))).getHostAddress();
-            Main.INSTANCE.println(ip);
             println("Resolved IP");
             if (ip.startsWith("198.18")) {
                 ip = "us2.nigger.party";
