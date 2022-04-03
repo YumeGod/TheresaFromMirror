@@ -82,6 +82,9 @@ public class Aura extends Module {
 
     private final BooleanValue rotations = new BooleanValue("Rotations", false);
 
+    public static final NumberValue<Integer> yOffset = new NumberValue<>("Custom Y Offset", 50, 0, 75);
+    private final BooleanValue customOffset = new BooleanValue("Custom Pitch", false);
+
     private final BooleanValue silent = new BooleanValue("Silent", true);
 
     private final BooleanValue noInv = new BooleanValue("No Inv", true);
@@ -174,7 +177,7 @@ public class Aura extends Module {
             if (target != null) {
                 float[] rots;
                 rots = rotationUtils.facePlayer(target, mouse_vl_fix.getObject(), random.getObject(), !instant.getObject(), prediction.getObject(), mouseFix.getObject()
-                        , bestVector.getObject(), inaccuracy.getObject(), clampYaw.getObject(), rotationSpeed.getObject(), range.getObject());
+                        , bestVector.getObject(), inaccuracy.getObject(), clampYaw.getObject(), rotationSpeed.getObject(), range.getObject() , customOffset.getObject() , yOffset.getObject());
 
                 curYaw = rots[0];
                 curPitch = rots[1];

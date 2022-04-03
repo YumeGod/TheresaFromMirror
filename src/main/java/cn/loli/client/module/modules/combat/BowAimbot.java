@@ -118,7 +118,7 @@ public class BowAimbot extends Module {
                 final double g = getGravity();
 
                 float pitch = FormulaHelper.getProjectileMotion(v, g, x, deltaY);
-                float[] rotations = rotationUtils.facePlayer(entity, false, false, false, prediction.getObject(), true, false, 0, clamp.getObject(), 180, 6);
+                float[] rotations = rotationUtils.facePlayer(entity, false, false, false, prediction.getObject(), true, false, 0, clamp.getObject(), 180, 6 , false , 0);
                 pitch = MathHelper.clamp_float(pitch, -90, 90);
 
                 yaw = rotations[0];

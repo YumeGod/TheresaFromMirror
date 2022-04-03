@@ -3,6 +3,7 @@ package cn.loli.client.module.modules.movement;
 import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
@@ -11,6 +12,7 @@ import net.minecraft.network.play.client.C03PacketPlayer;
 public class AntiFall extends Module {
 
     private final NumberValue<Integer> falldistance = new NumberValue<>("Fall Distance", 3, 1, 6);
+    private final BooleanValue matrix = new BooleanValue("Matrix", false);
 
     public AntiFall() {
         super("AntiFall", "I am the first one to fixz antifalls maybe", ModuleCategory.MOVEMENT);
@@ -20,13 +22,23 @@ public class AntiFall extends Module {
     public void onFall(MotionUpdateEvent event) {
         if (event.getEventType() == EventType.PRE) {
             if (mc.thePlayer.fallDistance > falldistance.getObject() && playerUtils.isOverVoid(mc)) {
-                if (mc.thePlayer.ticksExisted % 2 == 0) {
-                    event.setX(event.getX() + 0.2 + Math.random() / 100);
-                    event.setZ(event.getZ() - 0.2 + Math.random() / 100);
+                if (matrix.getObject()) {
+                    if ((mc.thePlayer.motionY + mc.thePlayer.posY) < Math.floor(mc.thePlayer.posY)) {
+                        mc.thePlayer.motionY = Math.floor(mc.thePlayer.posY) - mc.thePlayer.posY;
+
+                        if (mc.thePlayer.motionY == 0)
+                            event.setOnGround(true);
+                    }
                 } else {
-                    event.setX(event.getX() - 0.2 + Math.random() / 100);
-                    event.setZ(event.getZ() + 0.2 + Math.random() / 100);
+                    if (mc.thePlayer.ticksExisted % 2 == 0) {
+                        event.setX(event.getX() + 0.2 + Math.random() / 100);
+                        event.setZ(event.getZ() - 0.2 + Math.random() / 100);
+                    } else {
+                        event.setX(event.getX() - 0.2 + Math.random() / 100);
+                        event.setZ(event.getZ() + 0.2 + Math.random() / 100);
+                    }
                 }
+
             }
         }
 
