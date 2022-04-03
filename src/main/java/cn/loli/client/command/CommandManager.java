@@ -27,6 +27,7 @@ public class CommandManager {
         addCommand(new VClipCommand());
         addCommand(new IrcCommand());
         addCommand(new MSLoginCommand());
+        addCommand(new ReloadLuaCommand());
     }
 
     private void addCommand(Command cmd) {

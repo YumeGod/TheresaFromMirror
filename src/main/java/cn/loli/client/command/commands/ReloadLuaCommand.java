@@ -6,7 +6,7 @@ import cn.loli.client.command.Command;
 import java.util.List;
 
 public class ReloadLuaCommand extends Command {
-    protected ReloadLuaCommand(String name, String... aliases) {
+    public ReloadLuaCommand() {
         super("lua", "script");
     }
 
