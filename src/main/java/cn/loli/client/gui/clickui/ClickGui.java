@@ -297,14 +297,16 @@ public class ClickGui extends GuiScreen {
                             } else if (v instanceof StringValue) {
 
                                 if (((StringValue) v).text == null) {
-                                    ((StringValue) v).text = new GuiTextBox(0, Main.INSTANCE.fontLoaders.get("roboto17"),0,0,0,0);
-                                }else {
-                                    ((StringValue) v).text.xPosition = (int) (x + width - 50);
-                                    ((StringValue) v).text.yPosition = (int) valuesY;
+                                    ((StringValue) v).text = new GuiTextBox(0, Main.INSTANCE.fontLoaders.get("roboto17"), 0, 0, 0, 0);
+                                } else {
+                                    ((StringValue) v).text.xPosition = (int) (x + width - 80);
+                                    ((StringValue) v).text.yPosition = (int) valuesY-2;
 
-                                    ((StringValue) v).text.height = 20;
-                                    ((StringValue) v).text.width = 40;
+                                    ((StringValue) v).text.height = 14;
+                                    ((StringValue) v).text.width = 60;
+                                    RenderUtils.drawRoundedRect(((StringValue) v).text.xPosition - 1, ((StringValue) v).text.yPosition - 1, ((StringValue) v).text.width + 2, ((StringValue) v).text.height + 2, 2, new Color(200, 200, 200).getRGB());
                                     ((StringValue) v).text.drawTextBox();
+                                    v.setObject(((StringValue) v).text.getText());
                                 }
                             } else if (v instanceof ColorValue) {
                                 // Color
@@ -436,8 +438,8 @@ public class ClickGui extends GuiScreen {
                 if (m == curModule) {
                     for (Value v : Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName()))) {
                         if (v instanceof StringValue) {
-                            if (((StringValue) v).text == null) {
-                            ((StringValue) v).text.textboxKeyTyped(typedChar, keyCode);
+                            if (((StringValue) v).text != null) {
+                                ((StringValue) v).text.textboxKeyTyped(typedChar, keyCode);
                             }
                         }
                     }
@@ -500,10 +502,6 @@ public class ClickGui extends GuiScreen {
                                     ((NumberValue<?>) v).clickgui_drag = true;
                                 }
                                 valuesY += 8;
-                            } else if (v instanceof StringValue) {
-                                if (((StringValue) v).text == null) {
-                                    ((StringValue) v).text.mouseClicked(mouseX, mouseY, mouseButton);
-                                }
                             } else if (v instanceof ModeValue) {
                                 HFontRenderer font = Main.INSTANCE.fontLoaders.get("roboto16");
                                 float width2 = 0;
@@ -529,6 +527,10 @@ public class ClickGui extends GuiScreen {
                                     }
                                 }
                                 valuesY += v.clickgui_anim;
+                            } else if (v instanceof StringValue) {
+                                if (((StringValue) v).text != null) {
+                                    ((StringValue) v).text.mouseClicked(mouseX, mouseY, mouseButton);
+                                }
                             } else if (v instanceof ColorValue) {
                                 valuesY += 30;
                             }
