@@ -135,7 +135,7 @@ public class RotationUtils extends Utils {
         return new float[]{endYaw, endPitch};
     }
 
-    public float[] facePlayer(Entity e, boolean a3, boolean heuristics, boolean smooth, boolean prediction, boolean mouseFix, boolean bestVector, double inaccuracy, boolean clampYaw, float rotationSpeed, double range) {
+    public float[] facePlayer(Entity e, boolean a3, boolean heuristics, boolean smooth, boolean prediction, boolean mouseFix, boolean bestVector, double inaccuracy, boolean clampYaw, float rotationSpeed, double range , boolean custom , int customRange) {
         final RandomUtil randomUtil = RandomUtil.getInstance();
 
         final double eyeX = (mc.thePlayer.getEntityBoundingBox().minX + mc.thePlayer.getEntityBoundingBox().maxX) / 2;
@@ -156,6 +156,9 @@ public class RotationUtils extends Utils {
         if (!(e instanceof EntityLivingBase)) {
             y = (e.getEntityBoundingBox().minY + e.getEntityBoundingBox().maxY) / 2.0D - (mc.thePlayer.getEntityBoundingBox().minY + (double) mc.thePlayer.getEyeHeight());
         }
+
+        if (custom)
+            y *= customRange * 0.02;
 
         if (heuristics) {
             final float randomPitch = (float) MathHelper.getRandomDoubleInRange(new Random(), 0.015, 0.018);
