@@ -18,11 +18,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.awt.*;
 
-@SideOnly(Side.CLIENT)
 public class GuiTextBox extends Gui
 {
     private final int id;
-    private final HFontRenderer HFontRendererInstance;
+    public HFontRenderer HFontRendererInstance;
     public int xPosition;
     public int yPosition;
     /** The width of this text field. */

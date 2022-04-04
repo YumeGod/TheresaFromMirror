@@ -14,6 +14,7 @@ import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
+import cn.loli.client.value.StringValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -39,6 +40,7 @@ public class HUD extends Module {
     private final ModeValue mode = new ModeValue("Mode", "Normal", "Normal", "Clear", "Rectangle");
     private final ModeValue clientMark = new ModeValue("ClientMark", "Text", "Text", "Logo");
     private final ModeValue font = new ModeValue("Font", "Minecraft", "Minecraft", "Genshin", "Ubuntu", "Dos");
+    private final StringValue clientname = new StringValue("ClientName", "朔夜观星");
 
     private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -100,7 +102,7 @@ public class HUD extends Module {
 
         if (Objects.equals(clientMark.getCurrentMode(), "Text")) {
             GL11.glScaled(2.0, 2.0, 2.0);
-            int string = mc.fontRendererObj.drawString("朔夜观星", 2, 2, rainbow(0), true);
+            int string = mc.fontRendererObj.drawString(clientname.getObject(), 2, 2, rainbow(0), true);
             GL11.glScaled(0.5, 0.5, 0.5);
             mc.fontRendererObj.drawString(Main.CLIENT_VERSION, string * 2, mc.fontRendererObj.FONT_HEIGHT * 2 - 7, rainbow(100), true);
             //   fontRenderer.drawString("by " + Main.CLIENT_AUTHOR, 4, fontRenderer.FONT_HEIGHT * 2 + 2, rainbow(200), true);

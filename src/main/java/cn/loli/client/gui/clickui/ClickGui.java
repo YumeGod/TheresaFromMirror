@@ -12,14 +12,12 @@ import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
-import org.lwjgl.Sys;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.List;
 import java.util.Objects;
 
 import static cn.loli.client.value.ColorValue.isHovered;
@@ -296,6 +294,18 @@ public class ClickGui extends GuiScreen {
                                     }
                                 }
                                 valuesY += v.clickgui_anim;
+                            } else if (v instanceof StringValue) {
+
+                                if (((StringValue) v).text == null) {
+                                    ((StringValue) v).text = new GuiTextBox(0, Main.INSTANCE.fontLoaders.get("roboto17"),0,0,0,0);
+                                }else {
+                                    ((StringValue) v).text.xPosition = (int) (x + width - 50);
+                                    ((StringValue) v).text.yPosition = (int) valuesY;
+
+                                    ((StringValue) v).text.height = 20;
+                                    ((StringValue) v).text.width = 40;
+                                    ((StringValue) v).text.drawTextBox();
+                                }
                             } else if (v instanceof ColorValue) {
                                 // Color
                                 if (isHovered(x, y, x + width, y + height - 20, mouseX, mouseY)) {
@@ -314,7 +324,7 @@ public class ClickGui extends GuiScreen {
                 modsY += 31;
             }
         }
-        Main.INSTANCE.fontLoaders.get("roboto18").drawString("NOTHING MORE TO SEE HERE", x + leftMenuWidth + (width + showValueX - leftMenuWidth) / 2 - Main.INSTANCE.fontLoaders.get("roboto18").getStringWidth("NOTHING MORE TO SEE HERE") / 2f, modsY + 5, new Color(200,200,200).getRGB());
+        Main.INSTANCE.fontLoaders.get("roboto18").drawString("NOTHING MORE TO SEE HERE", x + leftMenuWidth + (width - showValueX - leftMenuWidth) / 2 - Main.INSTANCE.fontLoaders.get("roboto18").getStringWidth("NOTHING MORE TO SEE HERE") / 2f, modsY + 5, new Color(200, 200, 200).getRGB());
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
 
         float mouseDWheel = Mouse.getDWheel() / 2f;
@@ -414,6 +424,28 @@ public class ClickGui extends GuiScreen {
                 this.mc.setIngameFocus();
             }
         }
+
+        // Text value realize
+
+
+        for (Module m : Main.INSTANCE.moduleManager.getModules()) {
+            if (m.getCategory() == curType) {
+                if (!m.getName().contains(searchField.getText()) && searchField.getText() != "") {
+                    continue;
+                }
+                if (m == curModule) {
+                    for (Value v : Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName()))) {
+                        if (v instanceof StringValue) {
+                            if (((StringValue) v).text == null) {
+                            ((StringValue) v).text.textboxKeyTyped(typedChar, keyCode);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
     }
 
     boolean sizeDrag = false;
@@ -468,6 +500,10 @@ public class ClickGui extends GuiScreen {
                                     ((NumberValue<?>) v).clickgui_drag = true;
                                 }
                                 valuesY += 8;
+                            } else if (v instanceof StringValue) {
+                                if (((StringValue) v).text == null) {
+                                    ((StringValue) v).text.mouseClicked(mouseX, mouseY, mouseButton);
+                                }
                             } else if (v instanceof ModeValue) {
                                 HFontRenderer font = Main.INSTANCE.fontLoaders.get("roboto16");
                                 float width2 = 0;
