@@ -37,19 +37,19 @@ public class Abuser extends Module {
     private final BooleanValue redesky = new BooleanValue("Rede-Sky-Semi", false);
     private final BooleanValue hypixel = new BooleanValue("Hypixel-Semi", false);
     private final BooleanValue packetChoke = new BooleanValue("Hypixel-Obfuscation", false);
+    private final BooleanValue packetFreeze = new BooleanValue("Hypixel-Freeze", false);
     private final BooleanValue packetBrust = new BooleanValue("Brust", false);
     private final BooleanValue lesspacket = new BooleanValue("Less-Packet", false);
     private final BooleanValue packetDormant = new BooleanValue("Position-Dormant", false);
     private final NumberValue<Integer> collectTimer = new NumberValue<>("Dormant-Collect-Timer", 10, 1, 30);
     private final NumberValue<Integer> dormantLatency = new NumberValue<>("Dormant-Collect-Latency", 4, 1, 20);
+    private final NumberValue<Integer> freezeLatency = new NumberValue<>("Freeze-Collect-Latency", 15, 10, 50);
     private final BooleanValue positionSpoof = new BooleanValue("Position-Spoof", false);
 
     public boolean hasDisable;
     public double x, y, z;
-    public TimeHelper timer = new TimeHelper();
-    private final TimeHelper brust = new TimeHelper();
-    private final TimeHelper dormantTimer = new TimeHelper();
-    private final TimeHelper choke = new TimeHelper();
+    public final TimeHelper timer = new TimeHelper(), freezeTimer = new TimeHelper();
+    private final TimeHelper brust = new TimeHelper(), dormantTimer = new TimeHelper(), choke = new TimeHelper();
     private final ArrayList<Packet<INetHandlerPlayClient>> packets = new ArrayList<>();
     private final List<Packet<?>> dormant = new ArrayList<>();
     long delay = 150;
@@ -128,13 +128,14 @@ public class Abuser extends Module {
                     mc.thePlayer.setPositionAndRotation(d0, d1, d2,
                             mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
 
-                    if (!hasDisable && timer.hasReached(1000))
+                    if (!hasDisable)
                         mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(13371337.696969, 13371337.696969,
                                 13371337.696969, true));
                     else
                         mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
                                 ((S08PacketPlayerPosLook) event.getPacket()).getZ(), ((S08PacketPlayerPosLook) event.getPacket()).getYaw(), ((S08PacketPlayerPosLook) event.getPacket()).getPitch(), false));
 
+                    if (freezeTimer.hasReached(10000)) freezeTimer.reset();
                     event.setCancelled(true);
                 }
             }
@@ -171,6 +172,7 @@ public class Abuser extends Module {
                     event.setCancelled(true);
 
             if (!event.isCancelled()) {
+                //Packet Dormant
                 if (packetDormant.getObject() && mc.thePlayer.ticksExisted > 32) {
                     //Collect Packets for 1 second
                     if (!choke.hasReached(10000)) return;
@@ -184,13 +186,23 @@ public class Abuser extends Module {
                     if (choke.hasReached(10000 + collectTimer.getObject().longValue() * 100)) choke.reset();
                 }
 
-                if (positionSpoof.getObject())
-                    if (((C03PacketPlayer) event.getPacket()).isMoving() && ((C03PacketPlayer) event.getPacket()).getRotating())
-                        if (!packetDormant.getObject()) {
-                            mc.getNetHandler().getNetworkManager().sendPacket
-                                    (new C03PacketPlayer.C04PacketPlayerPosition(x, y, z, ((C03PacketPlayer) event.getPacket()).isOnGround()), null);
-                            event.setCancelled(true);
-                        }
+
+                if (packetFreeze.getObject())
+                    if (!freezeTimer.hasReached(freezeLatency.getObject().longValue() * 100)) {
+                        dormant.add(event.getPacket());
+                        event.setCancelled(true);
+                    }
+
+                //position Spoof
+                if (!event.isCancelled()) {
+                    if (positionSpoof.getObject())
+                        if (((C03PacketPlayer) event.getPacket()).isMoving() && ((C03PacketPlayer) event.getPacket()).getRotating())
+                            if (!packetDormant.getObject()) {
+                                mc.getNetHandler().getNetworkManager().sendPacket
+                                        (new C03PacketPlayer.C04PacketPlayerPosition(x, y, z, ((C03PacketPlayer) event.getPacket()).isOnGround()), null);
+                                event.setCancelled(true);
+                            }
+                }
             }
         }
     }
@@ -216,6 +228,11 @@ public class Abuser extends Module {
             resetPacket();
             if (dormantDelay > dormantLatency.getObject() * 100) dormantDelay = 50;
             else dormantDelay += 25;
+        }
+
+        if (packetFreeze.getObject()) {
+            if (!freezeTimer.hasReached(freezeLatency.getObject() * 100)) return;
+            resetPacket();
         }
     }
 
@@ -275,7 +292,7 @@ public class Abuser extends Module {
                         }
                     }
                     packets.remove(packets.get(0));
-                    if (delay > 400) delay = 150;
+                    if (delay > 425) delay = 300;
                     else delay += 25;
                 }
             }
