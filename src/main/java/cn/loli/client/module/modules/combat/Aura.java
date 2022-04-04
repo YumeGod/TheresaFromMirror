@@ -82,7 +82,7 @@ public class Aura extends Module {
 
     private final BooleanValue rotations = new BooleanValue("Rotations", false);
 
-    public static final NumberValue<Integer> yOffset = new NumberValue<>("Custom Y Offset", 50, 0, 75);
+    public static final NumberValue<Integer> yOffset = new NumberValue<>("Custom Y Offset", 50, 0, 150);
     private final BooleanValue customOffset = new BooleanValue("Custom Pitch", false);
 
     private final BooleanValue silent = new BooleanValue("Silent", true);

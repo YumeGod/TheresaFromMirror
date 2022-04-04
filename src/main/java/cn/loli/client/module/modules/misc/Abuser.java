@@ -275,8 +275,8 @@ public class Abuser extends Module {
                         }
                     }
                     packets.remove(packets.get(0));
-                    if (delay > 400) delay = 100;
-                    else delay += 50;
+                    if (delay > 400) delay = 150;
+                    else delay += 25;
                 }
             }
         }
