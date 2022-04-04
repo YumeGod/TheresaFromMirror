@@ -2,6 +2,7 @@
 
 package cn.loli.client.value;
 
+import cn.loli.client.gui.clickui.GuiTextBox;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -10,6 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Predicate;
 
 public class StringValue extends Value<String> {
+    public GuiTextBox text;
+
     public StringValue(String name, String defaultVal) {
         this(name, defaultVal, null);
     }
