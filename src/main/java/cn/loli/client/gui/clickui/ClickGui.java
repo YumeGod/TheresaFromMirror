@@ -48,16 +48,16 @@ public class ClickGui extends GuiScreen {
     private static Module curModule;//选中的功能
     private final boolean doesGuiPauseGame;//是否暂停游戏
     private static float leftMenuWidth = 0;//左侧类别栏的宽度
-    private float showValueX;//右侧value的宽度
+    public static float showValueX;//右侧value的宽度
     private static float gui_anim, list_anim;
 
     //搜索框
-    private static String search_context;
-    private boolean search_hover;
+    static GuiTextBox searchField;
 
     public ClickGui(boolean doesGuiPauseGame) {
         this.doesGuiPauseGame = doesGuiPauseGame;
     }
+
 
     @Override
     public boolean doesGuiPauseGame() {
@@ -80,6 +80,10 @@ public class ClickGui extends GuiScreen {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
+        // 搜索框位置更新
+        searchField.xPosition = (int) (x + leftMenuWidth + 10);
+        searchField.yPosition = (int) (y + 10);
+        searchField.width = (int) (width - leftMenuWidth - 20);
 
         //缓动
         if (gui_anim < 2) {
@@ -102,8 +106,15 @@ public class ClickGui extends GuiScreen {
 
         //拖动窗口
         if (drag) {
-            x = mouseX - dragX;
-            y = mouseY - dragY;
+            float tx = mouseX - dragX;
+            float ty = mouseY - dragY;
+
+            if (tx > 0 && tx < sr.getScaledWidth() - width) {
+                x = tx;
+            }
+            if (ty > 0 && ty < sr.getScaledHeight() - height) {
+                y = ty;
+            }
         }
 
         //设置窗口大小
@@ -130,7 +141,6 @@ public class ClickGui extends GuiScreen {
         Main.INSTANCE.fontLoaders.get("roboto24").drawString((Main.CLIENT_NAME.toCharArray()[0] + "").toUpperCase() + Main.CLIENT_NAME.substring(1), (int) (x + leftMenuWidth / 2 - 10), (int) (y + 20), theme.clientname.getRGB());//Client Name
         RenderUtils.drawRect((int) (x + leftMenuWidth / 2 - 3), (int) (y + 30), x + leftMenuWidth / 2 + 5, y + 31, theme.themeColor.getRGB());//客户端名字下方的矩形
         Main.INSTANCE.fontLoaders.get("roboto16").drawString(Main.CLIENT_VERSION, (int) (x + leftMenuWidth / 2 + 5), (int) (y + 30), theme.client_version.getRGB());//版本
-
         //绘制categories
         float my = y + 60;
         RenderUtils.drawRect(x, y + slider.top - 5, x + leftMenuWidth, y + slider.top + 25, theme.slider.getRGB());//滑块条
@@ -144,6 +154,11 @@ public class ClickGui extends GuiScreen {
 
         //右下角拖动的图标
         RenderUtils.drawImage(new ResourceLocation("theresa/icons/drag.png"), x + width - 20, y + height - 20, 16, 16, isHovered(x + width - 20, y + height - 20, x + width - 4, y + height - 4, mouseX, mouseY) ? theme.themeColor : drag ? theme.themeColor : theme.sec_unsel);
+        searchField.drawTextBox();//搜索框
+        if (Objects.equals(searchField.getText(), "") && !searchField.isFocused()) {
+            RenderUtils.drawImage(new ResourceLocation("theresa/icons/search.png"), x + leftMenuWidth + 14, y + 14, 8, 8, theme.sec_unsel);
+            Main.INSTANCE.fontLoaders.get("roboto18").drawString("Search...", x + leftMenuWidth + 30, y + 15, theme.sec_unsel.getRGB());
+        }
 
         //绘制功能列表并裁剪
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
@@ -154,11 +169,15 @@ public class ClickGui extends GuiScreen {
             list_anim = AnimationUtils.smoothAnimation(list_anim, 0, ANIMATION_SPEED, ANIMATION_SCALE);
         }
 
+
         float modsY = y + 50 + mods_wheel;
 
         float valuesY = 0;
         for (Module m : Main.INSTANCE.moduleManager.getModules()) {
             if (m.getCategory() == curType) {
+                if (!m.getName().contains(searchField.getText()) && searchField.getText() != "") {
+                    continue;
+                }
                 //动画
                 GlStateManager.translate(list_anim, 0, 0);
 
@@ -180,8 +199,10 @@ public class ClickGui extends GuiScreen {
                     //绘制功能开关
                     RenderUtils.drawImage(new ResourceLocation("theresa/icons/disabled.png"), x + leftMenuWidth + 20, modsY + 10, 8, 8, new Color(255, 255, 255, ((int) (255 - m.clickgui_animX))));
                     RenderUtils.drawImage(new ResourceLocation("theresa/icons/enabled.png"), x + leftMenuWidth + 20, modsY + 10, 8, 8, new Color(255, 255, 255, ((int) m.clickgui_animX)));
+                    RenderUtils.drawImage(new ResourceLocation("theresa/icons/star.png"), x + width - showValueX - 24, modsY + 7, 8, 8, new Color(225, 225, 225));
 
                     RenderUtils.drawRect(x + leftMenuWidth + 10, modsY + 30, x + width - 10 - showValueX, modsY + 31, theme.module_list_line.getRGB());
+
 
                     if (curModule == null) {
                         showValueX = AnimationUtils.smoothAnimation(showValueX, 0, ANIMATION_SPEED, ANIMATION_SCALE);
@@ -191,7 +212,6 @@ public class ClickGui extends GuiScreen {
                         showValueX = AnimationUtils.smoothAnimation(showValueX, width / 3, ANIMATION_SPEED * 2, ANIMATION_SCALE);
                         valuesY = y + 55 + values_wheel;
                         // TODO: 2022/2/14 这里写的又臭又长，有时间分开写
-                        
                         for (Value v : Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName()))) {
                             Main.INSTANCE.fontLoaders.get("roboto18").drawString(v.getName(), x + width - showValueX + 5, valuesY + 1, theme.value_name.getRGB());
 
@@ -220,6 +240,7 @@ public class ClickGui extends GuiScreen {
                                 String bs = df.format(v.getObject());
                                 Main.INSTANCE.fontLoaders.get("roboto18").drawString(bs, x + width - 15 - (Main.INSTANCE.fontLoaders.get("roboto16").getStringWidth(bs)) - 1, valuesY + 1, theme.value_number_value.getRGB(), false);
 
+                                // 设置number的值
                                 if (((NumberValue<?>) v).clickgui_drag && Mouse.isButtonDown(0) && valuesY > y && valuesY + 20 < y + height) {
                                     float v1 = (mouseX - (x + width - showValueX + 5)) / ((x + width - 19) - (x + width - showValueX + 5)) * (((NumberValue<?>) v).getMax().floatValue() - ((NumberValue<?>) v).getMin().floatValue()) + ((NumberValue<?>) v).getMin().floatValue();
                                     if (v1 <= ((NumberValue<?>) v).getMin().floatValue()) {
@@ -238,6 +259,7 @@ public class ClickGui extends GuiScreen {
                                     } else if (((NumberValue<?>) v).getMax() instanceof Long) {
                                         v.setObject((long) v1);
                                     }
+
                                 } else {
                                     ((NumberValue<?>) v).clickgui_drag = false;
                                 }
@@ -292,6 +314,7 @@ public class ClickGui extends GuiScreen {
                 modsY += 31;
             }
         }
+        Main.INSTANCE.fontLoaders.get("roboto18").drawString("NOTHING MORE TO SEE HERE", x + leftMenuWidth + (width + showValueX - leftMenuWidth) / 2 - Main.INSTANCE.fontLoaders.get("roboto18").getStringWidth("NOTHING MORE TO SEE HERE") / 2f, modsY + 5, new Color(200,200,200).getRGB());
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
 
         float mouseDWheel = Mouse.getDWheel() / 2f;
@@ -301,7 +324,7 @@ public class ClickGui extends GuiScreen {
             if (mouseDWheel > 0 && mods_wheelTemp <= 0) {
                 mods_wheelTemp += 16;
                 if (mods_wheelTemp > 0) mods_wheelTemp = 0;
-            } else if (mouseDWheel < 0 && modsY > y + height) {
+            } else if (mouseDWheel < 0 && modsY > y + height - 18) {
                 mods_wheelTemp -= 16;
             }
         }
@@ -313,7 +336,7 @@ public class ClickGui extends GuiScreen {
             if (mouseDWheel > 0 && values_wheelTemp <= 0) {
                 values_wheelTemp += 16;
                 if (values_wheelTemp > 0) values_wheelTemp = 0;
-            } else if (mouseDWheel < 0 && valuesY > y + height) {
+            } else if (mouseDWheel < 0 && valuesY > y + height - 18) {
                 values_wheelTemp -= 16;
             }
         }
@@ -324,6 +347,7 @@ public class ClickGui extends GuiScreen {
     @Override
     public void updateScreen() {
         super.updateScreen();
+
         if (width < new ScaledResolution(mc).getScaledWidth()) {
             if (x > new ScaledResolution(mc).getScaledWidth() - width) {
                 x = new ScaledResolution(mc).getScaledWidth() - width;
@@ -350,6 +374,7 @@ public class ClickGui extends GuiScreen {
     public void initGui() {
         super.initGui();
         //初始化
+        searchField = new GuiTextBox(1, Main.INSTANCE.fontLoaders.get("roboto18"), (int) x, (int) y, (int) (width - leftMenuWidth - 20), 20);
         gui_anim = -150;
         sr = new ScaledResolution(mc);
         theme = new Theme();
@@ -382,6 +407,7 @@ public class ClickGui extends GuiScreen {
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) {
+        searchField.textboxKeyTyped(typedChar, keyCode);
         if (keyCode == 1) {
             this.mc.displayGuiScreen(null);
             if (this.mc.currentScreen == null) {
@@ -397,6 +423,7 @@ public class ClickGui extends GuiScreen {
     @Override
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
         super.mouseClicked(mouseX, mouseY, mouseButton);
+        searchField.mouseClicked(mouseX, mouseY, mouseButton);
         if (mouseButton == 0 && isHovered(x, y, x + width, y + 34, mouseX, mouseY)) {
             drag = true;
             dragX = mouseX - x;
