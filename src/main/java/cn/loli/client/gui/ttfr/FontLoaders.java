@@ -10,6 +10,7 @@ import java.awt.*;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class FontLoaders {
 
@@ -40,11 +41,14 @@ public class FontLoaders {
         for (int i = 12; i <= 18; ++i) {
             fonts.put("targethub" + i, getFont("targethub", i));
         }
-        for (int i = 12; i <= 18; ++i) {
+        for (int i = 12; i <= 20; ++i) {
             fonts.put("genshin" + i, getFont("genshin", i));
         }
         for (int i = 12; i <= 18; ++i) {
             fonts.put("dos" + i, getFont("dos", i));
+        }
+        for (int i = 12; i <= 18; ++i) {
+            fonts.put("pingfang" + i, getFont("pingfang", i));
         }
         Main.INSTANCE.println("Fonts loading used " + (System.currentTimeMillis() - time) / 1000d + " seconds");
     }
@@ -67,12 +71,11 @@ public class FontLoaders {
         Font font;
         try {
             InputStream is = Utils.getFileFromResourceAsStream("theresa/font/" + name + ".ttf");
-            font = Font.createFont(0, is);
-            font = font.deriveFont(0, size);
+            font = Font.createFont(0, Objects.requireNonNull(is)).deriveFont(Font.PLAIN, size);
         } catch (Exception ex) {
             ex.printStackTrace();
             Main.INSTANCE.println("Error loading font");
-            font = new Font("default", 0, size);
+            font = new Font("Arial", Font.PLAIN, size);
         }
 
         return new HFontRenderer(font, size, true);

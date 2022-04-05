@@ -95,7 +95,7 @@ public class Aura extends Module {
     private final BooleanValue silentMoveFix = new BooleanValue("Silent Fix", false);
 
     private final BooleanValue rayCast = new BooleanValue("Ray Cast", false);
-    private static final BooleanValue throughBlock = new BooleanValue("Through Block", false);
+    private static final BooleanValue throughBlock = new BooleanValue("Through Block", true);
 
     private final BooleanValue mouseFix = new BooleanValue("Mouse Fix", true);
     private final BooleanValue mouse_vl_fix = new BooleanValue("Mouse VL Fix", true);
@@ -523,7 +523,7 @@ public class Aura extends Module {
         if (playerUtils.isOnSameTeam(target) && team.getObject()) return false;
         if (target.isInvisible() && !invisible.getObject()) return false;
         if (!isInFOV(target, fov.getObject())) return false;
-        if (!mc.thePlayer.canEntityBeSeen(target) && throughBlock.getObject()) return false;
+        if (!mc.thePlayer.canEntityBeSeen(target) && !throughBlock.getObject()) return false;
         if (Main.INSTANCE.moduleManager.getModule(AntiBot.class).getState() && Main.INSTANCE.moduleManager.getModule(AntiBot.class).isBot(target))
             return false;
 
