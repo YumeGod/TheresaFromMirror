@@ -47,9 +47,6 @@ public class FontLoaders {
         for (int i = 12; i <= 18; ++i) {
             fonts.put("dos" + i, getFont("dos", i));
         }
-        for (int i = 12; i <= 18; ++i) {
-            fonts.put("pingfang" + i, getFont("pingfang", i));
-        }
         Main.INSTANCE.println("Fonts loading used " + (System.currentTimeMillis() - time) / 1000d + " seconds");
     }
 
