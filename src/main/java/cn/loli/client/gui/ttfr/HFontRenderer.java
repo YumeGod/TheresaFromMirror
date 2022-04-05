@@ -52,8 +52,7 @@ public class HFontRenderer implements IResourceManagerReloadListener {
 
     public HFontRenderer(Font font, int size, boolean antiAlias) {
         GameSettings p_i1035_1_ = Minecraft.getMinecraft().gameSettings;
-        ResourceLocation p_i1035_2_ = new ResourceLocation("textures/font/ascii.png");
-        this.locationFontTexture = p_i1035_2_;
+        this.locationFontTexture = new ResourceLocation("textures/font/ascii.png");
         this.unicodeFlag = false;
         renderEngine.bindTexture(this.locationFontTexture);
 

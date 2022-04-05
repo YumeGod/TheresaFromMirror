@@ -296,6 +296,7 @@ public class ClickGui extends GuiScreen {
 
                             if (((StringValue) v).text == null) {
                                 ((StringValue) v).text = new GuiTextBox(0, Main.INSTANCE.fontLoaders.get("roboto17"), 0, 0, 0, 0);
+                                ((StringValue) v).text.setText(((StringValue) v).getObject());
                             } else {
                                 ((StringValue) v).text.xPosition = (int) (x + width - 80);
                                 ((StringValue) v).text.yPosition = (int) valuesY - 2;
