@@ -1,5 +1,6 @@
 package cn.loli.client.gui.clickui.dropdown;
 
+import cn.loli.client.gui.clickui.dropdown.panels.CategoryPanel;
 import cn.loli.client.module.ModuleCategory;
 import net.minecraft.client.gui.GuiScreen;
 import org.lwjgl.input.Mouse;
@@ -16,7 +17,7 @@ public class ClickUI extends GuiScreen {
 
         panels.clear();
         for (ModuleCategory category : ModuleCategory.values()) {
-            panels.add(new Panel(category.name()));
+            panels.add(new CategoryPanel(category.name(), category));
         }
 
         int x = 0;

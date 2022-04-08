@@ -3,6 +3,7 @@ package cn.loli.client.gui.clickui.dropdown;
 import cn.loli.client.Main;
 import cn.loli.client.gui.ttfr.HFontRenderer;
 import cn.loli.client.utils.render.RenderUtils;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
@@ -18,12 +19,12 @@ public class Panel {
     public boolean hover;
     public boolean click;
     public boolean drag;
-    public boolean dragable;
-    public boolean dragStart;
     public double dragX;
     public double dragY;
+    public boolean drag1;
+    public double dragY1;
 
-    public double TITLE_HEIGHT = 20.0;
+    public double TITLE_HEIGHT = 24.0;
 
     public Panel(String name) {
         this.name = name;
@@ -31,8 +32,6 @@ public class Panel {
         this.hover = false;
         this.click = false;
         this.drag = false;
-        this.dragable = false;
-        this.dragStart = false;
         this.dragX = 0;
         this.dragY = 0;
     }
@@ -49,14 +48,15 @@ public class Panel {
         onMouse(mouseX, mouseY, 0);
         RenderUtils.drawRect(x, y, x + width, y + TITLE_HEIGHT, new Color(255, 255, 255).getRGB());
         RenderUtils.drawRect(x, y, x + width, y + height, new Color(247, 247, 247).getRGB());
+        RenderUtils.drawGradientRect((float) x, (float) (y + TITLE_HEIGHT), (float) (x + width), (float) (y + TITLE_HEIGHT + 5), new Color(150, 150, 150, 0).getRGB(), new Color(150, 150, 150, 70).getRGB());
         HFontRenderer titleFont = Main.INSTANCE.fontLoaders.fonts.get("roboto22");
         RenderUtils.drawRect(x, y, x + width, y + TITLE_HEIGHT, new Color(255, 255, 255).getRGB());
-        titleFont.drawString(name, (float) (x + width / 2) - titleFont.getStringWidth(name) / 2f, (float) (y + 8), new Color(61, 61, 61).getRGB());
+        titleFont.drawString(name, (float) (x + width / 2) - titleFont.getStringWidth(name) / 2f + 5, (float) (y + 10), new Color(61, 61, 61).getRGB());
 
         RenderUtils.drawRect(x + 40, y + height - 6, x + width - 40, y + height - 5, new Color(153, 153, 153).getRGB());
 
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        RenderUtils.doGlScissor((float) x, (float) (y + TITLE_HEIGHT), (float) width, (float) (height - TITLE_HEIGHT));
+        RenderUtils.doGlScissor((float) x, (float) (y), (float) width, (float) (height - 10));
         display(mouseX, mouseY, partialTicks);
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
     }
@@ -66,23 +66,40 @@ public class Panel {
 
     }
 
+    public void onClicked(double mx, double my, int mouseButton) {
+
+    }
+
     public void onClick(double mx, double my, int mouseButton) {
+        if (!isHovered(x, x + width, y, y + height, mx, my)) {
+            return;
+        }
+        onClicked(mx, my, mouseButton);
         if (isHovered(x, x + width, y, y + TITLE_HEIGHT, mx, my)) {
             drag = true;
             dragX = mx - x;
             dragY = my - y;
+        }
+
+        if (isHovered(x, x + width, y + height - 8, y + height, mx, my)) {
+            drag1 = true;
+            dragY1 = my - (y + height);
         }
     }
 
     public void onMouse(double mx, double my, int btn) {
         if (!Mouse.isButtonDown(0)) {
             drag = false;
+            drag1 = false;
             dragX = 0;
             dragY = 0;
         }
         if (drag) {
             this.x = mx - dragX;
             this.y = my - dragY;
+        }
+        if (drag1 && (my - dragY1 - y >= 80)) {
+            this.height = my - dragY1 - y;
         }
     }
 
