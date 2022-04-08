@@ -38,6 +38,7 @@ public class Abuser extends Module {
     private final BooleanValue hypixel = new BooleanValue("Hypixel-Semi", false);
     private final BooleanValue packetChoke = new BooleanValue("Hypixel-Obfuscation", false);
     private final BooleanValue packetFreeze = new BooleanValue("Hypixel-Freeze", false);
+    public final BooleanValue updateFreeze = new BooleanValue("Hypixel-Freeze-Update", true);
     private final BooleanValue packetBrust = new BooleanValue("Brust", false);
     private final BooleanValue lesspacket = new BooleanValue("Less-Packet", false);
     private final BooleanValue packetDormant = new BooleanValue("Position-Dormant", false);
@@ -48,7 +49,7 @@ public class Abuser extends Module {
 
     public boolean hasDisable;
     public double x, y, z;
-    public final TimeHelper timer = new TimeHelper(), freezeTimer = new TimeHelper();
+    public final TimeHelper timer = new TimeHelper(), freezeTimer = new TimeHelper() , resetTimer = new TimeHelper();
     private final TimeHelper brust = new TimeHelper(), dormantTimer = new TimeHelper(), choke = new TimeHelper();
     private final ArrayList<Packet<INetHandlerPlayClient>> packets = new ArrayList<>();
     private final List<Packet<?>> dormant = new ArrayList<>();
@@ -128,6 +129,8 @@ public class Abuser extends Module {
                     mc.thePlayer.setPositionAndRotation(d0, d1, d2,
                             mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
 
+                    if (freezeTimer.hasReached(10000) || (!resetTimer.hasReached(100)) && hasDisable) freezeTimer.reset();
+
                     if (!hasDisable)
                         mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(13371337.696969, 13371337.696969,
                                 13371337.696969, true));
@@ -135,7 +138,7 @@ public class Abuser extends Module {
                         mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
                                 ((S08PacketPlayerPosLook) event.getPacket()).getZ(), ((S08PacketPlayerPosLook) event.getPacket()).getYaw(), ((S08PacketPlayerPosLook) event.getPacket()).getPitch(), false));
 
-                    if (freezeTimer.hasReached(10000)) freezeTimer.reset();
+                    if (updateFreeze.getObject()) resetTimer.reset();
                     event.setCancelled(true);
                 }
             }

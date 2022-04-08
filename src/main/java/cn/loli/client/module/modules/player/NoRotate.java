@@ -5,6 +5,7 @@ import cn.loli.client.events.PacketEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.misc.Abuser;
+import cn.loli.client.utils.misc.ChatUtils;
 import com.darkmagician6.eventapi.EventTarget;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
@@ -62,6 +63,11 @@ public class NoRotate extends Module {
                 mc.thePlayer.setPositionAndRotation(d0, d1, d2,
                         mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
 
+                if (Main.INSTANCE.moduleManager.getModule(Abuser.class).freezeTimer.hasReached(10000) || (!Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.hasReached(100) && Main.INSTANCE.moduleManager.getModule(Abuser.class).hasDisable)){
+                    Main.INSTANCE.moduleManager.getModule(Abuser.class).freezeTimer.reset();
+                    ChatUtils.info("Reset");
+                }
+
 
                 if (!Main.INSTANCE.moduleManager.getModule(Abuser.class).hasDisable && Main.INSTANCE.moduleManager.getModule(Abuser.class).getState())
                     mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(13371337.696969, 13371337.696969,
@@ -70,9 +76,7 @@ public class NoRotate extends Module {
                     mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
                             ((S08PacketPlayerPosLook) event.getPacket()).getZ(), ((S08PacketPlayerPosLook) event.getPacket()).getYaw(), ((S08PacketPlayerPosLook) event.getPacket()).getPitch(), false));
 
-                if (Main.INSTANCE.moduleManager.getModule(Abuser.class).freezeTimer.hasReached(10000))
-                    Main.INSTANCE.moduleManager.getModule(Abuser.class).freezeTimer.reset();
-
+                if (Main.INSTANCE.moduleManager.getModule(Abuser.class).updateFreeze.getObject()) Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.reset();
                 event.setCancelled(true);
             }
         }

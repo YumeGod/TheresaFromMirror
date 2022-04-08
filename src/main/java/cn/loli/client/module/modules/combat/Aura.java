@@ -287,6 +287,7 @@ public class Aura extends Module {
         if (mc.thePlayer.getDistanceToEntity(target) < range.getObject()) {
             if (blockWhen.getCurrentMode().equals("On Attack") || blockWhen.getCurrentMode().equals("Sync"))
                 handleAutoBlock(true);
+
             if (sprintSpam.getObject())
                 mc.getNetHandler().getNetworkManager().sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SPRINTING));
 
@@ -300,7 +301,9 @@ public class Aura extends Module {
 
             if (sprintSpam.getObject())
                 mc.getNetHandler().getNetworkManager().sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
-            if (blockWhen.getCurrentMode().equals("On Attack")) handleAutoBlock(false);
+
+            if (blockWhen.getCurrentMode().equals("On Attack"))
+                handleAutoBlock(false);
         }
     }
 
