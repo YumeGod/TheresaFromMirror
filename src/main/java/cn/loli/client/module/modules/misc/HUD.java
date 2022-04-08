@@ -107,10 +107,10 @@ public class HUD extends Module {
             mc.fontRendererObj.drawString(Main.CLIENT_VERSION, string * 2, mc.fontRendererObj.FONT_HEIGHT * 2 - 7, rainbow(100), true);
             //   fontRenderer.drawString("by " + Main.CLIENT_AUTHOR, 4, fontRenderer.FONT_HEIGHT * 2 + 2, rainbow(200), true);
         } else if (Objects.equals(clientMark.getCurrentMode(), "Logo")) {
-            RenderUtils.drawRect(0, 0, 28 + Main.INSTANCE.fontLoaders.fonts.get("roboto20").getStringWidth(clientname.getObject()), 20, new Color(0, 0, 0, 100).getRGB());
+            RenderUtils.drawRect(0, 0, 28 + Main.INSTANCE.fontLoaders.fonts.get("heiti20").getStringWidth(clientname.getObject()), 20, new Color(0, 0, 0, 100).getRGB());
             RenderUtils.drawRect(0, 0, 1.5, 20, new Color(68,119,255).getRGB());
             RenderUtils.drawImage(new ResourceLocation("theresa/icons/logo.png"), 4, 2, 17, 16);//logo
-            Main.INSTANCE.fontLoaders.fonts.get("roboto20").drawString(clientname.getObject(), 24, 6, new Color(255, 255, 255).getRGB());
+            Main.INSTANCE.fontLoaders.fonts.get("heiti20").drawString(clientname.getObject(), 24, 6, new Color(255, 255, 255).getRGB());
         }
 
         if (showArrayList.getObject()) {

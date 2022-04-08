@@ -20,33 +20,17 @@ public class FontLoaders {
         System.setProperty("java.awt.headless", "true");
 
         long time = System.currentTimeMillis();
-        for (int i = 12; i <= 16; ++i) {
-            fonts.put("inter" + i, getFont("inter", i));
-        }
-        for (int i = 12; i <= 16; ++i) {
-            fonts.put("nunito" + i, getFont("nunito", i));
-        }
-        for (int i = 12; i <= 16; ++i) {
-            fonts.put("opensans" + i, getFont("opensans", i));
-        }
-        for (int i = 12; i <= 24; ++i) {
-            fonts.put("roboto" + i, getFont("roboto", i));
-        }
-        for (int i = 12; i <= 16; ++i) {
-            fonts.put("ubuntu" + i, getFont("ubuntu", i));
-        }
-        for (int i = 12; i <= 18; ++i) {
-            fonts.put("tiejili" + i, getFont("tiejili", i));
-        }
-        for (int i = 12; i <= 18; ++i) {
-            fonts.put("targethub" + i, getFont("targethub", i));
-        }
-        for (int i = 12; i <= 20; ++i) {
-            fonts.put("genshin" + i, getFont("genshin", i));
-        }
-        for (int i = 12; i <= 18; ++i) {
-            fonts.put("dos" + i, getFont("dos", i));
-        }
+
+        load("inter", 12, 16);
+        load("nunito", 12, 16);
+        load("opensans", 12, 16);
+        load("roboto", 12, 24);
+        load("heiti", 12, 24);
+        load("genshin", 12, 24);
+        load("ubuntu", 12, 16);
+        load("tiejili", 12, 18);
+        load("targethub", 12, 18);
+        load("dos", 12, 18);
         Main.INSTANCE.println("Fonts loading used " + (System.currentTimeMillis() - time) / 1000d + " seconds");
     }
 
@@ -76,6 +60,11 @@ public class FontLoaders {
         }
 
         return new HFontRenderer(font, size, true);
+    }
+
+    private void load(String name, int minSize, int maxSize) {
+        for (int i = minSize; i <= maxSize; ++i)
+            fonts.put(name + i, getFont(name, i));
     }
 }
 

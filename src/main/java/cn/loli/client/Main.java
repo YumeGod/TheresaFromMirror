@@ -144,6 +144,7 @@ public class Main {
         fontLoaders = new FontLoaders();
         sFontLoader = new SFontLoader();
 
+
         //addCommands
         commandManager.addCommands();
 
