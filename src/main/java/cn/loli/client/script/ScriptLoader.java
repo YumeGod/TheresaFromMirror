@@ -74,7 +74,6 @@ public class ScriptLoader {
             try {
                 if (file.getName().endsWith(".lua")) {
                     addScript(readFile(file));
-                    Main.INSTANCE.println("[LuaManager] Loaded .lua script: " + file.getName());
                 }
 
                 if (file.getName().endsWith(".js")) {
@@ -100,7 +99,6 @@ public class ScriptLoader {
             }
         }
 
-        Main.INSTANCE.println("[LuaManager] Initialized.");
         Main.INSTANCE.println("[LuaManager] Size: " + scripts.size());
     }
 
@@ -109,8 +107,6 @@ public class ScriptLoader {
         LuaValue chunk = globals.load(script);
         chunk.call();
         scripts.put(String.valueOf(globals.get("get_lua_name").call()), globals);
-        Main.INSTANCE.println("Put script: " + globals.get("get_lua_name").call());
-        Main.INSTANCE.println("Size: " + scripts.size());
     }
 
     public void removeScript(String name) {

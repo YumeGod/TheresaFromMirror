@@ -140,7 +140,9 @@ public class Main {
         scriptLoader = new ScriptLoader();
         scriptLoader.init();
 
-        //instance loader
+        //font loader
+        fontLoaders = new FontLoaders();
+        sFontLoader = new SFontLoader();
 
         //addCommands
         commandManager.addCommands();
@@ -150,10 +152,6 @@ public class Main {
 
         //files load
         fileManager.load();
-
-        //font loader
-        fontLoaders = new FontLoaders();
-        sFontLoader = new SFontLoader();
 
         //Crasher
         packetQueue = new ConcurrentLinkedQueue<>();

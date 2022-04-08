@@ -49,7 +49,7 @@ public class Abuser extends Module {
 
     public boolean hasDisable;
     public double x, y, z;
-    public final TimeHelper timer = new TimeHelper(), freezeTimer = new TimeHelper() , resetTimer = new TimeHelper();
+    public final TimeHelper timer = new TimeHelper(), freezeTimer = new TimeHelper(), resetTimer = new TimeHelper();
     private final TimeHelper brust = new TimeHelper(), dormantTimer = new TimeHelper(), choke = new TimeHelper();
     private final ArrayList<Packet<INetHandlerPlayClient>> packets = new ArrayList<>();
     private final List<Packet<?>> dormant = new ArrayList<>();
@@ -126,14 +126,14 @@ public class Abuser extends Module {
                     y = ((S08PacketPlayerPosLook) event.getPacket()).getY();
                     z = ((S08PacketPlayerPosLook) event.getPacket()).getZ();
 
-                    mc.thePlayer.setPositionAndRotation(d0, d1, d2,
-                            mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
+                    mc.thePlayer.setPositionAndRotation(d0, d1, d2, f, f1);
 
-                    if (freezeTimer.hasReached(10000) || (!resetTimer.hasReached(100)) && hasDisable) freezeTimer.reset();
+                    if (freezeTimer.hasReached(10000) || (!resetTimer.hasReached(100)) && hasDisable)
+                        freezeTimer.reset();
 
                     if (!hasDisable)
-                        mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(13371337.696969, 13371337.696969,
-                                13371337.696969, true));
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(playerUtils.randomInRange(-0.99, 0.99) + 13371337.696969, playerUtils.randomInRange(-0.99, 0.99) + 13371337.696969,
+                                playerUtils.randomInRange(-0.99, 0.99) + 13371337.696969, true));
                     else
                         mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
                                 ((S08PacketPlayerPosLook) event.getPacket()).getZ(), ((S08PacketPlayerPosLook) event.getPacket()).getYaw(), ((S08PacketPlayerPosLook) event.getPacket()).getPitch(), false));

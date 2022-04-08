@@ -36,7 +36,7 @@ public class FontLoaders {
             fonts.put("ubuntu" + i, getFont("ubuntu", i));
         }
         for (int i = 12; i <= 18; ++i) {
-            fonts.put("wqy_microhei" + i, getFont("wqy_microhei", i));
+            fonts.put("tiejili" + i, getFont("tiejili", i));
         }
         for (int i = 12; i <= 18; ++i) {
             fonts.put("targethub" + i, getFont("targethub", i));
@@ -52,14 +52,14 @@ public class FontLoaders {
 
     public HFontRenderer get(String name, int size) {
         if (fonts.get(name + size) == null) {
-            return fonts.get("wqy_microhei14");
+            return fonts.get("tiejili");
         }
         return fonts.get(name + size);
     }
 
     public HFontRenderer get(String name) {
         if (fonts.get(name) == null) {
-            return fonts.get("wqy_microhei14");
+            return fonts.get("tiejili");
         }
         return fonts.get(name);
     }

@@ -63,7 +63,7 @@ public class Aura extends Module {
 
 
     public static final NumberValue<Integer> unBlockTweak = new NumberValue<>("UnBlock Tweak", 0, 0, 100);
-    private final ModeValue blockMode = new ModeValue("Block Mode", "Desync", "Desync", "Always", "Legit", "Vanilla", "NCP", "Semi-Vanilla", "Semi-Switch", "Switch", "Null");
+    private final ModeValue blockMode = new ModeValue("Block Mode", "Desync", "Desync", "Always", "Legit", "Vanilla", "NCP", "Semi-Vanilla", "Semi-Switch", "Switch", "Null" , "Obfuscated");
     private final ModeValue blockWhen = new ModeValue("Block when", "On Attack", "On Attack", "On Tick", "Sync");
     private final ModeValue attackWhen = new ModeValue("Attack when", "Pre", "Pre", "Post", "Tick");
     private final ModeValue durable = new ModeValue("Durable Status", "Disable", "Disable", "Sync", "Switch");
@@ -382,6 +382,10 @@ public class Aura extends Module {
                     case "always":
                         ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
                         break;
+                    case "obfuscated":
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, new BlockPos(-1, -1, -1), EnumFacing.DOWN));
+                        isBlocking = false;
+                        break;
                     case "semi-vanilla":
                         ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
                         isBlocking = false;
@@ -397,7 +401,7 @@ public class Aura extends Module {
                         break;
                     case "null":
                         mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
-                        mc.getNetHandler().getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, new BlockPos(-1, -1, -1), EnumFacing.DOWN));
                         isBlocking = false;
                     case "vanilla":
                         mc.playerController.onStoppedUsingItem(mc.thePlayer);
@@ -413,7 +417,8 @@ public class Aura extends Module {
                     case "ncp":
                     case "desync":
                     case "always":
-                        mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                    case "obfuscated":
+                            mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                         break;
                     case "legit":
                         mc.getNetHandler().getNetworkManager().sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.INTERACT));
