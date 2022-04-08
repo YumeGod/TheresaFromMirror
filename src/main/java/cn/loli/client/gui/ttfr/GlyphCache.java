@@ -189,7 +189,7 @@ public class GlyphCache
 
         /* Use Java's logical font as the default initial font if user does not override it in some configuration file */
         GraphicsEnvironment.getLocalGraphicsEnvironment().preferLocaleFonts();
-        usedFonts.add(new Font(Font.SANS_SERIF, Font.PLAIN, 72)); //size 1 > 72
+     //   usedFonts.add(new Font(Font.SANS_SERIF, Font.PLAIN, 72)); //size 1 > 72
     }
 
     /**
@@ -231,7 +231,7 @@ public class GlyphCache
      * @param layoutFlags either Font.LAYOUT_RIGHT_TO_LEFT or Font.LAYOUT_LEFT_TO_RIGHT
      * @return the newly created GlyphVector
      */
-    GlyphVector layoutGlyphVector(Font font, char text[], int start, int limit, int layoutFlags)
+    GlyphVector layoutGlyphVector(Font font, char[] text, int start, int limit, int layoutFlags)
     {
         /* Ensure this font is already in fontCache so it can be referenced by cacheGlyphs() later on */
         if(!fontCache.containsKey(font))
@@ -319,7 +319,7 @@ public class GlyphCache
      *
      * @todo May need a blank border of pixels around everything for mip-map/tri-linear filtering with Optifine
      */
-    void cacheGlyphs(Font font, char text[], int start, int limit, int layoutFlags)
+    void cacheGlyphs(Font font, char[] text, int start, int limit, int layoutFlags)
     {
         /* Create new GlyphVector so glyphs can be moved around (kerning workaround; see below) without affecting caller */
         GlyphVector vector = layoutGlyphVector(font, text, start, limit, layoutFlags);
@@ -516,16 +516,19 @@ public class GlyphCache
     {
         stringImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         stringGraphics = stringImage.createGraphics();
-        setRenderingHints();
-
+        stringGraphics.setColor(BACK_COLOR);
+        stringGraphics.fillRect(0, 0, width, height);
         /* Set background color for use with clearRect() */
         stringGraphics.setBackground(BACK_COLOR);
+        // Fill background with clear rect
+        setRenderingHints();
+        // Draw text in solid white
+        stringGraphics.setColor(Color.WHITE);
 
         /*
          * Full white (1.0, 1.0, 1.0, 1.0) can be modulated by vertex color to produce a full gamut of text colors, although with
          * a GL_ALPHA8 texture, only the alpha component of the color will actually get loaded into the texture.
          */
-        stringGraphics.setPaint(Color.WHITE);
     }
 
     /**
@@ -540,7 +543,6 @@ public class GlyphCache
         stringGraphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
                                         antiAliasEnabled ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
 
-        stringGraphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
         stringGraphics.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_OFF);
     }
 
@@ -571,6 +573,7 @@ public class GlyphCache
         GlStateManager.bindTexture(textureName);
         GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_ALPHA8, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0,
                           GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, imageBuffer);
+
 
         /* Explicitely disable mipmap support becuase updateTexture() will only update the base level 0 */
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
