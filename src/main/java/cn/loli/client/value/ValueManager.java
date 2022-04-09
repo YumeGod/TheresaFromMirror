@@ -20,7 +20,7 @@ public class ValueManager {
     public final HashMap<String, List<Value>> valueMap = new HashMap<>();
 
     @NotNull
-    public final HashMap<String, Value> ownerMap = new HashMap<>();
+    public final HashMap<Value, String> ownerMap = new HashMap<>();
 
     @NotNull
     public final HashMap<Value, Integer> keyBind = new HashMap<>();

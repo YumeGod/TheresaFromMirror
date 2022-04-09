@@ -69,7 +69,7 @@ public class BindCommand extends Command {
                                 Main.INSTANCE.valueManager.modeSelect.put(value, mode);
                                 if (args.length > 3) {
                                     int key = Keyboard.getKeyIndex(args[3].toUpperCase());
-                                    Main.INSTANCE.valueManager.ownerMap.put(args[0], value);
+                                    Main.INSTANCE.valueManager.ownerMap.put(value, args[0]);
                                     Main.INSTANCE.valueManager.keyBind.put(value, key);
                                     ChatUtils.success(ChatUtils.SECONDARY_COLOR + value.getName() + ChatUtils.PRIMARY_COLOR + " was bound to " + ChatUtils.SECONDARY_COLOR + Keyboard.getKeyName(key));
                                 } else {
@@ -84,7 +84,7 @@ public class BindCommand extends Command {
                                 Main.INSTANCE.valueManager.numberPick.put(value, number);
                                 if (args.length > 3) {
                                     int key = Keyboard.getKeyIndex(args[3].toUpperCase());
-                                    Main.INSTANCE.valueManager.ownerMap.put(args[0], value);
+                                    Main.INSTANCE.valueManager.ownerMap.put(value, args[0]);
                                     Main.INSTANCE.valueManager.keyBind.put(value, key);
                                     ChatUtils.success(ChatUtils.SECONDARY_COLOR + value.getName() + ChatUtils.PRIMARY_COLOR + " was bound to " + ChatUtils.SECONDARY_COLOR + Keyboard.getKeyName(key));
                                 } else {
@@ -96,7 +96,7 @@ public class BindCommand extends Command {
                             }
                             if (value instanceof BooleanValue) {
                                 int key = Keyboard.getKeyIndex(args[2].toUpperCase());
-                                Main.INSTANCE.valueManager.ownerMap.put(args[0], value);
+                                Main.INSTANCE.valueManager.ownerMap.put(value, args[0]);
                                 Main.INSTANCE.valueManager.keyBind.put(value, key);
                                 ChatUtils.success(ChatUtils.SECONDARY_COLOR + value.getName() + ChatUtils.PRIMARY_COLOR + " was bound to " + ChatUtils.SECONDARY_COLOR + Keyboard.getKeyName(key));
                             }
@@ -156,7 +156,7 @@ public class BindCommand extends Command {
                 currentModule.setKeybind(event.getKey());
                 ChatUtils.success(ChatUtils.SECONDARY_COLOR + currentModule.getName() + ChatUtils.PRIMARY_COLOR + " was bound to " + ChatUtils.SECONDARY_COLOR + Keyboard.getKeyName(event.getKey()));
             } else {
-                Main.INSTANCE.valueManager.ownerMap.put(owner, currentValue);
+                Main.INSTANCE.valueManager.ownerMap.put(currentValue, owner);
                 Main.INSTANCE.valueManager.keyBind.put(currentValue, event.getKey());
                 ChatUtils.success(ChatUtils.SECONDARY_COLOR + currentValue.getName() + ChatUtils.PRIMARY_COLOR + " was bound to " + ChatUtils.SECONDARY_COLOR + Keyboard.getKeyName(event.getKey()));
             }
