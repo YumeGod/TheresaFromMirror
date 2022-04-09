@@ -12,6 +12,7 @@ import cn.loli.client.value.Value;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Timer;
 import org.jetbrains.annotations.NotNull;
+import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -145,5 +146,19 @@ public class Wrapper {
     //Set Speed with TargetStrafe Enable
     public void setMotion(PlayerMoveEvent event, float speed) {
         MoveUtils.getInstance().setSpeed(Minecraft.getMinecraft().thePlayer, event, Main.INSTANCE.moduleManager.getModule(TargetStrafe.class), speed);
+    }
+
+    //get value's bind
+    public String getValueBind(String owner, String name, boolean ignoreSpace) {
+        return Keyboard.getKeyName(Main.INSTANCE.valueManager.keyBind.get(Main.INSTANCE.valueManager.get(owner, name, ignoreSpace)));
+    }
+
+    //get all bind's value
+    public ArrayList<String> getAllValueBinds() {
+        ArrayList<String> arrayList = new ArrayList<>();
+        Main.INSTANCE.valueManager.keyBind.keySet().forEach(key -> {
+            arrayList.add(key.getName() + " : " + Keyboard.getKeyName(Main.INSTANCE.valueManager.keyBind.get(key)));
+        });
+        return arrayList;
     }
 }

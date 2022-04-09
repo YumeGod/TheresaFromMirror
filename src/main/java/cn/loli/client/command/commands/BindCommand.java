@@ -26,6 +26,7 @@ public class BindCommand extends Command {
     private boolean active = false;
     @Nullable
     private Module currentModule = null;
+    private String owner;
     private Value<?> currentValue = null;
 
     public BindCommand() {
@@ -33,6 +34,9 @@ public class BindCommand extends Command {
 
         EventManager.register(this);
     }
+
+    //TODO: 将使用抽象类来解决这堆狗屎代码 因为这很愚蠢
+    //TODO: I will use abuse of abstract class to solve this shit code
 
     @Override
     public void run(String alias, @NotNull String[] args) {
@@ -65,11 +69,13 @@ public class BindCommand extends Command {
                                 Main.INSTANCE.valueManager.modeSelect.put(value, mode);
                                 if (args.length > 3) {
                                     int key = Keyboard.getKeyIndex(args[3].toUpperCase());
+                                    Main.INSTANCE.valueManager.ownerMap.put(args[0], value);
                                     Main.INSTANCE.valueManager.keyBind.put(value, key);
                                     ChatUtils.success(ChatUtils.SECONDARY_COLOR + value.getName() + ChatUtils.PRIMARY_COLOR + " was bound to " + ChatUtils.SECONDARY_COLOR + Keyboard.getKeyName(key));
                                 } else {
                                     active = true;
                                     currentValue = value;
+                                    owner = args[0];
                                     ChatUtils.info("Listening for keybinds for " + ChatUtils.SECONDARY_COLOR + value.getName());
                                 }
                             }
@@ -78,22 +84,26 @@ public class BindCommand extends Command {
                                 Main.INSTANCE.valueManager.numberPick.put(value, number);
                                 if (args.length > 3) {
                                     int key = Keyboard.getKeyIndex(args[3].toUpperCase());
+                                    Main.INSTANCE.valueManager.ownerMap.put(args[0], value);
                                     Main.INSTANCE.valueManager.keyBind.put(value, key);
                                     ChatUtils.success(ChatUtils.SECONDARY_COLOR + value.getName() + ChatUtils.PRIMARY_COLOR + " was bound to " + ChatUtils.SECONDARY_COLOR + Keyboard.getKeyName(key));
                                 } else {
                                     active = true;
                                     currentValue = value;
+                                    owner = args[0];
                                     ChatUtils.info("Listening for keybinds for " + ChatUtils.SECONDARY_COLOR + value.getName());
                                 }
                             }
                             if (value instanceof BooleanValue) {
                                 int key = Keyboard.getKeyIndex(args[2].toUpperCase());
+                                Main.INSTANCE.valueManager.ownerMap.put(args[0], value);
                                 Main.INSTANCE.valueManager.keyBind.put(value, key);
                                 ChatUtils.success(ChatUtils.SECONDARY_COLOR + value.getName() + ChatUtils.PRIMARY_COLOR + " was bound to " + ChatUtils.SECONDARY_COLOR + Keyboard.getKeyName(key));
                             }
                         } else {
                             active = true;
                             currentValue = value;
+                            owner = args[0];
                             ChatUtils.info("Listening for keybinds for " + ChatUtils.SECONDARY_COLOR + value.getName());
                         }
                         return;
@@ -142,11 +152,11 @@ public class BindCommand extends Command {
     @EventTarget
     public void onKey(@NotNull KeyEvent event) {
         if (active) {
-            if (currentModule != null){
+            if (currentModule != null) {
                 currentModule.setKeybind(event.getKey());
                 ChatUtils.success(ChatUtils.SECONDARY_COLOR + currentModule.getName() + ChatUtils.PRIMARY_COLOR + " was bound to " + ChatUtils.SECONDARY_COLOR + Keyboard.getKeyName(event.getKey()));
-            }
-            else{
+            } else {
+                Main.INSTANCE.valueManager.ownerMap.put(owner, currentValue);
                 Main.INSTANCE.valueManager.keyBind.put(currentValue, event.getKey());
                 ChatUtils.success(ChatUtils.SECONDARY_COLOR + currentValue.getName() + ChatUtils.PRIMARY_COLOR + " was bound to " + ChatUtils.SECONDARY_COLOR + Keyboard.getKeyName(event.getKey()));
             }
