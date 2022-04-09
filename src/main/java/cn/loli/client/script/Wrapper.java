@@ -157,7 +157,7 @@ public class Wrapper {
     public ArrayList<String> getAllValueBinds() {
         ArrayList<String> arrayList = new ArrayList<>();
         Main.INSTANCE.valueManager.keyBind.keySet().forEach(key -> {
-            arrayList.add(key.getName() + " : " + Keyboard.getKeyName(Main.INSTANCE.valueManager.keyBind.get(key)));
+            arrayList.add(Main.INSTANCE.valueManager.ownerMap.get(key) + ":" + key.getName() + ":" + Keyboard.getKeyName(Main.INSTANCE.valueManager.keyBind.get(key)));
         });
         return arrayList;
     }
