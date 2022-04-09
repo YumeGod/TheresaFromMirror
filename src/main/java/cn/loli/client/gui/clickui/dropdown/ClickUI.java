@@ -32,8 +32,9 @@ public class ClickUI extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
 
+        int mouseDWheel = Mouse.getDWheel();
         for (Panel panel : panels) {
-            panel.draw(mouseX, mouseY, partialTicks);
+            panel.draw(mouseX, mouseY, partialTicks,mouseDWheel);
         }
 
     }

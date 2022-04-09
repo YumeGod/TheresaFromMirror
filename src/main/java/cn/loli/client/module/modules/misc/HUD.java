@@ -157,6 +157,7 @@ public class HUD extends Module {
         if (showNotifications.getObject()) {
             NotificationManager.render();
         }
+
     }
 
     private static int rainbow(int delay) {
