@@ -2,7 +2,10 @@
 
 package cn.loli.client.value;
 
-import cn.loli.client.Main;
+import cn.loli.client.events.KeyEvent;
+import cn.loli.client.utils.misc.ChatUtils;
+import com.darkmagician6.eventapi.EventManager;
+import com.darkmagician6.eventapi.EventTarget;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,6 +18,19 @@ import java.util.Map;
 public class ValueManager {
     @NotNull
     public final HashMap<String, List<Value>> valueMap = new HashMap<>();
+
+    @NotNull
+    public final HashMap<Value, Integer> keyBind = new HashMap<>();
+
+    @NotNull
+    public final HashMap<Value, Integer> modeSelect = new HashMap<>();
+
+    @NotNull
+    public final HashMap<Value, Number> numberPick = new HashMap<>();
+
+    public ValueManager() {
+        EventManager.register(this);
+    }
 
     /**
      * @param name   The name of the owner
@@ -41,7 +57,7 @@ public class ValueManager {
     /**
      * @param name   The name of the owner
      * @param object The Value-object
-     * this method will add the value to the owner if it doesn't exist
+     *               this method will add the value to the owner if it doesn't exist
      */
     public void register(String name, @NotNull Value object) {
         List<Value> values = new ArrayList<>();
@@ -73,11 +89,45 @@ public class ValueManager {
      * @return The value or null
      */
     @Nullable
-    public Value get(String owner, @NotNull String name) {
+    public Value get(String owner, @NotNull String name, boolean ignoreSpace) {
         List<Value> found = getAllValuesFrom(owner);
 
         if (found == null) return null;
 
-        return found.stream().filter(val -> name.equalsIgnoreCase(val.getName())).findFirst().orElse(null);
+        return found.stream().filter(val -> name.equalsIgnoreCase(ignoreSpace ? val.getName().replaceAll(" ", "") : val.getName())).findFirst().orElse(null);
+    }
+
+
+    @EventTarget
+    private void onKey(KeyEvent event) {
+        for (Value value : keyBind.keySet())
+            if (keyBind.get(value) == event.getKey()) {
+                if (value instanceof BooleanValue) {
+                    BooleanValue booleanValue = (BooleanValue) value;
+                    booleanValue.setObject(!booleanValue.getObject());
+                    ChatUtils.info("Value " + value.getName() + " is now " + value.getObject());
+                }
+                if (value instanceof ModeValue) {
+                    ModeValue modeValue = (ModeValue) value;
+                    Integer integer = modeSelect.get(value);
+                    modeSelect.put(modeValue, ((ModeValue) value).getObject());
+                    modeValue.setObject(integer);
+                    ChatUtils.info("Value " + value.getName() + " is now " + value.getObject());
+                }
+                if (value instanceof NumberValue) {
+                    NumberValue numberValue = (NumberValue) value;
+                    Number number = numberPick.get(numberValue);
+                    numberPick.put(numberValue, (Number) numberValue.getObject());
+                    if (numberValue.getObject() instanceof Integer) {
+                        numberValue.setObject(number.intValue());
+                    } else if (numberValue.getObject() instanceof Float) {
+                        numberValue.setObject(number.floatValue());
+                    } else {
+                        numberValue.setObject(number.doubleValue());
+                    }
+                    ChatUtils.info("Value " + value.getName() + " is now " + value.getObject());
+                }
+
+            }
     }
 }

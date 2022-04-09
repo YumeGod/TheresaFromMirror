@@ -23,7 +23,7 @@ public class ValueCommand extends Command {
             throw new CommandException("Usage: ." + alias + " <owner> <name> <value>");
         }
 
-        Value value = Main.INSTANCE.valueManager.get(args[0], args[1]);
+        Value value = Main.INSTANCE.valueManager.get(args[0], args[1], true);
 
         if (value == null) {
             throw new CommandException("Value '" + args[0] + "/" + args[1] + "' doesn't exist");

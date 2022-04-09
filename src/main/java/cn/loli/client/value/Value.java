@@ -11,6 +11,7 @@ public abstract class Value<T> {
     public float clickgui_anim;
     private T object;
     private final T defaultVal;
+
     /**
      * The validator which is called every time the value is changed
      */
