@@ -47,7 +47,7 @@ public class FileManager {
             throw new IOException("Failed to create " + valuesFile.getAbsolutePath());
 
         JsonElement clientElement = new JsonParser().parse(toClientJsonObject().toString());
-        JsonElement modulesElement = new JsonParser().parse(toModulesJsonObject(true).toString());
+        JsonElement modulesElement = new JsonParser().parse(toModulesJsonObject().toString());
         JsonElement valuesElement = new JsonParser().parse(toValuesJsonObject().toString());
 
         Files.write(gson.toJson(clientElement).getBytes(StandardCharsets.UTF_8), saveFile);
@@ -83,7 +83,7 @@ public class FileManager {
     }
 
     @NotNull
-    private JsonObject toModulesJsonObject(boolean saveKeyBind) {
+    private JsonObject toModulesJsonObject() {
         JsonObject obj = new JsonObject();
 
         {
@@ -94,8 +94,7 @@ public class FileManager {
 
                 moduleObject.addProperty("state", module.getState());
 
-                if (saveKeyBind)
-                    moduleObject.addProperty("keybind", module.getKeybind());
+                moduleObject.addProperty("keybind", module.getKeybind());
 
                 modulesObject.add(module.getName(), moduleObject);
             }
@@ -127,6 +126,7 @@ public class FileManager {
         return obj;
     }
 
+    //TODO: Use more effective to solve it
     @NotNull
     private JsonObject toCfgJsonObject() {
         JsonObject obj = new JsonObject();
@@ -164,16 +164,20 @@ public class FileManager {
                     int keybind = Main.INSTANCE.valueManager.keyBind.get(values) == null ? 0 : Main.INSTANCE.valueManager.keyBind.get(values);
                     if (values instanceof NumberValue) {
                         NumberValue numberValue = (NumberValue) values;
-                        if (numberValue.getObject() instanceof Integer) {
-                            jsonObject.addProperty("value", ((Number) numberValue.getObject()).intValue());
-                        } else if (numberValue.getObject() instanceof Float) {
-                            jsonObject.addProperty("value", ((Number) numberValue.getObject()).floatValue());
-                        } else {
-                            jsonObject.addProperty("value", ((Number) numberValue.getObject()).doubleValue());
+                        if (Main.INSTANCE.valueManager.numberPick.get(values) != null){
+                            if (numberValue.getObject() instanceof Integer) {
+                                jsonObject.addProperty("value", Main.INSTANCE.valueManager.numberPick.get(values).intValue());
+                            } else if (numberValue.getObject() instanceof Float) {
+                                jsonObject.addProperty("value", Main.INSTANCE.valueManager.numberPick.get(values).floatValue());
+                            } else {
+                                jsonObject.addProperty("value", Main.INSTANCE.valueManager.numberPick.get(values).doubleValue());
+                            }
                         }
                     }
                     if (values instanceof ModeValue) {
-                        jsonObject.addProperty("mode", ((ModeValue) values).getObject());
+                        if (Main.INSTANCE.valueManager.modeSelect.get(values) != null) {
+                            jsonObject.addProperty("mode", Main.INSTANCE.valueManager.modeSelect.get(values));
+                        }
                     }
                     jsonObject.addProperty("keybind", keybind);
                     fatherObject.add(values.getName(), jsonObject);
