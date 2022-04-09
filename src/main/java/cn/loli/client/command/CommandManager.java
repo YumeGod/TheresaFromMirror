@@ -28,6 +28,7 @@ public class CommandManager {
         addCommand(new IrcCommand());
         addCommand(new MSLoginCommand());
         addCommand(new ReloadLuaCommand());
+        addCommand(new ConfigCommand());
     }
 
     private void addCommand(Command cmd) {
