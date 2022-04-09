@@ -6,10 +6,7 @@ import cn.loli.client.command.CommandManager;
 import cn.loli.client.connection.NettyClientHandler;
 import cn.loli.client.connection.RSAUtils;
 import cn.loli.client.connection.SslOneWayContextFactory;
-import cn.loli.client.events.LoopEvent;
-import cn.loli.client.events.PacketEvent;
-import cn.loli.client.events.TextEvent;
-import cn.loli.client.events.UpdateEvent;
+import cn.loli.client.events.*;
 import cn.loli.client.file.FileManager;
 import cn.loli.client.gui.guiscreen.GuiReconnectIRC;
 import cn.loli.client.gui.ttfr.FontLoaders;
@@ -36,6 +33,7 @@ import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.ssl.SslHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiDisconnected;
+import net.minecraft.client.gui.GuiDownloadTerrain;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S01PacketJoinGame;
@@ -197,6 +195,12 @@ public class Main {
                     getNetHandler().getNetworkManager().sendPacket(packetQueue.poll());
             ms.reset();
         }
+    }
+
+    @EventTarget
+    private void onTick(TickEvent e) {
+        if (Minecraft.getMinecraft().currentScreen instanceof GuiDownloadTerrain && (Minecraft.getMinecraft().thePlayer != null))
+            Minecraft.getMinecraft().thePlayer.closeScreen();
     }
 
     @EventTarget

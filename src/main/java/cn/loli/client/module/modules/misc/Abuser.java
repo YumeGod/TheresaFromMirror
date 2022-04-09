@@ -214,11 +214,6 @@ public class Abuser extends Module {
     private void onTick(TickEvent event) {
         if (mc.isSingleplayer()) return;
 
-        if (hypixel.getObject()) {
-            if (mc.currentScreen instanceof GuiDownloadTerrain && (mc.thePlayer != null))
-                mc.thePlayer.closeScreen();
-        }
-
         if (packetBrust.getObject() || hypixel.getObject()) {
             if (!brust.hasReached(delay)) return;
             resetPackets(mc.getNetHandler());
