@@ -157,10 +157,11 @@ public class FileManager {
             obj.add("values", cfgValueObject);
 
             for (Map.Entry<String, List<Value>> stringListEntry : Main.INSTANCE.valueManager.getAllValues().entrySet()) {
-                JsonObject jsonObject = new JsonObject();
                 JsonObject fatherObject = new JsonObject();
 
                 for (Value values : stringListEntry.getValue()) {
+                    JsonObject jsonObject = new JsonObject();
+
                     int keybind = Main.INSTANCE.valueManager.keyBind.get(values) == null ? 0 : Main.INSTANCE.valueManager.keyBind.get(values);
                     if (values instanceof NumberValue) {
                         NumberValue numberValue = (NumberValue) values;
@@ -176,6 +177,7 @@ public class FileManager {
                     }
                     if (values instanceof ModeValue) {
                         if (Main.INSTANCE.valueManager.modeSelect.get(values) != null) {
+                            Main.INSTANCE.println("ModeValue");
                             jsonObject.addProperty("mode", Main.INSTANCE.valueManager.modeSelect.get(values));
                         }
                     }
