@@ -28,6 +28,7 @@
     "MixinMinecraft",
     "MixinModelBiped",
     "MixinNetworkManager",
+    "MixinNetworkManagerChInit",
     "MixinPlayerControllerMP",
     "MixinRenderer",
     "MixinRendererLivingEntity",

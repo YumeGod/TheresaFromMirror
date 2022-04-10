@@ -26,6 +26,7 @@ import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemSword;
+import net.minecraft.network.Packet;
 import net.minecraft.network.play.client.*;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -33,10 +34,9 @@ import net.minecraft.util.MathHelper;
 import org.lwjgl.input.Keyboard;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Queue;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -63,8 +63,9 @@ public class Aura extends Module {
 
 
     public static final NumberValue<Integer> unBlockTweak = new NumberValue<>("UnBlock Tweak", 0, 0, 100);
-    private final ModeValue blockMode = new ModeValue("Block Mode", "Desync", "Desync", "Always", "Legit", "Vanilla", "NCP", "Semi-Vanilla", "Semi-Switch", "Switch", "Null", "Idle");
+    private final ModeValue blockMode = new ModeValue("Block Mode", "Desync", "NCP", "Idle", "Desync", "Always", "Legit", "Vanilla", "Semi-Vanilla", "Semi-Switch", "Switch", "Null");
     private final ModeValue blockWhen = new ModeValue("Block when", "On Attack", "On Attack", "On Tick", "Sync");
+    private final ModeValue blockSense = new ModeValue("Block style", "Sync", "Sync", "Desync");
     private final ModeValue attackWhen = new ModeValue("Attack when", "Pre", "Pre", "Post", "Tick");
     private final ModeValue durable = new ModeValue("Durable Status", "Disable", "Disable", "Sync", "Switch");
     private final BooleanValue sprintSpam = new BooleanValue("Sprint Spam", false);
@@ -127,6 +128,10 @@ public class Aura extends Module {
     float curYaw, curPitch;
 
     Criticals crit;
+
+    //Desync Auto Block
+    Queue<Packet<?>> desyncPackets = new ArrayDeque<>();
+    int ticks;
 
     public Aura() {
         super("Aura", "Automatically attacks enemies around you.", ModuleCategory.COMBAT);
@@ -280,6 +285,20 @@ public class Aura extends Module {
         if (attackWhen.getCurrentMode().equals("Tick")) attemptAttack();
     }
 
+    @EventTarget
+    private void onPacket(PacketEvent event) {
+        if (event.getPacket() instanceof C03PacketPlayer) {
+            if (blockSense.getCurrentMode().equalsIgnoreCase("desync"))
+                if (target != null) {
+                    desyncPackets.add(event.getPacket());
+                    ticks++;
+                    event.setCancelled(true);
+                } else {
+                    attemptRelease();
+                }
+        }
+    }
+
     //尝试进行Attack
     private void attemptAttack() {
         if (target == null) return;
@@ -376,6 +395,14 @@ public class Aura extends Module {
             if (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() && isBlocking) {
                 ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
+
+                if (blockSense.getCurrentMode().equalsIgnoreCase("desync"))
+                    if (ticks > 3) {
+                        attemptRelease();
+                    } else {
+                        return;
+                    }
+
                 switch (blockMode.getCurrentMode().toLowerCase()) {
                     case "desync":
                         mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
@@ -412,6 +439,7 @@ public class Aura extends Module {
                         isBlocking = false;
                         break;
                 }
+
             }
         } else {
             if ((mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() || mc.thePlayer.isBlocking()) && !isBlocking) {
@@ -449,9 +477,17 @@ public class Aura extends Module {
                         mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                         break;
                 }
+
                 isBlocking = true;
             }
         }
+    }
+
+    private void attemptRelease() {
+        while (!desyncPackets.isEmpty())
+            mc.getNetHandler().getNetworkManager().sendPacket(desyncPackets.poll(), null);
+
+        ticks = 0;
     }
 
     //handle the handleDura
