@@ -63,7 +63,7 @@ public class Aura extends Module {
 
 
     public static final NumberValue<Integer> unBlockTweak = new NumberValue<>("UnBlock Tweak", 0, 0, 100);
-    private final ModeValue blockMode = new ModeValue("Block Mode", "Desync", "Desync", "Always", "Legit", "Vanilla", "NCP", "Semi-Vanilla", "Semi-Switch", "Switch", "Null" , "Obfuscated");
+    private final ModeValue blockMode = new ModeValue("Block Mode", "Desync", "Desync", "Always", "Legit", "Vanilla", "NCP", "Semi-Vanilla", "Semi-Switch", "Switch", "Null", "Idle");
     private final ModeValue blockWhen = new ModeValue("Block when", "On Attack", "On Attack", "On Tick", "Sync");
     private final ModeValue attackWhen = new ModeValue("Attack when", "Pre", "Pre", "Post", "Tick");
     private final ModeValue durable = new ModeValue("Durable Status", "Disable", "Disable", "Sync", "Switch");
@@ -363,6 +363,8 @@ public class Aura extends Module {
         }
     }
 
+    double x, z;
+
 
     //确定他妈的是否格挡
     private void handleAutoBlock(boolean unblock) {
@@ -382,9 +384,11 @@ public class Aura extends Module {
                     case "always":
                         ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
                         break;
-                    case "obfuscated":
-                        mc.getNetHandler().getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, new BlockPos(-1, -1, -1), EnumFacing.DOWN));
-                        isBlocking = false;
+                    case "idle":
+                        if (mc.thePlayer.ticksExisted % 2 != 0) {
+                            mc.getNetHandler().getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, new BlockPos(-1, -1, -1), EnumFacing.DOWN));
+                            isBlocking = false;
+                        }
                         break;
                     case "semi-vanilla":
                         ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
@@ -417,7 +421,10 @@ public class Aura extends Module {
                     case "ncp":
                     case "desync":
                     case "always":
-                    case "obfuscated":
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                        break;
+                    case "idle":
+                        if (mc.thePlayer.ticksExisted % 2 == 0)
                             mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                         break;
                     case "legit":

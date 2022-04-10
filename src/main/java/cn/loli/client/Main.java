@@ -23,6 +23,7 @@ import cn.loli.client.value.ValueManager;
 import com.Kernel32;
 import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.EventTarget;
+import com.darkmagician6.eventapi.types.EventType;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -92,6 +93,7 @@ public class Main {
     public int realPosX;
     public int realPosY;
     public int realPosZ;
+    public double moveSpeed;
     public ChannelFuture cf;
 
 
@@ -208,6 +210,7 @@ public class Main {
         if (e.getText().contains("\247k"))
             e.setText(StringUtils.replace(e.getText(), "\247k", ""));
     }
+
 
     public void println(String obj) {
         Class<?> systemClass = null;

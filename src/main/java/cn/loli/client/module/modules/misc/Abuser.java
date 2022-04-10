@@ -290,7 +290,7 @@ public class Abuser extends Module {
                         }
                     }
                     packets.remove(packets.get(0));
-                    if (delay > 425) delay = 300;
+                    if (delay > 425) delay = 200;
                     else delay += 25;
                 }
             }
