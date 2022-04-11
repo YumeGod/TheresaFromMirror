@@ -67,19 +67,32 @@ public class Panel {
 
 
         scroll = AnimationUtils.smoothAnimation(scroll, scroll_temp, 50f, 0.3f);
-
+        double mn = (maxHeight - TITLE_HEIGHT - 10) / 25;
+        double slider_height = ((height - TITLE_HEIGHT - 10) / (mn * 25)) * (height - TITLE_HEIGHT - 10);
+        boolean flag = y + TITLE_HEIGHT + (Math.abs(scroll) / (mn * 25)) * (height - TITLE_HEIGHT - 20) + slider_height < y + height - 10;
         if (isHovered(x, x + width, y + TITLE_HEIGHT, y + height - 10, mouseX, mouseY)) {
-            if (mouseDWheel > 0 && scroll_temp <= 0) {
+            if (mouseDWheel > 0) {
                 scroll_temp += 8;
                 if (scroll_temp > 0) scroll_temp = 0;
-            } else if (mouseDWheel < 0 && scroll_height > height + 10) {
+            } else if (mouseDWheel < 0 && flag) {
                 scroll_temp -= 8;
             }
         }
+        if (drag1 && (mouseY - dragY1 - y <= mouseY) && (mouseY - dragY1 - y) <= (this.y - this.TITLE_HEIGHT - 10 + scroll + maxHeight)) {
+            this.height = mouseY - dragY1 - y;
+        }
+        // 绘制滑动条
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         RenderUtils.doGlScissor((float) x, (float) (y + TITLE_HEIGHT), (float) width, (float) (height - TITLE_HEIGHT - 10));
+        RenderUtils.drawRect(x + width - 5, y + TITLE_HEIGHT + (Math.abs(scroll) / (mn * 25)) * (height - TITLE_HEIGHT - 20), x + width - 4, y + TITLE_HEIGHT + (Math.abs(scroll) / (mn * 25)) * (height - TITLE_HEIGHT - 20) + slider_height, new Color(208, 208, 208).getRGB());
         display(mouseX, mouseY, partialTicks, mouseDWheel);
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
+        if (height > maxHeight) {
+            height = maxHeight;
+        }
+        if (height < 10) {
+            height = 10;
+        }
     }
 
     // Override this method
@@ -120,9 +133,6 @@ public class Panel {
             this.y = my - dragY;
         }
 
-        if (drag1 && (my - dragY1 - y <= my) && (my - dragY1 - y) <= maxHeight) {
-            this.height = my - dragY1 - y;
-        }
     }
 
     public boolean isHovered(double x, double x1, double y, double y1, double mouseX, double mouseY) {

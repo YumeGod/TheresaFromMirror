@@ -37,11 +37,6 @@ public class CategoryPanel extends Panel {
         }
 
         maxHeight = mn * 25 + TITLE_HEIGHT + 10;
-
-        // 绘制滑动条
-        double slider_height = ((height - TITLE_HEIGHT - 10) / (mn * 25)) * (height - TITLE_HEIGHT - 10);
-        RenderUtils.drawRect(x + width - 5, y + TITLE_HEIGHT + (Math.abs(scroll) / (mn * 25)) * (height - TITLE_HEIGHT - 20), x + width - 4, y + TITLE_HEIGHT + (Math.abs(scroll) / (mn * 25)) * (height - TITLE_HEIGHT - 20) + slider_height, new Color(208, 208, 208).getRGB());
-
     }
 
     @Override
@@ -60,8 +55,8 @@ public class CategoryPanel extends Panel {
             if (isHovered(x, x + width, my1 - 5, my1 + 15, mx, my)) {
                 if (mouseButton == 0) {
                     m.setState(!m.getState());// 如果鼠标左键点击，则切换模块状态
-                } else if (mouseButton == 1) {
-                    ClickUI.panels.add(new ValuePanel(m));// 如果鼠标右键点击，则打开模块值面板
+                } else if (mouseButton == 1 && Main.INSTANCE.valueManager.getAllValuesFrom(m.getName()).size() > 0) {
+                    ClickUI.panels_temp.add(new ValuePanel(m));// 如果鼠标右键点击，则打开模块值面板
                 }
             }
             my1 += 25;

@@ -10,20 +10,24 @@ import java.util.ArrayList;
 
 public class ClickUI extends GuiScreen {
     public static ArrayList<Panel> panels = new ArrayList<>();
+    public static ArrayList<Panel> panels_temp = new ArrayList<>();
+
 
     @Override
     public void initGui() {
         super.initGui();
 
-        panels.clear();
-        for (ModuleCategory category : ModuleCategory.values()) {
-            panels.add(new CategoryPanel(category.name(), category));
-        }
+        if (panels.size() == 0) {
+            panels.clear();
+            for (ModuleCategory category : ModuleCategory.values()) {
+                panels.add(new CategoryPanel(category.name(), category));
+            }
 
-        int x = 0;
-        for (Panel panel : panels) {
-            panel.update(10 + x, 60, 110, 200);
-            x += 120;
+            int x = 0;
+            for (Panel panel : panels) {
+                panel.update(10 + x, 60, 110, 200);
+                x += 120;
+            }
         }
 
     }
@@ -31,10 +35,13 @@ public class ClickUI extends GuiScreen {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawScreen(mouseX, mouseY, partialTicks);
-
+        if (panels_temp.size() != 0) {
+            panels.addAll(panels_temp);
+            panels_temp.clear();
+        }
         int mouseDWheel = Mouse.getDWheel();
         for (Panel panel : panels) {
-            panel.draw(mouseX, mouseY, partialTicks,mouseDWheel);
+            panel.draw(mouseX, mouseY, partialTicks, mouseDWheel);
         }
 
     }
