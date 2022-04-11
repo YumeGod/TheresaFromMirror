@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class ClickUI extends GuiScreen {
-    public ArrayList<Panel> panels = new ArrayList<>();
+    public static ArrayList<Panel> panels = new ArrayList<>();
 
     @Override
     public void initGui() {

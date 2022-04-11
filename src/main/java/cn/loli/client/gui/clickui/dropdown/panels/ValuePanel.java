@@ -1,9 +1,11 @@
 package cn.loli.client.gui.clickui.dropdown.panels;
 
 import cn.loli.client.gui.clickui.dropdown.Panel;
+import cn.loli.client.module.Module;
 
 public class ValuePanel extends Panel {
-    public ValuePanel(String name, double x, double y, double width, double height) {
-        super(name);
+    public ValuePanel(Module module) {
+        super(module.getName());
+        this.update(10, 140, 110, 200);
     }
 }
