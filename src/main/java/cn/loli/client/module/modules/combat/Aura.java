@@ -299,7 +299,7 @@ public class Aura extends Module {
         if (event.getPacket() instanceof C03PacketPlayer)
             if (blockSense.getCurrentMode().equalsIgnoreCase("Desync"))
                 if (target != null)
-                    if (!isBlocking && ticks < 3) {
+                    if (!isBlocking && ticks < 5) {
                         desyncPackets.add(event.getPacket());
                         event.setCancelled(true);
                         ticks++;
@@ -448,11 +448,9 @@ public class Aura extends Module {
             }
         } else {
             if ((mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() || mc.thePlayer.isBlocking()) && !isBlocking) {
-                ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
-
                 if (blockSense.getCurrentMode().equalsIgnoreCase("Desync"))
                     if (ticks != 0) return;
-
+                ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
 
                 switch (blockMode.getCurrentMode().toLowerCase()) {
                     case "ncp":
