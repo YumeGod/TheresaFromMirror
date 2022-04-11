@@ -62,7 +62,7 @@ public class Aura extends Module {
 
 
     public static final NumberValue<Integer> unBlockTweak = new NumberValue<>("UnBlock Tweak", 0, 0, 100);
-    private final ModeValue blockMode = new ModeValue("Block Mode", "Desync", "NCP", "Idle", "Desync", "Always", "Legit", "Vanilla", "Semi-Vanilla", "Semi-Switch", "Switch", "Null");
+    private final ModeValue blockMode = new ModeValue("Block Mode", "Desync", "NCP", "Idle", "Desync", "Always", "Legit", "Vanilla", "Semi-Vanilla", "Spoof-Switch", "Switch", "Null", "Dada", "Dada-Desync");
     private final ModeValue blockWhen = new ModeValue("Block when", "On Attack", "On Attack", "On Tick", "Sync");
     private final ModeValue blockSense = new ModeValue("Block style", "Sync", "Sync", "Desync");
     private final ModeValue attackWhen = new ModeValue("Attack when", "Pre", "Pre", "Post", "Tick");
@@ -291,18 +291,15 @@ public class Aura extends Module {
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject()))
                 if (target != null)
                     if (isBlocking) {
-                        desyncPackets.add(event.getPacket());
+                        if (ticks < 1) desyncPackets.add(event.getPacket());
                         event.setCancelled(true);
                     }
 
         if (event.getPacket() instanceof C03PacketPlayer)
-            if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && autoBlock.getObject())
+            if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
+                    && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject()))
                 if (target != null) {
-                    if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
-                            && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject()))
-                        ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
-
-                    if (!isBlocking && ticks < 5) {
+                    if (!isBlocking && ticks < 4) {
                         desyncPackets.add(event.getPacket());
                         event.setCancelled(true);
                         ticks++;
@@ -311,10 +308,18 @@ public class Aura extends Module {
                     }
                 } else {
                     attemptRelease();
-                    if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && mc.thePlayer.getHeldItem() != null
-                            && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword)
-                        ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
                 }
+
+        if (event.getPacket() instanceof C08PacketPlayerBlockPlacement)
+            if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
+                    && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject())) {
+                if (ticks > 3)
+                    attemptRelease();
+
+                if (ticks != 0)
+                    event.setCancelled(true);
+            }
+
     }
 
     //尝试进行Attack
@@ -413,11 +418,11 @@ public class Aura extends Module {
             if (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() && isBlocking) {
 
-                if (blockSense.getCurrentMode().equalsIgnoreCase("Sync"))
-                    ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
+                ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
 
                 switch (blockMode.getCurrentMode().toLowerCase()) {
                     case "desync":
+                    case "dada-desync":
                         mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                         isBlocking = false;
                         break;
@@ -435,8 +440,9 @@ public class Aura extends Module {
                         isBlocking = false;
                         break;
                     case "legit":
-                    case "semi-switch":
+                    case "spoof-switch":
                     case "switch":
+                    case "dada":
                         isBlocking = false;
                         break;
                     case "ncp":
@@ -445,22 +451,18 @@ public class Aura extends Module {
                         break;
                     case "null":
                         mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
-                        mc.getNetHandler().getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, new BlockPos(-1, -1, -1), EnumFacing.DOWN));
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, null, EnumFacing.DOWN));
                         isBlocking = false;
                     case "vanilla":
                         mc.playerController.onStoppedUsingItem(mc.thePlayer);
                         isBlocking = false;
                         break;
                 }
-
-                ticks++;
             }
         } else {
             if ((mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() || mc.thePlayer.isBlocking()) && !isBlocking) {
-                if (blockSense.getCurrentMode().equalsIgnoreCase("Sync"))
-                    ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
-                if (blockSense.getCurrentMode().equalsIgnoreCase("Desync"))
-                    if (ticks != 0) return;
+                ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
+
                 switch (blockMode.getCurrentMode().toLowerCase()) {
                     case "ncp":
                     case "desync":
@@ -482,7 +484,7 @@ public class Aura extends Module {
                     case "null":
                         mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(null));
                         break;
-                    case "semi-switch":
+                    case "spoof-switch":
                         final int spoof = curSlot == 0 ? 1 : -1;
                         mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                         mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot + spoof));
@@ -492,8 +494,18 @@ public class Aura extends Module {
                         mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot));
                         mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                         break;
+                    case "dada":
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem < 8 ? mc.thePlayer.inventory.currentItem + 1 : mc.thePlayer.inventory.currentItem - 1));
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.INTERACT));
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
+                        break;
+                    case "dada-desync":
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem < 8 ? mc.thePlayer.inventory.currentItem + 1 : mc.thePlayer.inventory.currentItem - 1));
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.INTERACT));
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                        break;
                 }
-
                 isBlocking = true;
             }
         }

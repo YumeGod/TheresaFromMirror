@@ -8,12 +8,12 @@ import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.player.NoRotate;
+import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
-import net.minecraft.client.gui.GuiDownloadTerrain;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -37,6 +37,7 @@ public class Abuser extends Module {
     private final BooleanValue redesky = new BooleanValue("Rede-Sky-Semi", false);
     private final BooleanValue hypixel = new BooleanValue("Hypixel-Semi", false);
     private final BooleanValue packetChoke = new BooleanValue("Hypixel-Obfuscation", false);
+    public final BooleanValue packetMeme = new BooleanValue("Hypixel-Meme", false);
     private final BooleanValue packetFreeze = new BooleanValue("Hypixel-Freeze", false);
     public final BooleanValue updateFreeze = new BooleanValue("Hypixel-Freeze-Update", true);
     private final BooleanValue packetBrust = new BooleanValue("Brust", false);
@@ -128,8 +129,16 @@ public class Abuser extends Module {
 
                     mc.thePlayer.setPositionAndRotation(d0, d1, d2, f, f1);
 
-                    if (freezeTimer.hasReached(10000) || (!resetTimer.hasReached(100)) && hasDisable)
+                    if (freezeTimer.hasReached(10000) || (!resetTimer.hasReached(100)) && (updateFreeze.getObject()) && hasDisable)
                         freezeTimer.reset();
+
+                    if (packetMeme.getObject())
+                        if (!resetTimer.hasReached(100) && hasDisable) {
+                            ChatUtils.info("Packet sent");
+                            resetTimer.reset();
+                            event.setCancelled(true);
+                            return;
+                        }
 
                     if (!hasDisable)
                         mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(playerUtils.randomInRange(-0.99, 0.99) + 13371337.696969, playerUtils.randomInRange(-0.99, 0.99) + 13371337.696969,
@@ -138,7 +147,7 @@ public class Abuser extends Module {
                         mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
                                 ((S08PacketPlayerPosLook) event.getPacket()).getZ(), ((S08PacketPlayerPosLook) event.getPacket()).getYaw(), ((S08PacketPlayerPosLook) event.getPacket()).getPitch(), false));
 
-                    if (updateFreeze.getObject()) resetTimer.reset();
+                    resetTimer.reset();
                     event.setCancelled(true);
                 }
             }
