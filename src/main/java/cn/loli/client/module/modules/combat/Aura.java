@@ -306,7 +306,7 @@ public class Aura extends Module {
                     } else {
                         attemptRelease();
                     }
-                 else attemptRelease();
+                else attemptRelease();
     }
 
     //尝试进行Attack
@@ -444,7 +444,6 @@ public class Aura extends Module {
                 }
 
                 ticks++;
-                ChatUtils.info("Unblocking " + System.currentTimeMillis());
 
             }
         } else {
@@ -452,10 +451,8 @@ public class Aura extends Module {
                 ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
 
                 if (blockSense.getCurrentMode().equalsIgnoreCase("Desync"))
-                    if (ticks != 0) {
-                        ChatUtils.info("[AutoBlock] " + "Trying to desync");
-                        return;
-                    }
+                    if (ticks != 0) return;
+
 
                 switch (blockMode.getCurrentMode().toLowerCase()) {
                     case "ncp":
@@ -490,7 +487,6 @@ public class Aura extends Module {
                         break;
                 }
 
-                ChatUtils.info("Blocking " + System.currentTimeMillis());
                 isBlocking = true;
             }
         }
