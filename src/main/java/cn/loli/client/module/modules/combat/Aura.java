@@ -8,7 +8,6 @@ import cn.loli.client.injection.implementations.IEntityPlayer;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.misc.AntiBot;
-import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.BooleanValue;
@@ -51,7 +50,6 @@ public class Aura extends Module {
     private static final NumberValue<Float> range = new NumberValue<>("Range", 3f, 1f, 6f);
     private static final NumberValue<Float> blockRange = new NumberValue<>("BlockRange", 2f, 0f, 3f);
 
-    //   private static final NumberValue<Float> mouseSpeed = new NumberValue<>("Mouse Speed", 5f, 0f, 6f);
     private static final NumberValue<Float> inaccuracy = new NumberValue<>("Inaccuracy", 0f, 0f, 1f);
     public static final NumberValue<Integer> target_Amount = new NumberValue<>("Targets Amount", 1, 1, 5);
     public static final NumberValue<Integer> switchDelay = new NumberValue<>("Switch Delay", 100, 0, 500);
@@ -289,7 +287,8 @@ public class Aura extends Module {
     @EventTarget
     private void onPacket(PacketEvent event) {
         if (event.getPacket() instanceof C07PacketPlayerDigging)
-            if (blockSense.getCurrentMode().equalsIgnoreCase("Desync"))
+            if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
+                    && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject()))
                 if (target != null)
                     if (isBlocking) {
                         desyncPackets.add(event.getPacket());
@@ -297,8 +296,12 @@ public class Aura extends Module {
                     }
 
         if (event.getPacket() instanceof C03PacketPlayer)
-            if (blockSense.getCurrentMode().equalsIgnoreCase("Desync"))
-                if (target != null)
+            if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && autoBlock.getObject())
+                if (target != null) {
+                    if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
+                            && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject()))
+                        ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
+
                     if (!isBlocking && ticks < 5) {
                         desyncPackets.add(event.getPacket());
                         event.setCancelled(true);
@@ -306,7 +309,12 @@ public class Aura extends Module {
                     } else {
                         attemptRelease();
                     }
-                else attemptRelease();
+                } else {
+                    attemptRelease();
+                    if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && mc.thePlayer.getHeldItem() != null
+                            && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword)
+                        ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
+                }
     }
 
     //尝试进行Attack
@@ -404,7 +412,9 @@ public class Aura extends Module {
 
             if (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() && isBlocking) {
-                ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
+
+                if (blockSense.getCurrentMode().equalsIgnoreCase("Sync"))
+                    ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
 
                 switch (blockMode.getCurrentMode().toLowerCase()) {
                     case "desync":
@@ -444,14 +454,13 @@ public class Aura extends Module {
                 }
 
                 ticks++;
-
             }
         } else {
             if ((mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() || mc.thePlayer.isBlocking()) && !isBlocking) {
+                if (blockSense.getCurrentMode().equalsIgnoreCase("Sync"))
+                    ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
                 if (blockSense.getCurrentMode().equalsIgnoreCase("Desync"))
                     if (ticks != 0) return;
-                ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
-
                 switch (blockMode.getCurrentMode().toLowerCase()) {
                     case "ncp":
                     case "desync":
