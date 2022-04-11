@@ -8,6 +8,7 @@ import cn.loli.client.injection.implementations.IEntityPlayer;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.misc.AntiBot;
+import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.BooleanValue;
@@ -287,16 +288,25 @@ public class Aura extends Module {
 
     @EventTarget
     private void onPacket(PacketEvent event) {
-        if (event.getPacket() instanceof C03PacketPlayer) {
-            if (blockSense.getCurrentMode().equalsIgnoreCase("desync"))
-                if (target != null) {
-                    desyncPackets.add(event.getPacket());
-                    ticks++;
-                    event.setCancelled(true);
-                } else {
-                    attemptRelease();
-                }
-        }
+        if (event.getPacket() instanceof C07PacketPlayerDigging)
+            if (blockSense.getCurrentMode().equalsIgnoreCase("Desync"))
+                if (target != null)
+                    if (isBlocking) {
+                        desyncPackets.add(event.getPacket());
+                        event.setCancelled(true);
+                    }
+
+        if (event.getPacket() instanceof C03PacketPlayer)
+            if (blockSense.getCurrentMode().equalsIgnoreCase("Desync"))
+                if (target != null)
+                    if (!isBlocking && ticks < 3) {
+                        desyncPackets.add(event.getPacket());
+                        event.setCancelled(true);
+                        ticks++;
+                    } else {
+                        attemptRelease();
+                    }
+                 else attemptRelease();
     }
 
     //尝试进行Attack
@@ -396,13 +406,6 @@ public class Aura extends Module {
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() && isBlocking) {
                 ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
 
-                if (blockSense.getCurrentMode().equalsIgnoreCase("desync"))
-                    if (ticks > 3) {
-                        attemptRelease();
-                    } else {
-                        return;
-                    }
-
                 switch (blockMode.getCurrentMode().toLowerCase()) {
                     case "desync":
                         mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
@@ -440,10 +443,19 @@ public class Aura extends Module {
                         break;
                 }
 
+                ticks++;
+                ChatUtils.info("Unblocking " + System.currentTimeMillis());
+
             }
         } else {
             if ((mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() || mc.thePlayer.isBlocking()) && !isBlocking) {
                 ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
+
+                if (blockSense.getCurrentMode().equalsIgnoreCase("Desync"))
+                    if (ticks != 0) {
+                        ChatUtils.info("[AutoBlock] " + "Trying to desync");
+                        return;
+                    }
 
                 switch (blockMode.getCurrentMode().toLowerCase()) {
                     case "ncp":
@@ -478,6 +490,7 @@ public class Aura extends Module {
                         break;
                 }
 
+                ChatUtils.info("Blocking " + System.currentTimeMillis());
                 isBlocking = true;
             }
         }

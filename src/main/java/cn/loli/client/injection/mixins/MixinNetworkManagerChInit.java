@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(targets = "net.minecraft.network.NetworkManager$5")
-public abstract class MixinNetworkManagerChInit {
+public class MixinNetworkManagerChInit {
 
     @Inject(method = "initChannel", at = @At(value = "INVOKE", target = "Lio/netty/channel/Channel;pipeline()Lio/netty/channel/ChannelPipeline;", shift = At.Shift.AFTER), remap = false)
     private void onInitChannel(Channel p_initChannel_1_, CallbackInfo ci) {
