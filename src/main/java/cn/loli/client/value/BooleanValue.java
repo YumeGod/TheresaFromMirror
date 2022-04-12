@@ -2,6 +2,8 @@
 
 package cn.loli.client.value;
 
+import cn.loli.client.gui.clickui.dropdown.panels.components.BooleanComponent;
+import cn.loli.client.gui.clickui.dropdown.panels.components.Component;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -10,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 public class BooleanValue extends Value<Boolean> {
     public BooleanValue(String name, Boolean defaultValue) {
         super(name, defaultValue, null);
+        this.component = new BooleanComponent(this);
     }
 
     @Override

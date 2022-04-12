@@ -2,6 +2,8 @@
 
 package cn.loli.client.value;
 
+import cn.loli.client.gui.clickui.dropdown.panels.components.Component;
+import cn.loli.client.gui.clickui.dropdown.panels.components.NumberComponent;
 import com.google.gson.JsonObject;
 
 import java.util.function.Predicate;
@@ -9,6 +11,7 @@ import java.util.function.Predicate;
 public abstract class Value<T> {
     private final String name;
     public float clickgui_anim;
+    public Component component;
     private T object;
     private final T defaultVal;
 

@@ -4,6 +4,9 @@ import cn.loli.client.Main;
 import cn.loli.client.gui.clickui.GuiTextBox;
 import cn.loli.client.gui.clickui.dropdown.ClickUI;
 import cn.loli.client.gui.clickui.dropdown.Panel;
+import cn.loli.client.gui.clickui.dropdown.panels.components.BooleanComponent;
+import cn.loli.client.gui.clickui.dropdown.panels.components.ModeComponent;
+import cn.loli.client.gui.clickui.dropdown.panels.components.NumberComponent;
 import cn.loli.client.gui.ttfr.HFontRenderer;
 import cn.loli.client.module.Module;
 import cn.loli.client.utils.render.AnimationUtils;
@@ -14,6 +17,7 @@ import org.lwjgl.input.Mouse;
 
 import java.awt.*;
 import java.text.DecimalFormat;
+import java.util.Objects;
 
 import static cn.loli.client.value.ColorValue.isHovered;
 
@@ -39,85 +43,20 @@ public class ValuePanel extends Panel {
             Main.INSTANCE.fontLoaders.get("heiti18").drawString(v.getName(), (float) (x + 5), (float) (valuesY + 1), theme.value_name.getRGB());
             if (v instanceof BooleanValue) {
                 // Boolean value
-                RenderUtils.drawRoundRect(x + width - 21, valuesY, x + width - 4, valuesY + 10, 5, theme.option_bg.getRGB());
-                v.clickgui_anim = AnimationUtils.smoothAnimation(v.clickgui_anim, ((boolean) v.getObject()) ? 11 : 0, ANIMATION_SPEED, ANIMATION_SCALE);
-                RenderUtils.drawFilledCircle(x + width - 21 + v.clickgui_anim, valuesY + 5, 5, ((boolean) v.getObject()) ? theme.option_on.getRGB() : theme.option_off.getRGB(), 5);
-
+                BooleanComponent bc = (BooleanComponent) v.component;
+                bc.draw((float) (x + width - 25), (float) valuesY, partialTicks);
                 //RenderUtils.drawRect(x + width - 35, valuesY, x + width - 14, valuesY + 10, 0x88ff0000);
             } else if (v instanceof NumberValue) {
-                // Number value
-                RenderUtils.drawRoundRect(x + width - 80, valuesY + 13, x + width - 5, valuesY + 19, 3, theme.option_bg.getRGB());
-
-                float vX = (((Number) v.getObject()).floatValue() - ((NumberValue<?>) v).getMin().floatValue()) / (((NumberValue<?>) v).getMax().floatValue() - ((NumberValue<?>) v).getMin().floatValue());
-
-                v.clickgui_anim = AnimationUtils.smoothAnimation(v.clickgui_anim, (float) (vX * ((x + width - 5) - (x + width - 80))), ANIMATION_SPEED, ANIMATION_SCALE);
-                //RenderUtils.drawRoundRect(x + width - showValueX + 5, valuesY + 13, x + width - showValueX + 10 + v.clickgui_anim, valuesY + 19, 3, theme.themeColor.getRGB());
-
-                RenderUtils.roundedRect((float) (x + width - 80f), (float) (valuesY + 13), v.clickgui_anim + 5, 6, 3, theme.themeColor.getRGB(), .5f, theme.themeColor.getRGB());
-
-                //RenderUtils.drawRect(x + width - showValueX + 5, valuesY + 13, x + width - 14, valuesY + 19, 0x88ff0000);
-
-                DecimalFormat df = new DecimalFormat("#.##");
-
-                String bs = df.format(v.getObject());
-                Main.INSTANCE.fontLoaders.get("heiti18").drawString(bs, (float) (x + width - 15 - (Main.INSTANCE.fontLoaders.get("heiti16").getStringWidth(bs)) - 1), (float) (valuesY + 1), theme.value_number_value.getRGB(), false);
-
-                // 设置number的值
-                if (((NumberValue<?>) v).clickgui_drag && Mouse.isButtonDown(0) && valuesY > y && valuesY + 20 < y + height) {
-                    float v1 = (float) ((mouseX - (x + width - 5)) / ((x + width - 80) - (x + width - 5)) * (((NumberValue<?>) v).getMax().floatValue() - ((NumberValue<?>) v).getMin().floatValue()) + ((NumberValue<?>) v).getMin().floatValue());
-                    if (v1 <= ((NumberValue<?>) v).getMin().floatValue()) {
-                        v1 = (((NumberValue<?>) v).getMin().floatValue());
-                    }
-
-                    if (v1 >= ((NumberValue<?>) v).getMax().floatValue()) {
-                        v1 = (((NumberValue<?>) v).getMax().floatValue());
-                    }
-                    if (((NumberValue<?>) v).getMax() instanceof Integer) {
-                        v.setObject((int) v1);
-                    } else if (((NumberValue<?>) v).getMax() instanceof Float) {
-                        v.setObject(v1);
-                    } else if (((NumberValue<?>) v).getMax() instanceof Double) {
-                        v.setObject(((double) v1));
-                    } else if (((NumberValue<?>) v).getMax() instanceof Long) {
-                        v.setObject((long) v1);
-                    }
-
-                } else {
-                    ((NumberValue<?>) v).clickgui_drag = false;
-                }
-
-                valuesY += 8;
+                NumberComponent bc = (NumberComponent) v.component;
+                bc.setMouseX(mouseX);
+                bc.setWidth((float) (width - 15));
+                bc.draw((float) (x + 10), (float) valuesY + 14, partialTicks);
+                valuesY += 10;
             } else if (v instanceof ModeValue) {
-                // Mode value
-                HFontRenderer font = Main.INSTANCE.fontLoaders.get("heiti17");
-                float width2 = 0;
-
-                for (String mode : ((ModeValue) v).getModes()) {
-                    float temp = font.getStringWidth(mode);
-                    if (width2 < temp) width2 = temp;
-                }
-
-                RenderUtils.drawRoundRect(x + width - 30 - width2, valuesY - 1, x + width - 15, valuesY + 11 + v.clickgui_anim, 2, theme.option_bg.getRGB());
-
-                font.drawCenteredString(((ModeValue) v).getCurrentMode(), (float) (x + width - 23 - width2 / 2), (float) (valuesY + 1), theme.value_mode_current.getRGB());
-
-                if (((ModeValue) v).open) {
-                    v.clickgui_anim = AnimationUtils.smoothAnimation(v.clickgui_anim, ((ModeValue) v).getModes().length * 14, ANIMATION_SPEED, ANIMATION_SCALE);
-                } else {
-                    v.clickgui_anim = AnimationUtils.smoothAnimation(v.clickgui_anim, 0, ANIMATION_SPEED, ANIMATION_SCALE);
-                }
-
-                if (((ModeValue) v).open) {
-                    float yy = (float) (valuesY + 14);
-                    for (String mode : ((ModeValue) v).getModes()) {
-                        if (valuesY + 18 + v.clickgui_anim >= yy + 14) {
-                            font.drawCenteredString(mode, (float) (x + width - 23 - width2 / 2), yy, theme.value_mode_unsel.getRGB());
-                        }
-
-                        yy += 14;
-                    }
-                }
+                ModeComponent mc = (ModeComponent) v.component;
+                mc.draw((float) (x + width - 25), (float) valuesY + 14, partialTicks);
                 valuesY += v.clickgui_anim;
+                valuesY += 10;
             } else if (v instanceof StringValue) {
                 if (((StringValue) v).text == null) {
                     ((StringValue) v).text = new GuiTextBox(0, Main.INSTANCE.fontLoaders.get("heiti17"), 0, 0, 0, 0);
@@ -134,31 +73,48 @@ public class ValuePanel extends Panel {
                 }
             } else if (v instanceof ColorValue) {
                 // Color
-                if (isHovered(x, y, x + width, y + height - 20, mouseX, mouseY)) {
-                    ((ColorValue) v).draw((float) (x + width - 70), (float) (valuesY + 1), 40, 40, mouseX, mouseY);
+                if (isHovered(x + width - 70, x + width - 30, valuesY + 10, valuesY + 41, mouseX, mouseY)) {
+                    ((ColorValue) v).draw((float) (x + width - 70), (float) (valuesY + 10), 40, 40, mouseX, mouseY);
                 } else {
-                    ((ColorValue) v).draw((float) (x + width - 70), (float) (valuesY + 1), 40, 40, -1, -1);
+                    ((ColorValue) v).draw((float) (x + width - 70), (float) (valuesY + 10), 40, 40, -1, -1);
                 }
 
-                valuesY += 100;
+                valuesY += 50;
             }
             valuesY += 20;
             RenderUtils.drawRect(x + width - 40, valuesY - 5, x + width - 10, valuesY - 5 + 0.5f, theme.value_line.getRGB());
         }
-        maxHeight = valuesY - this.y - this.TITLE_HEIGHT - 10;
+        maxHeight = 200;
     }
 
     @Override
     public void onClicked(double mx, double my, int mouseButton) {
-
         if (!isHovered(x, x + width, y, y + height - 10, mx, my)) {
             return; // 如果不在范围内，则不处理
         }
-
         // 处理鼠标点击事件
         double my1 = this.y + this.TITLE_HEIGHT + 10 + scroll;
-        for (Value value : Main.INSTANCE.valueManager.getAllValuesFrom(module.getName())) {
-
+        for (Value v : Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(module.getName()))) {
+            if (v instanceof BooleanValue) {
+                // Boolean value
+                v.component.onMouse((int) mx, (int) my, mouseButton);
+            } else if (v instanceof NumberValue) {
+                NumberComponent nc = (NumberComponent) v.component;
+                nc.onMouse((int) mx, (int) my, mouseButton);
+                my1 += 10;
+            } else if (v instanceof ModeValue) {
+                ModeComponent mc = (ModeComponent) v.component;
+                mc.onMouse((int) mx, (int) my, mouseButton);
+                my1 += v.clickgui_anim;
+                my1 += 10;
+            } else if (v instanceof StringValue) {
+                if (((StringValue) v).text != null) {
+                    ((StringValue) v).text.mouseClicked((int) mx, (int) my, mouseButton);
+                }
+            } else if (v instanceof ColorValue) {
+                my1 += 50;
+            }
+            my1 += 20;
         }
     }
 }

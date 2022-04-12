@@ -2,6 +2,8 @@
 
 package cn.loli.client.value;
 
+import cn.loli.client.gui.clickui.dropdown.panels.components.Component;
+import cn.loli.client.gui.clickui.dropdown.panels.components.ModeComponent;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -20,6 +22,7 @@ public class ModeValue extends Value<Integer> {
     public ModeValue(String name, String defaultVal, Predicate<Integer> validator, String... modes) {
         super(name, 0, validator);
         this.modes = modes;
+        this.component = new ModeComponent(this);
 
         setObject(defaultVal);
     }
