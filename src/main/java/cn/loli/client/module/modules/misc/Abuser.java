@@ -129,11 +129,11 @@ public class Abuser extends Module {
 
                     mc.thePlayer.setPositionAndRotation(d0, d1, d2, f, f1);
 
-                    if (freezeTimer.hasReached(10000) || (!resetTimer.hasReached(100)) && (updateFreeze.getObject()) && hasDisable)
+                    if (freezeTimer.hasReached(10000) || (!resetTimer.hasReached(175)) && (updateFreeze.getObject()) && hasDisable)
                         freezeTimer.reset();
 
                     if (packetMeme.getObject())
-                        if (!resetTimer.hasReached(100) && hasDisable) {
+                        if (!resetTimer.hasReached(175) && hasDisable) {
                             ChatUtils.info("Packet sent");
                             resetTimer.reset();
                             event.setCancelled(true);

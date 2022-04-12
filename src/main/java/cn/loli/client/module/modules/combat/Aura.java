@@ -62,7 +62,7 @@ public class Aura extends Module {
 
 
     public static final NumberValue<Integer> unBlockTweak = new NumberValue<>("UnBlock Tweak", 0, 0, 100);
-    private final ModeValue blockMode = new ModeValue("Block Mode", "Desync", "NCP", "Idle", "Desync", "Always", "Legit", "Vanilla", "Semi-Vanilla", "Spoof-Switch", "Switch", "Null", "Dada", "Dada-Desync");
+    private final ModeValue blockMode = new ModeValue("Block Mode", "Desync", "NCP", "Idle", "Desync", "Always", "Legit", "Vanilla", "Semi-Vanilla", "Spoof-Switch", "Switch", "Null");
     private final ModeValue blockWhen = new ModeValue("Block when", "On Attack", "On Attack", "On Tick", "Sync");
     private final ModeValue blockSense = new ModeValue("Block style", "Sync", "Sync", "Desync");
     private final ModeValue attackWhen = new ModeValue("Attack when", "Pre", "Pre", "Post", "Tick");
@@ -122,7 +122,7 @@ public class Aura extends Module {
     public static List<EntityLivingBase> targets = new ArrayList<>();
 
     int cps, index;
-    static boolean isBlocking = false;
+    boolean isBlocking = false;
 
     float curYaw, curPitch;
 
@@ -269,10 +269,14 @@ public class Aura extends Module {
             }
             if (blockWhen.getCurrentMode().equals("On Tick"))
                 handleAutoBlock(true);
+
             if (attackWhen.getCurrentMode().equals("Pre"))
                 attemptAttack();
+
         } else if (event.getEventType() == EventType.POST) {
-            if (attackWhen.getCurrentMode().equals("Post")) attemptAttack();
+            if (attackWhen.getCurrentMode().equals("Post"))
+                attemptAttack();
+
             if (blockWhen.getCurrentMode().equals("On Tick") || blockWhen.getCurrentMode().equals("Sync"))
                 handleAutoBlock(false);
         }
@@ -287,7 +291,7 @@ public class Aura extends Module {
     @EventTarget
     private void onPacket(PacketEvent event) {
         if (event.getPacket() instanceof C07PacketPlayerDigging)
-            if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
+            if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.getHeldItem() != null
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject()))
                 if (target != null)
                     if (isBlocking) {
@@ -296,7 +300,7 @@ public class Aura extends Module {
                     }
 
         if (event.getPacket() instanceof C03PacketPlayer)
-            if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
+            if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.getHeldItem() != null
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject()))
                 if (target != null) {
                     if (!isBlocking && ticks < 4) {
@@ -311,7 +315,7 @@ public class Aura extends Module {
                 }
 
         if (event.getPacket() instanceof C08PacketPlayerBlockPlacement)
-            if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
+            if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.getHeldItem() != null
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject())) {
                 if (ticks > 3)
                     attemptRelease();
@@ -453,6 +457,7 @@ public class Aura extends Module {
                         mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                         mc.getNetHandler().getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, null, EnumFacing.DOWN));
                         isBlocking = false;
+                        break;
                     case "vanilla":
                         mc.playerController.onStoppedUsingItem(mc.thePlayer);
                         isBlocking = false;
