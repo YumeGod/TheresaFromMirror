@@ -20,7 +20,7 @@ public class NoRotate extends Module {
     public void onPacket(PacketEvent event) {
         if (event.getPacket() instanceof S08PacketPlayerPosLook) {
             if (mc.thePlayer != null && mc.theWorld != null) {
-                if (!Main.INSTANCE.moduleManager.getModule(Abuser.class).getState() && mc.thePlayer.rotationPitch == 0.0F
+                if (mc.thePlayer.rotationPitch == 0.0F
                         || mc.isSingleplayer())
                     return;
 
@@ -55,21 +55,34 @@ public class NoRotate extends Module {
                 mc.thePlayer.setPositionAndRotation(d0, d1, d2,
                         mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
 
-                if (Main.INSTANCE.moduleManager.getModule(Abuser.class).freezeTimer.hasReached(10000) ||
-                        (!Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.hasReached(175) && Main.INSTANCE.moduleManager.getModule(Abuser.class).updateFreeze.getObject() && Main.INSTANCE.moduleManager.getModule(Abuser.class).hasDisable))
-                    Main.INSTANCE.moduleManager.getModule(Abuser.class).freezeTimer.reset();
+                if (Main.INSTANCE.moduleManager.getModule(Abuser.class).getState()) {
+                    if (Main.INSTANCE.moduleManager.getModule(Abuser.class).freezeTimer.hasReached(10000) ||
+                            (!Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.hasReached(175) && Main.INSTANCE.moduleManager.getModule(Abuser.class).updateFreeze.getObject() && Main.INSTANCE.moduleManager.getModule(Abuser.class).hasDisable))
+                        Main.INSTANCE.moduleManager.getModule(Abuser.class).freezeTimer.reset();
 
-                if (Main.INSTANCE.moduleManager.getModule(Abuser.class).packetMeme.getObject())
-                    if (!Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.hasReached(175) && Main.INSTANCE.moduleManager.getModule(Abuser.class).hasDisable) {
-                        ChatUtils.info("Packet sent");
-                        Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.reset();
-                        if (Main.INSTANCE.moduleManager.getModule(Abuser.class).packetMemeEdit.getObject())
-                            mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
-                                    ((S08PacketPlayerPosLook) event.getPacket()).getZ(), false));
-                        else
-                            event.setCancelled(true);
-                        return;
-                    }
+                    if (Main.INSTANCE.moduleManager.getModule(Abuser.class).packetMeme.getObject())
+                        if (!Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.hasReached(175)) {
+                            ChatUtils.info("Packet sent");
+                            Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.reset();
+                            if (Main.INSTANCE.moduleManager.getModule(Abuser.class).packetMemeEdit.getObject())
+                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY() + 0.01,
+                                        ((S08PacketPlayerPosLook) event.getPacket()).getZ(), false));
+                            else
+                                event.setCancelled(true);
+
+                            Main.INSTANCE.moduleManager.getModule(Abuser.class).flagStock.add(new Abuser.PosLookPacket(new C03PacketPlayer.C06PacketPlayerPosLook(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
+                                    ((S08PacketPlayerPosLook) event.getPacket()).getZ(), ((S08PacketPlayerPosLook) event.getPacket()).getYaw(), ((S08PacketPlayerPosLook) event.getPacket()).getPitch(), false)));
+                            return;
+                        } else {
+                            for (Abuser.PosLookPacket packet : Main.INSTANCE.moduleManager.getModule(Abuser.class).flagStock) {
+                                if (packet.isExpired()) {
+                                    mc.getNetHandler().getNetworkManager().sendPacket(packet.getPacket());
+                                    Main.INSTANCE.moduleManager.getModule(Abuser.class).flagStock.remove(packet);
+                                }
+                            }
+                        }
+
+                }
 
 
                 if (!Main.INSTANCE.moduleManager.getModule(Abuser.class).hasDisable && Main.INSTANCE.moduleManager.getModule(Abuser.class).getState())
@@ -78,7 +91,6 @@ public class NoRotate extends Module {
                 else
                     mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
                             ((S08PacketPlayerPosLook) event.getPacket()).getZ(), ((S08PacketPlayerPosLook) event.getPacket()).getYaw(), ((S08PacketPlayerPosLook) event.getPacket()).getPitch(), false));
-
 
                 Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.reset();
                 event.setCancelled(true);

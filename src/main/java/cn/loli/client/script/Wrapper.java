@@ -3,6 +3,7 @@ package cn.loli.client.script;
 import cn.loli.client.Main;
 import cn.loli.client.events.PlayerMoveEvent;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
+import cn.loli.client.injection.mixins.IAccessorRenderManager;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.modules.combat.TargetStrafe;
 import cn.loli.client.script.java.sfontmanager.SFontLoader;
@@ -161,4 +162,17 @@ public class Wrapper {
         });
         return arrayList;
     }
+
+    public double getRenderPosX(){
+       return ((IAccessorRenderManager) Minecraft.getMinecraft().getRenderManager()).getRenderPosX();
+    }
+
+    public double getRenderPosY(){
+       return ((IAccessorRenderManager) Minecraft.getMinecraft().getRenderManager()).getRenderPosY();
+    }
+
+    public double getRenderPosZ(){
+       return ((IAccessorRenderManager) Minecraft.getMinecraft().getRenderManager()).getRenderPosZ();
+    }
+
 }

@@ -28,6 +28,7 @@ import net.minecraft.util.BlockPos;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Abuser extends Module {
 
@@ -36,7 +37,6 @@ public class Abuser extends Module {
     private final BooleanValue ncp = new BooleanValue("NCP-Timer-Flag", false);
     private final BooleanValue redesky = new BooleanValue("Rede-Sky-Semi", false);
     private final BooleanValue hypixel = new BooleanValue("Hypixel-Semi", false);
-    //   private final BooleanValue packetChoke = new BooleanValue("Hypixel-Obfuscation", false);
     public final BooleanValue packetMeme = new BooleanValue("Hypixel-Meme", false);
     public final BooleanValue packetMemeEdit = new BooleanValue("Hypixel-Meme-Transform", false);
     private final BooleanValue packetFreeze = new BooleanValue("Hypixel-Freeze", false);
@@ -51,10 +51,12 @@ public class Abuser extends Module {
 
     public boolean hasDisable;
     public double x, y, z;
+    public final ConcurrentLinkedQueue<PosLookPacket> flagStock = new ConcurrentLinkedQueue<>();
     public final TimeHelper timer = new TimeHelper(), freezeTimer = new TimeHelper(), resetTimer = new TimeHelper();
-    private final TimeHelper brust = new TimeHelper(), dormantTimer = new TimeHelper(), choke = new TimeHelper();
-    private final ArrayList<Packet<INetHandlerPlayClient>> packets = new ArrayList<>();
+    private final TimeHelper burst = new TimeHelper(), dormantTimer = new TimeHelper(), choke = new TimeHelper();
+    private final List<Packet<INetHandlerPlayClient>> packets = new ArrayList<>();
     private final List<Packet<?>> dormant = new ArrayList<>();
+
     long delay = 150;
     long dormantDelay = 200;
     int invalid = 0;
@@ -134,14 +136,25 @@ public class Abuser extends Module {
                         freezeTimer.reset();
 
                     if (packetMeme.getObject())
-                        if (!resetTimer.hasReached(175) && hasDisable) {
+                        if (!resetTimer.hasReached(175)) {
                             ChatUtils.info("Packet sent");
                             resetTimer.reset();
                             if (packetMemeEdit.getObject())
                                 mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(), ((S08PacketPlayerPosLook) event.getPacket()).getZ(), false));
                             else
                                 event.setCancelled(true);
+
+                            flagStock.add(new PosLookPacket(new C03PacketPlayer.C06PacketPlayerPosLook(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
+                                    ((S08PacketPlayerPosLook) event.getPacket()).getZ(), ((S08PacketPlayerPosLook) event.getPacket()).getYaw(), ((S08PacketPlayerPosLook) event.getPacket()).getPitch(), false)));
                             return;
+                        } else {
+                            for (PosLookPacket packet : flagStock) {
+                                if (packet.isExpired()){
+                                    mc.getNetHandler().getNetworkManager().sendPacket(packet.getPacket());
+                                    flagStock.remove(packet);
+                                }
+
+                            }
                         }
 
                     if (!hasDisable)
@@ -170,7 +183,7 @@ public class Abuser extends Module {
                         && ((S32PacketConfirmTransaction) event.getPacket()).getActionNumber() < 0) {
                     if (!hasDisable) {
                         hasDisable = true;
-                        brust.reset();
+                        burst.reset();
                         invalid = 0;
                     }
 
@@ -228,9 +241,9 @@ public class Abuser extends Module {
         if (mc.isSingleplayer()) return;
 
         if (packetBrust.getObject() || hypixel.getObject()) {
-            if (!brust.hasReached(delay)) return;
+            if (!burst.hasReached(delay)) return;
             resetPackets(mc.getNetHandler());
-            brust.reset();
+            burst.reset();
         }
 
         if (packetDormant.getObject()) {
@@ -245,6 +258,16 @@ public class Abuser extends Module {
             if (!freezeTimer.hasReached(freezeLatency.getObject() * 100)) return;
             resetPacket();
         }
+
+        if (!flagStock.isEmpty() && hasDisable){
+            for (PosLookPacket packet : Main.INSTANCE.moduleManager.getModule(Abuser.class).flagStock) {
+                if (System.currentTimeMillis() - packet.time > 3000) {
+                    mc.getNetHandler().getNetworkManager().sendPacket(packet.getPacket());
+                    Main.INSTANCE.moduleManager.getModule(Abuser.class).flagStock.remove(packet);
+                }
+            }
+        }
+
     }
 
     @EventTarget
@@ -321,6 +344,28 @@ public class Abuser extends Module {
                     dormant.remove(dormant.get(0));
                 }
             }
+        }
+    }
+
+    public static class PosLookPacket {
+        private final C03PacketPlayer c03PacketPlayer;
+        private final long time;
+
+        public PosLookPacket(C03PacketPlayer c03PacketPlayer) {
+            this.c03PacketPlayer = c03PacketPlayer;
+            time = System.currentTimeMillis();
+        }
+
+        public C03PacketPlayer getPacket() {
+            return c03PacketPlayer;
+        }
+
+        public long getTime() {
+            return time;
+        }
+
+        public boolean isExpired() {
+            return System.currentTimeMillis() - time > 1200;
         }
     }
 
