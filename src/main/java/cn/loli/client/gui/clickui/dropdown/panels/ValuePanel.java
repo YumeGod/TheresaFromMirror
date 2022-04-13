@@ -73,7 +73,7 @@ public class ValuePanel extends Panel {
                 }
             } else if (v instanceof ColorValue) {
                 // Color
-                if (isHovered(x + width - 70, x + width - 30, valuesY + 10, valuesY + 41, mouseX, mouseY)) {
+                if (isHovered(x + width - 70, x + width, valuesY + 10, valuesY + 41, mouseX, mouseY)) {
                     ((ColorValue) v).draw((float) (x + width - 70), (float) (valuesY + 10), 40, 40, mouseX, mouseY);
                 } else {
                     ((ColorValue) v).draw((float) (x + width - 70), (float) (valuesY + 10), 40, 40, -1, -1);
@@ -84,7 +84,7 @@ public class ValuePanel extends Panel {
             valuesY += 20;
             RenderUtils.drawRect(x + width - 40, valuesY - 5, x + width - 10, valuesY - 5 + 0.5f, theme.value_line.getRGB());
         }
-        maxHeight = 200;
+        maxHeight = valuesY - this.y;
     }
 
     @Override

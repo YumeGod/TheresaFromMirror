@@ -141,7 +141,6 @@ public class ClickGui extends GuiScreen {
         RenderUtils.drawImage(new ResourceLocation("theresa/icons/logo.png"), (int) (x + leftMenuWidth / 2 - 30), (int) (y + 15), 17, 16);//logo
         Main.INSTANCE.fontLoaders.get("heiti24").drawString((Main.CLIENT_NAME.toCharArray()[0] + "").toUpperCase() + Main.CLIENT_NAME.substring(1), (int) (x + leftMenuWidth / 2 - 10), (int) (y + 20), theme.clientname.getRGB());//Client Name
         RenderUtils.drawRect((int) (x + leftMenuWidth / 2 - 3), (int) (y + 30), x + leftMenuWidth / 2 + 5, y + 31, theme.themeColor.getRGB());//客户端名字下方的矩形
-        Main.INSTANCE.fontLoaders.get("heiti16").drawString(Main.CLIENT_VERSION, (int) (x + leftMenuWidth / 2 + 5), (int) (y + 30), theme.client_version.getRGB());//版本
         //绘制categories
         float my = y + 60;
         RenderUtils.drawRect(x, y + slider.top - 5, x + leftMenuWidth, y + slider.top + 25, theme.slider.getRGB());//滑块条
@@ -154,7 +153,7 @@ public class ClickGui extends GuiScreen {
         }
 
         //右下角拖动的图标
-        RenderUtils.drawImage(new ResourceLocation("theresa/icons/drag.png"), x + width - 20, y + height - 20, 16, 16, isHovered(x + width - 20, y + height - 20, x + width - 4, y + height - 4, mouseX, mouseY) ? theme.themeColor : drag ? theme.themeColor : theme.sec_unsel);
+        RenderUtils.drawImage(new ResourceLocation("theresa/icons/drag.png"), x + width - 20, y + height - 20, 16, 16, isHovered(x + width - 20, y + height - 20, x + width - 4, y + height - 4, mouseX, mouseY) ? theme.themeColor : theme.sec_unsel);
         searchField.drawTextBox();//搜索框
         if (Objects.equals(searchField.getText(), "") && !searchField.isFocused()) {
             RenderUtils.drawImage(new ResourceLocation("theresa/icons/search.png"), x + leftMenuWidth + 14, y + 14, 8, 8, theme.sec_unsel);

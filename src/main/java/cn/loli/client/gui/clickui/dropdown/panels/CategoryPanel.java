@@ -5,7 +5,6 @@ import cn.loli.client.gui.clickui.dropdown.ClickUI;
 import cn.loli.client.gui.clickui.dropdown.Panel;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.utils.render.AnimationUtils;
 import cn.loli.client.utils.render.RenderUtils;
 import net.minecraft.util.ResourceLocation;
 
@@ -56,7 +55,16 @@ public class CategoryPanel extends Panel {
                 if (mouseButton == 0) {
                     m.setState(!m.getState());// 如果鼠标左键点击，则切换模块状态
                 } else if (mouseButton == 1 && Main.INSTANCE.valueManager.getAllValuesFrom(m.getName()).size() > 0) {
-                    ClickUI.panels_temp.add(new ValuePanel(m));// 如果鼠标右键点击，则打开模块值面板
+                    boolean found = false;
+                    for (Panel p : ClickUI.panels) {
+                        if (p.name.equals(m.getName())) {
+                            ClickUI.panels_remove_temp.add(p);// 如果鼠标右键点击，则打开模块值面板
+                            found = true;
+                        }
+                    }
+                    if (!found) {
+                        ClickUI.panels_add_temp.add(new ValuePanel(m));// 如果鼠标右键点击，则打开模块值面板
+                    }
                 }
             }
             my1 += 25;
