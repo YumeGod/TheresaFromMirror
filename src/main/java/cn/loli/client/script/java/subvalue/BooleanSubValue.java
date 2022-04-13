@@ -2,6 +2,7 @@
 
 package cn.loli.client.script.java.subvalue;
 
+import cn.loli.client.gui.clickui.dropdown.panels.components.BooleanComponent;
 import cn.loli.client.value.BooleanValue;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 public class BooleanSubValue extends BooleanValue {
     public BooleanSubValue(String name, Boolean defaultValue) {
         super(name, defaultValue);
+        this.component = new BooleanComponent(this);
     }
 
     @Override

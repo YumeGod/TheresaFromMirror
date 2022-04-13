@@ -2,6 +2,7 @@
 
 package cn.loli.client.script.java.subvalue;
 
+import cn.loli.client.gui.clickui.dropdown.panels.components.ModeComponent;
 import cn.loli.client.value.ModeValue;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.NotNull;
@@ -15,6 +16,7 @@ public class ModeSubValue extends ModeValue {
 
     public ModeSubValue(String name, String defaultVal, String... modes) {
         this(name, defaultVal, null, modes);
+        this.component = new ModeComponent(this);
     }
 
     public ModeSubValue(String name, String defaultVal, Predicate<Integer> validator, String... modes) {

@@ -3,6 +3,7 @@
 package cn.loli.client.script.java.subvalue;
 
 import cn.loli.client.Main;
+import cn.loli.client.gui.clickui.dropdown.panels.components.NumberComponent;
 import cn.loli.client.value.NumberValue;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -19,6 +20,7 @@ public class NumberSubValue<T extends Number> extends NumberValue<T> {
 
     public NumberSubValue(String name, T defaultVal, @NotNull T min, @NotNull T max) {
         this(name, defaultVal, min, max, null);
+        this.component = new NumberComponent(this);
     }
 
     public NumberSubValue(String name, T defaultVal, @NotNull T min, @NotNull T max, @Nullable Predicate<T> validator) {
