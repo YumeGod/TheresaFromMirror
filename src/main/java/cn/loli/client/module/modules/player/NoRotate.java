@@ -64,11 +64,11 @@ public class NoRotate extends Module {
                         mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch);
 
                 if (Main.INSTANCE.moduleManager.getModule(Abuser.class).freezeTimer.hasReached(10000) ||
-                        (!Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.hasReached(100) && Main.INSTANCE.moduleManager.getModule(Abuser.class).updateFreeze.getObject() && Main.INSTANCE.moduleManager.getModule(Abuser.class).hasDisable))
+                        (!Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.hasReached(175) && Main.INSTANCE.moduleManager.getModule(Abuser.class).updateFreeze.getObject() && Main.INSTANCE.moduleManager.getModule(Abuser.class).hasDisable))
                     Main.INSTANCE.moduleManager.getModule(Abuser.class).freezeTimer.reset();
 
                 if (Main.INSTANCE.moduleManager.getModule(Abuser.class).packetMeme.getObject())
-                    if (!Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.hasReached(100) && Main.INSTANCE.moduleManager.getModule(Abuser.class).hasDisable){
+                    if (!Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.hasReached(175) && Main.INSTANCE.moduleManager.getModule(Abuser.class).hasDisable){
                         ChatUtils.info("Packet sent");
                         Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.reset();
                         event.setCancelled(true);

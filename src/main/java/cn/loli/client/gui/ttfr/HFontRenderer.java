@@ -195,6 +195,7 @@ public class HFontRenderer implements IResourceManagerReloadListener {
         return (float) l;
     }
 
+
     private ResourceLocation getUnicodePageLocation(int p_getUnicodePageLocation_1_) {
         if (unicodePageLocations[p_getUnicodePageLocation_1_] == null) {
             unicodePageLocations[p_getUnicodePageLocation_1_] = new ResourceLocation(String.format("textures/font/unicode_page_%02x.png", p_getUnicodePageLocation_1_));

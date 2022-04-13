@@ -36,7 +36,7 @@ public class Abuser extends Module {
     private final BooleanValue ncp = new BooleanValue("NCP-Timer-Flag", false);
     private final BooleanValue redesky = new BooleanValue("Rede-Sky-Semi", false);
     private final BooleanValue hypixel = new BooleanValue("Hypixel-Semi", false);
-    private final BooleanValue packetChoke = new BooleanValue("Hypixel-Obfuscation", false);
+    //   private final BooleanValue packetChoke = new BooleanValue("Hypixel-Obfuscation", false);
     public final BooleanValue packetMeme = new BooleanValue("Hypixel-Meme", false);
     private final BooleanValue packetFreeze = new BooleanValue("Hypixel-Freeze", false);
     public final BooleanValue updateFreeze = new BooleanValue("Hypixel-Freeze-Update", true);
@@ -129,11 +129,11 @@ public class Abuser extends Module {
 
                     mc.thePlayer.setPositionAndRotation(d0, d1, d2, f, f1);
 
-                    if (freezeTimer.hasReached(10000) || (!resetTimer.hasReached(100)) && (updateFreeze.getObject()) && hasDisable)
+                    if (freezeTimer.hasReached(10000) || (!resetTimer.hasReached(175)) && (updateFreeze.getObject()) && hasDisable)
                         freezeTimer.reset();
 
                     if (packetMeme.getObject())
-                        if (!resetTimer.hasReached(100) && hasDisable) {
+                        if (!resetTimer.hasReached(175) && hasDisable) {
                             ChatUtils.info("Packet sent");
                             resetTimer.reset();
                             event.setCancelled(true);
@@ -290,13 +290,15 @@ public class Abuser extends Module {
                 while (packets.size() != 0) {
                     packets.get(0).processPacket(netHandler);
                     if (packets.get(0) instanceof S32PacketConfirmTransaction) {
-                        if (packetChoke.getObject()) {
+                        /*
+                                                if (packetChoke.getObject()) {
                             if (invalid > 8) {
                                 mc.getNetHandler().getNetworkManager().sendPacket(new C0FPacketConfirmTransaction(1, ((S32PacketConfirmTransaction) packets.get(0)).getActionNumber(), true));
                                 invalid = 0;
                             }
                             invalid++;
                         }
+                         */
                     }
                     packets.remove(packets.get(0));
                     if (delay > 400) delay = 200;
