@@ -56,6 +56,7 @@ public class Client {
                 }
 
             } catch (IOException e) {
+                e.printStackTrace();
                 try {
                     serverSocket.close();
                 } catch (IOException ex) {

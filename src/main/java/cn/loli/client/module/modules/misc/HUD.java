@@ -110,7 +110,7 @@ public class HUD extends Module {
             RenderUtils.drawRect(0, 0, 28 + Main.INSTANCE.fontLoaders.fonts.get("heiti20").getStringWidth(clientname.getObject()), 20, new Color(0, 0, 0, 100).getRGB());
             RenderUtils.drawRect(0, 0, 1.5, 20, new Color(68,119,255).getRGB());
             RenderUtils.drawImage(new ResourceLocation("theresa/icons/logo.png"), 4, 2, 17, 16);//logo
-            Main.INSTANCE.fontLoaders.fonts.get("heiti20").drawString(clientname.getObject(), 24, 6, new Color(255, 255, 255).getRGB());
+            Main.INSTANCE.fontLoaders.fonts.get("roboto20").drawString(clientname.getObject(), 24, 6, new Color(255, 255, 255).getRGB());
         }
 
         if (showArrayList.getObject()) {

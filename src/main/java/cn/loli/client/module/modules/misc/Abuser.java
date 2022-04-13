@@ -38,6 +38,7 @@ public class Abuser extends Module {
     private final BooleanValue hypixel = new BooleanValue("Hypixel-Semi", false);
     //   private final BooleanValue packetChoke = new BooleanValue("Hypixel-Obfuscation", false);
     public final BooleanValue packetMeme = new BooleanValue("Hypixel-Meme", false);
+    public final BooleanValue packetMemeEdit = new BooleanValue("Hypixel-Meme-Transform", false);
     private final BooleanValue packetFreeze = new BooleanValue("Hypixel-Freeze", false);
     public final BooleanValue updateFreeze = new BooleanValue("Hypixel-Freeze-Update", true);
     private final BooleanValue packetBrust = new BooleanValue("Brust", false);
@@ -136,7 +137,10 @@ public class Abuser extends Module {
                         if (!resetTimer.hasReached(175) && hasDisable) {
                             ChatUtils.info("Packet sent");
                             resetTimer.reset();
-                            event.setCancelled(true);
+                            if (packetMemeEdit.getObject())
+                                mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(), ((S08PacketPlayerPosLook) event.getPacket()).getZ(), false));
+                            else
+                                event.setCancelled(true);
                             return;
                         }
 

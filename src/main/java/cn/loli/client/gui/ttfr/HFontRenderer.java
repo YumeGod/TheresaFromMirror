@@ -21,6 +21,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.*;
 
@@ -30,7 +31,7 @@ public class HFontRenderer implements IResourceManagerReloadListener {
     public int FONT_HEIGHT = 9;
     public Random fontRandom = new Random();
     protected byte[] glyphWidth = new byte[65536];
-    private int[] colorCode = new int[32];
+    private final int[] colorCode = new int[32];
     protected ResourceLocation locationFontTexture;
     private final TextureManager renderEngine = Minecraft.getMinecraft().renderEngine;
     protected float posX;

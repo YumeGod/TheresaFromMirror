@@ -64,7 +64,7 @@ public class Aura extends Module {
     private final ModeValue blockMode = new ModeValue("Block Mode", "Desync", "NCP", "Idle", "Desync", "Always", "Legit", "Vanilla", "Semi-Vanilla", "Spoof-Switch", "Switch", "Null");
     private final ModeValue blockWhen = new ModeValue("Block when", "On Attack", "On Attack", "On Tick", "Sync");
     private final ModeValue blockSense = new ModeValue("Block style", "Sync", "Sync", "Desync");
-    public static final NumberValue<Integer> desyncTick = new NumberValue<>("Desync-Choke-Tick", 2, 1, 5);
+    public static final NumberValue<Integer> desyncTick = new NumberValue<>("Desync-Choke-Tick", 2, 0, 5);
     private final ModeValue attackWhen = new ModeValue("Attack when", "Pre", "Pre", "Post", "Tick");
     private final ModeValue durable = new ModeValue("Durable Status", "Disable", "Disable", "Sync", "Switch");
     private final BooleanValue sprintSpam = new BooleanValue("Sprint Spam", false);
@@ -436,6 +436,7 @@ public class Aura extends Module {
                     case "idle":
                         if (mc.thePlayer.ticksExisted % 2 != 0) {
                             mc.getNetHandler().getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, new BlockPos(-1, -1, -1), EnumFacing.DOWN));
+                            ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
                             isBlocking = false;
                         }
                         break;

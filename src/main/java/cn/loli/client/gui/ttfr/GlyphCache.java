@@ -574,12 +574,15 @@ public class GlyphCache
          */
         GlStateManager.bindTexture(textureName);
         GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_ALPHA8, TEXTURE_WIDTH, TEXTURE_HEIGHT, 0,
-                          GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, imageBuffer);
+                GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, imageBuffer);
 
 
         /* Explicitely disable mipmap support becuase updateTexture() will only update the base level 0 */
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
-        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+
     }
 
     /**
@@ -607,5 +610,41 @@ public class GlyphCache
         imageBuffer.clear();
         imageBuffer.put(imageData);
         imageBuffer.flip();
+    }
+
+    public ByteBuffer readImageToBuffer(BufferedImage bufferedImage) {
+        int[] rgbArray = bufferedImage.getRGB(0, 0, bufferedImage.getWidth(), bufferedImage.getHeight(), null, 0, bufferedImage.getWidth());
+
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4 * rgbArray.length);
+        for (int rgb : rgbArray) {
+            byteBuffer.putInt(rgb << 8 | rgb >> 24 & 255);
+        }
+        byteBuffer.flip();
+
+        return byteBuffer;
+    }
+
+    /**
+     * Reads the image into a texture.
+     *
+     * @return texture id
+     * @author func16
+     */
+    public int loadGlTexture(BufferedImage bufferedImage) {
+        int textureId = GL11.glGenTextures();
+
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
+
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+        GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+
+        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, bufferedImage.getWidth(), bufferedImage.getHeight(),
+                0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, imageBuffer);
+
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
+
+        return textureId;
     }
 }

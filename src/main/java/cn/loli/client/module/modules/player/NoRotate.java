@@ -48,14 +48,6 @@ public class NoRotate extends Module {
                     mc.thePlayer.motionZ = 0.0D;
                 }
 
-                if (((S08PacketPlayerPosLook) event.getPacket()).func_179834_f().contains(S08PacketPlayerPosLook.EnumFlags.X_ROT)) {
-                    f1 += mc.thePlayer.rotationPitch;
-                }
-
-                if (((S08PacketPlayerPosLook) event.getPacket()).func_179834_f().contains(S08PacketPlayerPosLook.EnumFlags.Y_ROT)) {
-                    f += mc.thePlayer.rotationYaw;
-                }
-
                 Main.INSTANCE.moduleManager.getModule(Abuser.class).x = ((S08PacketPlayerPosLook) event.getPacket()).getX();
                 Main.INSTANCE.moduleManager.getModule(Abuser.class).y = ((S08PacketPlayerPosLook) event.getPacket()).getY();
                 Main.INSTANCE.moduleManager.getModule(Abuser.class).z = ((S08PacketPlayerPosLook) event.getPacket()).getZ();
@@ -68,10 +60,14 @@ public class NoRotate extends Module {
                     Main.INSTANCE.moduleManager.getModule(Abuser.class).freezeTimer.reset();
 
                 if (Main.INSTANCE.moduleManager.getModule(Abuser.class).packetMeme.getObject())
-                    if (!Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.hasReached(175) && Main.INSTANCE.moduleManager.getModule(Abuser.class).hasDisable){
+                    if (!Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.hasReached(175) && Main.INSTANCE.moduleManager.getModule(Abuser.class).hasDisable) {
                         ChatUtils.info("Packet sent");
                         Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.reset();
-                        event.setCancelled(true);
+                        if (Main.INSTANCE.moduleManager.getModule(Abuser.class).packetMemeEdit.getObject())
+                            mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
+                                    ((S08PacketPlayerPosLook) event.getPacket()).getZ(), false));
+                        else
+                            event.setCancelled(true);
                         return;
                     }
 
