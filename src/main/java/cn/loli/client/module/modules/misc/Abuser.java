@@ -14,6 +14,7 @@ import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
+import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
@@ -48,6 +49,7 @@ public class Abuser extends Module {
     private final NumberValue<Integer> dormantLatency = new NumberValue<>("Dormant-Collect-Latency", 4, 1, 20);
     private final NumberValue<Integer> freezeLatency = new NumberValue<>("Freeze-Collect-Latency", 15, 10, 50);
     private final BooleanValue positionSpoof = new BooleanValue("Position-Spoof", false);
+    private final BooleanValue sneak = new BooleanValue("Sprint-Spoof", false);
 
     public boolean hasDisable;
     public double x, y, z;
@@ -86,6 +88,21 @@ public class Abuser extends Module {
                     event.setCancelled(true);
             }
         }
+
+        if (sneak.getObject())
+            if (event.getPacket() instanceof C0BPacketEntityAction) {
+                final C0BPacketEntityAction c0B = (C0BPacketEntityAction) event.getPacket();
+
+                if (c0B.getAction().equals(C0BPacketEntityAction.Action.START_SPRINTING)) {
+                    Minecraft.getMinecraft().getNetHandler().getNetworkManager().sendPacket
+                            (new C0BPacketEntityAction(Minecraft.getMinecraft().thePlayer, C0BPacketEntityAction.Action.STOP_SPRINTING), null);
+                    event.setCancelled(true);
+                }
+
+                if (c0B.getAction().equals(C0BPacketEntityAction.Action.STOP_SPRINTING)) {
+                    event.setCancelled(true);
+                }
+            }
 
         if (redesky.getObject()) {
             if (event.getPacket() instanceof C00PacketKeepAlive || event.getPacket() instanceof C0FPacketConfirmTransaction
