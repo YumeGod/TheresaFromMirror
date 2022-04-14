@@ -65,8 +65,8 @@ public class NoFall extends Module {
                     event.setOnGround(true);
                 break;
             case "Collision":
-                if (cancel.getObject()) {
-                    if (fallDist > 3) {
+                if (fallDist > 3) {
+                    if (cancel.getObject()) {
                         mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(
                                 (mc.thePlayer.posX + mc.thePlayer.lastTickPosX) / 2,
                                 (mc.thePlayer.posY - (mc.thePlayer.posY % (1 / 64.0))),
@@ -74,14 +74,11 @@ public class NoFall extends Module {
                                 mc.thePlayer.rotationYaw,
                                 mc.thePlayer.rotationPitch,
                                 true), null);
-                        fallDist = 0;
-                    }
-                } else {
-                    if (fallDist > 3) {
+                    } else {
                         mc.thePlayer.motionY = -(mc.thePlayer.posY - (mc.thePlayer.posY - (mc.thePlayer.posY % (1.0 / 64.0))));
                         event.setOnGround(true);
-                        fallDist = 0;
                     }
+                    fallDist = 0;
                 }
                 break;
             default:
