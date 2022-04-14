@@ -22,7 +22,7 @@ public class NoFall extends Module {
 
     private float fallDist, lastTickFallDist;
 
-    private final BooleanValue cancel = new BooleanValue("Slient", false);
+    private final BooleanValue cancel = new BooleanValue("Silent", false);
     private final BooleanValue isVoid = new BooleanValue("Ignore Void", false);
 
     public NoFall() {
@@ -93,7 +93,7 @@ public class NoFall extends Module {
 
         if (event.getPacket() instanceof C03PacketPlayer) {
             C03PacketPlayer look = (C03PacketPlayer) event.getPacket();
-            if (cancel.getObject())
+            if (cancel.getObject() && mode.getCurrentMode().equals("Packet"))
                 if (look.getRotating() && look.isMoving())
                     if ((fallDist > 1) && isBlockUnder())
                         event.setPacket(new C03PacketPlayer.C04PacketPlayerPosition
