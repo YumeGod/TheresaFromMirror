@@ -200,7 +200,7 @@ public class FileManager {
             throw new IOException("Failed to create " + cfg.getAbsolutePath());
 
         try {
-            JsonObject cfgObject = (JsonObject) new JsonParser().parse(new InputStreamReader(new FileInputStream(cfg)));
+            JsonObject cfgObject = (JsonObject) new JsonParser().parse(new InputStreamReader(new FileInputStream(cfg), StandardCharsets.UTF_8));
             // Modules
             JsonElement modulesElement = cfgObject.get("modules");
 
