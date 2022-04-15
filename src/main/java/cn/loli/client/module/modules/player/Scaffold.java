@@ -12,11 +12,13 @@ import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.client.C0APacketAnimation;
+import net.minecraft.network.play.client.C0BPacketEntityAction;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MovingObjectPosition;
@@ -87,6 +89,8 @@ public class Scaffold extends Module {
     private final BooleanValue mistake = new BooleanValue("Mistake", false);
     private final NumberValue<Integer> mistakerate = new NumberValue<>("Mistake Rate", 80, 70, 90);
 
+    private final BooleanValue sneak = new BooleanValue("Sprint-Spoof", false);
+
     int silentSlot = -1;
     int startY;
 
@@ -118,7 +122,6 @@ public class Scaffold extends Module {
 
     @Override
     public void onEnable() {
-
         if (mc.thePlayer == null)
             return;
 
@@ -166,7 +169,7 @@ public class Scaffold extends Module {
         }
 
 
-}
+    }
 
     @EventTarget
     private void onRotate(RotationEvent e) {
@@ -343,7 +346,20 @@ public class Scaffold extends Module {
 
     @EventTarget
     private void onPacket(PacketEvent e) {
+        if (sneak.getObject())
+            if (e.getPacket() instanceof C0BPacketEntityAction) {
+                final C0BPacketEntityAction c0B = (C0BPacketEntityAction) e.getPacket();
 
+                if (c0B.getAction().equals(C0BPacketEntityAction.Action.START_SPRINTING)) {
+                    Minecraft.getMinecraft().getNetHandler().getNetworkManager().sendPacket
+                            (new C0BPacketEntityAction(Minecraft.getMinecraft().thePlayer, C0BPacketEntityAction.Action.STOP_SPRINTING), null);
+                    e.setCancelled(true);
+                }
+
+                if (c0B.getAction().equals(C0BPacketEntityAction.Action.STOP_SPRINTING)) {
+                    e.setCancelled(true);
+                }
+            }
     }
 
     @EventTarget

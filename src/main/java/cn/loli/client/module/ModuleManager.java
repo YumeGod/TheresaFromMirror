@@ -44,6 +44,7 @@ public class ModuleManager {
         addModule(new AntiFall());
         addModule(new BaffleSpeed());
         addModule(new Speed());
+        addModule(new Sneak());
         addModule(new FlagDetector());
         addModule(new Fly());
         addModule(new Booster());

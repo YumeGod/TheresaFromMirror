@@ -42,10 +42,10 @@ import java.util.stream.Stream;
 
 
 public class Aura extends Module {
-    private final NumberValue<Integer> minCps = new NumberValue<>("MinCPS", 8, 1, 20);
-    private final NumberValue<Integer> maxCps = new NumberValue<>("MaxCPS", 12, 1, 20);
+    private final NumberValue<Integer> minCps = new NumberValue<>("Min CPS", 8, 1, 20);
+    private final NumberValue<Integer> maxCps = new NumberValue<>("Max CPS", 12, 1, 20);
 
-    private static final NumberValue<Integer> ticksExisted = new NumberValue<>("TicksExisted", 20, 0, 500);
+    private static final NumberValue<Integer> ticksExisted = new NumberValue<>("Ticks Existed", 20, 0, 500);
     private static final NumberValue<Integer> fov = new NumberValue<>("FOV", 360, 0, 360);
     private static final NumberValue<Float> range = new NumberValue<>("Range", 3f, 1f, 6f);
     private static final NumberValue<Float> blockRange = new NumberValue<>("BlockRange", 2f, 0f, 3f);
@@ -61,7 +61,7 @@ public class Aura extends Module {
     private final ModeValue mode = new ModeValue("Priority", "Angle", "Armor", "Range", "Fov", "Angle", "Health", "Hurt Time");
 
     public static final NumberValue<Integer> unBlockTweak = new NumberValue<>("UnBlock Tweak", 0, 0, 100);
-    private final ModeValue blockMode = new ModeValue("Block Mode", "Desync", "NCP", "Idle", "Desync", "Always", "Legit", "Vanilla", "Semi-Vanilla", "Spoof-Switch", "Switch", "Null");
+    private final ModeValue blockMode = new ModeValue("Block Mode", "Desync", "NCP", "Idle", "Desync", "Always", "Legit", "Dada-Legit" , "Vanilla", "Semi-Vanilla", "Spoof-Switch", "Switch", "Null");
     private final ModeValue blockWhen = new ModeValue("Block when", "On Attack", "On Attack", "On Tick", "Sync");
     private final ModeValue blockSense = new ModeValue("Block style", "Sync", "Sync", "Desync");
     public static final NumberValue<Integer> desyncTick = new NumberValue<>("Desync-Choke-Tick", 2, 0, 5);
@@ -450,6 +450,7 @@ public class Aura extends Module {
                     case "dada":
                         isBlocking = false;
                         break;
+                    case "dada-legit":
                     case "ncp":
                         mc.getNetHandler().getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
                         isBlocking = false;
@@ -500,7 +501,7 @@ public class Aura extends Module {
                         mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot));
                         mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                         break;
-                    case "dada":
+                    case "dada-legit":
                         mc.getNetHandler().getNetworkManager().sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem < 8 ? mc.thePlayer.inventory.currentItem + 1 : mc.thePlayer.inventory.currentItem - 1));
                         mc.getNetHandler().getNetworkManager().sendPacket(new C02PacketUseEntity(target, C02PacketUseEntity.Action.INTERACT));
                         mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));

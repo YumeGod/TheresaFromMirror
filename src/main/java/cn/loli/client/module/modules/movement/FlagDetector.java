@@ -19,9 +19,7 @@ import net.minecraft.util.Vec3;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Credit: Original ClientBase by superblaubeere27
- */
+
 public class FlagDetector extends Module {
     private final List<Vec3> lastLocations = new ArrayList<>();
     private final List<Long> lastSetBacks = new ArrayList<>();
