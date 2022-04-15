@@ -1,5 +1,6 @@
 package cn.loli.client.gui.ttfr;
 
+import cn.loli.client.utils.render.ColorUtils;
 import com.ibm.icu.text.ArabicShaping;
 import com.ibm.icu.text.ArabicShapingException;
 import com.ibm.icu.text.Bidi;
@@ -698,7 +699,8 @@ public class HFontRenderer implements IResourceManagerReloadListener {
     }
 
     public int drawStringWithShadow(String text, float x, float y, int color) {
-        this.drawString(text, x + 0.5F, y + 0.5F, new Color(0, 0, 0, 100).getRGB());
+        Color c = ColorUtils.intToColor(color);
+        this.drawString(text, x + 0.5F, y + 0.5F, new Color(0, 0, 0, (int) ((c.getAlpha() + 1) / 2f)).getRGB());
         return this.drawString(text, x, y, color);
     }
 

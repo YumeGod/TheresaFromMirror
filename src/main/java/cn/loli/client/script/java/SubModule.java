@@ -8,11 +8,7 @@ import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
 import com.darkmagician6.eventapi.EventManager;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.GameSettings;
 import org.lwjgl.input.Keyboard;
-
-import java.util.Random;
 
 public class SubModule extends Module {
 
@@ -86,8 +82,6 @@ public class SubModule extends Module {
             if (mc.thePlayer != null)
                 onEnable();
 
-            arraylist_animX = 0;
-            arraylist_animY -= 16;
 
             if (!isReg) {
                 isReg = true;

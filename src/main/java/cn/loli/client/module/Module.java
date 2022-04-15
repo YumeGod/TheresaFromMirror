@@ -14,9 +14,11 @@ import cn.loli.client.utils.player.movement.MoveUtils;
 import cn.loli.client.utils.player.rotation.RotationUtils;
 import com.darkmagician6.eventapi.EventManager;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.GameSettings;
 import org.lwjgl.input.Keyboard;
 
+import java.util.Comparator;
 import java.util.Random;
 
 public abstract class Module {
@@ -34,6 +36,8 @@ public abstract class Module {
     private final ModuleCategory category;
     private final boolean canBeEnabled;
     private final boolean hidden;
+    public float arraylist_animX;
+    public float arraylist_animY;
     private int keybind;
     protected boolean state;
 
@@ -43,13 +47,13 @@ public abstract class Module {
     //Animations
     public float clickgui_animY;
     public float clickgui_animX;
-    public float arraylist_animX;
-    public float arraylist_animY;
+    public float arraylist_animA;
     public float animX;
     public float animY;
+    private String suffix;
 
     protected Module(String name, String description, String moduleCategory) {
-        this(name, description, ModuleCategory.getCategory(moduleCategory) , true, false, Keyboard.KEY_NONE);
+        this(name, description, ModuleCategory.getCategory(moduleCategory), true, false, Keyboard.KEY_NONE);
     }
 
     protected Module(String name, String description, ModuleCategory moduleCategory) {
@@ -97,6 +101,11 @@ public abstract class Module {
         return state;
     }
 
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
+        // Sort modules
+
+    }
 
     public void setState(boolean state) {
         if (state) {
@@ -105,8 +114,15 @@ public abstract class Module {
             if (mc.thePlayer != null)
                 onEnable();
 
-            arraylist_animX = 0;
-            arraylist_animY -= 16;
+            if(!HUD.arraylist_mods.contains(this)) {
+                HUD.arraylist_mods.add(this);
+                HUD.sort();
+                ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+                this.arraylist_animX = sr.getScaledWidth();
+                if (arraylist_animY != 0) {
+                    arraylist_animY -= 16;
+                }
+            }
 
             if (!isReg) {
                 isReg = true;
@@ -141,5 +157,9 @@ public abstract class Module {
     }
 
     protected void onToggle() {
+    }
+
+    public String getSuffix() {
+        return suffix;
     }
 }

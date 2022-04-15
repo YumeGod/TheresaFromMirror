@@ -9,6 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.function.Predicate;
 
 public class ModeValue extends Value<Integer> {
@@ -16,11 +17,15 @@ public class ModeValue extends Value<Integer> {
     public boolean open;
 
     public ModeValue(String name, String defaultVal, String... modes) {
+
         this(name, defaultVal, null, modes);
     }
 
     public ModeValue(String name, String defaultVal, Predicate<Integer> validator, String... modes) {
         super(name, 0, validator);
+        if(!Arrays.asList(modes).contains(defaultVal)) {
+            modes[modes.length - 1] = defaultVal;
+        }
         this.modes = modes;
         this.component = new ModeComponent(this);
 

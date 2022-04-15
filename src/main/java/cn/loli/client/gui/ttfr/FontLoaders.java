@@ -21,7 +21,7 @@ public class FontLoaders {
 
         long time = System.currentTimeMillis();
 
-        load("inter", 12, 16);
+        load("inter", 14, 16);
         load("nunito", 12, 16);
         load("opensans", 12, 16);
         load("roboto", 12, 24);

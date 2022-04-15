@@ -1,179 +1,263 @@
-
-
 package cn.loli.client.module.modules.misc;
 
 import cn.loli.client.Main;
 import cn.loli.client.events.Render2DEvent;
+import cn.loli.client.events.TickEvent;
 import cn.loli.client.gui.ttfr.HFontRenderer;
-import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.utils.render.AnimationUtils;
 import cn.loli.client.utils.render.RenderUtils;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.ModeValue;
-import cn.loli.client.value.NumberValue;
-import cn.loli.client.value.StringValue;
+import cn.loli.client.value.*;
 import com.darkmagician6.eventapi.EventTarget;
-import com.mojang.realmsclient.gui.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 public class HUD extends Module {
-    private final BooleanValue showClientInfo = new BooleanValue("ClientInfo", true);
-    private final BooleanValue showArrayList = new BooleanValue("ArrayList", true);
-    private final BooleanValue showNotifications = new BooleanValue("Notifications", true);
-    private final BooleanValue onlyKeyBind = new BooleanValue("Only KeyBind", false);
-    private final NumberValue<Number> ArrayListXPos = new NumberValue<>("ArrayListXPos", 0, 0, 15);
-    private final NumberValue<Number> ArrayListYPos = new NumberValue<>("ArrayListYPos", 0, 0, 15);
-    private final BooleanValue reverse = new BooleanValue("Sort Reverse", false);
-
-
-    private final ModeValue mode = new ModeValue("Mode", "Normal", "Normal", "Clear", "Rectangle");
-    private final ModeValue clientMark = new ModeValue("ClientMark", "Text", "Text", "Logo");
-    private final ModeValue font = new ModeValue("Font", "Minecraft", "Minecraft", "Genshin", "Ubuntu", "Dos");
-    private final StringValue clientname = new StringValue("ClientName", "朔夜观星");
-
-    private static final DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private static final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm:ss");
-    public List<Module> sort = new ArrayList<>();
-    private boolean sorted = false;
+    private ArrayList<Module> needRemove = new ArrayList<>();
+    private static HFontRenderer fontRenderer;
+    private NumberValue<Integer> fontSize = new NumberValue<>("FontSize", 12, 12, 16);
 
     public HUD() {
         super("HUD", "The heads up display overlay", ModuleCategory.MISC);
-        setState(true);
-        sort.addAll(Main.INSTANCE.moduleManager.getModules());
-        if (onlyKeyBind.getObject()) sort.removeIf(m -> m.getKeybind() == 0x00);
     }
 
+    private static final ModeValue font = new ModeValue("Font", "Minecraft", "Minecraft", "Roboto", "Genshin", "Ubuntu", "Dos");
+    private final NumberValue<Number> ArrayListXPos = new NumberValue<>("ArrayListXPos", 0, 0, 50);
+    private final NumberValue<Number> ArrayListYPos = new NumberValue<>("ArrayListYPos", 0, 0, 50);
+    private final NumberValue<Number> arrayListSpace = new NumberValue<>("ArrayListSpace", 16, 0, 50);
 
-    //反转ArrayList
-    private static ArrayList<Module> reverse(List<Module> list) {
-        ArrayList<Module> newList = new ArrayList<>();
-        for (int i = list.size() - 1; i >= 0; i--) {
-            newList.add(list.get(i));
-        }
-        return newList;
-    }
+    private final BooleanValue showClientInfo = new BooleanValue("ClientInfo", true);
+    private final BooleanValue showArrayList = new BooleanValue("ArrayList", true);
+    private final BooleanValue showNotifications = new BooleanValue("Notifications", true);
+    //    private final BooleanValue onlyKeyBind = new BooleanValue("Only KeyBind", false);
+    private static final BooleanValue reverse = new BooleanValue("Sort Reverse", false);
+
+    private final ModeValue logoMode = new ModeValue("LogoMode", "Theresa", "Theresa", "None", "Logo2");
+    private final ModeValue arrayMode = new ModeValue("ArrayListMode", "Simple", "Simple", "Rectangle", "Simple2");
+    private final ModeValue arrayColor = new ModeValue("Color", "Color", "Color", "Rainbow", "Rainbow2");
+    private final ColorValue color = new ColorValue("Color", new Color(255, 255, 255));
+    private final NumberValue<Number> rainbowSaturation = new NumberValue<>("RainbowSaturation", 0.6f, 0f, 1f);
+    private final NumberValue<Number> rainbowBrightness = new NumberValue<>("RainbowBrightness", 1f, 0f, 1f);
+
+
+    private final ModeValue arrayAnimation = new ModeValue("ArrayAnimation", "None", "None", "Slide", "Smooth", "Alpha");
+
+    private StringValue clientName = new StringValue("ClientName", "Theresa.exe");
+
+    public static ArrayList<Module> arraylist_mods = new ArrayList<>();
+
 
     @EventTarget
-    private void render2D(Render2DEvent event) {
-        if (!getState()) return;
-        ScaledResolution res = new ScaledResolution(Minecraft.getMinecraft());
-        boolean mcfont = font.getCurrentMode().equals("Minecraft");
-
-        HFontRenderer fontRenderer;
-
-        if (font.getCurrentMode().equals("Genshin")) {
-            fontRenderer = Main.INSTANCE.fontLoaders.get("genshin16");
-        } else if (font.getCurrentMode().equals("Ubuntu"))
-            fontRenderer = Main.INSTANCE.fontLoaders.get("ubuntu16");
-        else
-            fontRenderer = Main.INSTANCE.fontLoaders.get("dos18");
-
-
-        if (!sorted) {
-            sort.sort(Comparator.comparingInt(m -> mcfont ? mc.fontRendererObj.getStringWidth(m.getName())
-                    : fontRenderer.getStringWidth(m.getName())));
-            if (!reverse.getObject())
-                sort = reverse(sort);
-            sorted = true;
+    public void onRender2D(Render2DEvent event) {
+        switch (logoMode.getCurrentMode()) {
+            case "Theresa":
+                RenderUtils.drawImage(new ResourceLocation("theresa/icons/logo.png"), 10, 8, 17, 16);//logo
+                Main.INSTANCE.fontLoaders.fonts.get("heiti22").drawStringWithShadow(clientName.getObject(), 30, 13, new Color(255, 255, 255).getRGB());
+                break;
+            case "Logo2":
+                Main.INSTANCE.fontLoaders.fonts.get("heiti24").drawString(clientName.getObject(), 16, 12, new Color(255, 255, 255).getRGB());
+                Main.INSTANCE.fontLoaders.fonts.get("heiti18").drawString("v" + Main.CLIENT_VERSION, 18, 26, new Color(255, 255, 255).getRGB());
+                break;
+            case "None":
+                break;
         }
-
-        int i = ArrayListYPos.getObject().intValue();
-
-        double xDist = mc.thePlayer.posX - mc.thePlayer.lastTickPosX;
-        double zDist = mc.thePlayer.posZ - mc.thePlayer.lastTickPosZ;
-        double currSpeed = StrictMath.sqrt(xDist * xDist + zDist * zDist) * 20.0 * ((IAccessorMinecraft) mc).getTimer().timerSpeed;
-
-        if (showClientInfo.getObject()) {
-            int fpsWidth = mc.fontRendererObj.drawString("FPS: " + Minecraft.getDebugFPS(), 2, res.getScaledHeight() - mc.fontRendererObj.FONT_HEIGHT - 2, -1, true);
-            fpsWidth = Math.max(fpsWidth, mc.fontRendererObj.drawString(String.format("BPS: %.2f", currSpeed), 2, res.getScaledHeight() - mc.fontRendererObj.FONT_HEIGHT * 2 - 2, -1, true));
-            fpsWidth = Math.max(fpsWidth, mc.fontRendererObj.drawString(String.format("User: " + Main.INSTANCE.name, currSpeed), (float) (res.getScaledWidth() - mc.fontRendererObj.getStringWidth(String.format("User: " + Main.INSTANCE.name, currSpeed))), res.getScaledHeight() - mc.fontRendererObj.FONT_HEIGHT - 2, -1, true));
+        if (this.showClientInfo.getObject()) {
+            this.drawClientInfo();
         }
-
-        if (Objects.equals(clientMark.getCurrentMode(), "Text")) {
-            GL11.glScaled(2.0, 2.0, 2.0);
-            int string = mc.fontRendererObj.drawString(clientname.getObject(), 2, 2, rainbow(0), true);
-            GL11.glScaled(0.5, 0.5, 0.5);
-            mc.fontRendererObj.drawString(Main.CLIENT_VERSION, string * 2, mc.fontRendererObj.FONT_HEIGHT * 2 - 7, rainbow(100), true);
-            //   fontRenderer.drawString("by " + Main.CLIENT_AUTHOR, 4, fontRenderer.FONT_HEIGHT * 2 + 2, rainbow(200), true);
-        } else if (Objects.equals(clientMark.getCurrentMode(), "Logo")) {
-            RenderUtils.drawRect(0, 0, 28 + Main.INSTANCE.fontLoaders.fonts.get("heiti20").getStringWidth(clientname.getObject()), 20, new Color(0, 0, 0, 100).getRGB());
-            RenderUtils.drawRect(0, 0, 1.5, 20, new Color(68,119,255).getRGB());
-            RenderUtils.drawImage(new ResourceLocation("theresa/icons/logo.png"), 4, 2, 17, 16);//logo
-            Main.INSTANCE.fontLoaders.fonts.get("roboto20").drawString(clientname.getObject(), 24, 6, new Color(255, 255, 255).getRGB());
+        if (this.showArrayList.getObject()) {
+            this.drawArrayList(ArrayListXPos.getObject().floatValue(), ArrayListYPos.getObject().floatValue());
         }
-
-        if (showArrayList.getObject()) {
-            for (Module m : sort) {
-                if (m.getState()) {
-                    String s = m.getName();
-                    switch (mode.getCurrentMode()) {
-                        case "Normal":
-                            if (mcfont)
-                                mc.fontRendererObj.drawStringWithShadow(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, rainbow(25));
-                            else
-                                fontRenderer.drawStringWithShadow(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, rainbow(50), 150);
-                            break;
-                        case "Clear":
-                            if (mcfont)
-                                mc.fontRendererObj.drawString(s, (int) (res.getScaledWidth() - m.arraylist_animX), (int) m.arraylist_animY, rainbow(25));
-                            else
-                                fontRenderer.drawString(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, rainbow(50));
-                            break;
-                        case "Rectangle":
-                            double x = res.getScaledWidth() - m.arraylist_animX - 2;
-
-                            if (mcfont) {
-                                double x1 = x + mc.fontRendererObj.getStringWidth(s) + 6;
-                                RenderUtils.drawRect(x, m.arraylist_animY - 2, x1, m.arraylist_animY + 10, new Color(0, 0, 0, 50).getRGB());
-                                RenderUtils.drawRect(x1, m.arraylist_animY - 2, x1 + 1, m.arraylist_animY + 10, rainbow(25));
-                                mc.fontRendererObj.drawStringWithShadow(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, rainbow(25));
-                            } else {
-                                double x2 = x + fontRenderer.getStringWidth(s) + 6;
-                                RenderUtils.drawRect(x, m.arraylist_animY - 2, x2, m.arraylist_animY + 10, new Color(0, 0, 0, 50).getRGB());
-                                RenderUtils.drawRect(x2, m.arraylist_animY - 2, x2 + 1, m.arraylist_animY + 10, rainbow(50));
-                                fontRenderer.drawStringWithShadow(s, res.getScaledWidth() - m.arraylist_animX, m.arraylist_animY, rainbow(50), 150);
-                            }
-                            break;
-                    }
-
-                    m.arraylist_animY = AnimationUtils.smoothAnimation(m.arraylist_animY, i + ArrayListYPos.getObject().intValue(), 50, .3f);
-                    m.arraylist_animX = AnimationUtils.smoothAnimation(m.arraylist_animX, (mcfont ? mc.fontRendererObj.getStringWidth(s) : fontRenderer.getStringWidth(s)) + ArrayListXPos.getObject().intValue(), 50, .4f);
-                    i += 12;
-                }
-            }
+        if (this.showNotifications.getObject()) {
+            this.drawNotifications();
         }
-
-        if (showNotifications.getObject()) {
-            NotificationManager.render();
-        }
-
     }
 
-    private static int rainbow(int delay) {
-        double rainbowState = Math.ceil((System.currentTimeMillis() + delay) / 20.0);
-        rainbowState %= 360;
-        return Color.getHSBColor((float) (rainbowState / 360.0f), 0.45f, 0.9f).getRGB();
+    private void drawNotifications() {
+        NotificationManager.render();
+    }
+
+    int rainbowOffset;
+
+    @EventTarget
+    public void onTick(TickEvent event) {
+        if (mc.thePlayer != null) {
+            if (mc.thePlayer.ticksExisted % 2 == 0) {
+                rainbowOffset++;
+            }
+        }
+    }
+
+    private void drawArrayList(float x, float y) {
+        if (showArrayList.getObject()) {
+            float modY = 0;
+            int offset = 50;
+            for (Module arraylist_mod : arraylist_mods) {
+
+                String name = arraylist_mod.getName() + (arraylist_mod.getSuffix() != null ? " " + arraylist_mod.getSuffix() : "");
+                ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+                float x1 = 0, y1 = 0;
+                // get color
+                int acolor = 0xFFFFFF;
+                offset--;
+                switch (arrayColor.getCurrentMode()) {
+                    case "Color":
+                        acolor = color.getObject().getRGB();
+                        break;
+                    case "Rainbow":
+                        acolor = RenderUtils.getRainbow((offset + rainbowOffset) * 100, 6000, rainbowSaturation.getObject().floatValue(), rainbowBrightness.getObject().floatValue()).getRGB();
+                        break;
+                    case "Rainbow2":
+                        acolor = new Color(color.getObject().getRed(), color.getObject().getGreen(), color.getObject().getBlue(), RenderUtils.getRainbow((offset + rainbowOffset) * 100, 6000, rainbowSaturation.getObject().floatValue(), rainbowBrightness.getObject().floatValue()).getRed()).getRGB();
+                }
+
+                fontRenderer = Main.INSTANCE.fontLoaders.get(font.getCurrentMode().toLowerCase() + fontSize.getObject());
+                FontRenderer mcFont = mc.fontRendererObj;
+                boolean flag = font.getCurrentMode().equals("Minecraft");
+
+                if (arrayAnimation.getCurrentMode().equals("Alpha")) {
+                    if (flag) {
+                        x1 = sr.getScaledWidth() - mcFont.getStringWidth(name) - x;
+                    } else {
+                        x1 = sr.getScaledWidth() - fontRenderer.getStringWidth(name) - x;
+                    }
+                    if (arraylist_mod.getState()) {
+                        arraylist_mod.arraylist_animA = AnimationUtils.smoothAnimation(arraylist_mod.arraylist_animA, 255, 30, 0.1f);
+                        arraylist_mod.arraylist_animY = AnimationUtils.smoothAnimation(arraylist_mod.arraylist_animY, y + modY, 50, 0.3f);
+                    } else {
+                        arraylist_mod.arraylist_animY = AnimationUtils.smoothAnimation(arraylist_mod.arraylist_animY, y + modY - 10, 50, 0.5f);
+                        arraylist_mod.arraylist_animA = AnimationUtils.smoothAnimation(arraylist_mod.arraylist_animA, 0, 50, 0.4f);
+                        if (arraylist_mod.arraylist_animA <= 30) {
+                            needRemove.add(arraylist_mod);
+                        }
+                    }
+                    y1 = arraylist_mod.arraylist_animY;
+                } else if (arrayAnimation.getCurrentMode().equals("Slide")) {
+                    arraylist_mod.arraylist_animA = 255;
+                    if (flag) {
+                        if (arraylist_mod.getState()) {
+                            arraylist_mod.arraylist_animX = AnimationUtils.smoothAnimation(arraylist_mod.arraylist_animX, sr.getScaledWidth() - mcFont.getStringWidth(name) - x, 50, 0.5f);
+                        } else {
+                            arraylist_mod.arraylist_animX = AnimationUtils.smoothAnimation(arraylist_mod.arraylist_animX, sr.getScaledWidth(), 50, 0.5f);
+                        }
+                    } else {
+                        if (arraylist_mod.getState()) {
+                            arraylist_mod.arraylist_animX = AnimationUtils.smoothAnimation(arraylist_mod.arraylist_animX, sr.getScaledWidth() - fontRenderer.getStringWidth(name) - x, 50, 0.5f);
+                        } else {
+                            arraylist_mod.arraylist_animX = AnimationUtils.smoothAnimation(arraylist_mod.arraylist_animX, sr.getScaledWidth(), 50, 0.5f);
+                        }
+                    }
+                    x1 = arraylist_mod.arraylist_animX;
+                    y1 = y + modY;
+                    if (!arraylist_mod.getState() && arraylist_mod.arraylist_animX >= sr.getScaledWidth()) {
+                        needRemove.add(arraylist_mod);
+                    }
+                } else if (arrayAnimation.getCurrentMode().equals("Smooth")) {
+                    arraylist_mod.arraylist_animA = 255;
+                    if (arraylist_mod.getState()) {
+                        if (flag) {
+                            arraylist_mod.arraylist_animX = AnimationUtils.smoothAnimation(arraylist_mod.arraylist_animX, sr.getScaledWidth() - mcFont.getStringWidth(name) - x, 50, 0.5f);
+                        } else {
+                            arraylist_mod.arraylist_animX = AnimationUtils.smoothAnimation(arraylist_mod.arraylist_animX, sr.getScaledWidth() - fontRenderer.getStringWidth(name) - x, 50, 0.5f);
+                        }
+                        arraylist_mod.arraylist_animY = AnimationUtils.smoothAnimation(arraylist_mod.arraylist_animY, y + modY, 50, 0.5f);
+                    } else {
+                        arraylist_mod.arraylist_animX = AnimationUtils.smoothAnimation(arraylist_mod.arraylist_animX, sr.getScaledWidth(), 50, 0.5f);
+                        arraylist_mod.arraylist_animY = AnimationUtils.smoothAnimation(arraylist_mod.arraylist_animY, y + modY - 16, 50, 0.5f);
+                    }
+                    x1 = arraylist_mod.arraylist_animX;
+                    y1 = arraylist_mod.arraylist_animY;
+                    if (arraylist_mod.arraylist_animY == y + modY - 16) {
+                        needRemove.add(arraylist_mod);
+                    }
+                } else if (arrayAnimation.getCurrentMode().equals("None")) {
+                    arraylist_mod.arraylist_animA = 255;
+                    if (flag) {
+                        x1 = sr.getScaledWidth() - mcFont.getStringWidth(name) - x;
+
+                    } else {
+                        x1 = sr.getScaledWidth() - fontRenderer.getStringWidth(name) - x;
+                    }
+                    y1 = y + modY;
+                    if (!arraylist_mod.getState()) {
+                        needRemove.add(arraylist_mod);
+                    }
+                }
+                Color c = new Color(acolor);
+                float width = 0;
+                if (flag) {
+                    width = mcFont.getStringWidth(name);
+                } else {
+                    width = fontRenderer.getStringWidth(name);
+                }
+
+                switch (arrayMode.getCurrentMode()) {
+                    case "Rectangle":
+                        RenderUtils.drawRect(x1 - 4, y1, x1 + width + 5, y1 + arrayListSpace.getObject().floatValue(), new Color(0, 0, 0, 100).getRGB());
+                        RenderUtils.drawRect(x1 + width + 3.5f, y1, x1 + width + 5, y1 + arrayListSpace.getObject().floatValue(), c.getRGB());
+                        break;
+                    case "Simple2":
+                        RenderUtils.drawRect(x1 - 4, y1, x1 + width + 5, y1 + arrayListSpace.getObject().floatValue(), new Color(0, 0, 0, 100).getRGB());
+                        break;
+                }
+                if (flag) {
+                    mcFont.drawStringWithShadow(name, x1, y1 + arrayListSpace.getObject().floatValue() / 2 - mcFont.FONT_HEIGHT / 2f, new Color(c.getRed(), c.getGreen(), c.getBlue(), ((int) arraylist_mod.arraylist_animA)).getRGB());
+                } else {
+                    fontRenderer.drawStringWithShadow(name, x1, y1 + arrayListSpace.getObject().floatValue() / 2 - fontRenderer.getHeight() / 2, new Color(c.getRed(), c.getGreen(), c.getBlue(), ((int) arraylist_mod.arraylist_animA)).getRGB());
+                }
+
+                modY += arrayListSpace.getObject().floatValue();
+            }
+            if (needRemove.size() != 0) {
+                arraylist_mods.removeAll(needRemove);
+                needRemove.clear();
+            }
+
+        }
+    }
+
+
+    public static void sort() {
+        boolean mcfont = font.getCurrentMode().equals("Minecraft");
+        arraylist_mods.sort(Comparator.comparingInt(m -> mcfont ? -mc.fontRendererObj.getStringWidth(m.getName() + (m.getSuffix() != null ? " " + m.getSuffix() : ""))
+                : -fontRenderer.getStringWidth(m.getName() + (m.getSuffix() != null ? " " + m.getSuffix() : ""))));
+    }
+
+    private void drawClientInfo() {
+
     }
 
     @Override
     public void onEnable() {
-        if (sorted) sorted = false;
+        super.onEnable();
+        arraylist_mods.clear();
+        arraylist_mods.addAll(Main.INSTANCE.moduleManager.getModules());
+        if (reverse.getObject()) {
+            ArrayList<Module> temp = reverse(arraylist_mods);
+            arraylist_mods.clear();
+            arraylist_mods.addAll(temp);
+        }
+    }
 
-        //Shit Code but i dont wanna change it
-        sort.clear();
-        sort.addAll(Main.INSTANCE.moduleManager.getModules());
-        //Only for testing with keybind one
-        if (onlyKeyBind.getObject()) sort.removeIf(m -> m.getKeybind() == 0x00);
+    // Reverse an arraylist return new arraylist
+    public static ArrayList<Module> reverse(ArrayList<Module> arrayList) {
+        ArrayList<Module> newArrayList = new ArrayList<>();
+        for (int i = arrayList.size() - 1; i >= 0; i--) {
+            newArrayList.add(arrayList.get(i));
+        }
+        return newArrayList;
+    }
+
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
     }
 }
