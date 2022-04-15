@@ -35,8 +35,8 @@ public class ClickGui extends GuiScreen {
     private static final float LEFTMENU_MIN_WIDTH = 120; //左侧类别列表的最小宽度
     private static final float LEFTMENU_MAX_WIDTH = 150; //左侧类别列表的最大宽度
 
-    private static final float WINDOW_MIN_WIDTH = 400; //窗口最小宽度
-    private static final float WINDOW_MIN_HEIGHT = 250; //窗口最小高度
+    private static final float WINDOW_MIN_WIDTH = 420; //窗口最小宽度
+    private static final float WINDOW_MIN_HEIGHT = 300; //窗口最小高度
 
     static float x = -1, y = -1, width = 0, height = 0;//坐标和宽高
 
@@ -332,8 +332,8 @@ public class ClickGui extends GuiScreen {
         for (ModuleCategory m : ModuleCategory.values()) {
             if (m == curType) {
                 slider.change(my - 8 - y);
-                mods_wheelTemp = 0;
-                mods_wheel = 0;
+//                mods_wheelTemp = 0;
+//                mods_wheel = 0;
                 curType = m;
             }
             my += 30;
@@ -417,29 +417,27 @@ public class ClickGui extends GuiScreen {
 
         for (Module m : Main.INSTANCE.moduleManager.getModules()) {
             if (m.getCategory() == curType) {
-                if (modsY < (y + height - 20)) {
-                    if (m == curModule && isHovered(x + width - showValueX, y + 45, x + width - 10, y + height - 20, mouseX, mouseY)) {
-                        float valuesY = y + 55 + values_wheel;
-                        for (Value v : Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName()))) {
-                            if (v instanceof BooleanValue) {
-                                v.component.onMouse(mouseX, mouseY, mouseButton);
-                            } else if (v instanceof NumberValue) {
-                                NumberComponent nc = (NumberComponent) v.component;
-                                nc.onMouse(mouseX, mouseY, mouseButton);
-                                valuesY += 8;
-                            } else if (v instanceof ModeValue) {
-                                ModeComponent mc = (ModeComponent) v.component;
-                                mc.onMouse(mouseX, mouseY, mouseButton);
-                                valuesY += v.clickgui_anim;
-                            } else if (v instanceof StringValue) {
-                                if (((StringValue) v).text != null) {
-                                    ((StringValue) v).text.mouseClicked(mouseX, mouseY, mouseButton);
-                                }
-                            } else if (v instanceof ColorValue) {
-                                valuesY += 30;
+                if (m == curModule && isHovered(x + width - showValueX, y + 45, x + width - 10, y + height - 20, mouseX, mouseY)) {
+                    float valuesY = y + 55 + values_wheel;
+                    for (Value v : Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName()))) {
+                        if (v instanceof BooleanValue) {
+                            v.component.onMouse(mouseX, mouseY, mouseButton);
+                        } else if (v instanceof NumberValue) {
+                            NumberComponent nc = (NumberComponent) v.component;
+                            nc.onMouse(mouseX, mouseY, mouseButton);
+                            valuesY += 8;
+                        } else if (v instanceof ModeValue) {
+                            ModeComponent mc = (ModeComponent) v.component;
+                            mc.onMouse(mouseX, mouseY, mouseButton);
+                            valuesY += v.clickgui_anim;
+                        } else if (v instanceof StringValue) {
+                            if (((StringValue) v).text != null) {
+                                ((StringValue) v).text.mouseClicked(mouseX, mouseY, mouseButton);
                             }
-                            valuesY += 20;
+                        } else if (v instanceof ColorValue) {
+                            valuesY += 30;
                         }
+                        valuesY += 20;
                     }
                 }
                 if (isHovered(x + leftMenuWidth + 10, Math.max(modsY, y + 35), x + width - 10 - showValueX, Math.min(modsY + 30, y + height - 17.5f), mouseX, mouseY) && mouseButton == 0) {
