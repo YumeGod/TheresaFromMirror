@@ -4,6 +4,7 @@ import cn.loli.client.Main;
 import cn.loli.client.events.Render2DEvent;
 import cn.loli.client.events.TickEvent;
 import cn.loli.client.gui.ttfr.HFontRenderer;
+import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.notifications.NotificationManager;
@@ -59,6 +60,8 @@ public class HUD extends Module {
 
     @EventTarget
     public void onRender2D(Render2DEvent event) {
+        ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
+
         switch (logoMode.getCurrentMode()) {
             case "Theresa":
                 RenderUtils.drawImage(new ResourceLocation("theresa/icons/logo.png"), 10, 8, 17, 16);//logo
@@ -72,10 +75,10 @@ public class HUD extends Module {
                 break;
         }
         if (this.showClientInfo.getObject()) {
-            this.drawClientInfo();
+            this.drawClientInfo(sr);
         }
         if (this.showArrayList.getObject()) {
-            this.drawArrayList(ArrayListXPos.getObject().floatValue(), ArrayListYPos.getObject().floatValue());
+            this.drawArrayList(ArrayListXPos.getObject().floatValue(), ArrayListYPos.getObject().floatValue(), sr);
         }
         if (this.showNotifications.getObject()) {
             this.drawNotifications();
@@ -97,14 +100,13 @@ public class HUD extends Module {
         }
     }
 
-    private void drawArrayList(float x, float y) {
+    private void drawArrayList(float x, float y, ScaledResolution sr) {
         if (showArrayList.getObject()) {
             float modY = 0;
             int offset = 50;
             for (Module arraylist_mod : arraylist_mods) {
 
                 String name = arraylist_mod.getName() + (arraylist_mod.getSuffix() != null ? " " + arraylist_mod.getSuffix() : "");
-                ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
                 float x1 = 0, y1 = 0;
                 // get color
                 int acolor = 0xFFFFFF;
@@ -123,7 +125,7 @@ public class HUD extends Module {
                 FontRenderer mcFont = mc.fontRendererObj;
                 boolean flag = font.getCurrentMode().equals("Minecraft");
 
-                if (Main.INSTANCE.fontLoaders.get(font.getCurrentMode().toLowerCase() + fontSize.getObject()) != fontRenderer){
+                if (Main.INSTANCE.fontLoaders.get(font.getCurrentMode().toLowerCase() + fontSize.getObject()) != fontRenderer) {
                     fontRenderer = Main.INSTANCE.fontLoaders.get(font.getCurrentMode().toLowerCase() + fontSize.getObject());
                     sort();
                 }
@@ -236,8 +238,16 @@ public class HUD extends Module {
                 : -fontRenderer.getStringWidth(m.getName() + (m.getSuffix() != null ? " " + m.getSuffix() : ""))));
     }
 
-    private void drawClientInfo() {
+    private void drawClientInfo(ScaledResolution res) {
+        double xDist = mc.thePlayer.posX - mc.thePlayer.lastTickPosX;
+        double zDist = mc.thePlayer.posZ - mc.thePlayer.lastTickPosZ;
+        double currSpeed = StrictMath.sqrt(xDist * xDist + zDist * zDist) * 20.0 * ((IAccessorMinecraft) mc).getTimer().timerSpeed;
 
+        if (showClientInfo.getObject()) {
+            int fpsWidth = mc.fontRendererObj.drawString("FPS: " + Minecraft.getDebugFPS(), 2, res.getScaledHeight() - mc.fontRendererObj.FONT_HEIGHT - 2, -1, true);
+            fpsWidth = Math.max(fpsWidth, mc.fontRendererObj.drawString(String.format("BPS: %.2f", currSpeed), 2, res.getScaledHeight() - mc.fontRendererObj.FONT_HEIGHT * 2 - 2, -1, true));
+            fpsWidth = Math.max(fpsWidth, mc.fontRendererObj.drawString(String.format("User: " + Main.INSTANCE.name, currSpeed), (float) (res.getScaledWidth() - mc.fontRendererObj.getStringWidth(String.format("User: " + Main.INSTANCE.name, currSpeed))), res.getScaledHeight() - mc.fontRendererObj.FONT_HEIGHT - 2, -1, true));
+        }
     }
 
     private void originalSort() {
