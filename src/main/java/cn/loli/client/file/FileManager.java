@@ -165,7 +165,7 @@ public class FileManager {
                     int keybind = Main.INSTANCE.valueManager.keyBind.get(values) == null ? 0 : Main.INSTANCE.valueManager.keyBind.get(values);
                     if (values instanceof NumberValue) {
                         NumberValue numberValue = (NumberValue) values;
-                        if (Main.INSTANCE.valueManager.numberPick.get(values) != null){
+                        if (Main.INSTANCE.valueManager.numberPick.get(values) != null) {
                             if (numberValue.getObject() instanceof Integer) {
                                 jsonObject.addProperty("value", Main.INSTANCE.valueManager.numberPick.get(values).intValue());
                             } else if (numberValue.getObject() instanceof Float) {
@@ -302,9 +302,9 @@ public class FileManager {
         List<String> backupReasons = new ArrayList<>();
 
         try {
-            JsonObject clientObject = (JsonObject) new JsonParser().parse(new InputStreamReader(new FileInputStream(saveFile)));
-            JsonObject modulesObject = (JsonObject) new JsonParser().parse(new InputStreamReader(new FileInputStream(modulesFile)));
-            JsonObject valuesObject = (JsonObject) new JsonParser().parse(new InputStreamReader(new FileInputStream(valuesFile)));
+            JsonObject clientObject = (JsonObject) new JsonParser().parse(new InputStreamReader(new FileInputStream(saveFile), StandardCharsets.UTF_8));
+            JsonObject modulesObject = (JsonObject) new JsonParser().parse(new InputStreamReader(new FileInputStream(modulesFile), StandardCharsets.UTF_8));
+            JsonObject valuesObject = (JsonObject) new JsonParser().parse(new InputStreamReader(new FileInputStream(valuesFile), StandardCharsets.UTF_8));
 
             // Metadata
             if (clientObject.has("metadata")) {

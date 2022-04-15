@@ -84,9 +84,9 @@ public class SubModule extends Module {
             if (mc.thePlayer != null)
                 onEnable();
 
-            if(!HUD.arraylist_mods.contains(this)) {
-                HUD.arraylist_mods.add(this);
-                HUD.sort();
+            if(!Main.INSTANCE.moduleManager.getModule(HUD.class).arraylist_mods.contains(this)) {
+                Main.INSTANCE.moduleManager.getModule(HUD.class).arraylist_mods.add(this);
+                Main.INSTANCE.moduleManager.getModule(HUD.class).sort();
                 ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
                 this.arraylist_animX = sr.getScaledWidth();
                 if (arraylist_animY != 0) {

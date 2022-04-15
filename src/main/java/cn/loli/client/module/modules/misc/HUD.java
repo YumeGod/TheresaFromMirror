@@ -21,24 +21,26 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 public class HUD extends Module {
-    private ArrayList<Module> needRemove = new ArrayList<>();
-    private static HFontRenderer fontRenderer;
-    private NumberValue<Integer> fontSize = new NumberValue<>("FontSize", 12, 12, 16);
+    private final ArrayList<Module> needRemove = new ArrayList<>();
+    private HFontRenderer fontRenderer;
+    private final NumberValue<Integer> fontSize = new NumberValue<>("FontSize", 12, 12, 16);
 
     public HUD() {
         super("HUD", "The heads up display overlay", ModuleCategory.MISC);
+        fontRenderer = Main.INSTANCE.fontLoaders.get(font.getCurrentMode().toLowerCase() + fontSize.getObject());
+        originalSort();
     }
 
     private static final ModeValue font = new ModeValue("Font", "Minecraft", "Minecraft", "Roboto", "Genshin", "Ubuntu", "Dos");
     private final NumberValue<Number> ArrayListXPos = new NumberValue<>("ArrayListXPos", 0, 0, 50);
     private final NumberValue<Number> ArrayListYPos = new NumberValue<>("ArrayListYPos", 0, 0, 50);
-    private final NumberValue<Number> arrayListSpace = new NumberValue<>("ArrayListSpace", 16, 0, 50);
+    private final NumberValue<Number> arrayListSpace = new NumberValue<>("ArrayListSpace", 12, 0, 28);
 
     private final BooleanValue showClientInfo = new BooleanValue("ClientInfo", true);
     private final BooleanValue showArrayList = new BooleanValue("ArrayList", true);
     private final BooleanValue showNotifications = new BooleanValue("Notifications", true);
-    //    private final BooleanValue onlyKeyBind = new BooleanValue("Only KeyBind", false);
-    private static final BooleanValue reverse = new BooleanValue("Sort Reverse", false);
+    // private final BooleanValue onlyKeyBind = new BooleanValue("Only KeyBind", false);
+    private final BooleanValue reverse = new BooleanValue("Sort Reverse", false);
 
     private final ModeValue logoMode = new ModeValue("LogoMode", "Theresa", "Theresa", "None", "Logo2");
     private final ModeValue arrayMode = new ModeValue("ArrayListMode", "Simple", "Simple", "Rectangle", "Simple2");
@@ -50,9 +52,9 @@ public class HUD extends Module {
 
     private final ModeValue arrayAnimation = new ModeValue("ArrayAnimation", "None", "None", "Slide", "Smooth", "Alpha");
 
-    private StringValue clientName = new StringValue("ClientName", "Theresa.exe");
+    private final StringValue clientName = new StringValue("ClientName", "Theresa.exe");
 
-    public static ArrayList<Module> arraylist_mods = new ArrayList<>();
+    public final ArrayList<Module> arraylist_mods = new ArrayList<>();
 
 
     @EventTarget
@@ -118,9 +120,13 @@ public class HUD extends Module {
                         acolor = new Color(color.getObject().getRed(), color.getObject().getGreen(), color.getObject().getBlue(), RenderUtils.getRainbow((offset + rainbowOffset) * 100, 6000, rainbowSaturation.getObject().floatValue(), rainbowBrightness.getObject().floatValue()).getRed()).getRGB();
                 }
 
-                fontRenderer = Main.INSTANCE.fontLoaders.get(font.getCurrentMode().toLowerCase() + fontSize.getObject());
                 FontRenderer mcFont = mc.fontRendererObj;
                 boolean flag = font.getCurrentMode().equals("Minecraft");
+
+                if (Main.INSTANCE.fontLoaders.get(font.getCurrentMode().toLowerCase() + fontSize.getObject()) != fontRenderer){
+                    fontRenderer = Main.INSTANCE.fontLoaders.get(font.getCurrentMode().toLowerCase() + fontSize.getObject());
+                    sort();
+                }
 
                 if (arrayAnimation.getCurrentMode().equals("Alpha")) {
                     if (flag) {
@@ -224,7 +230,7 @@ public class HUD extends Module {
     }
 
 
-    public static void sort() {
+    public void sort() {
         boolean mcfont = font.getCurrentMode().equals("Minecraft");
         arraylist_mods.sort(Comparator.comparingInt(m -> mcfont ? -mc.fontRendererObj.getStringWidth(m.getName() + (m.getSuffix() != null ? " " + m.getSuffix() : ""))
                 : -fontRenderer.getStringWidth(m.getName() + (m.getSuffix() != null ? " " + m.getSuffix() : ""))));
@@ -234,9 +240,7 @@ public class HUD extends Module {
 
     }
 
-    @Override
-    public void onEnable() {
-        super.onEnable();
+    private void originalSort() {
         arraylist_mods.clear();
         arraylist_mods.addAll(Main.INSTANCE.moduleManager.getModules());
         if (reverse.getObject()) {
@@ -244,6 +248,12 @@ public class HUD extends Module {
             arraylist_mods.clear();
             arraylist_mods.addAll(temp);
         }
+        sort();
+    }
+
+    @Override
+    public void onEnable() {
+        super.onEnable();
     }
 
     // Reverse an arraylist return new arraylist
