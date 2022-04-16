@@ -139,8 +139,6 @@ public class Aura extends Module {
 
     @Override
     public void onEnable() {
-        curYaw = mc.thePlayer.rotationYaw;
-        curPitch = mc.thePlayer.rotationPitch;
         crit = Main.INSTANCE.moduleManager.getModule(Criticals.class);
     }
 
@@ -168,7 +166,7 @@ public class Aura extends Module {
         /*
          *  CPS 运算
          */
-        if (target != null && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() &&
+        if (target != null && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() &&
                 attackTimer.hasReached(randomClickDelay(Math.min(minCps.getObject(), maxCps.getObject()), Math.max(minCps.getObject(), maxCps.getObject())))) {
             cps++;
             attackTimer.reset();
@@ -226,20 +224,20 @@ public class Aura extends Module {
 
     @EventTarget
     public void onMoveFly(MoveFlyEvent event) {
-        if (moveFix.getObject() && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() && target != null)
+        if (moveFix.getObject() && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() && target != null)
             event.setYaw(curYaw);
     }
 
 
     @EventTarget
     public void onJump(JumpYawEvent event) {
-        if (moveFix.getObject() && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() && target != null)
+        if (moveFix.getObject() && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() && target != null)
             event.setYaw(curYaw);
     }
 
     @EventTarget
     public void onSlient(MovementStateEvent event) {
-        if (moveFix.getObject() && target != null && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() && silentMoveFix.getObject()) {
+        if (moveFix.getObject() && target != null && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() && silentMoveFix.getObject()) {
             event.setSilentMoveFix(true);
             event.setYaw(curYaw);
         }
@@ -330,7 +328,7 @@ public class Aura extends Module {
     private void attemptAttack() {
         if (target == null) return;
         //Pre Attack
-        if (mc.thePlayer.getDistanceToEntity(target) < range.getObject()) {
+        if (mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject()) {
             if (blockWhen.getCurrentMode().equals("On Attack") || blockWhen.getCurrentMode().equals("Sync"))
                 handleAutoBlock(true);
 
@@ -399,7 +397,7 @@ public class Aura extends Module {
 
         if (target == null) return;
 
-        if (mc.thePlayer.getDistanceToEntity(target) > range.getObject())
+        if (mc.thePlayer.getDistanceToEntity(target) - 0.5657 > range.getObject())
             index = 0;
 
         if (switchTimer.hasReached(switchDelay.getObject())
@@ -601,7 +599,7 @@ public class Aura extends Module {
             if (target instanceof EntityPlayer && !players.getObject()) return false;
             if (target instanceof EntityAnimal && !animals.getObject()) return false;
             if (target instanceof EntityWither && boss.getObject())
-                return mc.thePlayer.getDistanceToEntity(target) <= range.getObject() + blockRange.getObject(); // true
+                return mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() + blockRange.getObject(); // true
             if (target instanceof EntityMob && !mobs.getObject()) return false;
             if (target instanceof INpc && !villagers.getObject()) return false;
         }
@@ -613,7 +611,7 @@ public class Aura extends Module {
         if (Main.INSTANCE.moduleManager.getModule(AntiBot.class).getState() && Main.INSTANCE.moduleManager.getModule(AntiBot.class).isBot(target))
             return false;
 
-        return target != mc.thePlayer && target.isEntityAlive() && mc.thePlayer.getDistanceToEntity(target) <= range.getObject() + blockRange.getObject() && target.ticksExisted > ticksExisted.getObject();
+        return target != mc.thePlayer && target.isEntityAlive() && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() + blockRange.getObject() && target.ticksExisted > ticksExisted.getObject();
     }
 
     private static boolean isInFOV(EntityLivingBase entity, double angle) {
