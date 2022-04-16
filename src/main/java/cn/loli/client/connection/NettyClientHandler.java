@@ -124,7 +124,6 @@ public class NettyClientHandler extends SimpleChannelInboundHandler<String> {
                             break;
                         }
 
-
                     } else {
                         if (!Objects.equals(i, ping)) {
                             Main.INSTANCE.println("Keep Alive Broken " + "ordinal data error x2");

