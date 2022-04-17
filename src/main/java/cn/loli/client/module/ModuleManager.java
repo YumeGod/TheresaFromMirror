@@ -61,6 +61,7 @@ public class ModuleManager {
         addModule(new DamnBridge());
         addModule(new InvCleaner());
         addModule(new InventoryWalk());
+        addModule(new LongJump());
         addModule(new MurderMystery());
         addModule(new NoFall());
         addModule(new NoRightClickDelay());

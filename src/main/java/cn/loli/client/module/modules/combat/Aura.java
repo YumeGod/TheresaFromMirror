@@ -62,7 +62,7 @@ public class Aura extends Module {
 
     public static final NumberValue<Integer> unBlockTweak = new NumberValue<>("UnBlock Tweak", 0, 0, 100);
     private final ModeValue blockMode = new ModeValue("Block Mode", "Desync", "NCP", "Idle", "Desync", "Always", "Legit", "Dada-Legit" , "Vanilla", "Semi-Vanilla", "Spoof-Switch", "Switch", "Null");
-    private final ModeValue blockWhen = new ModeValue("Block when", "On Attack", "On Attack", "On Tick", "Sync");
+    private final ModeValue blockWhen = new ModeValue("Block when", "On Attack", "On Attack", "On Tick", "Sync" , "Reverse");
     private final ModeValue blockSense = new ModeValue("Block style", "Sync", "Sync", "Desync");
     public static final NumberValue<Integer> desyncTick = new NumberValue<>("Desync-Choke-Tick", 2, 0, 5);
     private final ModeValue attackWhen = new ModeValue("Attack when", "Pre", "Pre", "Post", "Tick");
@@ -130,7 +130,7 @@ public class Aura extends Module {
 
     //Desync Auto Block
     Queue<Packet<?>> desyncPackets = new ArrayDeque<>();
-    int ticks;
+    int ticks , ignoreTicks;
 
     public Aura() {
         super("Aura", "Automatically attacks enemies around you.", ModuleCategory.COMBAT);
@@ -265,18 +265,13 @@ public class Aura extends Module {
                     event.setPitch(curPitch);
                 }
             }
-            if (blockWhen.getCurrentMode().equals("On Tick"))
-                handleAutoBlock(true);
-
-            if (attackWhen.getCurrentMode().equals("Pre"))
-                attemptAttack();
-
+            if (blockWhen.getCurrentMode().equals("Reverse") && ignoreTicks == 2) handleAutoBlock(true);
+            if (blockWhen.getCurrentMode().equals("On Tick")) handleAutoBlock(true);
+            if (attackWhen.getCurrentMode().equals("Pre")) attemptAttack();
         } else if (event.getEventType() == EventType.POST) {
-            if (attackWhen.getCurrentMode().equals("Post"))
-                attemptAttack();
-
-            if (blockWhen.getCurrentMode().equals("On Tick") || blockWhen.getCurrentMode().equals("Sync"))
-                handleAutoBlock(false);
+            if (attackWhen.getCurrentMode().equals("Post")) attemptAttack();
+            if (blockWhen.getCurrentMode().equals("On Tick") || blockWhen.getCurrentMode().equals("Sync") || blockWhen.getCurrentMode().equals("Reverse")) handleAutoBlock(false);
+            ignoreTicks ++;
         }
     }
 
@@ -301,7 +296,7 @@ public class Aura extends Module {
             if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.getHeldItem() != null
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject()))
                 if (target != null) {
-                    if (!isBlocking && ticks < 3 + desyncTick.getObject()) {
+                    if (!isBlocking && ticks < 2 + desyncTick.getObject()) {
                         desyncPackets.add(event.getPacket());
                         event.setCancelled(true);
                         ticks++;
@@ -315,7 +310,7 @@ public class Aura extends Module {
         if (event.getPacket() instanceof C08PacketPlayerBlockPlacement)
             if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.getHeldItem() != null
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject())) {
-                if (ticks > 2 + desyncTick.getObject())
+                if (ticks > 1 + desyncTick.getObject())
                     attemptRelease();
 
                 if (ticks != 0)
@@ -407,8 +402,6 @@ public class Aura extends Module {
         }
     }
 
-    double x, z;
-
 
     //确定他妈的是否格挡
     private void handleAutoBlock(boolean unblock) {
@@ -432,9 +425,9 @@ public class Aura extends Module {
                         ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
                         break;
                     case "idle":
+                        ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
                         if (mc.thePlayer.ticksExisted % 2 != 0) {
                             mc.getNetHandler().getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, new BlockPos(-1, -1, -1), EnumFacing.DOWN));
-                            ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
                             isBlocking = false;
                         }
                         break;
@@ -442,15 +435,15 @@ public class Aura extends Module {
                         ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
                         isBlocking = false;
                         break;
-                    case "legit":
                     case "spoof-switch":
                     case "switch":
                     case "dada":
                         isBlocking = false;
                         break;
+                    case "legit":
                     case "dada-legit":
                     case "ncp":
-                        mc.getNetHandler().getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, new BlockPos(-1, -1, -1), EnumFacing.DOWN));
                         isBlocking = false;
                         break;
                     case "null":
@@ -511,6 +504,7 @@ public class Aura extends Module {
                         mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
                         break;
                 }
+                ignoreTicks = 0;
                 isBlocking = true;
             }
         }
