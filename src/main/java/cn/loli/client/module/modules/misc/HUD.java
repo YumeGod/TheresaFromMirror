@@ -24,7 +24,7 @@ import java.util.Comparator;
 public class HUD extends Module {
     private final ArrayList<Module> needRemove = new ArrayList<>();
     private HFontRenderer fontRenderer;
-    private final NumberValue<Integer> fontSize = new NumberValue<>("FontSize", 12, 12, 16);
+    private final NumberValue<Integer> fontSize = new NumberValue<>("FontSize", 12, 12, 18);
     public static float maxY = 0;
 
     public HUD() {
