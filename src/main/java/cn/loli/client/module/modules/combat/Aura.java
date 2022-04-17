@@ -271,7 +271,7 @@ public class Aura extends Module {
         } else if (event.getEventType() == EventType.POST) {
             if (attackWhen.getCurrentMode().equals("Post")) attemptAttack();
             if (blockWhen.getCurrentMode().equals("On Tick") || blockWhen.getCurrentMode().equals("Sync") || blockWhen.getCurrentMode().equals("Reverse")) handleAutoBlock(false);
-            ignoreTicks ++;
+            ignoreTicks++;
         }
     }
 
@@ -286,26 +286,26 @@ public class Aura extends Module {
         if (event.getPacket() instanceof C07PacketPlayerDigging)
             if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.getHeldItem() != null
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject()))
-                if (target != null)
-                    if (isBlocking) {
-                        if (ticks < 1) desyncPackets.add(event.getPacket());
-                        event.setCancelled(true);
-                    }
+                if (target != null) {
+                    if (ticks < 1)
+                        desyncPackets.add(event.getPacket());
+
+                    event.setCancelled(true);
+                    ticks++;
+                }
 
         if (event.getPacket() instanceof C03PacketPlayer)
             if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.getHeldItem() != null
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject()))
-                if (target != null) {
-                    if (!isBlocking && ticks < 2 + desyncTick.getObject()) {
+                if (target != null)
+                    if (ticks < 2 + desyncTick.getObject()) {
                         desyncPackets.add(event.getPacket());
                         event.setCancelled(true);
-                        ticks++;
-                    } else {
+                    } else
                         attemptRelease();
-                    }
-                } else {
+                else
                     attemptRelease();
-                }
+
 
         if (event.getPacket() instanceof C08PacketPlayerBlockPlacement)
             if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.getHeldItem() != null
