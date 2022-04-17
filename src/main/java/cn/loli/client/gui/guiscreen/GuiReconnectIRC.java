@@ -31,7 +31,7 @@ public class GuiReconnectIRC extends GuiScreen {
         //AvailableProxy
         proxys.add(new ProxyEntry("JP", "jp1.nigger.party", "jp2.nigger.party"));
         proxys.add(new ProxyEntry("HK", "hk1.nigger.party"));
-        proxys.add(new ProxyEntry("US", "us1.nigger.party", "us2.nigger.party", "us3.nigger.party", "us4.nigger.party"));
+        proxys.add(new ProxyEntry("US", "us1.nigger.party", "us2.nigger.party", "us3.nigger.party", "us4.nigger.party" , "us5.nigger.party"));
         proxys.add(new ProxyEntry("Russia", "ru1.nigger.party", "ru2.nigger.party", "ru3.nigger.party", "ru4.nigger.party"));
     }
 
