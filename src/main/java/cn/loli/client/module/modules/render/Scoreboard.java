@@ -1,12 +1,12 @@
 package cn.loli.client.module.modules.render;
 
+import cn.loli.client.Main;
 import cn.loli.client.events.Render2DEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.misc.HUD;
 import cn.loli.client.value.ModeValue;
 import com.darkmagician6.eventapi.EventTarget;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import net.minecraft.client.gui.Gui;
@@ -54,7 +54,7 @@ public class Scoreboard extends Module {
         if (mode.getCurrentMode().equals("Normal")) {
             j1 = scaledRes.getScaledHeight() / 2 - i1 / 3;
         } else if (mode.getCurrentMode().equals("Arrays")) {
-            j1 = (int) HUD.maxY;
+            j1 = (int) Main.INSTANCE.moduleManager.getModule(HUD.class).maxY;
         }
         j1 += i1 + 4;
         int k1 = 3;

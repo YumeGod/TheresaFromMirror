@@ -25,7 +25,7 @@ public class HUD extends Module {
     private final ArrayList<Module> needRemove = new ArrayList<>();
     private HFontRenderer fontRenderer;
     private final NumberValue<Integer> fontSize = new NumberValue<>("FontSize", 12, 12, 18);
-    public static float maxY = 0;
+    public float maxY = 0;
 
     public HUD() {
         super("HUD", "The heads up display overlay", ModuleCategory.MISC);
@@ -33,7 +33,7 @@ public class HUD extends Module {
         originalSort();
     }
 
-    private static final ModeValue font = new ModeValue("Font", "Minecraft", "Minecraft", "Roboto", "Genshin", "Ubuntu", "Dos");
+    private final ModeValue font = new ModeValue("Font", "Minecraft", "Minecraft", "Roboto", "Genshin", "Ubuntu", "Dos");
     private final NumberValue<Number> ArrayListXPos = new NumberValue<>("ArrayListXPos", 0, 0, 50);
     private final NumberValue<Number> ArrayListYPos = new NumberValue<>("ArrayListYPos", 0, 0, 50);
     private final NumberValue<Number> arrayListSpace = new NumberValue<>("ArrayListSpace", 12, 0, 28);
