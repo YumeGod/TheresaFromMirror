@@ -35,17 +35,16 @@ public class FontLoaders {
     }
 
     public HFontRenderer get(String name, int size) {
-        if (fonts.get(name + size) == null) {
-            load(name, size, size);
-//            return fonts.get("tiejili");
-        }
+        if (fonts.get(name + size) == null)
+            fonts.put(name + size, getFont(name, size));
+
         return fonts.get(name + size);
     }
 
     public HFontRenderer get(String name) {
-        if (fonts.get(name) == null) {
+        if (fonts.get(name) == null)
             return fonts.get("tiejili");
-        }
+
         return fonts.get(name);
     }
 
