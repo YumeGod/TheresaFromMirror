@@ -2,7 +2,9 @@
 
 package cn.loli.client.injection.mixins;
 
+import cn.loli.client.Main;
 import cn.loli.client.events.Render2DEvent;
+import cn.loli.client.module.modules.render.Scoreboard;
 import com.darkmagician6.eventapi.EventManager;
 import net.minecraft.client.gui.GuiIngame;
 import net.minecraft.client.gui.ScaledResolution;
@@ -18,5 +20,12 @@ public class MixinGuiIngame {
     @Inject(method = "renderTooltip", at = @At("RETURN"))
     private void renderTooltip(ScaledResolution sr, float partialTicks, CallbackInfo ci) {
         EventManager.call(new Render2DEvent());
+    }
+
+    @Inject(method = "renderScoreboard", at = @At("HEAD"), cancellable = true)
+    private void renderScoreboard(CallbackInfo callbackInfo) {
+//        if (!Main.INSTANCE.moduleManager.getModule(Scoreboard.class).getState()) {
+            callbackInfo.cancel();
+//        }
     }
 }
