@@ -25,6 +25,7 @@ public class HUD extends Module {
     private final ArrayList<Module> needRemove = new ArrayList<>();
     private HFontRenderer fontRenderer;
     private final NumberValue<Integer> fontSize = new NumberValue<>("FontSize", 12, 12, 16);
+    public static float maxY = 0;
 
     public HUD() {
         super("HUD", "The heads up display overlay", ModuleCategory.MISC);
@@ -40,6 +41,8 @@ public class HUD extends Module {
     private final BooleanValue showClientInfo = new BooleanValue("ClientInfo", true);
     private final BooleanValue showArrayList = new BooleanValue("ArrayList", true);
     private final BooleanValue showNotifications = new BooleanValue("Notifications", true);
+    private final BooleanValue noRender = new BooleanValue("noRender", false);
+
     // private final BooleanValue onlyKeyBind = new BooleanValue("Only KeyBind", false);
     private final BooleanValue reverse = new BooleanValue("Sort Reverse", false);
 
@@ -105,7 +108,9 @@ public class HUD extends Module {
             float modY = 0;
             int offset = 50;
             for (Module arraylist_mod : arraylist_mods) {
-
+                if (arraylist_mod.getCategory().equals(ModuleCategory.RENDER) && noRender.getObject()) {
+                    continue;
+                }
                 String name = arraylist_mod.getName() + (arraylist_mod.getSuffix() != null ? " " + arraylist_mod.getSuffix() : "");
                 float x1 = 0, y1 = 0;
                 // get color
@@ -164,6 +169,7 @@ public class HUD extends Module {
                     }
                     x1 = arraylist_mod.arraylist_animX;
                     y1 = y + modY;
+                    arraylist_mod.arraylist_animY = y1;
                     if (!arraylist_mod.getState() && arraylist_mod.arraylist_animX >= sr.getScaledWidth()) {
                         needRemove.add(arraylist_mod);
                     }
@@ -194,6 +200,8 @@ public class HUD extends Module {
                         x1 = sr.getScaledWidth() - fontRenderer.getStringWidth(name) - x;
                     }
                     y1 = y + modY;
+                    arraylist_mod.arraylist_animY = y1;
+
                     if (!arraylist_mod.getState()) {
                         needRemove.add(arraylist_mod);
                     }
@@ -222,6 +230,7 @@ public class HUD extends Module {
                 }
 
                 modY += arrayListSpace.getObject().floatValue();
+                maxY = arraylist_mod.arraylist_animY + fontRenderer.getHeight() + 2;
             }
             if (needRemove.size() != 0) {
                 arraylist_mods.removeAll(needRemove);

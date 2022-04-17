@@ -89,6 +89,7 @@ public class ModuleManager {
         addModule(new Trail());
         addModule(new ViewClip());
         addModule(new Nazi());
+        addModule(new Scoreboard());
 
         //World
         addModule(new Eagle());
