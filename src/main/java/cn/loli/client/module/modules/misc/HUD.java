@@ -107,6 +107,7 @@ public class HUD extends Module {
         if (showArrayList.getObject()) {
             float modY = 0;
             int offset = 50;
+
             for (Module arraylist_mod : arraylist_mods) {
                 if (arraylist_mod.getCategory().equals(ModuleCategory.RENDER) && noRender.getObject()) {
                     continue;
@@ -206,6 +207,7 @@ public class HUD extends Module {
                         needRemove.add(arraylist_mod);
                     }
                 }
+
                 Color c = new Color(acolor);
                 float width = 0;
                 if (flag) {
@@ -229,14 +231,17 @@ public class HUD extends Module {
                     fontRenderer.drawStringWithShadow(name, x1, y1 + arrayListSpace.getObject().floatValue() / 2 - fontRenderer.getHeight() / 2, new Color(c.getRed(), c.getGreen(), c.getBlue(), ((int) arraylist_mod.arraylist_animA)).getRGB());
                 }
 
+
+
                 modY += arrayListSpace.getObject().floatValue();
-                maxY = arraylist_mod.arraylist_animY + fontRenderer.getHeight() + 2;
+                //mcFont Init
+                maxY = arraylist_mod.arraylist_animY + (mcFont == null ? fontRenderer.getHeight() : 8) + 2;
             }
+
             if (needRemove.size() != 0) {
                 arraylist_mods.removeAll(needRemove);
                 needRemove.clear();
             }
-
         }
     }
 
@@ -245,6 +250,11 @@ public class HUD extends Module {
         boolean mcfont = font.getCurrentMode().equals("Minecraft");
         arraylist_mods.sort(Comparator.comparingInt(m -> mcfont ? -mc.fontRendererObj.getStringWidth(m.getName() + (m.getSuffix() != null ? " " + m.getSuffix() : ""))
                 : -fontRenderer.getStringWidth(m.getName() + (m.getSuffix() != null ? " " + m.getSuffix() : ""))));
+
+        if (reverse.getObject()) {
+            arraylist_mods.sort(Comparator.comparingInt(m -> mcfont ? mc.fontRendererObj.getStringWidth(m.getName() + (m.getSuffix() != null ? " " + m.getSuffix() : ""))
+                    : fontRenderer.getStringWidth(m.getName() + (m.getSuffix() != null ? " " + m.getSuffix() : ""))));
+        }
     }
 
     private void drawClientInfo(ScaledResolution res) {
@@ -262,11 +272,6 @@ public class HUD extends Module {
     private void originalSort() {
         arraylist_mods.clear();
         arraylist_mods.addAll(Main.INSTANCE.moduleManager.getModules());
-        if (reverse.getObject()) {
-            ArrayList<Module> temp = reverse(arraylist_mods);
-            arraylist_mods.clear();
-            arraylist_mods.addAll(temp);
-        }
         sort();
     }
 

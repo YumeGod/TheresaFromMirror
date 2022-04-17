@@ -138,6 +138,8 @@ public abstract class Module {
             if (mc.thePlayer != null)
                 onDisable();
 
+            Main.INSTANCE.moduleManager.getModule(HUD.class).sort();
+
             if (!keepReg && isReg) {
                 isReg = false;
                 EventManager.unregister(this);
