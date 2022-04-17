@@ -18,7 +18,6 @@ import net.minecraft.util.EnumChatFormatting;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Scoreboard extends Module {
 
@@ -34,7 +33,7 @@ public class Scoreboard extends Module {
         ScaledResolution scaledRes = new ScaledResolution(mc);
         ScoreObjective objective = scoreboard.getObjectiveInDisplaySlot(1);
         Collection<Score> collection = scoreboard.getSortedScores(scoreboard.getObjectiveInDisplaySlot(1));
-        List<Score> list = collection.stream().filter(p_apply_1_ -> p_apply_1_.getPlayerName() != null && !p_apply_1_.getPlayerName().startsWith("#")).collect(Collectors.toList());
+        List<Score> list = Lists.newArrayList(Iterables.filter(collection, p_apply_1_ -> p_apply_1_.getPlayerName() != null && !p_apply_1_.getPlayerName().startsWith("#")));
 
         if (list.size() > 15) {
             collection = Lists.newArrayList(Iterables.skip(list, collection.size() - 15));
