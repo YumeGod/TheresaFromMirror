@@ -21,13 +21,13 @@ public class FontLoaders {
 
         long time = System.currentTimeMillis();
 
-        load("inter", 14, 16);
-        load("nunito", 12, 16);
-        load("opensans", 12, 16);
+        load("inter", 14, 18);
+        load("nunito", 12, 18);
+        load("opensans", 12, 18);
         load("roboto", 12, 24);
         load("heiti", 12, 24);
         load("genshin", 12, 24);
-        load("ubuntu", 12, 16);
+        load("ubuntu", 12, 18);
         load("tiejili", 12, 18);
         load("targethub", 12, 18);
         load("dos", 12, 18);
