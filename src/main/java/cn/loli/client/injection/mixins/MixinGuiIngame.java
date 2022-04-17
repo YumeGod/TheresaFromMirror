@@ -24,8 +24,7 @@ public class MixinGuiIngame {
 
     @Inject(method = "renderScoreboard", at = @At("HEAD"), cancellable = true)
     private void renderScoreboard(CallbackInfo callbackInfo) {
-//        if (!Main.INSTANCE.moduleManager.getModule(Scoreboard.class).getState()) {
+        if (Main.INSTANCE.moduleManager.getModule(Scoreboard.class).getState())
             callbackInfo.cancel();
-//        }
     }
 }
