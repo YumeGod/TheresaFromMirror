@@ -240,7 +240,6 @@ public class HUD extends Module {
                 }
 
                 modY += arrayListSpace.getObject().floatValue();
-                //mcFont Init
                 maxY = arraylist_mod.arraylist_animY + (mcFont == null ? fontRenderer.getHeight() : 8) + 2;
             }
 
