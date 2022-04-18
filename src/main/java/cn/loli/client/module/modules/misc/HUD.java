@@ -29,7 +29,8 @@ public class HUD extends Module {
 
     public HUD() {
         super("HUD", "The heads up display overlay", ModuleCategory.MISC);
-        fontRenderer = Main.INSTANCE.fontLoaders.get(font.getCurrentMode().toLowerCase() + fontSize.getObject());
+        if (!font.getCurrentMode().equals("Minecraft"))
+            fontRenderer = Main.INSTANCE.fontLoaders.get(font.getCurrentMode().toLowerCase() + fontSize.getObject());
         originalSort();
     }
 
@@ -131,9 +132,16 @@ public class HUD extends Module {
                 FontRenderer mcFont = mc.fontRendererObj;
                 boolean flag = font.getCurrentMode().equals("Minecraft");
 
-                if (Main.INSTANCE.fontLoaders.get(font.getCurrentMode().toLowerCase() + fontSize.getObject()) != fontRenderer) {
-                    fontRenderer = Main.INSTANCE.fontLoaders.get(font.getCurrentMode().toLowerCase() + fontSize.getObject());
-                    sort();
+                if (!flag) {
+                    if (Main.INSTANCE.fontLoaders.get(font.getCurrentMode().toLowerCase() + fontSize.getObject()) != fontRenderer) {
+                        fontRenderer = Main.INSTANCE.fontLoaders.get(font.getCurrentMode().toLowerCase() + fontSize.getObject());
+                        sort();
+                    }
+                } else {
+                    if (fontRenderer != null) {
+                        fontRenderer = null;
+                        sort();
+                    }
                 }
 
                 if (arrayAnimation.getCurrentMode().equals("Alpha")) {
@@ -230,8 +238,6 @@ public class HUD extends Module {
                 } else {
                     fontRenderer.drawStringWithShadow(name, x1, y1 + arrayListSpace.getObject().floatValue() / 2 - fontRenderer.getHeight() / 2, new Color(c.getRed(), c.getGreen(), c.getBlue(), ((int) arraylist_mod.arraylist_animA)).getRGB());
                 }
-
-
 
                 modY += arrayListSpace.getObject().floatValue();
                 //mcFont Init

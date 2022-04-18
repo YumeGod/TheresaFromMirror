@@ -286,26 +286,26 @@ public class Aura extends Module {
         if (event.getPacket() instanceof C07PacketPlayerDigging)
             if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.getHeldItem() != null
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject()))
-                if (target != null) {
-                    if (ticks < 1)
-                        desyncPackets.add(event.getPacket());
-
-                    event.setCancelled(true);
-                    ticks++;
-                }
+                if (target != null)
+                    if (isBlocking) {
+                        if (ticks < 1) desyncPackets.add(event.getPacket());
+                        event.setCancelled(true);
+                    }
 
         if (event.getPacket() instanceof C03PacketPlayer)
             if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.getHeldItem() != null
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject()))
-                if (target != null)
-                    if (ticks < 2 + desyncTick.getObject()) {
+                if (target != null) {
+                    if (!isBlocking && ticks < 2 + desyncTick.getObject()) {
                         desyncPackets.add(event.getPacket());
                         event.setCancelled(true);
-                    } else
+                        ticks++;
+                    } else {
                         attemptRelease();
-                else
+                    }
+                } else {
                     attemptRelease();
-
+                }
 
         if (event.getPacket() instanceof C08PacketPlayerBlockPlacement)
             if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.getHeldItem() != null
@@ -316,7 +316,6 @@ public class Aura extends Module {
                 if (ticks != 0)
                     event.setCancelled(true);
             }
-
     }
 
     //尝试进行Attack
