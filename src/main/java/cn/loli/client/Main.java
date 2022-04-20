@@ -91,7 +91,7 @@ public class Main {
     public int realPosX;
     public int realPosY;
     public int realPosZ;
-    public double moveSpeed;
+
     public ChannelFuture cf;
 
 
@@ -185,21 +185,15 @@ public class Main {
     }
 
     @EventTarget
-    private void onTick(LoopEvent e) {
-        if (Minecraft.getMinecraft().thePlayer.ticksExisted < 5)
-            return;
+    private void onTick(TickEvent e) {
+        if (Minecraft.getMinecraft().currentScreen instanceof GuiDownloadTerrain && (Minecraft.getMinecraft().thePlayer != null))
+            Minecraft.getMinecraft().thePlayer.closeScreen();
 
         if (ms.hasReached(timing)) {
             if (!packetQueue.isEmpty()) Minecraft.getMinecraft().
                     getNetHandler().getNetworkManager().sendPacket(packetQueue.poll());
             ms.reset();
         }
-    }
-
-    @EventTarget
-    private void onTick(TickEvent e) {
-        if (Minecraft.getMinecraft().currentScreen instanceof GuiDownloadTerrain && (Minecraft.getMinecraft().thePlayer != null))
-            Minecraft.getMinecraft().thePlayer.closeScreen();
     }
 
     @EventTarget
@@ -265,15 +259,11 @@ public class Main {
                     if (!connected)
                         Minecraft.getMinecraft().displayGuiScreen(new GuiReconnectIRC(guiScreen));
 
-                    Thread.sleep(1000L); //-1s
                     if (ProtectionThread.getInstance().runChecks()) {
                         println("检测到非法行为，已自动踢出");
-                        if (!(Minecraft.getMinecraft().currentScreen instanceof GuiDisconnected))
-                            Minecraft.getMinecraft().displayGuiScreen(new GuiDisconnected(new GuiDisconnected(new GuiDisconnected(new GuiDisconnected(new GuiCrashMe(),
-                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "HAHAHAH")),
-                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "AS WHAT I SAY")),
-                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "NIGGA")),
-                                    "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "Dont Skid")));
+                        attack();
+                        Minecraft.getMinecraft().displayGuiScreen(new GuiDisconnected(new GuiCrashMe(),
+                                "connect.failed", new ChatComponentTranslation("disconnect.genericReason", "Dont Skid")));
                         try {
                             Class.forName("javax.swing.JOptionPane").getDeclaredMethod("showMessageDialog",
                                     java.awt.Component.class, Object.class, String.class, int.class).invoke(Class.forName("javax.swing.JOptionPane"),
@@ -285,6 +275,8 @@ public class Main {
                         }
                         doCrash();
                     }
+
+                    Thread.sleep(5000L); //-5s
                 }
             } catch (InterruptedException exception) {
                 exception.printStackTrace();
