@@ -61,8 +61,8 @@ public class Aura extends Module {
     private final ModeValue mode = new ModeValue("Priority", "Angle", "Armor", "Range", "Fov", "Angle", "Health", "Hurt Time");
 
     public static final NumberValue<Integer> unBlockTweak = new NumberValue<>("UnBlock Tweak", 0, 0, 100);
-    private final ModeValue blockMode = new ModeValue("Block Mode", "Desync", "NCP", "Idle", "Desync", "Always", "Legit", "Dada-Legit" , "Vanilla", "Semi-Vanilla", "Spoof-Switch", "Switch", "Null");
-    private final ModeValue blockWhen = new ModeValue("Block when", "On Attack", "On Attack", "On Tick", "Sync" , "Reverse");
+    private final ModeValue blockMode = new ModeValue("Block Mode", "Desync", "NCP", "Idle", "Desync", "Always", "Legit", "Dada-Legit", "Vanilla", "Semi-Vanilla", "Spoof-Switch", "Switch", "Null");
+    private final ModeValue blockWhen = new ModeValue("Block when", "On Attack", "On Attack", "On Tick", "Sync", "Reverse");
     private final ModeValue blockSense = new ModeValue("Block style", "Sync", "Sync", "Desync");
     public static final NumberValue<Integer> desyncTick = new NumberValue<>("Desync-Choke-Tick", 2, 0, 5);
     private final ModeValue attackWhen = new ModeValue("Attack when", "Pre", "Pre", "Post", "Tick");
@@ -130,7 +130,7 @@ public class Aura extends Module {
 
     //Desync Auto Block
     Queue<Packet<?>> desyncPackets = new ArrayDeque<>();
-    int ticks , ignoreTicks;
+    int ticks, ignoreTicks;
 
     public Aura() {
         super("Aura", "Automatically attacks enemies around you.", ModuleCategory.COMBAT);
@@ -270,7 +270,8 @@ public class Aura extends Module {
             if (attackWhen.getCurrentMode().equals("Pre")) attemptAttack();
         } else if (event.getEventType() == EventType.POST) {
             if (attackWhen.getCurrentMode().equals("Post")) attemptAttack();
-            if (blockWhen.getCurrentMode().equals("On Tick") || blockWhen.getCurrentMode().equals("Sync") || blockWhen.getCurrentMode().equals("Reverse")) handleAutoBlock(false);
+            if (blockWhen.getCurrentMode().equals("On Tick") || blockWhen.getCurrentMode().equals("Sync") || blockWhen.getCurrentMode().equals("Reverse"))
+                handleAutoBlock(false);
             ignoreTicks++;
         }
     }
@@ -608,9 +609,9 @@ public class Aura extends Module {
     }
 
     private static boolean isInFOV(EntityLivingBase entity, double angle) {
-        angle *= .5D;
-        double angleDiff = getAngleDifference(mc.thePlayer.rotationYaw, getRotations(entity.posX, entity.posY, entity.posZ)[0]);
-        return (angleDiff > 0 && angleDiff < angle) || (-angle < angleDiff && angleDiff < 0);
+        double calcYaw = rotationUtils.calculateRotationDiff(MathHelper.wrapAngleTo180_float(mc.thePlayer.rotationYaw) + 180,
+                MathHelper.wrapAngleTo180_float(rotationUtils.getYaw(mc.thePlayer, entity)))[0];
+        return calcYaw <= angle;
     }
 
     //优先级
@@ -621,24 +622,6 @@ public class Aura extends Module {
         }
         return angle3;
     }
-
-    private static float getAngleDifference(float dir, float yaw) {
-        float f = Math.abs(yaw - dir) % 360F;
-        return f > 180F ? 360F - f : f;
-    }
-
-    private static float[] getRotations(double x, double y, double z) {
-        double diffX = x + .5D - mc.thePlayer.posX;
-        double diffY = (y + .5D) / 2D - (mc.thePlayer.posY + mc.thePlayer.getEyeHeight());
-        double diffZ = z + .5D - mc.thePlayer.posZ;
-
-        double dist = MathHelper.sqrt_double(diffX * diffX + diffZ * diffZ);
-        float yaw = (float) (Math.atan2(diffZ, diffX) * 180D / Math.PI) - 90F;
-        float pitch = (float) -(Math.atan2(diffY, dist) * 180D / Math.PI);
-
-        return new float[]{yaw, pitch};
-    }
-
 
     public static float[] getRotations(final Entity entity) {
         if (entity == null) {
