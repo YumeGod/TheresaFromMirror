@@ -47,14 +47,16 @@ public class MSLoginCommand extends Command {
         }
         try {
             //TODO: 源依赖被owner删除
+            ChatUtils.info("Try to Log in.......");
+            new Thread(() -> {
+                MinecraftAuthenticator minecraftAuthenticator = new MinecraftAuthenticator();
+                MinecraftToken minecraftToken = minecraftAuthenticator.loginWithXbox(username, password);
+                MinecraftProfile minecraftProfile = minecraftAuthenticator.checkOwnership(minecraftToken);
+                Session session = new Session(minecraftProfile.getUsername(), minecraftProfile.getUuid().toString(), minecraftToken.getAccessToken(), "mojang");
+                ((IAccessorMinecraft) Minecraft.getMinecraft()).setSession(session);
 
-            MinecraftAuthenticator minecraftAuthenticator = new MinecraftAuthenticator();
-            MinecraftToken minecraftToken = minecraftAuthenticator.loginWithXbox(username, password);
-            MinecraftProfile minecraftProfile = minecraftAuthenticator.checkOwnership(minecraftToken);
-            Session session = new Session(minecraftProfile.getUsername(), minecraftProfile.getUuid().toString(), minecraftToken.getAccessToken(), "mojang");
-            ((IAccessorMinecraft) Minecraft.getMinecraft()).setSession(session);
-
-            ChatUtils.success("Logged in. New IGN: " + session.getUsername());
+                ChatUtils.success("Logged in. New IGN: " + session.getUsername());
+            }).start();
 
         } catch (Exception e) {
             throw new CommandException(e.getMessage());

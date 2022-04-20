@@ -42,8 +42,13 @@ import java.util.stream.Stream;
 
 
 public class Aura extends Module {
-    private final NumberValue<Integer> minCps = new NumberValue<>("Min CPS", 8, 1, 20);
-    private final NumberValue<Integer> maxCps = new NumberValue<>("Max CPS", 12, 1, 20);
+
+    private final ModeValue cpsMode = new ModeValue("CPS Mode", "Randomize", "Randomize", "Smooth", "Legit", "Hit Based");
+    private final NumberValue<Integer> simpleCps = new NumberValue<>("Simple CPS", 8, 1, 20);
+    private final NumberValue<Integer> extendCps = new NumberValue<>("Extend CPS", 4, 0, 60);
+    private final BooleanValue smoothRandomizing = new BooleanValue("Smooth-Randomizing", true);
+    private final NumberValue<Float> smoothCpsSpeed = new NumberValue<>("Smooth-Delay", 0f, 0f, 1f);
+    private final NumberValue<Float> smoothCpsRandomStrength = new NumberValue<>("Smooth-Random-Length", 0f, 0f, 1f);
 
     private static final NumberValue<Integer> ticksExisted = new NumberValue<>("Ticks Existed", 20, 0, 500);
     private static final NumberValue<Integer> fov = new NumberValue<>("FOV", 360, 0, 360);
@@ -94,6 +99,7 @@ public class Aura extends Module {
     private final BooleanValue moveFix = new BooleanValue("Move Fix", false);
     private final BooleanValue silentMoveFix = new BooleanValue("Silent Fix", false);
 
+    private final BooleanValue swingWhenMisAttack = new BooleanValue("Swing when mis attack", false);
     private final BooleanValue rayCast = new BooleanValue("Ray Cast", false);
     private static final BooleanValue throughBlock = new BooleanValue("Through Block", true);
 
@@ -117,10 +123,14 @@ public class Aura extends Module {
     private final TimeHelper attackTimer = new TimeHelper();
     private final TimeHelper switchTimer = new TimeHelper();
     private final TimeHelper unblockTimer = new TimeHelper();
+    //CPS Legit
+    private final TimeHelper reset = new TimeHelper();
 
     public static ArrayList<Entity> entities = new ArrayList<>();
     public static List<EntityLivingBase> targets = new ArrayList<>();
 
+    //attack per durable
+    long apd;
     int cps, index;
     boolean isBlocking = false;
 
@@ -140,6 +150,7 @@ public class Aura extends Module {
     @Override
     public void onEnable() {
         crit = Main.INSTANCE.moduleManager.getModule(Criticals.class);
+        calculateCPS();
     }
 
     @Override
@@ -166,8 +177,9 @@ public class Aura extends Module {
         /*
          *  CPS 运算
          */
+        if (!cpsMode.getCurrentMode().equals("Hit Based")) calculateCPS();
         if (target != null && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() &&
-                attackTimer.hasReached(randomClickDelay(Math.min(minCps.getObject(), maxCps.getObject()), Math.max(minCps.getObject(), maxCps.getObject())))) {
+                attackTimer.hasReached(apd)) {
             cps++;
             attackTimer.reset();
         }
@@ -222,6 +234,9 @@ public class Aura extends Module {
         }
     }
 
+
+    //Rotate Strafe
+
     @EventTarget
     public void onMoveFly(MoveFlyEvent event) {
         if (moveFix.getObject() && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() && target != null)
@@ -243,6 +258,8 @@ public class Aura extends Module {
         }
     }
 
+
+    //Listen to Attack
     @EventTarget
     private void onMotionUpdate(MotionUpdateEvent event) {
         if (target == null) {
@@ -281,6 +298,8 @@ public class Aura extends Module {
         if (target == null) return;
         if (attackWhen.getCurrentMode().equals("Tick")) attemptAttack();
     }
+
+    //Desync autoblock
 
     @EventTarget
     private void onPacket(PacketEvent event) {
@@ -365,9 +384,11 @@ public class Aura extends Module {
             mc.playerController.attackEntity(mc.thePlayer, entity);
         } else {
             //不打人
-            mc.thePlayer.swingItem();
+            if (!swingWhenMisAttack.getObject())
+                mc.thePlayer.swingItem();
         }
 
+        if (cpsMode.getCurrentMode().equals("Hit Based")) calculateCPS();
     }
 
 
@@ -583,8 +604,51 @@ public class Aura extends Module {
     }
 
     //计算CPS
-    private static long randomClickDelay(final double minCPS, final double maxCPS) {
-        return (long) ((Math.random() * (1000 / minCPS - 1000 / maxCPS) + 1) + 1000 / maxCPS);
+    private long randomClickDelay(final double minCPS, final double maxCPS) {
+        return (long) (1000L / (minCPS + ((maxCPS - minCPS) * playerUtils.randomInRange(0.4 , 1.0))));
+    }
+
+
+    boolean wasCPSDrop = false;
+
+    private void calculateCPS() {
+        long cps = simpleCps.getObject();
+
+        switch (cpsMode.getCurrentMode()) {
+            case "Legit": {
+                    final Random random = new Random();
+                    final long maxCPS = cps + extendCps.getObject();
+                    apd = cps + (random.nextInt() * (maxCPS - cps));
+
+                    if (reset.hasReached((long) (1000.0 / playerUtils.randomInRange(cps, maxCPS)))) {
+                        wasCPSDrop = !wasCPSDrop;
+                        if (wasCPSDrop) reset.reset();
+                    }
+
+                    final long cur = System.currentTimeMillis() * random.nextInt(220);
+
+                    long timeCovert = Math.max(apd, cur) / 3;
+                    if (wasCPSDrop) {
+                        apd = timeCovert;
+                    } else {
+                        apd = cps + (random.nextInt() * (maxCPS - cps)) / timeCovert;
+                    }
+                break;
+            }
+            case "Randomize": {
+                apd = randomClickDelay(simpleCps.getObject(), simpleCps.getObject() + extendCps.getObject());
+                break;
+            }
+            case "Smooth": {
+                cps = (long) playerUtils.smooth(cps + extendCps.getObject(), cps, smoothCpsSpeed.getObject() / 10, smoothRandomizing.getObject(), smoothCpsRandomStrength.getObject());
+            }
+            default: {
+                apd = 1000 / cps;
+            }
+        }
+
+        if (cpsMode.getCurrentMode().equals("Hit Based"))
+            apd += playerUtils.getRandomGaussian(50);
     }
 
     //限制

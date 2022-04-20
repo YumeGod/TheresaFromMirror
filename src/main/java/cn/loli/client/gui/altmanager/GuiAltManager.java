@@ -87,14 +87,17 @@ public class GuiAltManager extends GuiScreen {
             status = "\u00a7eSuccessfully logged in as " + usernameField.getText() + " [OFFLINE]!";
             return;
         }
+        new Thread(() -> {
+            try {
+                status = "\u00a7a Logging....";
+                Session session = Utils.createSession(usernameField.getText(), passwordField.getText(), Proxy.NO_PROXY);
+                ((IAccessorMinecraft) mc).setSession(session);
+                status = "\u00a7aSuccessfully logged in as " + session.getUsername() + " [ONLINE]!";
+            } catch (AuthenticationException e) {
+                status = "\u00a7cError: " + e.getMessage();
+            }
+        }).start();
 
-        try {
-            Session session = Utils.createSession(usernameField.getText(), passwordField.getText(), Proxy.NO_PROXY);
-            ((IAccessorMinecraft) mc).setSession(session);
-            status = "\u00a7aSuccessfully logged in as " + session.getUsername() + " [ONLINE]!";
-        } catch (AuthenticationException e) {
-            status = "\u00a7cError: " + e.getMessage();
-        }
     }
 
     private void microsoftLogin() {
@@ -118,16 +121,19 @@ public class GuiAltManager extends GuiScreen {
         }
 
         try {
-            MinecraftAuthenticator minecraftAuthenticator = new MinecraftAuthenticator();
-            MinecraftToken minecraftToken = minecraftAuthenticator.loginWithXbox(usernameField.getText(), passwordField.getText());
-            MinecraftProfile minecraftProfile = minecraftAuthenticator.checkOwnership(minecraftToken);
-            Session session = new Session(minecraftProfile.getUsername(), minecraftProfile.getUuid().toString(), minecraftToken.getAccessToken(), "mojang");
-            ((IAccessorMinecraft) mc).setSession(session);
-            if (session.getToken() != null) {
-                status = "\u00a7aSuccessfully logged in as " + session.getUsername() + " [ONLINE]! (Microsoft Login)";
-            } else {
-                status = "\u00a7cError: login failed!";
-            }
+            status = "\u00a7a Logging....";
+            new Thread(() -> {
+                MinecraftAuthenticator minecraftAuthenticator = new MinecraftAuthenticator();
+                MinecraftToken minecraftToken = minecraftAuthenticator.loginWithXbox(usernameField.getText(), passwordField.getText());
+                MinecraftProfile minecraftProfile = minecraftAuthenticator.checkOwnership(minecraftToken);
+                Session session = new Session(minecraftProfile.getUsername(), minecraftProfile.getUuid().toString(), minecraftToken.getAccessToken(), "mojang");
+                ((IAccessorMinecraft) mc).setSession(session);
+                if (session.getToken() != null) {
+                    status = "\u00a7aSuccessfully logged in as " + session.getUsername() + " [ONLINE]! (Microsoft Login)";
+                } else {
+                    status = "\u00a7cError: login failed!";
+                }
+            }).start();
         } catch (Exception e) {
             status = "\u00a7cError: " + e.getMessage();
         }

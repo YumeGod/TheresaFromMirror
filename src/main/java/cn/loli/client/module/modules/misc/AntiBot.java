@@ -40,6 +40,7 @@ public class AntiBot extends Module {
     private final BooleanValue duplicateEntityCheck = new BooleanValue("Duplicate", false);
     private final BooleanValue soundCheck = new BooleanValue("Sound", false);
     private final BooleanValue rotation = new BooleanValue("Illegal Rotation", false);
+    private final BooleanValue period = new BooleanValue("Tolerance Period", false);
 
     private final NumberValue<Integer> ticksExisted = new NumberValue<>("Ticks Existed", 0, 0, 100);
     private final NumberValue<Integer> ping = new NumberValue<>("Ping", 0, -10, 500);
@@ -51,6 +52,7 @@ public class AntiBot extends Module {
     private final ArrayList<Entity> rotationEntity = new ArrayList<>();
     private final ArrayList<Entity> groundSpawnEntity = new ArrayList<>();
     private final ArrayList<Entity> duplicates = new ArrayList<>();
+    private final ArrayList<Entity> periodEntity = new ArrayList<>();
 
 
     private final CopyOnWriteArrayList<Entity> copyEntities = new CopyOnWriteArrayList<>();
@@ -62,7 +64,7 @@ public class AntiBot extends Module {
     public boolean isBot(EntityLivingBase entity) {
         if (entity != null && entity != mc.thePlayer) {
             if (entity instanceof EntityPlayer) {
-                if (ticksExisted.getObject().intValue() != 0 && entity.ticksExisted < ticksExisted.getObject().intValue())
+                if (ticksExisted.getObject() != 0 && entity.ticksExisted < ticksExisted.getObject())
                     return false;
                 if (healthNaNCheck.getObject() && !Float.isNaN(entity.getHealth()))
                     return true;
@@ -84,17 +86,17 @@ public class AntiBot extends Module {
                     return true;
                 if (groundSpawnCheck.getObject() && groundSpawnEntity.contains(entity))
                     return true;
+                if (period.getObject() && !periodEntity.contains(entity))
+                    return true;
                 if (entity instanceof AbstractClientPlayer) {
                     if (skinCheck.getObject() && !((AbstractClientPlayer) entity).hasSkin()) {
                         return true;
                     }
                 }
-                if (duplicateEntityCheck.getObject() && duplicates.contains(entity))
-                    return true;
+                return duplicateEntityCheck.getObject() && duplicates.contains(entity);
             } else {
                 return false;
             }
-
         }
         return false;
     }
@@ -151,7 +153,7 @@ public class AntiBot extends Module {
                 groundSpawnEntity.clear();
                 duplicates.clear();
                 copyEntities.clear();
-
+                periodEntity.clear();
                 //Clear
             }
 
@@ -170,6 +172,10 @@ public class AntiBot extends Module {
                     if (player != null)
                         if ((!player.onGround || playerUtils.getBlockUnderPlayer(1) == Blocks.air) && groundSpawnCheck.getObject())
                             groundSpawnEntity.add(player);
+
+                    if (mc.thePlayer.ticksExisted < 60) {
+                        periodEntity.add(player);
+                    }
                 }
             }
             if (event.getPacket() instanceof S0BPacketAnimation) {
