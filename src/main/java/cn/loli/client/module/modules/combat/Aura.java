@@ -8,6 +8,7 @@ import cn.loli.client.injection.implementations.IEntityPlayer;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.misc.AntiBot;
+import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.BooleanValue;
@@ -150,6 +151,7 @@ public class Aura extends Module {
     @Override
     public void onEnable() {
         crit = Main.INSTANCE.moduleManager.getModule(Criticals.class);
+        cps = 0;
         calculateCPS();
     }
 
@@ -375,7 +377,7 @@ public class Aura extends Module {
         }
 
         if (rayCast.getObject())
-            entity = rotationUtils.rayCastedEntity(range.getObject(), curYaw, curPitch);
+            entity = rotationUtils.rayCastedEntity(range.getObject() + 0.5657, curYaw, curPitch);
 
         if (entity != null) {
             if (!durable.getCurrentMode().equals("Disable")) handleDura(durable.getCurrentMode().equals("Switch"));
@@ -612,7 +614,7 @@ public class Aura extends Module {
     boolean wasCPSDrop = false;
 
     private void calculateCPS() {
-        long cps = simpleCps.getObject();
+        int cps = simpleCps.getObject();
 
         switch (cpsMode.getCurrentMode()) {
             case "Legit": {
@@ -636,19 +638,18 @@ public class Aura extends Module {
                 break;
             }
             case "Randomize": {
-                apd = randomClickDelay(simpleCps.getObject(), simpleCps.getObject() + extendCps.getObject());
+                apd = randomClickDelay(cps, cps + extendCps.getObject());
                 break;
             }
             case "Smooth": {
-                cps = (long) playerUtils.smooth(cps + extendCps.getObject(), cps, smoothCpsSpeed.getObject() / 10, smoothRandomizing.getObject(), smoothCpsRandomStrength.getObject());
+                cps = (int) playerUtils.smooth(cps + extendCps.getObject(), cps, smoothCpsSpeed.getObject() / 10, smoothRandomizing.getObject(), smoothCpsRandomStrength.getObject());
             }
             default: {
                 apd = 1000 / cps;
             }
         }
 
-        if (cpsMode.getCurrentMode().equals("Hit Based"))
-            apd += playerUtils.getRandomGaussian(50);
+        ChatUtils.info(apd + "ms");
     }
 
     //限制
