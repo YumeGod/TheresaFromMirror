@@ -4,9 +4,11 @@ import cn.loli.client.events.*;
 import cn.loli.client.injection.mixins.IAccessorKeyBinding;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
+import cn.loli.client.script.java.subvalue.ModeSubValue;
 import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.value.BooleanValue;
+import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
 import com.darkmagician6.eventapi.types.EventType;
@@ -89,6 +91,7 @@ public class Scaffold extends Module {
     private final BooleanValue mistake = new BooleanValue("Mistake", false);
     private final NumberValue<Integer> mistakerate = new NumberValue<>("Mistake Rate", 80, 70, 90);
 
+    private final ModeValue eventMode = new ModeValue("Work on...", "On Tick", "On Tick", "On Pre", "On Post");
     private final BooleanValue sneak = new BooleanValue("Sprint-Spoof", false);
 
     int silentSlot = -1;
@@ -215,12 +218,23 @@ public class Scaffold extends Module {
                     e.setPitch(curPitch + (float) (randomizePitch.getObject() ? playerUtils.randomInRange(-0.1, 0.1) : 0));
                 }
             }
+
+            if (eventMode.getCurrentMode().equals("On Pre"))
+                onWorking();
+        } else {
+            if (eventMode.getCurrentMode().equals("On Post"))
+                onWorking();
         }
     }
 
     @EventTarget
-    private void onWorking(TickAttackEvent e) {
+    private void onTick(TickAttackEvent event) {
+        if (eventMode.getCurrentMode().equals("On Tick"))
+            onWorking();
+    }
 
+
+    private void onWorking() {
         final double y = sameY.getObject() && playerUtils.isMoving2() ? startY : mc.thePlayer.posY;
 
         if (!sprint.getObject()) {

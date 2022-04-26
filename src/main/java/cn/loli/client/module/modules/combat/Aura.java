@@ -8,7 +8,6 @@ import cn.loli.client.injection.implementations.IEntityPlayer;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.misc.AntiBot;
-import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.BooleanValue;
@@ -179,10 +178,11 @@ public class Aura extends Module {
         /*
          *  CPS 运算
          */
-        if (!cpsMode.getCurrentMode().equals("Hit Based")) calculateCPS();
         if (target != null && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() &&
                 attackTimer.hasReached(apd)) {
             cps++;
+            if (!cpsMode.getCurrentMode().equals("Hit Based"))
+                calculateCPS();
             attackTimer.reset();
         }
 
@@ -648,8 +648,6 @@ public class Aura extends Module {
                 apd = 1000 / cps;
             }
         }
-
-        ChatUtils.info(apd + "ms");
     }
 
     //限制
