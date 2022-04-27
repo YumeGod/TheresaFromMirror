@@ -55,6 +55,7 @@ public class TargetHUD extends Module {
     private final FloatBuffer modelMatrix = GLAllocation.createDirectFloatBuffer(16);
     private final FloatBuffer projectionMatrix = GLAllocation.createDirectFloatBuffer(16);
 
+    private final ModeValue mode = new ModeValue("Mode", "Genshin", "Genshin", "Fancy");
     private final ModeValue font = new ModeValue("Font", "Genshin", "Genshin", "Ubuntu", "Dos");
     private final NumberValue<Integer> targetAmount = new NumberValue<>("Display Amount", 5, 1, 6);
     private final ModeValue sort = new ModeValue("Display", "Normal", "Normal", "Player");

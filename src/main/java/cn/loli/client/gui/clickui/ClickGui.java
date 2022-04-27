@@ -262,22 +262,23 @@ public class ClickGui extends GuiScreen {
         //mods列表滚动
         if (isHovered(x + leftMenuWidth + 10, y + 10, x + width - showValueX - 10, y + height - 20, mouseX, mouseY)) {
             if (mouseDWheel > 0 && mods_wheelTemp <= 0) {
-                mods_wheelTemp += 16;
+                mods_wheelTemp += mouseDWheel / 2;
                 if (mods_wheelTemp > 0) mods_wheelTemp = 0;
             } else if (mouseDWheel < 0 && modsY > y + height - 18) {
-                mods_wheelTemp -= 16;
+                mods_wheelTemp += mouseDWheel / 2;
             }
         }
+
 
         mods_wheel = AnimationUtils.smoothAnimation(mods_wheel, mods_wheelTemp, ANIMATION_SPEED, ANIMATION_SCALE);
 
         //values列表滚动
         if (isHovered(x + width - showValueX, y + 10, x + width - 10, y + height - 20, mouseX, mouseY)) {
             if (mouseDWheel > 0 && values_wheelTemp <= 0) {
-                values_wheelTemp += 16;
+                values_wheelTemp += mouseDWheel / 2;
                 if (values_wheelTemp > 0) values_wheelTemp = 0;
             } else if (mouseDWheel < 0 && valuesY > y + height - 18) {
-                values_wheelTemp -= 16;
+                values_wheelTemp += mouseDWheel / 2;
             }
         }
 
