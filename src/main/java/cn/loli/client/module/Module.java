@@ -8,6 +8,7 @@ import cn.loli.client.module.modules.misc.HUD;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
+import cn.loli.client.utils.Translate;
 import cn.loli.client.utils.player.InventoryUtil;
 import cn.loli.client.utils.player.PlayerUtils;
 import cn.loli.client.utils.player.movement.MoveUtils;
@@ -16,6 +17,7 @@ import com.darkmagician6.eventapi.EventManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.GameSettings;
+import org.jetbrains.annotations.NotNull;
 import org.lwjgl.input.Keyboard;
 
 import java.util.Comparator;
@@ -51,6 +53,8 @@ public abstract class Module {
     public float animX;
     public float animY;
     private String suffix;
+
+    private final Translate tabgui = new Translate(0f, 0f);
 
     protected Module(String name, String description, String moduleCategory) {
         this(name, description, ModuleCategory.getCategory(moduleCategory), true, false, Keyboard.KEY_NONE);
@@ -164,4 +168,7 @@ public abstract class Module {
     public String getSuffix() {
         return suffix;
     }
+
+    public Translate getabguitranslate() {return tabgui;}
+
 }

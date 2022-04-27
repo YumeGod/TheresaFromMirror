@@ -12,6 +12,7 @@ import cn.loli.client.module.modules.player.*;
 import cn.loli.client.module.modules.render.*;
 import cn.loli.client.module.modules.world.Eagle;
 import cn.loli.client.module.modules.world.Timer;
+import cn.loli.client.utils.render.Tabgui;
 import com.darkmagician6.eventapi.EventManager;
 import com.darkmagician6.eventapi.EventTarget;
 import org.jetbrains.annotations.NotNull;
@@ -90,6 +91,7 @@ public class ModuleManager {
         addModule(new ViewClip());
         addModule(new Nazi());
         addModule(new Scoreboard());
+        addModule(new Tabgui());
 
         //World
         addModule(new Eagle());
