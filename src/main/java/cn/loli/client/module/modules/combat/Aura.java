@@ -8,6 +8,7 @@ import cn.loli.client.injection.implementations.IEntityPlayer;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.misc.AntiBot;
+import cn.loli.client.module.modules.player.Scaffold;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.BooleanValue;
@@ -99,6 +100,7 @@ public class Aura extends Module {
     private final BooleanValue moveFix = new BooleanValue("Move Fix", false);
     private final BooleanValue silentMoveFix = new BooleanValue("Silent Fix", false);
 
+    private final BooleanValue noScaffold = new BooleanValue("No Scaffold", false);
     private final BooleanValue swingWhenMisAttack = new BooleanValue("Swing when mis attack", false);
     private final BooleanValue rayCast = new BooleanValue("Ray Cast", false);
     private static final BooleanValue throughBlock = new BooleanValue("Through Block", true);
@@ -230,6 +232,8 @@ public class Aura extends Module {
 
     @EventTarget
     public void onRotation(RotationEvent event) {
+        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
+            return;
         if (rotations.getObject()) {
             event.setYaw(curYaw);
             event.setPitch(curPitch);
@@ -241,6 +245,8 @@ public class Aura extends Module {
 
     @EventTarget
     public void onMoveFly(MoveFlyEvent event) {
+        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
+            return;
         if (moveFix.getObject() && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() && target != null)
             event.setYaw(curYaw);
     }
@@ -248,12 +254,16 @@ public class Aura extends Module {
 
     @EventTarget
     public void onJump(JumpYawEvent event) {
+        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
+            return;
         if (moveFix.getObject() && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() && target != null)
             event.setYaw(curYaw);
     }
 
     @EventTarget
     public void onSlient(MovementStateEvent event) {
+        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
+            return;
         if (moveFix.getObject() && target != null && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() && silentMoveFix.getObject()) {
             event.setSilentMoveFix(true);
             event.setYaw(curYaw);
@@ -264,6 +274,8 @@ public class Aura extends Module {
     //Listen to Attack
     @EventTarget
     private void onMotionUpdate(MotionUpdateEvent event) {
+        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
+            return;
         if (target == null) {
             curYaw = mc.thePlayer.rotationYaw;
             curPitch = mc.thePlayer.rotationPitch;
@@ -297,6 +309,8 @@ public class Aura extends Module {
 
     @EventTarget
     private void onAttack(TickAttackEvent event) {
+        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
+            return;
         if (target == null) return;
         if (attackWhen.getCurrentMode().equals("Tick")) attemptAttack();
     }
@@ -305,6 +319,8 @@ public class Aura extends Module {
 
     @EventTarget
     private void onPacket(PacketEvent event) {
+        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
+            return;
         if (event.getPacket() instanceof C07PacketPlayerDigging)
             if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.getHeldItem() != null
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject()))

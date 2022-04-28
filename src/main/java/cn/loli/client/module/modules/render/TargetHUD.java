@@ -56,7 +56,7 @@ public class TargetHUD extends Module {
     private final FloatBuffer projectionMatrix = GLAllocation.createDirectFloatBuffer(16);
 
     private final ModeValue mode = new ModeValue("Mode", "Genshin", "Genshin", "Fancy");
-    private final ModeValue font = new ModeValue("Font", "Genshin", "Genshin", "Ubuntu", "Dos");
+    private final ModeValue font = new ModeValue("Font", "Genshin", "Genshin", "Roboto", "Ubuntu", "Dos");
     private final NumberValue<Integer> targetAmount = new NumberValue<>("Display Amount", 5, 1, 6);
     private final ModeValue sort = new ModeValue("Display", "Normal", "Normal", "Player");
 
@@ -201,9 +201,15 @@ public class TargetHUD extends Module {
             } else if (font.getCurrentMode().equals("Ubuntu")) {
                 fontRenderer = Main.INSTANCE.fontLoaders.get("ubuntu16");
                 fontRenderer2 = Main.INSTANCE.fontLoaders.get("ubuntu14");
-            } else {
+            } else if (font.getCurrentMode().equals("Dos")) {
                 fontRenderer = Main.INSTANCE.fontLoaders.get("dos18");
                 fontRenderer2 = Main.INSTANCE.fontLoaders.get("dos14");
+            } else if (font.getCurrentMode().equals("Roboto")) {
+                fontRenderer = Main.INSTANCE.fontLoaders.get("roboto18");
+                fontRenderer2 = Main.INSTANCE.fontLoaders.get("roboto14");
+            } else {
+                fontRenderer = Main.INSTANCE.fontLoaders.get("roboto18");
+                fontRenderer2 = Main.INSTANCE.fontLoaders.get("roboto14");
             }
 
 
@@ -213,98 +219,158 @@ public class TargetHUD extends Module {
 
             //更改TargetHUD在屏幕坐标的初始位置
             GL11.glTranslatef(x, y, 0);
-            RenderUtils.drawRoundRect(0, 0, 30 + width, 40, 3, RenderUtils.reAlpha(0x000000, 0.6f));
-            RenderUtils.drawOutlinedRect(0, 0, 30 + width, 40, 1, RenderUtils.reAlpha(0xffffff, 0.4f));
+            if (mode.getCurrentMode().equals("Genshin")) {
+                RenderUtils.drawRoundRect(0, 0, 30 + width, 40, 3, RenderUtils.reAlpha(0x000000, 0.6f));
+                RenderUtils.drawOutlinedRect(0, 0, 30 + width, 40, 1, RenderUtils.reAlpha(0xffffff, 0.4f));
 
-            fontRenderer.drawString(playerName, 30f, 2f, new Color(0xffffff).getRGB());
-            fontRenderer2.drawString(healthStr, 28 + width - fontRenderer2.getStringWidth(healthStr) - 2, 4f, 0xffcccccc);
+                fontRenderer.drawString(playerName, 30f, 2f, new Color(0xffffff).getRGB());
+                fontRenderer2.drawString(healthStr, 28 + width - fontRenderer2.getStringWidth(healthStr) - 2, 4f, 0xffcccccc);
 
 
-            boolean isNaN = Float.isNaN(ent.getHealth());
-            float health = isNaN ? 20 : ent.getHealth();
-            float maxHealth = isNaN ? 20 : ent.getMaxHealth();
-            float healthPercent = RenderUtils.clamp(health / maxHealth, 0f, 1f);
+                boolean isNaN = Float.isNaN(ent.getHealth());
+                float health = isNaN ? 20 : ent.getHealth();
+                float maxHealth = isNaN ? 20 : ent.getMaxHealth();
+                float healthPercent = RenderUtils.clamp(health / maxHealth, 0f, 1f);
 
-            RenderUtils.drawRectBound(31, 15f, width - 4, 10f, RenderUtils.reAlpha(new Color(0x000000).getRGB(), 0.35f));
+                RenderUtils.drawRectBound(31, 15f, width - 4, 10f, RenderUtils.reAlpha(new Color(0x000000).getRGB(), 0.35f));
 
-            float barWidth = width - 6;
-            float drawPercent = (barWidth / 100) * (healthPercent * 100);
+                float barWidth = width - 6;
+                float drawPercent = (barWidth / 100) * (healthPercent * 100);
 
-            if (Main.INSTANCE.moduleManager.getModule(TargetHUD.class).health.get(ent) == null)
-                this.animation = drawPercent;
-            else
-                this.animation = Main.INSTANCE.moduleManager.getModule(TargetHUD.class).health.get(ent);
+                if (Main.INSTANCE.moduleManager.getModule(TargetHUD.class).health.get(ent) == null)
+                    this.animation = drawPercent;
+                else
+                    this.animation = Main.INSTANCE.moduleManager.getModule(TargetHUD.class).health.get(ent);
 
-            animation = AnimationUtils.smoothAnimation(animation, drawPercent, 10f, 0.4f);
+                animation = AnimationUtils.smoothAnimation(animation, drawPercent, 10f, 0.4f);
 
-            Main.INSTANCE.moduleManager.getModule(TargetHUD.class).health.put(ent, animation);
+                Main.INSTANCE.moduleManager.getModule(TargetHUD.class).health.put(ent, animation);
 
-            float f3 = (barWidth / 100f) * (ent.getTotalArmorValue() * 5);
+                float f3 = (barWidth / 100f) * (ent.getTotalArmorValue() * 5);
 
-            int healcol = new Color(0x77EE37).getRGB();
-            int col = new Color(0xF50909).getRGB();
-            boolean heal = drawPercent > animation;
+                int healcol = new Color(0x77EE37).getRGB();
+                int col = new Color(0xF50909).getRGB();
+                boolean heal = drawPercent > animation;
 
-            String[] parts = {"\ue900", "\ue901", "\ue902", "\ue903", "\ue904", "\ue905", "\ue908", "\ue907", "\ue908"};
-            int[] partIndex = {0xC8C9CB, 0xC8C9CB, 0xC8C9CB, 0xC8C9CB, 0xC8C9CB, 0xC8C9CB, 0xC8C9CB, 0xC8C9CB, 0xC8C9CB};
+                String[] parts = {"\ue900", "\ue901", "\ue902", "\ue903", "\ue904", "\ue905", "\ue908", "\ue907", "\ue908"};
+                int[] partIndex = {0xC8C9CB, 0xC8C9CB, 0xC8C9CB, 0xC8C9CB, 0xC8C9CB, 0xC8C9CB, 0xC8C9CB, 0xC8C9CB, 0xC8C9CB};
 
-            boolean isArmor = ent.getTotalArmorValue() > 0;
-            boolean isInLiquid = ent.isInWater();
-            boolean isBurner = ent.isBurning();
-            boolean isBlock = ent.isBlocking();
-            boolean canSee = ent.canEntityBeSeen(mc.thePlayer);
-            boolean isHeal = heal || ent.getActivePotionEffect(Potion.regeneration) != null;
-            boolean speed = ent.getActivePotionEffect(Potion.moveSpeed) != null;
+                boolean isArmor = ent.getTotalArmorValue() > 0;
+                boolean isInLiquid = ent.isInWater();
+                boolean isBurner = ent.isBurning();
+                boolean isBlock = ent.isBlocking();
+                boolean canSee = ent.canEntityBeSeen(mc.thePlayer);
+                boolean isHeal = heal || ent.getActivePotionEffect(Potion.regeneration) != null;
+                boolean speed = ent.getActivePotionEffect(Potion.moveSpeed) != null;
 
-            if (isArmor)
-                partIndex[0] = 0xEFC434;
-            if (isInLiquid)
-                partIndex[1] = 0x04ACE2;
-            if (isBurner)
-                partIndex[2] = 0xF97824;
-            if (isBlock)
-                partIndex[3] = 0xBA9243;
-            if (canSee)
-                partIndex[4] = 0xA776D4;
-            if (isHeal)
-                partIndex[5] = 0x9AD019;
-            if (speed)
-                partIndex[6] = 0x76E2A9;
+                if (isArmor)
+                    partIndex[0] = 0xEFC434;
+                if (isInLiquid)
+                    partIndex[1] = 0x04ACE2;
+                if (isBurner)
+                    partIndex[2] = 0xF97824;
+                if (isBlock)
+                    partIndex[3] = 0xBA9243;
+                if (canSee)
+                    partIndex[4] = 0xA776D4;
+                if (isHeal)
+                    partIndex[5] = 0x9AD019;
+                if (speed)
+                    partIndex[6] = 0x76E2A9;
 
-            for (int i = 0; i < 7; i++)
-                Main.INSTANCE.fontLoaders.get("targethub18").drawStringWithShadow(parts[i], 30f + (i * (Main.INSTANCE.fontLoaders.get("targethub18").getStringWidth(parts[i]) + 1)), 30f, partIndex[i]);
+                for (int i = 0; i < 7; i++)
+                    Main.INSTANCE.fontLoaders.get("targethub18").drawStringWithShadow(parts[i], 30f + (i * (Main.INSTANCE.fontLoaders.get("targethub18").getStringWidth(parts[i]) + 1)), 30f, partIndex[i]);
 
-            RenderUtils.drawRoundedRect(32, 16f, this.animation, 3f, 1, RenderUtils.reAlpha(RenderUtils.darker(heal ? healcol : col, 25), 0.95f));
+                RenderUtils.drawRoundedRect(32, 16f, this.animation, 3f, 1, RenderUtils.reAlpha(RenderUtils.darker(heal ? healcol : col, 25), 0.95f));
 
-            if (!heal) RenderUtils.drawRoundedRect(32, 16f, drawPercent, 3f, 1, RenderUtils.reAlpha(col, 0.95f));
+                if (!heal) RenderUtils.drawRoundedRect(32, 16f, drawPercent, 3f, 1, RenderUtils.reAlpha(col, 0.95f));
 
-            RenderUtils.drawRoundedRect(32, 20f, width - 6, 5f, 1, RenderUtils.reAlpha(new Color(0x000000).getRGB(), 0.5f));
-            RenderUtils.drawRoundedRect(33, 21f, f3, 3f, 0, 0xff4286f5);
+                RenderUtils.drawRoundedRect(32, 20f, width - 6, 5f, 1, RenderUtils.reAlpha(new Color(0x000000).getRGB(), 0.5f));
+                RenderUtils.drawRoundedRect(33, 21f, f3, 3f, 0, 0xff4286f5);
 
-            RenderUtils.drawOutlinedRect(2, 2, 28, 28, 1, new Color(0xBEFFFFFF, true), new Color(0xD3FFFFFF, true));
+                RenderUtils.drawOutlinedRect(2, 2, 28, 28, 1, new Color(0xBEFFFFFF, true), new Color(0xD3FFFFFF, true));
 
-            GL11.glColor4f(1, 1, 1, 1);
-            GL11.glDisable(GL11.GL_DEPTH_TEST);
-            GL11.glEnable(GL11.GL_BLEND);
-            GL11.glDepthMask(false);
-            OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
-            for (NetworkPlayerInfo info : mc.getNetHandler().getPlayerInfoMap()) {
-                if (mc.theWorld.getPlayerEntityByUUID(info.getGameProfile().getId()) == ent) {
-                    mc.getTextureManager().bindTexture(info.getLocationSkin());
-                    RenderUtils.drawScaledCustomSizeModalRect(3f, 3f, 8.0f, 8.0f, 8, 8, 24, 24, 64.0f, 64.0f);
-                    if (ent.isWearing(EnumPlayerModelParts.HAT)) {
-                        RenderUtils.drawScaledCustomSizeModalRect(3f, 3f, 40.0f, 8.0f, 8, 8, 24, 24, 64.0f, 64.0f);
+                GL11.glColor4f(1, 1, 1, 1);
+                GL11.glDisable(GL11.GL_DEPTH_TEST);
+                GL11.glEnable(GL11.GL_BLEND);
+                GL11.glDepthMask(false);
+                OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+                for (NetworkPlayerInfo info : mc.getNetHandler().getPlayerInfoMap()) {
+                    if (mc.theWorld.getPlayerEntityByUUID(info.getGameProfile().getId()) == ent) {
+                        mc.getTextureManager().bindTexture(info.getLocationSkin());
+                        RenderUtils.drawScaledCustomSizeModalRect(3f, 3f, 8.0f, 8.0f, 8, 8, 24, 24, 64.0f, 64.0f);
+                        if (ent.isWearing(EnumPlayerModelParts.HAT)) {
+                            RenderUtils.drawScaledCustomSizeModalRect(3f, 3f, 40.0f, 8.0f, 8, 8, 24, 24, 64.0f, 64.0f);
+                        }
+                        GlStateManager.bindTexture(0);
+                        break;
                     }
-                    GlStateManager.bindTexture(0);
-                    break;
                 }
-            }
-            GL11.glDepthMask(true);
-            GL11.glDisable(GL11.GL_BLEND);
-            GL11.glEnable(GL11.GL_DEPTH_TEST);
+                GL11.glDepthMask(true);
+                GL11.glDisable(GL11.GL_BLEND);
+                GL11.glEnable(GL11.GL_DEPTH_TEST);
 
-            GlStateManager.resetColor();
-            GL11.glPopMatrix();
+                GlStateManager.resetColor();
+                GL11.glPopMatrix();
+            } else if (mode.getCurrentMode().equals("Fancy")) {
+                RenderUtils.drawRect(0, 0, 30 + width, 30, new Color(0, 0, 0, 160).getRGB());
+                fontRenderer.drawString(playerName, 30f, 2f, new Color(0xffffff).getRGB());
+                fontRenderer2.drawString(healthStr, 28 + width - fontRenderer2.getStringWidth(healthStr) - 2, 2f, 0xffcccccc);
+
+
+                boolean isNaN = Float.isNaN(ent.getHealth());
+                float health = isNaN ? 20 : ent.getHealth();
+                float maxHealth = isNaN ? 20 : ent.getMaxHealth();
+                float healthPercent = RenderUtils.clamp(health / maxHealth, 0f, 1f);
+
+
+                float barWidth = width - 6;
+                float drawPercent = (barWidth / 100) * (healthPercent * 100);
+
+                if (Main.INSTANCE.moduleManager.getModule(TargetHUD.class).health.get(ent) == null)
+                    this.animation = drawPercent;
+                else
+                    this.animation = Main.INSTANCE.moduleManager.getModule(TargetHUD.class).health.get(ent);
+
+                animation = AnimationUtils.smoothAnimation(animation, drawPercent, 10f, 0.4f);
+
+                Main.INSTANCE.moduleManager.getModule(TargetHUD.class).health.put(ent, animation);
+
+                float f3 = (barWidth / 100f) * (ent.getTotalArmorValue() * 5);
+
+                int healcol = new Color(0x77EE37).getRGB();
+                int col = new Color(0xF50909).getRGB();
+
+
+                RenderUtils.drawRect(32, 16, 32 + this.animation, 18, healcol);
+
+                RenderUtils.drawRect(32, 21f, width + 26, 23f, RenderUtils.reAlpha(new Color(0x000000).getRGB(), 0.5f));
+                RenderUtils.drawRect(33, 21f, 33 + f3, 23f, 0xff4286f5);
+
+
+                GL11.glColor4f(1, 1, 1, 1);
+                GL11.glDisable(GL11.GL_DEPTH_TEST);
+                GL11.glEnable(GL11.GL_BLEND);
+                GL11.glDepthMask(false);
+                OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
+                for (NetworkPlayerInfo info : mc.getNetHandler().getPlayerInfoMap()) {
+                    if (mc.theWorld.getPlayerEntityByUUID(info.getGameProfile().getId()) == ent) {
+                        mc.getTextureManager().bindTexture(info.getLocationSkin());
+                        RenderUtils.drawScaledCustomSizeModalRect(3f, 3f, 8.0f, 8.0f, 8, 8, 24, 24, 64.0f, 64.0f);
+                        if (ent.isWearing(EnumPlayerModelParts.HAT)) {
+                            RenderUtils.drawScaledCustomSizeModalRect(3f, 3f, 40.0f, 8.0f, 8, 8, 24, 24, 64.0f, 64.0f);
+                        }
+                        GlStateManager.bindTexture(0);
+                        break;
+                    }
+                }
+                GL11.glDepthMask(true);
+                GL11.glDisable(GL11.GL_BLEND);
+                GL11.glEnable(GL11.GL_DEPTH_TEST);
+
+                GlStateManager.resetColor();
+                GL11.glPopMatrix();
+            }
         }
     }
 }
