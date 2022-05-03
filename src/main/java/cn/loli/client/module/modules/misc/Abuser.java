@@ -175,8 +175,8 @@ public class Abuser extends Module {
                         }
 
                     if (!hasDisable)
-                        mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(playerUtils.randomInRange(-0.99, 0.99) + 13371337.696969, playerUtils.randomInRange(-0.99, 0.99) + 13371337.696969,
-                                playerUtils.randomInRange(-0.99, 0.99) + 13371337.696969, true));
+                        mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(playerUtils.randomInRange(-0.99, 0.99) + Main.INSTANCE.pos[0], playerUtils.randomInRange(-0.99, 0.99) + Main.INSTANCE.pos[1],
+                                playerUtils.randomInRange(-0.99, 0.99) + Main.INSTANCE.pos[2], true));
                     else
                         mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
                                 ((S08PacketPlayerPosLook) event.getPacket()).getZ(), ((S08PacketPlayerPosLook) event.getPacket()).getYaw(), ((S08PacketPlayerPosLook) event.getPacket()).getPitch(), false));
@@ -293,9 +293,9 @@ public class Abuser extends Module {
         if (event.getEventType() == EventType.PRE) {
             if (hypixel.getObject()) {
                 if (!hasDisable && timer.hasReached(1000)) {
-                    event.setX(1993634.696969696969);
-                    event.setY(1993634.696969696969);
-                    event.setZ(1993634.696969696969);
+                    event.setX(0);
+                    event.setY(120);
+                    event.setZ(0);
                     event.setOnGround(true);
                 }
             }

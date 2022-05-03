@@ -92,6 +92,8 @@ public class Main {
     public int realPosY;
     public int realPosZ;
 
+    public int[] pos = new int[]{0, 120, 0};
+
     public ChannelFuture cf;
 
 

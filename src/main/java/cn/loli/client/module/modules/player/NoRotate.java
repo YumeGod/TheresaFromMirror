@@ -86,8 +86,8 @@ public class NoRotate extends Module {
 
 
                 if (!Main.INSTANCE.moduleManager.getModule(Abuser.class).hasDisable && Main.INSTANCE.moduleManager.getModule(Abuser.class).getState())
-                    mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(playerUtils.randomInRange(-0.99, 0.99) + 13371337.696969, playerUtils.randomInRange(-0.99, 0.99) + 13371337.696969,
-                            playerUtils.randomInRange(-0.99, 0.99) + 13371337.696969, true));
+                    mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(playerUtils.randomInRange(-0.99, 0.99) + Main.INSTANCE.pos[0], playerUtils.randomInRange(-0.99, 0.99) + Main.INSTANCE.pos[1],
+                            playerUtils.randomInRange(-0.99, 0.99) + Main.INSTANCE.pos[2], true));
                 else
                     mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(),
                             ((S08PacketPlayerPosLook) event.getPacket()).getZ(), ((S08PacketPlayerPosLook) event.getPacket()).getYaw(), ((S08PacketPlayerPosLook) event.getPacket()).getPitch(), false));
