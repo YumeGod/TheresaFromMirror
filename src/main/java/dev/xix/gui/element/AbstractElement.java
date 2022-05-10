@@ -72,7 +72,7 @@ public abstract class AbstractElement implements Cloneable {
         this.renderElement();
 
         if (animation != null) {
-            // TODO
+            if (animation.process()) animation = null;
         }
 
         for (final AbstractElement elementChild : elements.values()) {

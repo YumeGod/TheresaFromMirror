@@ -26,7 +26,7 @@ public abstract class AbstractAnimation {
         return completion;
     }
 
-    protected abstract boolean process();
+    public abstract boolean process();
 
     public void init(final AbstractElement element) {
         this.startElement = element.clone();
