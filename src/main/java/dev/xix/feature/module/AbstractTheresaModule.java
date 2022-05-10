@@ -27,6 +27,4 @@ public abstract class AbstractTheresaModule implements ITheresaFeature {
     public TheresaModuleCategory getTheresaModuleCategory() {
         return theresaModuleCategory;
     }
-    
-    public abstract <T extends AbstractTheresaModule> T getInstance();
 }

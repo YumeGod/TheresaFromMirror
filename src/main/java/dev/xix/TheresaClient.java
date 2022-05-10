@@ -1,6 +1,7 @@
 package dev.xix;
 
 import cn.loli.client.module.ModuleManager;
+import dev.xix.feature.module.TheresaModuleManager;
 
 public final class TheresaClient {
 
@@ -8,14 +9,14 @@ public final class TheresaClient {
     private final String clientVersion;
     private final String[] clientDevelopers;
 
-    private final ModuleManager moduleManager;
+    private final TheresaModuleManager moduleManager;
 
     private TheresaClient() {
         this.clientName = "Theresa";
         this.clientVersion = "1.0-H";
         this.clientDevelopers = new String[]{"Mirror", "Yume", "xix"};
 
-        this.moduleManager = new ModuleManager();
+        this.moduleManager = new TheresaModuleManager();
     }
 
     public static TheresaClient getInstance() {
@@ -34,7 +35,7 @@ public final class TheresaClient {
         return clientDevelopers;
     }
 
-    public ModuleManager getModuleManager() {
+    public TheresaModuleManager getModuleManager() {
         return moduleManager;
     }
 
