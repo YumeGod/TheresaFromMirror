@@ -1,7 +1,8 @@
 package cn.loli.client.injection.mixins;
 
 import cn.loli.client.events.RenderBlockEvent;
-import com.darkmagician6.eventapi.EventManager;
+
+import dev.xix.TheresaClient;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.BlockRendererDispatcher;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -17,6 +18,6 @@ public class MixinBlockRendererDispatcher {
     @Inject(method = "renderBlock", at = @At("HEAD"))
     public void eventUpdate(IBlockState state, BlockPos pos, IBlockAccess blockAccess, WorldRenderer worldRendererIn, CallbackInfoReturnable<Boolean> cir) {
         RenderBlockEvent event = new RenderBlockEvent(pos.getX(), pos.getY(), pos.getZ(), state.getBlock(), pos);
-        EventManager.call(event);
+        TheresaClient.getInstance().getEventBus().call(event);
     }
 }

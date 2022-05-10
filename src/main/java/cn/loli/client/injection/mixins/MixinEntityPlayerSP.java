@@ -9,8 +9,9 @@ import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.module.modules.misc.AlwaysRotate;
 import cn.loli.client.module.modules.movement.NoSlowDown;
 import cn.loli.client.utils.player.rotation.RotationHook;
-import com.darkmagician6.eventapi.EventManager;
-import com.darkmagician6.eventapi.types.EventType;
+
+import dev.xix.TheresaClient;
+import dev.xix.event.EventType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.AxisAlignedBB;
@@ -54,7 +55,7 @@ public class MixinEntityPlayerSP extends MixinEntity {
         cacheGround = onGround;
 
         MotionUpdateEvent event = new MotionUpdateEvent(EventType.PRE, posX, posY, posZ, rotationYaw, rotationPitch, onGround);
-        EventManager.call(event);
+        TheresaClient.getInstance().getEventBus().call(event);
 
         posX = event.getX();
         posY = event.getY();
@@ -85,7 +86,7 @@ public class MixinEntityPlayerSP extends MixinEntity {
 
         onGround = cacheGround;
 
-        EventManager.call(new MotionUpdateEvent(EventType.POST, posX, posY, posZ, rotationYaw, rotationPitch, onGround));
+        TheresaClient.getInstance().getEventBus().call(new MotionUpdateEvent(EventType.POST, posX, posY, posZ, rotationYaw, rotationPitch, onGround));
     }
 
 
@@ -96,7 +97,7 @@ public class MixinEntityPlayerSP extends MixinEntity {
 
     @Inject(method = "onUpdate", at = @At("RETURN"))
     private void onUpdate(CallbackInfo ci) {
-        EventManager.call(new UpdateEvent());
+        TheresaClient.getInstance().getEventBus().call(new UpdateEvent());
     }
 
 
@@ -134,7 +135,7 @@ public class MixinEntityPlayerSP extends MixinEntity {
     @Override
     public void moveEntity(double x, double y, double z) {
         PlayerMoveEvent moveEvent = new PlayerMoveEvent(x, y, z);
-        EventManager.call(moveEvent);
+        TheresaClient.getInstance().getEventBus().call(moveEvent);
 
         if (moveEvent.isCancelled())
             return;

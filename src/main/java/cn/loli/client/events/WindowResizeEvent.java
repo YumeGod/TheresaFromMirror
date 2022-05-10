@@ -1,10 +1,8 @@
-
-
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.Event;
+import dev.xix.event.Event;
 
-public class WindowResizeEvent implements Event {
+public class WindowResizeEvent extends Event {
     private final int width;
     private final int height;
 

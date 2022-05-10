@@ -1,8 +1,8 @@
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.Event;
+import dev.xix.event.Event;
 
-public class CameraEvent implements Event {
+public class CameraEvent extends Event {
 
     public double posX, posY, posZ, prevPosX, prevPosY, prevPosZ;
     public float yaw, pitch, prevYaw, prevPitch;

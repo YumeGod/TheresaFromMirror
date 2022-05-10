@@ -16,7 +16,7 @@ import cn.loli.client.value.ColorValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
-import com.darkmagician6.eventapi.types.EventType;
+import dev.xix.event.EventType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -230,15 +230,6 @@ public class Aura extends Module {
 
     }
 
-    @EventTarget
-    public void onRotation(RotationEvent event) {
-        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
-            return;
-        if (rotations.getObject()) {
-            event.setYaw(curYaw);
-            event.setPitch(curPitch);
-        }
-    }
 
 
     //Rotate Strafe

@@ -4,19 +4,14 @@ import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.utils.misc.ChatUtils;
-import cn.loli.client.utils.player.PlayerUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import com.darkmagician6.eventapi.EventTarget;
-import com.darkmagician6.eventapi.types.EventType;
+import dev.xix.event.EventType;
 import net.minecraft.item.ItemBow;
-import net.minecraft.network.play.client.C07PacketPlayerDigging;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
 import net.minecraft.network.play.server.S30PacketWindowItems;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.EnumFacing;
 
 public class NoSlowDown extends Module {
     private final ModeValue mode = new ModeValue("Mode","Packet","Vanilla" ,"Packet" ,"Tweak");

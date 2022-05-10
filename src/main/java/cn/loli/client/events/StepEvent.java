@@ -1,9 +1,9 @@
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.Event;
-import com.darkmagician6.eventapi.types.EventType;
+import dev.xix.event.Event;
+import dev.xix.event.EventType;
 
-public class StepEvent implements Event {
+public class StepEvent extends Event {
     private float stepHeight;
     private double heightStepped;
     private final EventType eventType;

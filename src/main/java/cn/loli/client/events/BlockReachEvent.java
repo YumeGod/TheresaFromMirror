@@ -1,8 +1,8 @@
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.Event;
+import dev.xix.event.Event;
 
-public class BlockReachEvent implements Event {
+public class BlockReachEvent extends Event {
     float range;
 
     public BlockReachEvent(float range) {

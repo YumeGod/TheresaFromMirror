@@ -1,10 +1,12 @@
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.Event;
-import com.darkmagician6.eventapi.types.EventType;
+
+
+import dev.xix.event.Event;
+import dev.xix.event.EventType;
 import net.minecraft.entity.Entity;
 
-public class AnimationEvent implements Event {
+public class AnimationEvent extends Event {
 
     public EventType eventType;
     public Entity entity;

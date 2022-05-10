@@ -5,7 +5,8 @@ import cn.loli.client.events.AttackEvent;
 import cn.loli.client.events.BlockReachEvent;
 import cn.loli.client.injection.implementations.IPlayerControllerMP;
 import cn.loli.client.module.modules.combat.Criticals;
-import com.darkmagician6.eventapi.EventManager;
+
+import dev.xix.TheresaClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.entity.Entity;
@@ -31,7 +32,7 @@ public class MixinPlayerControllerMP implements IPlayerControllerMP {
 
     @Inject(method = "attackEntity",  at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/PlayerControllerMP;syncCurrentPlayItem()V", shift = At.Shift.AFTER))
     private void attackEntity(EntityPlayer playerIn, Entity targetEntity, CallbackInfo ci){
-        EventManager.call(new AttackEvent(targetEntity));
+        TheresaClient.getInstance().getEventBus().call(new AttackEvent(targetEntity));
     }
 
     @Override
@@ -56,7 +57,7 @@ public class MixinPlayerControllerMP implements IPlayerControllerMP {
     public float getBlockReachDistance()
     {
         final BlockReachEvent blockReachEvent = new BlockReachEvent(Minecraft.getMinecraft().playerController.getCurrentGameType().isCreative() ? 5.0F : 4.5F);
-        EventManager.call(blockReachEvent);
+        TheresaClient.getInstance().getEventBus().call(blockReachEvent);
         return blockReachEvent.getRange();
     }
 

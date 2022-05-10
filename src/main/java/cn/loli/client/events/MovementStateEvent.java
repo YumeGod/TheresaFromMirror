@@ -1,8 +1,8 @@
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.Event;
+import dev.xix.event.Event;
 
-public class MovementStateEvent implements Event {
+public class MovementStateEvent extends Event {
     float moveForward, moveStrafe, yaw, shouldYaw;
     boolean silentMoveFix, fixYaw, sneak;
 

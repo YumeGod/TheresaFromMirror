@@ -1,10 +1,9 @@
-
-
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.Event;
 
-public class KeyEvent implements Event {
+import dev.xix.event.Event;
+
+public class KeyEvent extends Event {
     private final int key;
 
     public KeyEvent(int key) {

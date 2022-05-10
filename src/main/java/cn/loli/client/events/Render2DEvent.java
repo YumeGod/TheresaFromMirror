@@ -1,9 +1,7 @@
-
-
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.Event;
+import dev.xix.event.Event;
 
-public class Render2DEvent implements Event {
+public class Render2DEvent extends Event {
 
 }

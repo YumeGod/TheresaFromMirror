@@ -2,7 +2,8 @@ package cn.loli.client.injection.mixins;
 
 import cn.loli.client.events.MovementStateEvent;
 import cn.loli.client.utils.player.rotation.RotationHook;
-import com.darkmagician6.eventapi.EventManager;
+
+import dev.xix.TheresaClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
@@ -39,7 +40,7 @@ public class MixinMovementInputFromOptions extends MovementInput {
         }
 
         final MovementStateEvent event = new MovementStateEvent(moveForward, moveStrafe, RotationHook.yaw, Minecraft.getMinecraft().thePlayer.rotationYaw, false, false, Minecraft.getMinecraft().gameSettings.keyBindSneak.isKeyDown());
-        EventManager.call(event);
+        TheresaClient.getInstance().getEventBus().call(event);
         moveForward = event.getMoveForward();
         moveStrafe = event.getMoveStrafe();
 

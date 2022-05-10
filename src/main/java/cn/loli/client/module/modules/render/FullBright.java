@@ -7,7 +7,7 @@ import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
-import com.darkmagician6.eventapi.types.EventType;
+import dev.xix.event.EventType;
 
 public class FullBright extends Module {
     private final NumberValue<Integer> gamma = new NumberValue<>("Gamma", 100, 1, 100);

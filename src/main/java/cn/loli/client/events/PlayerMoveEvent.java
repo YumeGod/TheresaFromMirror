@@ -2,10 +2,10 @@
 
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.Event;
-import com.darkmagician6.eventapi.events.callables.EventCancellable;
 
-public class PlayerMoveEvent extends EventCancellable implements Event {
+import dev.xix.event.EventCancellable;
+
+public class PlayerMoveEvent extends EventCancellable {
     public double x;
     public double y;
     public double z;

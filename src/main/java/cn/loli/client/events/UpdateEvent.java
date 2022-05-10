@@ -1,8 +1,6 @@
-
-
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.Event;
+import dev.xix.event.Event;
 
-public class UpdateEvent implements Event {
+public class UpdateEvent extends Event {
 }

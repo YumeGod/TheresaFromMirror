@@ -1,10 +1,11 @@
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.Event;
+
+import dev.xix.event.Event;
 import net.minecraft.block.Block;
 import net.minecraft.util.BlockPos;
 
-public class RenderBlockEvent implements Event {
+public class RenderBlockEvent extends Event {
     public int x;
     public int y;
     public int z;

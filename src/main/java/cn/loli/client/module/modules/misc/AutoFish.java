@@ -12,7 +12,7 @@ import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
-import com.darkmagician6.eventapi.types.EventType;
+import dev.xix.event.EventType;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.init.Items;
 import net.minecraft.network.play.server.S29PacketSoundEffect;

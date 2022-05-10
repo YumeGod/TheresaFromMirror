@@ -1,11 +1,11 @@
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.Event;
-import com.darkmagician6.eventapi.types.EventType;
+import dev.xix.event.Event;
+import dev.xix.event.EventType;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.entity.Entity;
 
-public class EmoteEvent implements Event {
+public class EmoteEvent extends Event {
     public ModelBiped biped;
     public EventType type;
     public Entity entity;

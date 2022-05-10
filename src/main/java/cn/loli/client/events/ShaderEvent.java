@@ -1,9 +1,9 @@
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.Event;
+import dev.xix.event.Event;
 import net.minecraft.client.shader.ShaderGroup;
 
-public class ShaderEvent implements Event {
+public class ShaderEvent extends Event {
     public ShaderGroup shader;
     public boolean useShader;
 
