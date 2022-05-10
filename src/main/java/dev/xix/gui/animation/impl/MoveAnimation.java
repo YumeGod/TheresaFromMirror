@@ -17,7 +17,7 @@ public final class MoveAnimation extends AbstractAnimation {
     public boolean process() {
         if (element.isAtPosition(x, y)) return true;
 
-        element.setPosition(startElement.getX() + (x - startElement.getX()) * getCompletion(), startElement.getY() + (y - startElement.getY()) * getCompletion());
+        element.setPosition((float) (startElement.getPosX() + (x - startElement.getPosX()) * getCompletion()), (float) (startElement.getPosY() + (y - startElement.getPosY()) * getCompletion()));
 
         return false;
     }

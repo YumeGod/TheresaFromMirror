@@ -252,4 +252,5 @@ public abstract class AbstractElement implements Cloneable {
     public void setRotation(final float rotation) {
         this.rotation = rotation;
     }
+
 }
