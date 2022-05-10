@@ -4,7 +4,7 @@ import cn.loli.client.events.*;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import com.darkmagician6.eventapi.EventTarget;
-import com.darkmagician6.eventapi.types.EventType;
+import dev.xix.event.EventType;
 import org.luaj.vm2.Globals;
 
 import java.util.ArrayList;

@@ -4,9 +4,6 @@ public abstract class EventCancellable extends Event {
 
     private boolean cancelled;
 
-    protected EventCancellable() {
-    }
-
     public boolean isCancelled() {
         return cancelled;
     }

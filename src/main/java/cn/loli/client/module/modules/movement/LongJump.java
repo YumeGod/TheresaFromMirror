@@ -5,7 +5,7 @@ import cn.loli.client.events.PlayerMoveEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import com.darkmagician6.eventapi.EventTarget;
-import com.darkmagician6.eventapi.types.EventType;
+import dev.xix.event.EventType;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.potion.Potion;
 

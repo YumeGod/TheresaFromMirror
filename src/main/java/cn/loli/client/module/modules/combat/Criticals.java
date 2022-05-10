@@ -15,7 +15,7 @@ import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import com.darkmagician6.eventapi.EventTarget;
-import com.darkmagician6.eventapi.types.EventType;
+import dev.xix.event.EventType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.network.play.client.C02PacketUseEntity;

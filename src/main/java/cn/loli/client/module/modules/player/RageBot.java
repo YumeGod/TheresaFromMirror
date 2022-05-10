@@ -10,7 +10,7 @@ import cn.loli.client.utils.misc.WorldUtil;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
-import com.darkmagician6.eventapi.types.EventType;
+import dev.xix.event.EventType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.INpc;

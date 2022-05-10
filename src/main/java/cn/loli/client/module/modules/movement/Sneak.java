@@ -4,7 +4,7 @@ import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import com.darkmagician6.eventapi.EventTarget;
-import com.darkmagician6.eventapi.types.EventType;
+import dev.xix.event.EventType;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
 
 public class Sneak extends Module {

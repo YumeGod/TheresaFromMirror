@@ -3,8 +3,8 @@ package cn.loli.client.injection.mixins;
 
 import cn.loli.client.events.EmoteEvent;
 
-import com.darkmagician6.eventapi.types.EventType;
 import dev.xix.TheresaClient;
+import dev.xix.event.EventType;
 import net.minecraft.client.model.ModelBiped;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;

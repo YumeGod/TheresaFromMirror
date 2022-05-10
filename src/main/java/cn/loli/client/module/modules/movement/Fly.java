@@ -10,7 +10,7 @@ import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import com.darkmagician6.eventapi.EventTarget;
-import com.darkmagician6.eventapi.types.EventType;
+import dev.xix.event.EventType;
 import net.minecraft.network.play.client.C03PacketPlayer;
 
 public class Fly extends Module {

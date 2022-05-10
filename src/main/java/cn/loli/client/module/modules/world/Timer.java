@@ -8,7 +8,7 @@ import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.value.NumberValue;
 import com.darkmagician6.eventapi.EventTarget;
-import com.darkmagician6.eventapi.types.EventType;
+import dev.xix.event.EventType;
 
 public class Timer extends Module {
     private final NumberValue<Float> speed = new NumberValue<>("Speed", 2f, 0.1f, 10f);
