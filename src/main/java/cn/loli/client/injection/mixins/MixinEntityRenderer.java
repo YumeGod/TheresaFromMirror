@@ -7,9 +7,10 @@ import cn.loli.client.events.*;
 import cn.loli.client.module.modules.combat.KeepSprint;
 import cn.loli.client.module.modules.render.NoFov;
 import cn.loli.client.module.modules.render.ViewClip;
-import com.darkmagician6.eventapi.EventManager;
+
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
+import dev.xix.TheresaClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.shader.ShaderGroup;
@@ -45,19 +46,19 @@ public abstract class MixinEntityRenderer {
 
     @Inject(method = "renderWorldPass", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/ForgeHooksClient;dispatchRenderLast(Lnet/minecraft/client/renderer/RenderGlobal;F)V"))
     private void onRenderWorldPass(int pass, float partialTicks, long finishTimeNano, CallbackInfo ci) {
-        EventManager.call(new RenderWorldLastEvent(Minecraft.getMinecraft().renderGlobal, partialTicks));
+        TheresaClient.getInstance().getEventBus().call(new RenderWorldLastEvent(Minecraft.getMinecraft().renderGlobal, partialTicks));
     }
 
     @Inject(method = "renderWorldPass", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/EntityRenderer;renderHand(FI)V"))
     private void onRenderHand(CallbackInfo ci) {
-        EventManager.call(new RenderEvent());
+        TheresaClient.getInstance().getEventBus().call(new RenderEvent());
     }
 
     @Inject(method = "renderWorldPass", at =
     @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;disableFog()V", shift = At.Shift.AFTER))
     private void eventRender3D(int pass, float partialTicks, long finishTimeNano, CallbackInfo callbackInfo) {
         Render3DEvent eventRender = new Render3DEvent(pass, partialTicks, finishTimeNano);
-        EventManager.call(eventRender);
+        TheresaClient.getInstance().getEventBus().call(eventRender);
         GL11.glColor3f(1.0F, 1.0F, 1.0F);
     }
 
@@ -75,7 +76,7 @@ public abstract class MixinEntityRenderer {
     @Inject(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/RenderGlobal;renderEntityOutlineFramebuffer()V", shift = At.Shift.AFTER))
     private void onShader(CallbackInfo callbackInfo) {
         ShaderEvent shaderEvent = new ShaderEvent(theShaderGroup, useShader);
-        EventManager.call(shaderEvent);
+        TheresaClient.getInstance().getEventBus().call(shaderEvent);
         theShaderGroup = shaderEvent.getShader();
         useShader = shaderEvent.isUseShader();
     }
@@ -97,7 +98,7 @@ public abstract class MixinEntityRenderer {
                         Minecraft.getMinecraft().getRenderViewEntity().prevPosX, Minecraft.getMinecraft().getRenderViewEntity().prevPosY, Minecraft.getMinecraft().getRenderViewEntity().prevPosZ,
                         Minecraft.getMinecraft().getRenderViewEntity().rotationYaw, Minecraft.getMinecraft().getRenderViewEntity().rotationPitch, Minecraft.getMinecraft().getRenderViewEntity().prevRotationYaw, Minecraft.getMinecraft().getRenderViewEntity().prevRotationPitch);
 
-        EventManager.call(event);
+        TheresaClient.getInstance().getEventBus().call(event);
         Minecraft.getMinecraft().getRenderViewEntity().rotationYaw = event.getYaw();
         Minecraft.getMinecraft().getRenderViewEntity().rotationPitch = event.getPitch();
         Minecraft.getMinecraft().getRenderViewEntity().prevRotationYaw = event.getPrevYaw();
@@ -142,7 +143,7 @@ public abstract class MixinEntityRenderer {
                 }
 
                 final MouseOverEvent mouseOverEvent = new MouseOverEvent(d1, flag, entity);
-                EventManager.call(mouseOverEvent);
+                TheresaClient.getInstance().getEventBus().call(mouseOverEvent);
                 d0 = d1 = mouseOverEvent.getRange();
                 flag = mouseOverEvent.isRangeCheck();
 

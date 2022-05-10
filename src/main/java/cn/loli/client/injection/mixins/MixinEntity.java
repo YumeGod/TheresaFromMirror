@@ -7,8 +7,9 @@ import cn.loli.client.events.MoveFlyEvent;
 import cn.loli.client.events.StepEvent;
 import cn.loli.client.module.modules.combat.Velocity;
 import cn.loli.client.module.modules.player.SafeWalk;
-import com.darkmagician6.eventapi.EventManager;
+
 import com.darkmagician6.eventapi.types.EventType;
+import dev.xix.TheresaClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
@@ -69,7 +70,7 @@ public abstract class MixinEntity {
     @Redirect(method = {"moveFlying"}, at = @At(value = "FIELD", target = "Lnet/minecraft/entity/Entity;rotationYaw:F"))
     public float moveFlying(Entity instance) {
         MoveFlyEvent event = new MoveFlyEvent(rotationYaw);
-        EventManager.call(event);
+        TheresaClient.getInstance().getEventBus().call(event);
         return ((Object) this == Minecraft.getMinecraft().thePlayer) ? event.getYaw() : rotationYaw;
     }
 
@@ -77,7 +78,7 @@ public abstract class MixinEntity {
     public float onStep(Entity instance) {
         StepEvent event = new StepEvent(instance.stepHeight, EventType.PRE);
         if ((Object) this == Minecraft.getMinecraft().thePlayer)
-            EventManager.call(event);
+            TheresaClient.getInstance().getEventBus().call(event);
 
         return event.getStepHeight();
     }
@@ -90,7 +91,7 @@ public abstract class MixinEntity {
             double blockHeight = event.getStepHeight() + axisalignedbb2;
             if (blockHeight % 0.015625 == 0) {
                 event.setHeightStepped(blockHeight);
-                EventManager.call(event);
+                TheresaClient.getInstance().getEventBus().call(event);
             }
         }
 

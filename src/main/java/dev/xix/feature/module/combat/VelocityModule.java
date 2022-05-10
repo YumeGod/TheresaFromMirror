@@ -12,6 +12,7 @@ public final class VelocityModule extends AbstractTheresaModule {
         module = this;
     }
 
+
     @Override
     public VelocityModule getInstance() {
         return module;

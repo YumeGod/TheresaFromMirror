@@ -4,7 +4,8 @@ import cn.loli.client.Main;
 import cn.loli.client.events.JumpEvent;
 import cn.loli.client.events.JumpYawEvent;
 import cn.loli.client.module.modules.movement.NoJumpDelay;
-import com.darkmagician6.eventapi.EventManager;
+
+import dev.xix.TheresaClient;
 import net.minecraft.entity.EntityLivingBase;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -27,14 +28,14 @@ public class MixinEntityLivingBase extends MixinEntity{
     @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
     private void jumphandle(CallbackInfo callbackInfo) {
         JumpEvent jumpEvent = new JumpEvent();
-        EventManager.call(jumpEvent);
+        TheresaClient.getInstance().getEventBus().call(jumpEvent);
         if (jumpEvent.isCancelled()) callbackInfo.cancel();
     }
 
     @Redirect(method = "jump", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/EntityLivingBase;rotationYaw:F"))
     public float onJump(EntityLivingBase instance) {
         JumpYawEvent jumpEvent = new JumpYawEvent(rotationYaw);
-        EventManager.call(jumpEvent);
+        TheresaClient.getInstance().getEventBus().call(jumpEvent);
         return jumpEvent.getYaw();
     }
 }

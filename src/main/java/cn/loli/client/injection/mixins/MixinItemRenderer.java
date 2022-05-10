@@ -5,8 +5,9 @@ package cn.loli.client.injection.mixins;
 import cn.loli.client.Main;
 import cn.loli.client.events.AnimationEvent;
 import cn.loli.client.module.modules.render.BlockHit;
-import com.darkmagician6.eventapi.EventManager;
+
 import com.darkmagician6.eventapi.types.EventType;
+import dev.xix.TheresaClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -99,21 +100,21 @@ public abstract class MixinItemRenderer {
                     case EAT:
                     case DRINK:
                         AnimationEvent eatAnimation = new AnimationEvent(EventType.EAT, player, partialTicks, f, f1, false);
-                        EventManager.call(eatAnimation);
+                        TheresaClient.getInstance().getEventBus().call(eatAnimation);
                         if (eatAnimation.isCancelable()) break;
                         this.performDrinking(player, partialTicks);
                         this.transformFirstPersonItem(f, f4);
                         break;
                     case BLOCK:
                         AnimationEvent blockAnimation = new AnimationEvent(EventType.BLOCK, player, partialTicks, f, f1, false);
-                        EventManager.call(blockAnimation);
+                        TheresaClient.getInstance().getEventBus().call(blockAnimation);
                         if (blockAnimation.isCancelable()) break;
                         this.transformFirstPersonItem(f, f4);
                         this.doBlockTransformations();
                         break;
                     case BOW:
                         AnimationEvent bowAnimation = new AnimationEvent(EventType.BOW, player, partialTicks, f, f1, false);
-                        EventManager.call(bowAnimation);
+                        TheresaClient.getInstance().getEventBus().call(bowAnimation);
                         if (bowAnimation.isCancelable()) break;
                         this.transformFirstPersonItem(f, f4);
                         this.doBowTransformations(partialTicks, player);

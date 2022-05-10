@@ -42,7 +42,7 @@ public final class EventBus<T> {
         updateCallbacks();
     }
 
-    public void dispatch(final T t) {
+    public void call(final T t) {
         final List<IEventListener<T>> callbacks = callbackMap.get(t.getClass());
         if (callbacks != null) {
             for (final IEventListener<T> callback : callbacks) {
