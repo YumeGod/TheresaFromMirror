@@ -100,10 +100,12 @@ public abstract class AbstractTheresaModule implements ITheresaFeature, IInputta
     }
 
     public void onEnable() {
+        this.enabled = true;
         TheresaClient.getInstance().getEventBus().register(this);
     }
 
     public void onDisable() {
+        this.enabled = false;
         TheresaClient.getInstance().getEventBus().unregister(this);
     }
 
