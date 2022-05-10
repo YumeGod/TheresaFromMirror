@@ -1,5 +1,7 @@
 package dev.xix.feature.module;
 
+import dev.xix.TheresaClient;
+import dev.xix.event.impl.module.ModuleStatusEvent;
 import dev.xix.feature.ITheresaFeature;
 import dev.xix.feature.module.input.IInputtableTheresaModule;
 import dev.xix.feature.module.status.IToggleableTheresaModule;
@@ -80,6 +82,29 @@ public abstract class AbstractTheresaModule implements ITheresaFeature, IInputta
     @Override
     public void toggle() {
         enabled = !enabled;
+
+        final ModuleStatusEvent event = new ModuleStatusEvent(this);
+
+        TheresaClient.getInstance().getEventBus().register(event);
+
+        if (event.isCancelled()) {
+            enabled = !enabled;
+            return;
+        }
+
+        if (this.enabled) {
+            onEnable();
+        } else {
+            onDisable();
+        }
+    }
+
+    public void onEnable() {
+        TheresaClient.getInstance().getEventBus().register(this);
+    }
+
+    public void onDisable() {
+        TheresaClient.getInstance().getEventBus().unregister(this);
     }
 
     public Map<String, AbstractElement> getElements() {
