@@ -10,8 +10,8 @@ import cn.loli.client.module.modules.misc.AlwaysRotate;
 import cn.loli.client.module.modules.movement.NoSlowDown;
 import cn.loli.client.utils.player.rotation.RotationHook;
 
-import com.darkmagician6.eventapi.types.EventType;
 import dev.xix.TheresaClient;
+import dev.xix.event.EventType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.AxisAlignedBB;

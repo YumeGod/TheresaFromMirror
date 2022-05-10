@@ -1,6 +1,7 @@
 package dev.xix;
 
 import cn.loli.client.module.ModuleManager;
+import dev.xix.event.Event;
 import dev.xix.event.bus.EventBus;
 
 public final class TheresaClient {
@@ -9,14 +10,14 @@ public final class TheresaClient {
     private final String clientVersion;
     private final String[] clientDevelopers;
 
-    private final EventBus eventBus;
+    private final EventBus<Event> eventBus;
     private final ModuleManager moduleManager;
 
     private TheresaClient() {
         this.clientName = "Theresa";
         this.clientVersion = "1.0-H";
         this.clientDevelopers = new String[]{"Mirror", "Yume", "xix"};
-        this.eventBus = new EventBus();
+        this.eventBus = new EventBus<>();
         this.moduleManager = new ModuleManager();
     }
 

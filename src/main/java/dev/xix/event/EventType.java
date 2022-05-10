@@ -1,4 +1,4 @@
-package com.darkmagician6.eventapi.types;
+package dev.xix.event;
 
 public enum EventType {
 	PRE,

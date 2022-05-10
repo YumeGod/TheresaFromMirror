@@ -1,11 +1,9 @@
-
-
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.Event;
+import dev.xix.event.Event;
 import net.minecraft.client.renderer.RenderGlobal;
 
-public class RenderWorldLastEvent implements Event {
+public class RenderWorldLastEvent extends Event {
     private final RenderGlobal renderGlobal;
     private final float partialTicks;
 

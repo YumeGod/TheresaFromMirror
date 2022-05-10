@@ -1,9 +1,10 @@
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.Event;
+
+import dev.xix.event.Event;
 import net.minecraft.entity.Entity;
 
-public class AttackEvent implements Event {
+public class AttackEvent extends Event {
     Entity entity;
 
     public AttackEvent(Entity entity) {

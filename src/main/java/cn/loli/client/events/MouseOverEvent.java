@@ -1,9 +1,9 @@
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.Event;
+import dev.xix.event.Event;
 import net.minecraft.entity.Entity;
 
-public class MouseOverEvent implements Event {
+public class MouseOverEvent extends Event {
     double range;
     boolean rangeCheck;
     Entity entity;

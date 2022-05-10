@@ -1,9 +1,9 @@
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.Event;
+import dev.xix.event.Event;
 import net.minecraft.client.gui.ScaledResolution;
 
-public class RenderSREvent implements Event {
+public class RenderSREvent extends Event {
     public ScaledResolution sr;
     private int width, height;
 

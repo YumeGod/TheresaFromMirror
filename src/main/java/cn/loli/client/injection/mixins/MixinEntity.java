@@ -8,8 +8,8 @@ import cn.loli.client.events.StepEvent;
 import cn.loli.client.module.modules.combat.Velocity;
 import cn.loli.client.module.modules.player.SafeWalk;
 
-import com.darkmagician6.eventapi.types.EventType;
 import dev.xix.TheresaClient;
+import dev.xix.event.EventType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;

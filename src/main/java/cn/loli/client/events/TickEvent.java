@@ -1,11 +1,9 @@
-
-
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.Event;
-import com.darkmagician6.eventapi.types.EventType;
+import dev.xix.event.Event;
+import dev.xix.event.EventType;
 
-public class TickEvent implements Event {
+public class TickEvent extends Event {
     private final EventType eventType;
 
     public TickEvent(EventType eventType) {

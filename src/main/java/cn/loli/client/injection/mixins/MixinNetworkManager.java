@@ -4,8 +4,8 @@ package cn.loli.client.injection.mixins;
 
 import cn.loli.client.events.PacketEvent;
 
-import com.darkmagician6.eventapi.types.EventType;
 import dev.xix.TheresaClient;
+import dev.xix.event.EventType;
 import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.net.InetAddress;
 

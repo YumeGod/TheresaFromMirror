@@ -1,13 +1,11 @@
-
-
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.Event;
+import dev.xix.event.Event;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.AxisAlignedBB;
 
-public class CollisionEvent implements Event {
+public class CollisionEvent extends Event {
     private final Entity entity;
     private final double posX;
     private final double posY;

@@ -7,8 +7,8 @@ import cn.loli.client.events.*;
 import cn.loli.client.module.modules.render.BlockHit;
 import cn.loli.client.utils.render.AnimationUtils;
 
-import com.darkmagician6.eventapi.types.EventType;
 import dev.xix.TheresaClient;
+import dev.xix.event.EventType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.GuiChat;

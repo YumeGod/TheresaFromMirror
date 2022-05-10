@@ -1,6 +1,6 @@
 package cn.loli.client.events;
 
-import com.darkmagician6.eventapi.events.callables.EventCancellable;
+import dev.xix.event.EventCancellable;
 import net.minecraft.util.IChatComponent;
 
 public class ChatEvent extends EventCancellable {
