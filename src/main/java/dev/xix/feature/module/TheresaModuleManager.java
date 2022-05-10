@@ -34,6 +34,15 @@ public final class TheresaModuleManager {
         return null;
     }
 
+    public <T extends AbstractTheresaModule> T getModuleByStringOrNull(final String identifier) {
+        for (final AbstractTheresaModule module : modules.values()) {
+            if (module.getIdentifier().equalsIgnoreCase(identifier) || module.getName().equalsIgnoreCase(identifier)) {
+                return (T) module;
+            }
+        }
+        return null;
+    }
+
     public static <T extends AbstractTheresaModule> T getInstanceOrNull(final Class<T> clazz) {
         return TheresaClient.getInstance().getModuleManager().getModuleOrNull(clazz);
     }

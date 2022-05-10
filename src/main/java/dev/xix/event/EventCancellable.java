@@ -8,7 +8,11 @@ public abstract class EventCancellable extends Event {
         return cancelled;
     }
 
-    public void setCancelled(boolean state) {
+    public void cancel(boolean state) {
         cancelled = state;
+    }
+
+    public void cancel() {
+        cancelled = true;
     }
 }
