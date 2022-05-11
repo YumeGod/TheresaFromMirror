@@ -21,8 +21,11 @@ import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.others.SoundFxPlayer;
 import cn.loli.client.value.ValueManager;
 import com.Kernel32;
-import com.darkmagician6.eventapi.EventManager;
-import com.darkmagician6.eventapi.EventTarget;
+
+
+import dev.xix.event.Event;
+import dev.xix.event.bus.EventBus;
+import dev.xix.event.bus.IEventListener;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -107,9 +110,13 @@ public class Main {
     public PluginsManager pluginsManager;
     public SFontLoader sFontLoader;
 
+    public final EventBus<Event> eventBus;
+
+
     public Main() {
         INSTANCE = this;
-        EventManager.register(this);
+        eventBus = new EventBus<>();
+        eventBus.register(this);
     }
 
     public void startClient() {
@@ -171,23 +178,20 @@ public class Main {
         }
     }
 
-    @EventTarget
-    private void onMisc(UpdateEvent e) {
+    private final IEventListener<UpdateEvent> onMisc = event -> {
         new ExploitFix(null);
-    }
+    };
 
-    @EventTarget
-    private void onWorldChange(PacketEvent e) {
-        if (e.getPacket() instanceof S07PacketRespawn || e.getPacket() instanceof S01PacketJoinGame) {
+    private final IEventListener<PacketEvent> onWorldChange = event -> {
+        if (event.getPacket() instanceof S07PacketRespawn || event.getPacket() instanceof S01PacketJoinGame) {
             packetQueue.clear();
             ms.reset();
         }
 
-        new ExploitFix(e);
-    }
+        new ExploitFix(event);
+    };
 
-    @EventTarget
-    private void onTick(TickEvent e) {
+    private final IEventListener<TickEvent> onTick = event -> {
         if (Minecraft.getMinecraft().currentScreen instanceof GuiDownloadTerrain && (Minecraft.getMinecraft().thePlayer != null))
             Minecraft.getMinecraft().thePlayer.closeScreen();
 
@@ -196,13 +200,12 @@ public class Main {
                     getNetHandler().getNetworkManager().sendPacket(packetQueue.poll());
             ms.reset();
         }
-    }
+    };
 
-    @EventTarget
-    private void nameFix(TextEvent e) {
+    private final IEventListener<TextEvent> nameFix = e -> {
         if (e.getText().contains("\247k"))
             e.setText(StringUtils.replace(e.getText(), "\247k", ""));
-    }
+    };
 
 
     public void println(String obj) {

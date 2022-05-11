@@ -2,14 +2,16 @@
 
 package cn.loli.client.module.modules.combat;
 
+import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.TickEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.util.MovingObjectPosition;
 import org.lwjgl.input.Mouse;
@@ -35,9 +37,9 @@ public class AutoClicker extends Module {
         return min + (max - min) * new SecureRandom().nextDouble();
     }
 
-    @EventTarget
-    public void onTick(TickEvent e) {
-        if (e.getEventType() != EventType.PRE) return;
+    private final IEventListener<TickEvent> onTick = event ->
+    {
+        if (event.getEventType() != EventType.PRE) return;
 
         if (mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK && block.getObject()) return;
 
@@ -54,5 +56,6 @@ public class AutoClicker extends Module {
                 timer.reset();
             }
         }
-    }
+    };
+
 }

@@ -11,8 +11,9 @@ import cn.loli.client.utils.player.rotation.RotationHook;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.init.Items;
 import net.minecraft.network.play.server.S29PacketSoundEffect;
@@ -43,8 +44,8 @@ public class AutoFish extends Module {
         super("Auto Fish", "Auto catch the fish", ModuleCategory.MISC);
     }
 
-    @EventTarget
-    public void onPacket(PacketEvent e) {
+    private final IEventListener<PacketEvent> onPacket = e ->
+    {
         if (e.getPacket() instanceof S29PacketSoundEffect) {
             S29PacketSoundEffect packet = (S29PacketSoundEffect) e.getPacket();
             if (!shouldReCast && packet.getSoundName().equals("random.splash")
@@ -53,11 +54,11 @@ public class AutoFish extends Module {
                 timer.reset();
             }
         }
-    }
+    };
 
 
-    @EventTarget
-    public void onMove(MotionUpdateEvent e) {
+    private final IEventListener<MotionUpdateEvent> onMove = e ->
+    {
         if (e.getEventType() == EventType.PRE) {
             if (mc.thePlayer.getHeldItem().getItem() == Items.fishing_rod) {
                 if (move.getObject())
@@ -76,10 +77,10 @@ public class AutoFish extends Module {
                 }
             }
         }
-    }
+    };
 
-    @EventTarget
-    public void onTick(TickEvent e) {
+    private final IEventListener<TickEvent> onTick = e ->
+    {
         if (mc.thePlayer.getHeldItem().getItem() != Items.fishing_rod) {
             timer.reset();
             shouldCatch = false;
@@ -130,7 +131,7 @@ public class AutoFish extends Module {
             shouldCatch = false;
             shouldReCast = false;
         }
-    }
+    };
 
 
     private boolean bounceCheck() {

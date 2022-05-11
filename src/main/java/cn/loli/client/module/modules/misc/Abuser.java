@@ -1,10 +1,7 @@
 package cn.loli.client.module.modules.misc;
 
 import cn.loli.client.Main;
-import cn.loli.client.events.MotionUpdateEvent;
-import cn.loli.client.events.PacketEvent;
-import cn.loli.client.events.TickEvent;
-import cn.loli.client.events.UpdateEvent;
+import cn.loli.client.events.*;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.player.NoRotate;
@@ -12,8 +9,9 @@ import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -78,8 +76,8 @@ public class Abuser extends Module {
 
     }
 
-    @EventTarget
-    private void onPost(PacketEvent event) {
+    private final IEventListener<PacketEvent> onPost = event ->
+    {
         if (mc.isSingleplayer()) return;
 
         if (range.getObject()) {
@@ -166,7 +164,7 @@ public class Abuser extends Module {
                             return;
                         } else {
                             for (PosLookPacket packet : flagStock) {
-                                if (packet.isExpired()){
+                                if (packet.isExpired()) {
                                     mc.getNetHandler().getNetworkManager().sendPacket(packet.getPacket());
                                     flagStock.remove(packet);
                                 }
@@ -251,10 +249,10 @@ public class Abuser extends Module {
                 }
             }
         }
-    }
+    };
 
-    @EventTarget
-    private void onTick(TickEvent event) {
+    private final IEventListener<TickEvent> onTick = event ->
+    {
         if (mc.isSingleplayer()) return;
 
         if (packetBrust.getObject() || hypixel.getObject()) {
@@ -276,7 +274,7 @@ public class Abuser extends Module {
             resetPacket();
         }
 
-        if (!flagStock.isEmpty() && hasDisable){
+        if (!flagStock.isEmpty() && hasDisable) {
             for (PosLookPacket packet : Main.INSTANCE.moduleManager.getModule(Abuser.class).flagStock) {
                 if (System.currentTimeMillis() - packet.time > 3000) {
                     mc.getNetHandler().getNetworkManager().sendPacket(packet.getPacket());
@@ -284,11 +282,11 @@ public class Abuser extends Module {
                 }
             }
         }
+    };
 
-    }
 
-    @EventTarget
-    private void onMotionUpdate(MotionUpdateEvent event) {
+    private final IEventListener<MotionUpdateEvent> onMotionUpdate = event ->
+    {
         if (mc.isSingleplayer()) return;
         if (event.getEventType() == EventType.PRE) {
             if (hypixel.getObject()) {
@@ -300,10 +298,10 @@ public class Abuser extends Module {
                 }
             }
         }
-    }
+    };
 
-    @EventTarget
-    private void onUpdate(UpdateEvent event) {
+    private final IEventListener<UpdateEvent> onUpdate = event ->
+    {
         if (mc.isSingleplayer()) return;
 
         if (ncp.getObject()) {
@@ -324,7 +322,7 @@ public class Abuser extends Module {
                             , new ItemStack(Blocks.stone.getItem(mc.theWorld, new BlockPos(-1, -1, -1))), 0, 0.94f, 0));
 
         }
-    }
+    };
 
 
     //Reset Packets

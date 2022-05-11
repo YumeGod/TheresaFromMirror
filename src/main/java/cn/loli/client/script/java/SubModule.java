@@ -7,7 +7,7 @@ import cn.loli.client.module.modules.misc.HUD;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
-import com.darkmagician6.eventapi.EventManager;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import org.lwjgl.input.Keyboard;
@@ -96,7 +96,7 @@ public class SubModule extends Module {
 
             if (!isReg) {
                 isReg = true;
-                EventManager.register(this);
+                 Main.INSTANCE.eventBus.register(this);
             }
 
             if (mc.thePlayer != null && Main.INSTANCE.moduleManager.getModule(HUD.class).getState()) {
@@ -110,7 +110,7 @@ public class SubModule extends Module {
 
             if (!keepReg && isReg) {
                 isReg = false;
-                EventManager.unregister(this);
+                Main.INSTANCE.eventBus.unregister(this);
             }
 
             if (mc.thePlayer != null && Main.INSTANCE.moduleManager.getModule(HUD.class).getState()) {

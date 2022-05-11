@@ -2,12 +2,14 @@ package cn.loli.client.module.modules.movement;
 
 import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PacketEvent;
+import cn.loli.client.events.PlayerMoveEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.item.ItemBow;
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
 import net.minecraft.network.play.client.C09PacketHeldItemChange;
@@ -22,8 +24,8 @@ public class NoSlowDown extends Module {
         super("NoSlowDown", "You wont get slowdown when you hold or eating", ModuleCategory.MOVEMENT);
     }
 
-    @EventTarget
-    public void onMotion(MotionUpdateEvent event) {
+    private final IEventListener<MotionUpdateEvent> onMotion = e ->
+    {
         if (mc.thePlayer == null
                 || mc.theWorld == null)
             return;
@@ -33,24 +35,23 @@ public class NoSlowDown extends Module {
 
         switch (mode.getCurrentMode()) {
             case "Packet":
-                doPacketMode(event);
+                doPacketMode(e);
                 break;
             case "Tweak":
                 if (mc.thePlayer.ticksExisted % 2 != 0) return;
-                doPacketMode(event);
+                doPacketMode(e);
             case "Vanilla":
             default:
                 break;
         }
+    };
 
-    }
+    private final IEventListener<PacketEvent> onPacket = e ->
+    {
+        if (e.getPacket() instanceof S30PacketWindowItems)
+            e.setCancelled(mc.thePlayer.isUsingItem());
+    };
 
-    @EventTarget
-    public void onPacket(PacketEvent event) {
-        if (event.getPacket() instanceof S30PacketWindowItems)
-            event.setCancelled(mc.thePlayer.isUsingItem());
-
-    }
 
     private void doPacketMode(MotionUpdateEvent event) {
         if (event.getEventType() == EventType.PRE) {

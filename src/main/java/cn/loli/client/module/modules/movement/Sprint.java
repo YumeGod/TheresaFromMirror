@@ -2,12 +2,14 @@
 
 package cn.loli.client.module.modules.movement;
 
+import cn.loli.client.events.JumpEvent;
 import cn.loli.client.events.TickEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.value.ModeValue;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.potion.Potion;
 
 public class Sprint extends Module {
@@ -17,9 +19,9 @@ public class Sprint extends Module {
         super("Sprint", "Automatically sprints for you.", ModuleCategory.MOVEMENT);
     }
 
-    @EventTarget
-    public void onTick(TickEvent e) {
-        if (e.getEventType() != EventType.PRE) return;
+    private final IEventListener<TickEvent> onTick = event ->
+    {
+        if (event.getEventType() != EventType.PRE) return;
 
         if (mode.getCurrentMode().equalsIgnoreCase("Rage") ||
                 (!mc.thePlayer.movementInput.sneak &&
@@ -29,5 +31,7 @@ public class Sprint extends Module {
                         !mc.thePlayer.isPotionActive(Potion.blindness))) {
             mc.thePlayer.setSprinting(true);
         }
-    }
+    };
+
+
 }

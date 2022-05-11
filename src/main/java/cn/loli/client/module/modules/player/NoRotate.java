@@ -2,11 +2,13 @@ package cn.loli.client.module.modules.player;
 
 import cn.loli.client.Main;
 import cn.loli.client.events.PacketEvent;
+import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.misc.Abuser;
 import cn.loli.client.utils.misc.ChatUtils;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 
@@ -16,8 +18,8 @@ public class NoRotate extends Module {
         super("NoRotate", "Just desync the rotation from serverside", ModuleCategory.PLAYER);
     }
 
-    @EventTarget
-    public void onPacket(PacketEvent event) {
+    private final IEventListener<PacketEvent> onPacket = event ->
+    {
         if (event.getPacket() instanceof S08PacketPlayerPosLook) {
             if (mc.thePlayer != null && mc.theWorld != null) {
                 if (mc.thePlayer.rotationPitch == 0.0F
@@ -96,6 +98,8 @@ public class NoRotate extends Module {
                 event.setCancelled(true);
             }
         }
-    }
+    };
+
+
 
 }

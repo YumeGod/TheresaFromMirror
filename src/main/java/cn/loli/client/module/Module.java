@@ -13,7 +13,7 @@ import cn.loli.client.utils.player.InventoryUtil;
 import cn.loli.client.utils.player.PlayerUtils;
 import cn.loli.client.utils.player.movement.MoveUtils;
 import cn.loli.client.utils.player.rotation.RotationUtils;
-import com.darkmagician6.eventapi.EventManager;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.settings.GameSettings;
@@ -130,7 +130,7 @@ public abstract class Module {
 
             if (!isReg) {
                 isReg = true;
-                EventManager.register(this);
+                 Main.INSTANCE.eventBus.register(this);
             }
 
             if (mc.thePlayer != null && Main.INSTANCE.moduleManager.getModule(HUD.class).getState()) {
@@ -146,7 +146,7 @@ public abstract class Module {
 
             if (!keepReg && isReg) {
                 isReg = false;
-                EventManager.unregister(this);
+                Main.INSTANCE.eventBus.unregister(this);
             }
 
             if (mc.thePlayer != null && Main.INSTANCE.moduleManager.getModule(HUD.class).getState()) {

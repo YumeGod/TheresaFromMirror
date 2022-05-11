@@ -2,11 +2,13 @@ package cn.loli.client.module.modules.player;
 
 import cn.loli.client.events.CollisionEvent;
 import cn.loli.client.events.MotionUpdateEvent;
+import cn.loli.client.events.PacketEvent;
 import cn.loli.client.events.PlayerMoveEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockAir;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -23,6 +25,7 @@ public class Phase extends Module {
     public Phase() {
         super("Phase", "Make you throught a block", ModuleCategory.PLAYER);
     }
+
 
     public static boolean isInsideBlock() {
         final EntityPlayerSP player = mc.thePlayer;
@@ -42,16 +45,15 @@ public class Phase extends Module {
         return false;
     }
 
-    /* events */
-    @EventTarget
-    public void onCollide(CollisionEvent collide) {
-        if (isInsideBlock()) {
-            collide.setBoundingBox(null);
-        }
-    }
+    private final IEventListener<CollisionEvent> onCollide = event ->
+    {
+        if (isInsideBlock())
+            event.setBoundingBox(null);
+    };
 
-    @EventTarget
-    public void onMove(PlayerMoveEvent event) {
+
+    private final IEventListener<PlayerMoveEvent> onMove = event ->
+    {
         if (isInsideBlock()) {
             if (mc.gameSettings.keyBindJump.isKeyDown()) {
                 event.setY(mc.thePlayer.motionY += 0.09f);
@@ -62,10 +64,10 @@ public class Phase extends Module {
             }
             moveUtils.setMotion(event, moveUtils.getBaseMoveSpeed());
         }
-    }
+    };
 
-    @EventTarget
-    public void onPost(MotionUpdateEvent event) {
+    private final IEventListener<MotionUpdateEvent> onPost = event ->
+    {
         if (event.getEventType() == EventType.POST) {
             if (mc.thePlayer.stepHeight > 0) mc.thePlayer.stepHeight = 0;
 
@@ -86,7 +88,8 @@ public class Phase extends Module {
                 mc.thePlayer.setPosition(posX + x, posY, posZ + z);
             }
         }
-    }
+    };
+
 
 
     @Override

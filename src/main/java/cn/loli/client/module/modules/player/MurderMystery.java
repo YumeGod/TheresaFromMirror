@@ -3,13 +3,15 @@ package cn.loli.client.module.modules.player;
 
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.events.RenderEvent;
+import cn.loli.client.events.TickEvent;
 import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.ColorValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmorStand;
@@ -48,22 +50,21 @@ public class MurderMystery extends Module {
         
     }
 
-    @EventTarget
-    public void onRespawn(PacketEvent event) {
-        if (event.getPacket() instanceof S01PacketJoinGame){
+
+    private final IEventListener<PacketEvent> onRespawn = event ->
+    {
+        if (event.getPacket() instanceof S01PacketJoinGame)
             this.alartedPlayers.clear();
-        }
+    };
 
-    }
-
-    @EventTarget
-    public void onRender(RenderEvent event) {
+    private final IEventListener<RenderEvent> onRender = event ->
+    {
         if (isMurder(murder))
-           RenderUtils.renderBox(murder, espColor.getObject().getRGB());
-    }
+            RenderUtils.renderBox(murder, espColor.getObject().getRGB());
+    };
 
-    @EventTarget
-    public void onUpdate(UpdateEvent event) {
+    private final IEventListener<UpdateEvent> onUpdate = event ->
+    {
         if (mc.theWorld == null || this.alartedPlayers == null)
             return;
 
@@ -74,7 +75,7 @@ public class MurderMystery extends Module {
 
                 if (player.getCurrentEquippedItem() != null) {
                     if (checkItem(player.getCurrentEquippedItem().getItem())) {
-                       ChatUtils.info(EnumChatFormatting.GOLD + player.getName() + EnumChatFormatting.RESET + " is the murderer!!!");
+                        ChatUtils.info(EnumChatFormatting.GOLD + player.getName() + EnumChatFormatting.RESET + " is the murderer!!!");
                         this.alartedPlayers.add(player.getName());
                         murder = player;
 
@@ -86,7 +87,8 @@ public class MurderMystery extends Module {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    };
+
 
     public boolean checkItem(Item item) {
         return !(item instanceof ItemMap) && !(item instanceof ItemArmorStand) && !item.getUnlocalizedName().equalsIgnoreCase("item.ingotGold") &&

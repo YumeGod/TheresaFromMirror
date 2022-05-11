@@ -1,11 +1,13 @@
 package cn.loli.client.module.modules.player;
 
 import cn.loli.client.events.PacketEvent;
+import cn.loli.client.events.RenderEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.player.InventoryUtil;
 import cn.loli.client.value.BooleanValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
@@ -45,8 +47,8 @@ public class AutoTools extends Module {
         return tempEntity;
     }
 
-    @EventTarget
-    public void onAttack(PacketEvent e) {
+    private final IEventListener<PacketEvent> onAttack = e ->
+    {
         if ((e.getPacket() instanceof C02PacketUseEntity)
                 && ((C02PacketUseEntity) e.getPacket()).getAction().equals(C02PacketUseEntity.Action.ATTACK)) {
             boolean checks = !mc.thePlayer.isEating();
@@ -66,7 +68,10 @@ public class AutoTools extends Module {
                 }
             }
         }
-    }
+    };
+
+
+
 
 
     public void bestSword() {

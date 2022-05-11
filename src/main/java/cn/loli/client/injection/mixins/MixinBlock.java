@@ -32,7 +32,7 @@ public abstract class MixinBlock {
 
     @Inject(method = "addCollisionBoxesToList", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/block/Block;getCollisionBoundingBox(Lnet/minecraft/world/World;Lnet/minecraft/util/BlockPos;Lnet/minecraft/block/state/IBlockState;)Lnet/minecraft/util/AxisAlignedBB;"))
     private void onAddCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List<AxisAlignedBB> list, Entity collidingEntity, CallbackInfo ci) {
-        TheresaClient.getInstance().getEventBus().call(new CollisionEvent(collidingEntity, pos.getX(), pos.getY(), pos.getZ(), mask, (Block) (Object) this));
+        Main.INSTANCE.eventBus.call(new CollisionEvent(collidingEntity, pos.getX(), pos.getY(), pos.getZ(), mask, (Block) (Object) this));
     }
 
 

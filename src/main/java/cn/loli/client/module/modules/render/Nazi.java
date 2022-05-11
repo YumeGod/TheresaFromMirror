@@ -1,10 +1,12 @@
 package cn.loli.client.module.modules.render;
 
 import cn.loli.client.events.EmoteEvent;
+import cn.loli.client.events.RenderEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.client.model.ModelBiped;
 
 public class Nazi extends Module {
@@ -20,15 +22,15 @@ public class Nazi extends Module {
         heilY = 0;
     }
 
-
-    @EventTarget
-    private void onEmote(EmoteEvent event){
+    private final IEventListener<EmoteEvent> onEmote = event ->
+    {
         if (event.getEventType() == EventType.POST){
             if (event.entity == mc.thePlayer){
                 setBiped(event.getBiped());
             }
         }
-    }
+    };
+
 
 
     public void setBiped(ModelBiped biped) {

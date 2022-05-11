@@ -10,7 +10,8 @@ import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ColorValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -32,8 +33,7 @@ public class Trail extends Module {
         super("Trail", "Bread crumbs", ModuleCategory.RENDER);
     }
 
-    @EventTarget
-    private void onRender(RenderEvent event) {
+    private final IEventListener<RenderEvent> onRender = event -> {
         Color customColor = trailColor.getObject();
         if (mc.gameSettings.thirdPersonView != 0 || showInFirstPerson.getObject()) {
             GL11.glPushMatrix();
@@ -60,10 +60,9 @@ public class Trail extends Module {
 
             GL11.glPopMatrix();
         }
-    }
+    };
 
-    @EventTarget
-    private void onUpdate(UpdateEvent event) {
+    private final IEventListener<UpdateEvent> onUpdate = event -> {
         for (int i = 0; i < positions.size(); i++) {
             final double[] position = positions.get(i);
             if (System.currentTimeMillis() - position[3] > length.getObject()) {
@@ -71,11 +70,12 @@ public class Trail extends Module {
                 positions.remove(position);
             }
         }
-    }
+    };
 
-    @EventTarget
-    private void onMotion(MotionUpdateEvent event) {
+    private final IEventListener<MotionUpdateEvent> onMotion = event -> {
         positions.add(new double[]{mc.thePlayer.posX, mc.thePlayer.posY + 0.01, mc.thePlayer.posZ, System.currentTimeMillis()});
-    }
+    };
+
+
 
 }

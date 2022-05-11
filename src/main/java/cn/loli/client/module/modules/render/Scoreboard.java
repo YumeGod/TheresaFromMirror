@@ -1,14 +1,16 @@
 package cn.loli.client.module.modules.render;
 
 import cn.loli.client.Main;
+import cn.loli.client.events.EmoteEvent;
 import cn.loli.client.events.Render2DEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.misc.HUD;
 import cn.loli.client.value.ModeValue;
-import com.darkmagician6.eventapi.EventTarget;
+
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.scoreboard.Score;
@@ -27,8 +29,8 @@ public class Scoreboard extends Module {
         super("Scoreboard", "Render the scoreboard", ModuleCategory.RENDER);
     }
 
-    @EventTarget
-    public void onEvent(Render2DEvent e) {
+    private final IEventListener<Render2DEvent> onEvent = event ->
+    {
         net.minecraft.scoreboard.Scoreboard scoreboard = mc.theWorld.getScoreboard();
         ScaledResolution scaledRes = new ScaledResolution(mc);
         ScoreObjective objective = scoreboard.getObjectiveInDisplaySlot(1);
@@ -80,5 +82,6 @@ public class Scoreboard extends Module {
             mc.fontRendererObj.drawString(s2, l - mc.fontRendererObj.getStringWidth(s2), k, 553648127);
 
         }
-    }
+    };
+
 }

@@ -1,12 +1,14 @@
 package cn.loli.client.module.modules.player;
 
+import cn.loli.client.events.PacketEvent;
 import cn.loli.client.events.Render3DEvent;
 import cn.loli.client.events.TickEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSnow;
 import net.minecraft.client.Minecraft;
@@ -45,7 +47,7 @@ public class TellyBridge extends Module {
         } catch (Exception e) {
             ChatUtils.send(("Some Error"));
         }
-        
+
     }
 
 
@@ -58,18 +60,18 @@ public class TellyBridge extends Module {
         } catch (Exception e) {
             ChatUtils.send(("Some Error"));
         }
-        
+
     }
 
-    @EventTarget
-    private void onRender(Render3DEvent event) {
-        if (phase.equals(Phase.Placing)) {
-            placeBlock((int) mc.playerController.getBlockReachDistance(), false, event.getPartialTicks());
-        }
-    }
+    private final IEventListener<Render3DEvent> onRender = e ->
+    {
+        if (phase.equals(Phase.Placing))
+            placeBlock((int) mc.playerController.getBlockReachDistance(), false, e.getPartialTicks());
 
-    @EventTarget
-    private void onTick(TickEvent event) {
+    };
+
+    private final IEventListener<TickEvent> onTick = e ->
+    {
         if (lastBlock == null || mc.playerController.getCurrentGameType().isCreative()) {
             ChatUtils.send(("Some Error"));
             setState(false);
@@ -123,7 +125,8 @@ public class TellyBridge extends Module {
                 break;
             }
         }
-    }
+    };
+
 
     private void placeBlock(final int range, final boolean place, final float partialTicks) {
         if (!isAirBlock(getBlock(new BlockPos(mc.thePlayer).down()))) {

@@ -3,8 +3,9 @@ package cn.loli.client.script.lua;
 import cn.loli.client.events.*;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import org.luaj.vm2.Globals;
 
 import java.util.ArrayList;
@@ -26,109 +27,90 @@ public class LuaModule extends Module {
             globals.get("init").call();
     }
 
-    @EventTarget
-    private void onUpdate(UpdateEvent event) {
+    private final IEventListener<UpdateEvent> onUpdate = event -> {
         invoke("on_update");
-    }
+    };
 
-    @EventTarget
-    private void onUpdate(MotionUpdateEvent event) {
+    private final IEventListener<RenderEvent> onRender = event -> {
+        invoke("on_render");
+    };
+
+
+    private final IEventListener<MotionUpdateEvent> onMotionUpdate = event -> {
         if (event.getEventType() == EventType.PRE) {
             invoke("on_pre_update");
         } else {
             invoke("on_post_update");
         }
+    };
 
-    }
-
-    @EventTarget
-    private void onPacket(PacketEvent event) {
+    private final IEventListener<PacketEvent> onPacket = event -> {
         if (event.getEventType() == EventType.SEND) {
             invoke("on_packet_post");
         } else {
             invoke("on_packet_receive");
         }
-    }
+    };
 
-    @EventTarget
-    private void onTick(TickEvent event) {
+    private final IEventListener<TickEvent> onTick = event -> {
         invoke("on_tick");
-    }
+    };
 
-    @EventTarget
-    private void onRender(RenderEvent event) {
-        invoke("on_render");
-    }
-
-    @EventTarget
-    private void onRender(Render2DEvent event) {
+    private final IEventListener<Render2DEvent> onRender2D = event -> {
         invoke("on_render_2d");
-    }
+    };
 
-    @EventTarget
-    private void onRender(RenderSREvent event) {
-        invoke("on_render_sr");
-    }
+    private final IEventListener<RenderSREvent> onRenderSR = event -> {
+        invoke("on_render_2d");
+    };
 
-    @EventTarget
-    private void onBlockReach(BlockReachEvent event) {
+    private final IEventListener<BlockReachEvent> onBlockReach = event -> {
         invoke("on_block_reach");
-    }
+    };
 
-    @EventTarget
-    private void onCollision(CollisionEvent event) {
+    private final IEventListener<CollisionEvent> onCollision = event -> {
         invoke("on_collision_block");
-    }
+    };
 
-    @EventTarget
-    private void onMouseOver(MouseOverEvent event) {
+    private final IEventListener<MouseOverEvent> onMouseOver = event -> {
         invoke("on_mouse_over");
-    }
+    };
 
-    @EventTarget
-    private void onMoveFly(MoveFlyEvent event) {
+    private final IEventListener<MoveFlyEvent> onMoveFly = event -> {
         invoke("on_move_fly");
-    }
+    };
 
-    @EventTarget
-    private void onJump(JumpYawEvent event) {
+    private final IEventListener<JumpYawEvent> onJumpYaw = event -> {
         invoke("on_jump_yaw");
-    }
+    };
 
-    @EventTarget
-    private void onChat(ChatEvent event) {
+    private final IEventListener<ChatEvent> onChat = event -> {
         invoke("on_chat");
-    }
+    };
 
-    @EventTarget
-    private void onKey(KeyEvent event) {
+    private final IEventListener<KeyEvent> onKey = event -> {
         invoke("on_key");
-    }
+    };
 
-    @EventTarget
-    private void onMove(PlayerMoveEvent event) {
+    private final IEventListener<PlayerMoveEvent> onMove = event -> {
         invoke("on_move");
-    }
+    };
 
-    @EventTarget
-    private void onAttack(AttackEvent event) {
+    private final IEventListener<AttackEvent> onAttack = event -> {
         invoke("on_attack");
-    }
+    };
 
-    @EventTarget
-    private void onJump(JumpEvent event) {
+    private final IEventListener<JumpEvent> onJump = event -> {
         invoke("on_jump");
-    }
+    };
 
-    @EventTarget
-    private void onEmote(EmoteEvent event) {
+    private final IEventListener<EmoteEvent> onEmote = event -> {
         invoke("on_emote");
-    }
+    };
 
-    @EventTarget
-    private void onAnimation(AnimationEvent event) {
+    private final IEventListener<AnimationEvent> onAnimation = event -> {
         invoke("on_animation");
-    }
+    };
 
     @Override
     public void onDisable() {

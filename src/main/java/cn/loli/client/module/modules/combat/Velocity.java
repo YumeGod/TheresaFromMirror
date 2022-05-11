@@ -1,6 +1,7 @@
 package cn.loli.client.module.modules.combat;
 
 import cn.loli.client.events.PacketEvent;
+import cn.loli.client.events.RenderEvent;
 import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.injection.implementations.IS27PacketExplosion;
 import cn.loli.client.module.Module;
@@ -8,7 +9,8 @@ import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
@@ -41,27 +43,27 @@ public class Velocity extends Module {
 
     @Override
     public void onEnable() {
-        
+
     }
 
     @Override
     public void onDisable() {
-        
+
     }
 
-    @EventTarget
-    private void onUpdate(UpdateEvent e) {
-//        ChatUtils.info("Hurttime: " + mc.thePlayer.hurtResistantTime + " | " + mc.thePlayer.velocityChanged);
+    private final IEventListener<UpdateEvent> onUpdate = e ->
+    {
         if (legit.getObject()) {
             if (mc.thePlayer.hurtTime == 10 && mc.thePlayer.onGround) {
                 mc.thePlayer.jump();
             }
         } else
             resetPackets(mc.getNetHandler().getNetworkManager().getNetHandler());
-    }
+    };
 
-    @EventTarget
-    private void onPacket(PacketEvent event) {
+
+    private final IEventListener<PacketEvent> onPacket = event ->
+    {
         //计算水平和垂直的数值
         float hor = horizon.getObject().floatValue() / 100;
         float ver = vertical.getObject().floatValue() / 100;
@@ -138,7 +140,7 @@ public class Velocity extends Module {
 
             }
         }
-    }
+    };
 
 
     private void addPackets(TimestampedPacket packet, PacketEvent eventReadPacket) {

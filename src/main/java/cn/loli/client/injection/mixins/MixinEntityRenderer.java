@@ -46,19 +46,19 @@ public abstract class MixinEntityRenderer {
 
     @Inject(method = "renderWorldPass", at = @At(value = "INVOKE", target = "Lnet/minecraftforge/client/ForgeHooksClient;dispatchRenderLast(Lnet/minecraft/client/renderer/RenderGlobal;F)V"))
     private void onRenderWorldPass(int pass, float partialTicks, long finishTimeNano, CallbackInfo ci) {
-        TheresaClient.getInstance().getEventBus().call(new RenderWorldLastEvent(Minecraft.getMinecraft().renderGlobal, partialTicks));
+        Main.INSTANCE.eventBus.call(new RenderWorldLastEvent(Minecraft.getMinecraft().renderGlobal, partialTicks));
     }
 
     @Inject(method = "renderWorldPass", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/EntityRenderer;renderHand(FI)V"))
     private void onRenderHand(CallbackInfo ci) {
-        TheresaClient.getInstance().getEventBus().call(new RenderEvent());
+        Main.INSTANCE.eventBus.call(new RenderEvent());
     }
 
     @Inject(method = "renderWorldPass", at =
     @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GlStateManager;disableFog()V", shift = At.Shift.AFTER))
     private void eventRender3D(int pass, float partialTicks, long finishTimeNano, CallbackInfo callbackInfo) {
         Render3DEvent eventRender = new Render3DEvent(pass, partialTicks, finishTimeNano);
-        TheresaClient.getInstance().getEventBus().call(eventRender);
+        Main.INSTANCE.eventBus.call(eventRender);
         GL11.glColor3f(1.0F, 1.0F, 1.0F);
     }
 
@@ -76,7 +76,7 @@ public abstract class MixinEntityRenderer {
     @Inject(method = "updateCameraAndRender", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/RenderGlobal;renderEntityOutlineFramebuffer()V", shift = At.Shift.AFTER))
     private void onShader(CallbackInfo callbackInfo) {
         ShaderEvent shaderEvent = new ShaderEvent(theShaderGroup, useShader);
-        TheresaClient.getInstance().getEventBus().call(shaderEvent);
+        Main.INSTANCE.eventBus.call(shaderEvent);
         theShaderGroup = shaderEvent.getShader();
         useShader = shaderEvent.isUseShader();
     }
@@ -98,7 +98,7 @@ public abstract class MixinEntityRenderer {
                         Minecraft.getMinecraft().getRenderViewEntity().prevPosX, Minecraft.getMinecraft().getRenderViewEntity().prevPosY, Minecraft.getMinecraft().getRenderViewEntity().prevPosZ,
                         Minecraft.getMinecraft().getRenderViewEntity().rotationYaw, Minecraft.getMinecraft().getRenderViewEntity().rotationPitch, Minecraft.getMinecraft().getRenderViewEntity().prevRotationYaw, Minecraft.getMinecraft().getRenderViewEntity().prevRotationPitch);
 
-        TheresaClient.getInstance().getEventBus().call(event);
+        Main.INSTANCE.eventBus.call(event);
         Minecraft.getMinecraft().getRenderViewEntity().rotationYaw = event.getYaw();
         Minecraft.getMinecraft().getRenderViewEntity().rotationPitch = event.getPitch();
         Minecraft.getMinecraft().getRenderViewEntity().prevRotationYaw = event.getPrevYaw();
@@ -143,7 +143,7 @@ public abstract class MixinEntityRenderer {
                 }
 
                 final MouseOverEvent mouseOverEvent = new MouseOverEvent(d1, flag, entity);
-                TheresaClient.getInstance().getEventBus().call(mouseOverEvent);
+                Main.INSTANCE.eventBus.call(mouseOverEvent);
                 d0 = d1 = mouseOverEvent.getRange();
                 flag = mouseOverEvent.isRangeCheck();
 

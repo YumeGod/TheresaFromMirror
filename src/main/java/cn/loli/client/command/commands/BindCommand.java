@@ -12,8 +12,9 @@ import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
 import cn.loli.client.value.Value;
-import com.darkmagician6.eventapi.EventManager;
-import com.darkmagician6.eventapi.EventTarget;
+
+
+import dev.xix.event.bus.IEventListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
@@ -32,7 +33,7 @@ public class BindCommand extends Command {
     public BindCommand() {
         super("bind");
 
-        EventManager.register(this);
+         Main.INSTANCE.eventBus.register(this);
     }
 
     //TODO: 将使用抽象类来解决这堆狗屎代码 因为这很愚蠢
@@ -149,8 +150,7 @@ public class BindCommand extends Command {
         } else return new ArrayList<>();
     }
 
-    @EventTarget
-    public void onKey(@NotNull KeyEvent event) {
+    private final IEventListener<@NotNull KeyEvent> onKey = event -> {
         if (active) {
             if (currentModule != null) {
                 currentModule.setKeybind(event.getKey());
@@ -165,5 +165,6 @@ public class BindCommand extends Command {
             active = false;
             currentModule = null;
         }
-    }
+    };
+
 }

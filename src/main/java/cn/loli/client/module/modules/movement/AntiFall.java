@@ -1,12 +1,14 @@
 package cn.loli.client.module.modules.movement;
 
 import cn.loli.client.events.MotionUpdateEvent;
+import cn.loli.client.events.TickEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.network.play.client.C03PacketPlayer;
 
 public class AntiFall extends Module {
@@ -18,8 +20,8 @@ public class AntiFall extends Module {
         super("AntiFall", "I am the first one to fixz antifalls maybe", ModuleCategory.MOVEMENT);
     }
 
-    @EventTarget
-    public void onFall(MotionUpdateEvent event) {
+    private final IEventListener<MotionUpdateEvent> onFall = event ->
+    {
         if (event.getEventType() == EventType.PRE) {
             if (mc.thePlayer.fallDistance > falldistance.getObject() && playerUtils.isOverVoid(mc)) {
                 if (matrix.getObject()) {
@@ -42,7 +44,8 @@ public class AntiFall extends Module {
             }
         }
 
-    }
+    };
+
 
     public void blinkTo(double speed, float yaw) {
         this.blinkTo(speed, mc.thePlayer.posY + 1e-31, yaw, mc.thePlayer.onGround);

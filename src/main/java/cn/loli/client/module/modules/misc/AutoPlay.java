@@ -1,13 +1,15 @@
 package cn.loli.client.module.modules.misc;
 
 import cn.loli.client.events.ChatEvent;
+import cn.loli.client.events.TickEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.network.play.client.C01PacketChatMessage;
 import net.minecraft.util.IChatComponent;
@@ -20,9 +22,9 @@ public class AutoPlay extends Module {
         super("AutoPlay", "Auto play the next game", ModuleCategory.MISC);
     }
 
-    @EventTarget
-    private void onPacket(ChatEvent event) {
-        for (IChatComponent cc : event.getChatComponent().getSiblings()) {
+    private final IEventListener<ChatEvent> onPacket = e ->
+    {
+        for (IChatComponent cc : e.getChatComponent().getSiblings()) {
             final ClickEvent ce = cc.getChatStyle().getChatClickEvent();
             if (ce != null)
                 if ((ce.getAction() == ClickEvent.Action.RUN_COMMAND) && ce.getValue().contains("/play")) {
@@ -36,8 +38,9 @@ public class AutoPlay extends Module {
                         mc.thePlayer.sendQueue.addToSendQueue(new C01PacketChatMessage(ce.getValue()));
                     }).start();
 
-                    event.setCancelled(true);
+                    e.setCancelled(true);
                 }
         }
-    }
+    };
+
 }

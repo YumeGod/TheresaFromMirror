@@ -14,7 +14,7 @@ import cn.loli.client.utils.render.AnimationUtils;
 import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.network.NetworkPlayerInfo;
@@ -64,8 +64,8 @@ public class TargetHUD extends Module {
         super("Target Hud", "Make you can check the detail of targets", ModuleCategory.RENDER);
     }
 
-    @EventTarget
-    private void onRender(Render2DEvent event) {
+    private final IEventListener<Render2DEvent> onRender = event ->
+    {
         ScaledResolution sr = new ScaledResolution(mc);
 
         int renderIndex = 0;
@@ -99,10 +99,11 @@ public class TargetHUD extends Module {
                     render(x, y);
             renderIndex++;
         }
-    }
+    };
 
-    @EventTarget
-    private void onRender(RenderEvent event) {
+
+    private final IEventListener<RenderEvent> onRenderSR = event ->
+    {
         for (int i = 0; i < playerList.size(); i++) {
             //3d coordinate to 2d coordinate
             ScaledResolution res = new ScaledResolution(mc);
@@ -137,15 +138,16 @@ public class TargetHUD extends Module {
             posMap.put(playerInfoList.get(i), new Float[]{position.x, position.y, position.z, position.w});
             GL11.glPopMatrix();
         }
-    }
+    };
 
-
-    @EventTarget
-    private void onReload(TickEvent event) {
+    private final IEventListener<TickEvent> refresh = event ->
+    {
         entity = Main.INSTANCE.moduleManager.getModule(Aura.class).getState()
                 ? Main.INSTANCE.moduleManager.getModule(Aura.class).target
                 : rotationUtils.rayCastedEntity(6.0, RotationHook.yaw, RotationHook.pitch);
-    }
+    };
+
+
 
     private Vec3 getVec3(final EntityPlayer var0) {
         final float timer = ((IAccessorMinecraft) mc).getTimer().renderPartialTicks;

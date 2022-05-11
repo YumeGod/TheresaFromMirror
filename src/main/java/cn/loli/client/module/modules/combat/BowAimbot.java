@@ -10,8 +10,9 @@ import cn.loli.client.utils.player.FormulaHelper;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.client.Minecraft;
@@ -60,28 +61,24 @@ public class BowAimbot extends Module {
     }
 
 
-    @EventTarget
-    private void onMoveFly(MoveFlyEvent event) {
+    private final IEventListener<MoveFlyEvent> onMoveFly = event -> {
         if (moveFix.getObject() && allowAiming(mc.thePlayer))
             event.setYaw(yaw);
-    }
+    };
 
-    @EventTarget
-    private void onJump(JumpYawEvent event) {
+    private final IEventListener<JumpYawEvent> onJump = event -> {
         if (moveFix.getObject() && allowAiming(mc.thePlayer))
             event.setYaw(yaw);
-    }
+    };
 
-    @EventTarget
-    private void onSlient(MovementStateEvent event) {
+    private final IEventListener<MovementStateEvent> onSilent = event -> {
         if (moveFix.getObject() && allowAiming(mc.thePlayer)) {
             event.setYaw(yaw);
             event.setSilentMoveFix(true);
         }
-    }
+    };
 
-    @EventTarget
-    private void onMotion(MotionUpdateEvent event) {
+    private final IEventListener<MotionUpdateEvent> onMotion = event -> {
         if (event.getEventType() == EventType.PRE) {
             if (slient.getObject() && allowAiming(mc.thePlayer)) {
                 if (!Float.isNaN(pitch)) {
@@ -90,18 +87,16 @@ public class BowAimbot extends Module {
                 }
             }
         }
-    }
+    };
 
-    @EventTarget
-    private void onTick(UpdateEvent event) {
+    private final IEventListener<UpdateEvent> onUpdate = event -> {
         if (!slient.getObject() && allowAiming(mc.thePlayer)) {
             mc.thePlayer.rotationYaw = yaw;
             mc.thePlayer.rotationPitch = pitch;
         }
-    }
+    };
 
-    @EventTarget
-    private void onRender(RenderEvent event) {
+    private final IEventListener<RenderEvent> onRender = event -> {
         Entity entity = getClosestEntity();
         curEntity = entity;
         if (isUsing(mc.thePlayer)) {
@@ -118,7 +113,7 @@ public class BowAimbot extends Module {
                 final double g = getGravity();
 
                 float pitch = FormulaHelper.getProjectileMotion(v, g, x, deltaY);
-                float[] rotations = rotationUtils.facePlayer(entity, false, false, false, prediction.getObject(), true, false, 0, clamp.getObject(), 180, 6 , false , 0);
+                float[] rotations = rotationUtils.facePlayer(entity, false, false, false, prediction.getObject(), true, false, 0, clamp.getObject(), 180, 6, false, 0);
                 pitch = MathHelper.clamp_float(pitch, -90, 90);
 
                 yaw = rotations[0];
@@ -133,7 +128,8 @@ public class BowAimbot extends Module {
 
             }
         }
-    }
+    };
+
 
     @Override
     public void onEnable() {

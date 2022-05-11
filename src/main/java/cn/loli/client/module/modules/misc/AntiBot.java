@@ -7,8 +7,9 @@ import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.entity.Entity;
@@ -100,8 +101,8 @@ public class AntiBot extends Module {
         return false;
     }
 
-    @EventTarget
-    private void onUpdate(UpdateEvent event) {
+    private final IEventListener<UpdateEvent> onUpdate = event ->
+    {
         for (Entity entity : mc.theWorld.loadedEntityList) {
             if (entity instanceof EntityPlayer) {
                 if (isWrongRotation((EntityPlayer) entity)) {
@@ -137,12 +138,11 @@ public class AntiBot extends Module {
                 }
             }
         }
+    };
 
 
-    }
-
-    @EventTarget
-    private void onPacket(PacketEvent event) {
+    private final IEventListener<PacketEvent> onPacket = event ->
+    {
         if (event.getEventType() == EventType.RECEIVE) {
             if (event.getPacket() instanceof S01PacketJoinGame) {
                 madeSound.clear();
@@ -190,7 +190,7 @@ public class AntiBot extends Module {
                 }
             }
         }
-    }
+    };
 
 
     public boolean isWrongRotation(EntityPlayer entity) {

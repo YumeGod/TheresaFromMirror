@@ -2,6 +2,7 @@ package cn.loli.client.module.modules.render;
 
 import cn.loli.client.events.Render2DEvent;
 import cn.loli.client.events.RenderEvent;
+import cn.loli.client.events.TickEvent;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.injection.mixins.IAccessorRenderManager;
 import cn.loli.client.module.Module;
@@ -9,7 +10,8 @@ import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ColorValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.tileentity.TileEntity;
@@ -39,8 +41,8 @@ public class ItemESP extends Module {
         super("Item ESP", "You can see items through walls", ModuleCategory.RENDER);
     }
 
-    @EventTarget
-    public void onRender(RenderEvent event) {
+    private final IEventListener<RenderEvent> onRender = event ->
+    {
         if (cylinder.getObject()) {
             if (itemDisplay.getObject()) {
                 for (Entity entity : mc.theWorld.loadedEntityList) {
@@ -131,11 +133,8 @@ public class ItemESP extends Module {
                 }
             }
         }
+    };
 
-    }
 
-    @EventTarget
-    public void onRender(Render2DEvent event) {
-    }
 
 }

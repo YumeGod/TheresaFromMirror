@@ -70,7 +70,7 @@ public abstract class MixinEntity {
     @Redirect(method = {"moveFlying"}, at = @At(value = "FIELD", target = "Lnet/minecraft/entity/Entity;rotationYaw:F"))
     public float moveFlying(Entity instance) {
         MoveFlyEvent event = new MoveFlyEvent(rotationYaw);
-        TheresaClient.getInstance().getEventBus().call(event);
+        Main.INSTANCE.eventBus.call(event);
         return ((Object) this == Minecraft.getMinecraft().thePlayer) ? event.getYaw() : rotationYaw;
     }
 
@@ -78,7 +78,7 @@ public abstract class MixinEntity {
     public float onStep(Entity instance) {
         StepEvent event = new StepEvent(instance.stepHeight, EventType.PRE);
         if ((Object) this == Minecraft.getMinecraft().thePlayer)
-            TheresaClient.getInstance().getEventBus().call(event);
+            Main.INSTANCE.eventBus.call(event);
 
         return event.getStepHeight();
     }
@@ -91,7 +91,7 @@ public abstract class MixinEntity {
             double blockHeight = event.getStepHeight() + axisalignedbb2;
             if (blockHeight % 0.015625 == 0) {
                 event.setHeightStepped(blockHeight);
-                TheresaClient.getInstance().getEventBus().call(event);
+                Main.INSTANCE.eventBus.call(event);
             }
         }
 

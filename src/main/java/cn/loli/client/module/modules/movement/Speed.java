@@ -11,8 +11,9 @@ import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;
@@ -53,8 +54,8 @@ public class Speed extends Module {
         }
     }
 
-    @EventTarget
-    private void onUpdate(UpdateEvent event) {
+    private final IEventListener<UpdateEvent> onUpdate = e ->
+    {
         if (mc.thePlayer == null
                 || mc.theWorld == null)
             return;
@@ -69,10 +70,10 @@ public class Speed extends Module {
                 }
             }
         }
-    }
+    };
 
-    @EventTarget
-    private void onMove(PlayerMoveEvent event) {
+    private final IEventListener<PlayerMoveEvent> onMove = event ->
+    {
         switch (modes.getCurrentMode()) {
             case "Mini": {
                 if (playerUtils.isMoving2()) {
@@ -132,11 +133,10 @@ public class Speed extends Module {
                 break;
             }
         }
+    };
 
-    }
-
-    @EventTarget
-    private void onMove(MotionUpdateEvent event) {
+    private final IEventListener<MotionUpdateEvent> onMoveUpdate = event ->
+    {
         if (event.getEventType() == EventType.PRE) {
             switch (modes.getCurrentMode()) {
                 case "Mini": {
@@ -169,14 +169,12 @@ public class Speed extends Module {
                 if (mc.thePlayer.onGround)
                     event.setY(event.getY() + 2.40201E-6D);
         }
+    };
 
-
-    }
-
-    @EventTarget
-    private void onJump(JumpEvent event) {
+    private final IEventListener<JumpEvent> onJump = event ->
+    {
         event.setCancelled(true);
-    }
+    };
 
 
     private double getLegitSpeed(int stage) {

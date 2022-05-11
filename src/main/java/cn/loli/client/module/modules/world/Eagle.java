@@ -2,12 +2,14 @@
 
 package cn.loli.client.module.modules.world;
 
+import cn.loli.client.events.RenderEvent;
 import cn.loli.client.injection.mixins.IAccessorKeyBinding;
 import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.value.BooleanValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -23,8 +25,7 @@ public class Eagle extends Module {
         super("Eagle", "Safewalk but with sneaking. Useful for 'Eagle Bridging'", ModuleCategory.WORLD);
     }
 
-    @EventTarget
-    public void onUpdate(UpdateEvent e) {
+    private final IEventListener<UpdateEvent> onUpdate = event -> {
         if (mc.thePlayer != null && mc.theWorld != null) {
             ItemStack heldItem = mc.thePlayer.getCurrentEquippedItem();
             BlockPos belowPlayer = new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 1D, mc.thePlayer.posZ);
@@ -46,5 +47,7 @@ public class Eagle extends Module {
                 }
             }
         }
-    }
+    };
+
+
 }

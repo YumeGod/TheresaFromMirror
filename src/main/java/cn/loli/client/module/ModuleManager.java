@@ -12,8 +12,9 @@ import cn.loli.client.module.modules.player.*;
 import cn.loli.client.module.modules.render.*;
 import cn.loli.client.module.modules.world.Eagle;
 import cn.loli.client.module.modules.world.Timer;
-import com.darkmagician6.eventapi.EventManager;
-import com.darkmagician6.eventapi.EventTarget;
+
+
+import dev.xix.event.bus.IEventListener;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -23,7 +24,7 @@ public class ModuleManager {
     private final List<Module> modules = new ArrayList<>();
 
     public ModuleManager() {
-        EventManager.register(this);
+         Main.INSTANCE.eventBus.register(this);
     }
 
     public void addModules() {
@@ -147,9 +148,9 @@ public class ModuleManager {
         return modules.stream().filter(mod -> !caseSensitive && name.equalsIgnoreCase(mod.getName()) || name.equals(mod.getName())).findFirst().orElse(null);
     }
 
-    @EventTarget
-    private void onKey(@NotNull KeyEvent event) {
+    private final IEventListener<@NotNull KeyEvent> onKey = event -> {
         for (Module module : modules) if (module.getKeybind() == event.getKey()) module.setState(!module.getState());
-    }
+    };
+
 
 }

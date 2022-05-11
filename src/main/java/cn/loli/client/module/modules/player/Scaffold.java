@@ -9,8 +9,9 @@ import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -147,8 +148,8 @@ public class Scaffold extends Module {
         switchTimer.reset();
     }
 
-    @EventTarget
-    private void onRender(RenderEvent e) {
+    private final IEventListener<RenderEvent> onRender = event ->
+    {
         ray = rotationUtils.rayCastedBlock(curYaw, curPitch);
 
         if (curPos != null) {
@@ -169,27 +170,23 @@ public class Scaffold extends Module {
 
             }
         }
+    };
 
-
-    }
-
-
-    @EventTarget
-    private void onMoveFly(MoveFlyEvent e) {
+    private final IEventListener<MoveFlyEvent> onMoveFly = event ->
+    {
         if (moveFix.getObject() && rotation.getObject())
-            e.setYaw(curYaw);
-    }
+            event.setYaw(curYaw);
+    };
 
-
-    @EventTarget
-    private void onJump(JumpYawEvent e) {
+    private final IEventListener<JumpYawEvent> onJump = event ->
+    {
         if (moveFix.getObject() && rotation.getObject())
-            e.setYaw(curYaw);
-    }
+            event.setYaw(curYaw);
+    };
 
 
-    @EventTarget
-    private void onSlient(MovementStateEvent e) {
+    private final IEventListener<MovementStateEvent> onSilent = e ->
+    {
         if (moveFix.getObject() && rotation.getObject() && silentMoveFix.getObject()) {
             e.setSilentMoveFix(true);
             e.setYaw(curYaw);
@@ -198,11 +195,10 @@ public class Scaffold extends Module {
                 e.setFixYaw(true);
             }
         }
-    }
+    };
 
-
-    @EventTarget
-    private void onMotion(MotionUpdateEvent e) {
+    private final IEventListener<MotionUpdateEvent> onMotion = e ->
+    {
         if (e.getEventType() == EventType.PRE) {
             if (rotation.getObject()) {
                 if (keeprotation.getObject() || playerUtils.getBlockUnderPlayer(0.01F) == Blocks.air) {
@@ -217,13 +213,13 @@ public class Scaffold extends Module {
             if (eventMode.getCurrentMode().equals("On Post"))
                 onWorking();
         }
-    }
+    };
 
-    @EventTarget
-    private void onTick(TickAttackEvent event) {
+    private final IEventListener<TickAttackEvent> onTick = e ->
+    {
         if (eventMode.getCurrentMode().equals("On Tick"))
             onWorking();
-    }
+    };
 
 
     private void onWorking() {
@@ -350,8 +346,8 @@ public class Scaffold extends Module {
 
     }
 
-    @EventTarget
-    private void onPacket(PacketEvent e) {
+    private final IEventListener<PacketEvent> onPacket = e ->
+    {
         if (sneak.getObject())
             if (e.getPacket() instanceof C0BPacketEntityAction) {
                 final C0BPacketEntityAction c0B = (C0BPacketEntityAction) e.getPacket();
@@ -366,15 +362,10 @@ public class Scaffold extends Module {
                     e.setCancelled(true);
                 }
             }
-    }
+    };
 
-    @EventTarget
-    public void onMove(PlayerMoveEvent event) {
-    }
-
-
-    @EventTarget
-    private void onUpdate(UpdateEvent e) {
+    private final IEventListener<UpdateEvent> onUpdate = e ->
+    {
         if (sprint.getObject()) {
             mc.thePlayer.setSprinting(true);
         }
@@ -387,12 +378,8 @@ public class Scaffold extends Module {
                 if (jump.getObject() && playerUtils.isMoving2())
                     mc.thePlayer.jump();
             }
-    }
+    };
 
-    @EventTarget
-    private void onJump(JumpEvent e) {
-        //  if (jump.getObject()) e.setCancelled(true);
-    }
 
     public BlockPos searchPos(BlockPos pos) {
         for (int x = -1; x < 1; x++)

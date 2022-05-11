@@ -2,6 +2,7 @@
 
 package cn.loli.client.module.modules.render;
 
+import cn.loli.client.events.TickEvent;
 import cn.loli.client.injection.mixins.IAccessorRenderManager;
 import cn.loli.client.events.RenderEvent;
 import cn.loli.client.module.Module;
@@ -10,7 +11,8 @@ import cn.loli.client.utils.Utils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ColorValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.INpc;
 import net.minecraft.entity.monster.IMob;
@@ -42,8 +44,7 @@ public class Tracers extends Module {
     /**
      * Credit: Xdolf by DarkCart
      */
-    @EventTarget
-    public void onRender(RenderEvent event) {
+    private final IEventListener<RenderEvent> onRender = event -> {
         GL11.glPushMatrix();
         GL11.glEnable(GL11.GL_LINE_SMOOTH);
         GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -98,5 +99,6 @@ public class Tracers extends Module {
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glDisable(GL11.GL_LINE_SMOOTH);
         GL11.glPopMatrix();
-    }
+    };
+
 }

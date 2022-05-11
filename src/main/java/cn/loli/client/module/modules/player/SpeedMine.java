@@ -6,7 +6,8 @@ import cn.loli.client.injection.implementations.IPlayerControllerMP;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
@@ -28,8 +29,8 @@ public class SpeedMine extends Module {
         super("SpeedMine", "Make you dig faster", ModuleCategory.PLAYER);
     }
 
-    @EventTarget
-    public void onUpdate(UpdateEvent e) {
+    private final IEventListener<UpdateEvent> onUpdate = e ->
+    {
         if (mc.playerController.extendedReach()) {
             ((IPlayerControllerMP) mc.playerController).setBlockHitDelay(0);
         }
@@ -43,10 +44,10 @@ public class SpeedMine extends Module {
                 this.bzs = false;
             }
         }
-    }
+    };
 
-    @EventTarget
-    public void onPacket(PacketEvent e){
+    private final IEventListener<PacketEvent> onPacket = e ->
+    {
         if (e.getPacket() instanceof C07PacketPlayerDigging && mc.playerController != null) {
             final C07PacketPlayerDigging c07PacketPlayerDigging = (C07PacketPlayerDigging) e.getPacket();
             if (c07PacketPlayerDigging.getStatus() == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK) {
@@ -61,5 +62,7 @@ public class SpeedMine extends Module {
                 this.facing = null;
             }
         }
-    }
+    };
+
+
 }

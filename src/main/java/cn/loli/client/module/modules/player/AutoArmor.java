@@ -1,6 +1,7 @@
 package cn.loli.client.module.modules.player;
 
 import cn.loli.client.events.GuiHandleEvent;
+import cn.loli.client.events.StepEvent;
 import cn.loli.client.events.TickEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
@@ -8,7 +9,8 @@ import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.player.InventoryUtil;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -21,10 +23,10 @@ import java.util.List;
 
 public class AutoArmor extends Module {
 
-    private final List<ItemArmor> helmet;
-    private final List<ItemArmor> chest;
-    private final List<ItemArmor> legging;
-    private final List<ItemArmor> boot;
+    private final List<ItemArmor> helmet = Arrays.asList(Items.leather_helmet, Items.golden_helmet, Items.chainmail_helmet, Items.iron_helmet, Items.diamond_helmet);
+    private final List<ItemArmor> chest = Arrays.asList(Items.leather_chestplate, Items.golden_chestplate, Items.chainmail_chestplate, Items.iron_chestplate, Items.diamond_chestplate);
+    private final List<ItemArmor> legging = Arrays.asList(Items.leather_leggings, Items.golden_leggings, Items.chainmail_leggings, Items.iron_leggings, Items.diamond_leggings);
+    private final List<ItemArmor> boot = Arrays.asList(Items.leather_boots, Items.golden_boots, Items.chainmail_boots, Items.iron_boots, Items.diamond_boots);
 
     private final TimeHelper timeHelper = new TimeHelper();
     private final TimeHelper throwTimer = new TimeHelper();
@@ -35,14 +37,10 @@ public class AutoArmor extends Module {
 
     public AutoArmor() {
         super("Auto Armor", "Make you automatically put the armor on", ModuleCategory.PLAYER);
-        helmet = Arrays.asList(Items.leather_helmet, Items.golden_helmet, Items.chainmail_helmet, Items.iron_helmet, Items.diamond_helmet);
-        chest = Arrays.asList(Items.leather_chestplate, Items.golden_chestplate, Items.chainmail_chestplate, Items.iron_chestplate, Items.diamond_chestplate);
-        legging = Arrays.asList(Items.leather_leggings, Items.golden_leggings, Items.chainmail_leggings, Items.iron_leggings, Items.diamond_leggings);
-        boot = Arrays.asList(Items.leather_boots, Items.golden_boots, Items.chainmail_boots, Items.iron_boots, Items.diamond_boots);
     }
 
-    @EventTarget
-    private void onGui(TickEvent event) {
+    private final IEventListener<TickEvent> onGui = event ->
+    {
         if (mc.currentScreen instanceof GuiInventory) {
             if (!timeHelper.hasReached((long) (startDelay.getObject() + inventoryUtil.getRandomGaussian(20)))) {
                 throwTimer.reset();
@@ -93,7 +91,9 @@ public class AutoArmor extends Module {
                 }
             }
         }
-    }
+    };
+
+
 
 
     public boolean isTrashArmor(ItemStack itemStack) {

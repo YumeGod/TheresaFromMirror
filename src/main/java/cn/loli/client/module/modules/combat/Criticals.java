@@ -14,8 +14,9 @@ import cn.loli.client.notifications.NotificationType;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.network.play.client.C02PacketUseEntity;
@@ -38,47 +39,9 @@ public class Criticals extends Module {
         super("Criticals", "Makes you always deal a critical hit.", ModuleCategory.COMBAT);
     }
 
-    @EventTarget
-    public void onPacket(PacketEvent e) {
-        if (e.getEventType() == EventType.SEND) {
-            if (e.getPacket() instanceof C02PacketUseEntity) {
-                if (((C02PacketUseEntity) e.getPacket()).getAction() == C02PacketUseEntity.Action.ATTACK) {
-                    Entity entity = ((C02PacketUseEntity) e.getPacket()).getEntityFromWorld(mc.theWorld);
-                    if (!(entity instanceof EntityLiving)) {
-                    }
-                }
-            }
-        }
-    }
 
-    public void onCrit(Entity entity) {
-        if (!(mc.thePlayer.isCollidedVertically && mc.thePlayer.onGround))
-            return;
-
-        switch (mode.getCurrentMode()) {
-            case "Packet":
-                if (always.getObject() || entity.hurtResistantTime != 20) {
-                    if (!i.hasReached(nodelay.getObject() ? 25 : 150)) return;
-                    for (double i : offset) sendPacket(i);
-                    i.reset();
-                }
-                break;
-            case "Edit":
-            case "Recall":
-                break;
-            default:
-                NotificationManager.show(new Notification(NotificationType.WARNING, this.getName(), "Invalid mode: " + mode.getCurrentMode(), 2));
-        }
-    }
-
-    private void sendPacket(double yOffset) {
-        C03PacketPlayer.C04PacketPlayerPosition packet = new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + yOffset, mc.thePlayer.posZ, false);
-        mc.getNetHandler().getNetworkManager().sendPacket(packet);
-    }
-
-
-    @EventTarget
-    public void onEdit(MotionUpdateEvent e) {
+    private final IEventListener<MotionUpdateEvent> onEdit = e ->
+    {
         double pos = 0;
         if (e.getEventType() == EventType.PRE) {
             switch (offsetvalue.getCurrentMode()) {
@@ -170,8 +133,35 @@ public class Criticals extends Module {
                 }
             }
         }
+    };
 
+
+    public void onCrit(Entity entity) {
+        if (!(mc.thePlayer.isCollidedVertically && mc.thePlayer.onGround))
+            return;
+
+        switch (mode.getCurrentMode()) {
+            case "Packet":
+                if (always.getObject() || entity.hurtResistantTime != 20) {
+                    if (!i.hasReached(nodelay.getObject() ? 25 : 150)) return;
+                    for (double i : offset) sendPacket(i);
+                    i.reset();
+                }
+                break;
+            case "Edit":
+            case "Recall":
+                break;
+            default:
+                NotificationManager.show(new Notification(NotificationType.WARNING, this.getName(), "Invalid mode: " + mode.getCurrentMode(), 2));
+        }
     }
+
+    private void sendPacket(double yOffset) {
+        C03PacketPlayer.C04PacketPlayerPosition packet = new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX, mc.thePlayer.posY + yOffset, mc.thePlayer.posZ, false);
+        mc.getNetHandler().getNetworkManager().sendPacket(packet);
+    }
+
+
 }
 
 

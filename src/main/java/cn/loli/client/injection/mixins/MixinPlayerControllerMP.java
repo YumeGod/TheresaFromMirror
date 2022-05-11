@@ -32,7 +32,7 @@ public class MixinPlayerControllerMP implements IPlayerControllerMP {
 
     @Inject(method = "attackEntity",  at = @At(value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/PlayerControllerMP;syncCurrentPlayItem()V", shift = At.Shift.AFTER))
     private void attackEntity(EntityPlayer playerIn, Entity targetEntity, CallbackInfo ci){
-        TheresaClient.getInstance().getEventBus().call(new AttackEvent(targetEntity));
+        Main.INSTANCE.eventBus.call(new AttackEvent(targetEntity));
     }
 
     @Override
@@ -57,7 +57,7 @@ public class MixinPlayerControllerMP implements IPlayerControllerMP {
     public float getBlockReachDistance()
     {
         final BlockReachEvent blockReachEvent = new BlockReachEvent(Minecraft.getMinecraft().playerController.getCurrentGameType().isCreative() ? 5.0F : 4.5F);
-        TheresaClient.getInstance().getEventBus().call(blockReachEvent);
+        Main.INSTANCE.eventBus.call(blockReachEvent);
         return blockReachEvent.getRange();
     }
 

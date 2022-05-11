@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinGuiIngame {
     @Inject(method = "renderTooltip", at = @At("RETURN"))
     private void renderTooltip(ScaledResolution sr, float partialTicks, CallbackInfo ci) {
-        TheresaClient.getInstance().getEventBus().call(new Render2DEvent());
+        Main.INSTANCE.eventBus.call(new Render2DEvent());
     }
 
     @Inject(method = "renderScoreboard", at = @At("HEAD"), cancellable = true)

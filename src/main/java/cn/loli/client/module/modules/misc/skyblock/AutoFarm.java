@@ -1,16 +1,14 @@
 package cn.loli.client.module.modules.misc.skyblock;
 
-import cn.loli.client.events.MotionUpdateEvent;
-import cn.loli.client.events.RenderBlockEvent;
-import cn.loli.client.events.RenderEvent;
-import cn.loli.client.events.TickEvent;
+import cn.loli.client.events.*;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.player.rotation.RotationHook;
 import cn.loli.client.value.BooleanValue;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -47,18 +45,19 @@ public class AutoFarm extends Module {
 
     //TODO : Auto Farm
 
-    @EventTarget
-    public void onMotion(MotionUpdateEvent e) {
+    private final IEventListener<MotionUpdateEvent> onMotion = e ->
+    {
         if (e.getEventType() == EventType.PRE) {
             if (slient.getObject()) {
                 e.setYaw(yaw);
                 e.setPitch(pitch);
             }
         }
-    }
+    };
 
-    @EventTarget
-    private void onRotate(RenderEvent e) {
+
+    private final IEventListener<RenderEvent> onRotate = e ->
+    {
         if (!heuristic.getObject()) {
             if (time.hasReached(500)) {
                 for (int y = 6; y >= -1; --y)
@@ -100,10 +99,11 @@ public class AutoFarm extends Module {
             yaw = mc.thePlayer.rotationYaw;
             pitch = mc.thePlayer.rotationPitch;
         }
-    }
+    };
 
-    @EventTarget
-    private void onSort(TickEvent e) {
+
+    private final IEventListener<TickEvent> onSort = e ->
+    {
         if (Keyboard.isKeyDown(Keyboard.KEY_LMENU)) return;
 
         if (!slient.getObject()) {
@@ -148,10 +148,11 @@ public class AutoFarm extends Module {
 
             }
         }
-    }
+    };
 
-    @EventTarget
-    private void onRender(RenderBlockEvent e) {
+
+    private final IEventListener<RenderBlockEvent> onRender = e ->
+    {
         //Added to List
         if (heuristic.getObject()) {
             BlockPos pos = new BlockPos(e.x, e.y, e.z);
@@ -161,7 +162,8 @@ public class AutoFarm extends Module {
             if (!plantSeedTaskArrayList.contains(new PlantSeedTask(pos, true)) && isBlockValid(pos, true))
                 plantSeedTaskArrayList.add(new PlantSeedTask(pos, true));
         }
-    }
+    };
+
 
     private boolean isBlockValid(BlockPos position, boolean isPlant) {
         boolean temp = false;

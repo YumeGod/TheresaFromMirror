@@ -2,10 +2,13 @@
 
 package cn.loli.client.value;
 
+import cn.loli.client.Main;
 import cn.loli.client.events.KeyEvent;
+import cn.loli.client.events.MoveFlyEvent;
 import cn.loli.client.utils.misc.ChatUtils;
-import com.darkmagician6.eventapi.EventManager;
-import com.darkmagician6.eventapi.EventTarget;
+
+
+import dev.xix.event.bus.IEventListener;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +35,7 @@ public class ValueManager {
     public final HashMap<Value, Number> numberPick = new HashMap<>();
 
     public ValueManager() {
-        EventManager.register(this);
+        Main.INSTANCE.eventBus.register(this);
     }
 
     /**
@@ -101,8 +104,7 @@ public class ValueManager {
     }
 
 
-    @EventTarget
-    private void onKey(KeyEvent event) {
+    private final IEventListener<KeyEvent> onKey = event -> {
         for (Value value : keyBind.keySet())
             if (keyBind.get(value) == event.getKey()) {
                 if (value instanceof BooleanValue) {
@@ -132,5 +134,7 @@ public class ValueManager {
                 }
 
             }
-    }
+    };
+
+
 }

@@ -1,6 +1,7 @@
 package cn.loli.client.module.modules.combat;
 
 import cn.loli.client.Main;
+import cn.loli.client.events.MouseOverEvent;
 import cn.loli.client.events.PlayerMoveEvent;
 import cn.loli.client.events.RenderEvent;
 import cn.loli.client.module.Module;
@@ -8,7 +9,8 @@ import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.BlockPos;
@@ -43,8 +45,8 @@ public class TargetStrafe extends Module {
         targetStrafeInstance = this;
     }
 
-    @EventTarget
-    private void onUpdate(final RenderEvent event) {
+    private final IEventListener<RenderEvent> onUpdate = e ->
+    {
         this.currentTarget = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
 
         if (this.currentTarget != null) {
@@ -63,7 +65,9 @@ public class TargetStrafe extends Module {
         } else {
             this.currentPoint = null;
         }
-    }
+    };
+
+
 
     private Point findOptimalPoint(EntityLivingBase target, List<Point> points) {
         if ("Freeze".equals(modeProperty.getCurrentMode())) {

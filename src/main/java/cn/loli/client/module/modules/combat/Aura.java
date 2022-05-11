@@ -15,8 +15,9 @@ import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ColorValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -169,8 +170,8 @@ public class Aura extends Module {
     }
 
 
-    @EventTarget
-    private void onRender(RenderEvent event) {
+    private final IEventListener<RenderEvent> onRender = event ->
+    {
         try {
             update();
         } catch (Exception e) {
@@ -227,45 +228,38 @@ public class Aura extends Module {
             }
 
         }
-
-    }
-
+    };
 
 
-    //Rotate Strafe
-
-    @EventTarget
-    public void onMoveFly(MoveFlyEvent event) {
-        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
+    private final IEventListener<MoveFlyEvent> onMoveFly = event ->
+    {
+        if (noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
             return;
         if (moveFix.getObject() && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() && target != null)
             event.setYaw(curYaw);
-    }
+    };
 
-
-    @EventTarget
-    public void onJump(JumpYawEvent event) {
-        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
+    private final IEventListener<JumpYawEvent> onJump = event ->
+    {
+        if (noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
             return;
         if (moveFix.getObject() && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() && target != null)
             event.setYaw(curYaw);
-    }
+    };
 
-    @EventTarget
-    public void onSlient(MovementStateEvent event) {
-        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
+    private final IEventListener<MovementStateEvent> onSlient = event ->
+    {
+        if (noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
             return;
         if (moveFix.getObject() && target != null && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() && silentMoveFix.getObject()) {
             event.setSilentMoveFix(true);
             event.setYaw(curYaw);
         }
-    }
+    };
 
-
-    //Listen to Attack
-    @EventTarget
-    private void onMotionUpdate(MotionUpdateEvent event) {
-        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
+    private final IEventListener<MotionUpdateEvent> onMotionUpdate = event ->
+    {
+        if (noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
             return;
         if (target == null) {
             curYaw = mc.thePlayer.rotationYaw;
@@ -296,21 +290,20 @@ public class Aura extends Module {
                 handleAutoBlock(false);
             ignoreTicks++;
         }
-    }
+    };
 
-    @EventTarget
-    private void onAttack(TickAttackEvent event) {
-        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
+
+    private final IEventListener<TickAttackEvent> onAttack = event ->
+    {
+        if (noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
             return;
         if (target == null) return;
         if (attackWhen.getCurrentMode().equals("Tick")) attemptAttack();
-    }
+    };
 
-    //Desync autoblock
-
-    @EventTarget
-    private void onPacket(PacketEvent event) {
-        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
+    private final IEventListener<PacketEvent> onPacket = event ->
+    {
+        if (noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
             return;
         if (event.getPacket() instanceof C07PacketPlayerDigging)
             if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.getHeldItem() != null
@@ -345,7 +338,8 @@ public class Aura extends Module {
                 if (ticks != 0)
                     event.setCancelled(true);
             }
-    }
+    };
+
 
     //尝试进行Attack
     private void attemptAttack() {
@@ -614,7 +608,7 @@ public class Aura extends Module {
 
     //计算CPS
     private long randomClickDelay(final double minCPS, final double maxCPS) {
-        return (long) (1000L / (minCPS + ((maxCPS - minCPS) * playerUtils.randomInRange(0.4 , 1.0))));
+        return (long) (1000L / (minCPS + ((maxCPS - minCPS) * playerUtils.randomInRange(0.4, 1.0))));
     }
 
 
@@ -625,23 +619,23 @@ public class Aura extends Module {
 
         switch (cpsMode.getCurrentMode()) {
             case "Legit": {
-                    final Random random = new Random();
-                    final long maxCPS = cps + extendCps.getObject();
-                    apd = cps + (random.nextInt() * (maxCPS - cps));
+                final Random random = new Random();
+                final long maxCPS = cps + extendCps.getObject();
+                apd = cps + (random.nextInt() * (maxCPS - cps));
 
-                    if (reset.hasReached((long) (1000.0 / playerUtils.randomInRange(cps, maxCPS)))) {
-                        wasCPSDrop = !wasCPSDrop;
-                        if (wasCPSDrop) reset.reset();
-                    }
+                if (reset.hasReached((long) (1000.0 / playerUtils.randomInRange(cps, maxCPS)))) {
+                    wasCPSDrop = !wasCPSDrop;
+                    if (wasCPSDrop) reset.reset();
+                }
 
-                    final long cur = System.currentTimeMillis() * random.nextInt(220);
+                final long cur = System.currentTimeMillis() * random.nextInt(220);
 
-                    long timeCovert = Math.max(apd, cur) / 3;
-                    if (wasCPSDrop) {
-                        apd = timeCovert;
-                    } else {
-                        apd = cps + (random.nextInt() * (maxCPS - cps)) / timeCovert;
-                    }
+                long timeCovert = Math.max(apd, cur) / 3;
+                if (wasCPSDrop) {
+                    apd = timeCovert;
+                } else {
+                    apd = cps + (random.nextInt() * (maxCPS - cps)) / timeCovert;
+                }
                 break;
             }
             case "Randomize": {

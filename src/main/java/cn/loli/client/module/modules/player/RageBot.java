@@ -9,8 +9,9 @@ import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.utils.misc.WorldUtil;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.INpc;
@@ -54,20 +55,20 @@ public class RageBot extends Module {
 
     @Override
     public void onEnable() {
-        
+
     }
 
     @Override
     public void onDisable() {
-        
+
     }
 
 
-    List<EntityLivingBase> list = new ArrayList<>();;
+    List<EntityLivingBase> list = new ArrayList<>();
+    ;
 
-    @EventTarget
-    private void onUpdatePre(MotionUpdateEvent event) {
-
+    private final IEventListener<MotionUpdateEvent> onUpdatePre = event ->
+    {
         list.clear();
         final List<EntityLivingBase> targets = WorldUtil.getLivingEntities().stream()
                 .filter(this::canAttack)
@@ -95,11 +96,10 @@ public class RageBot extends Module {
             if (!(mc.thePlayer.getHeldItem().getItem() instanceof ItemSword || mc.thePlayer.getHeldItem().getItem() instanceof ItemBook))
                 mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, mc.thePlayer.getHeldItem());
         }
+    };
 
-    }
-
-    @EventTarget
-    private void onRender3D(final RenderEvent event) {
+    private final IEventListener<RenderEvent> onRender3D = event ->
+    {
         if (!aim)
             return;
 
@@ -108,7 +108,8 @@ public class RageBot extends Module {
         double posZ = this.aimed.zCoord - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosZ();
 
         RenderUtils.drawBlockESP(posX - 0.5, posY - 0.5, posZ - 0.5, new Color(255, 0, 0, 100).getRGB(), new Color(0xFFE900).getRGB(), 0.4f, 0.1f);
-    }
+    };
+
 
     private Vec3 getFixedLocation(final EntityLivingBase entity, final float velocity, final boolean head) {
         double x = entity.posX + ((entity.posX - entity.lastTickPosX) * velocity);

@@ -4,6 +4,7 @@ package cn.loli.client.module.modules.player;
 
 import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PacketEvent;
+import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.injection.mixins.IAccessorEntityPlayerSP;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
@@ -12,8 +13,9 @@ import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ModeValue;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.AxisAlignedBB;
 
@@ -29,8 +31,8 @@ public class NoFall extends Module {
         super("NoFall", "Negates fall damage.", ModuleCategory.PLAYER);
     }
 
-    @EventTarget
-    private void onUpdate(MotionUpdateEvent event) {
+    private final IEventListener<MotionUpdateEvent> onUpdate = event ->
+    {
         if (mc.thePlayer == null || mc.theWorld == null || mc.thePlayer.capabilities.isFlying || mc.thePlayer.capabilities.disableDamage
                 || mc.thePlayer.motionY >= 0.0d || mc.thePlayer.posY <= 0 || event.getEventType() == EventType.POST)
             return;
@@ -86,11 +88,10 @@ public class NoFall extends Module {
                 break;
         }
 
-    }
+    };
 
-    @EventTarget
-    private void onPacket(PacketEvent event) {
-
+    private final IEventListener<PacketEvent> onPacket = event ->
+    {
         if (event.getPacket() instanceof C03PacketPlayer) {
             C03PacketPlayer look = (C03PacketPlayer) event.getPacket();
             if (cancel.getObject() && mode.getCurrentMode().equals("Packet"))
@@ -101,7 +102,8 @@ public class NoFall extends Module {
 
         }
 
-    }
+    };
+
 
     public static boolean isBlockUnder() {
         if (mc.thePlayer.posY < 0.0D) {

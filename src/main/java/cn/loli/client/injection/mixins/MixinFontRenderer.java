@@ -1,6 +1,7 @@
 package cn.loli.client.injection.mixins;
 
 
+import cn.loli.client.Main;
 import cn.loli.client.events.TextEvent;
 
 import dev.xix.TheresaClient;
@@ -15,14 +16,14 @@ public abstract class MixinFontRenderer {
     @ModifyVariable(method = "renderString", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private String renderString(final String string) {
         final TextEvent textEvent = new TextEvent(string);
-        TheresaClient.getInstance().getEventBus().call(textEvent);
+        Main.INSTANCE.eventBus.call(textEvent);
         return textEvent.getText();
     }
 
     @ModifyVariable(method = "getStringWidth", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     private String getStringWidth(final String string) {
         final TextEvent textEvent = new TextEvent(string);
-        TheresaClient.getInstance().getEventBus().call(textEvent);
+        Main.INSTANCE.eventBus.call(textEvent);
         return textEvent.getText();
     }
 

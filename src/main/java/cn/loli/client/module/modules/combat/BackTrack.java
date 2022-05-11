@@ -9,8 +9,9 @@ import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.network.OldServerPinger;
 import net.minecraft.entity.Entity;
@@ -53,16 +54,16 @@ public class BackTrack extends Module {
 
     @Override
     public void onEnable() {
-        
+
     }
 
     @Override
     public void onDisable() {
-        
+
     }
 
-    @EventTarget
-    private void onProcess(PacketEvent e) {
+    private final IEventListener<PacketEvent> onProcess = e ->
+    {
         if (mc.getNetHandler().getNetworkManager().getNetHandler()
                 != null && mc.getNetHandler().getNetworkManager().getNetHandler() instanceof OldServerPinger) return;
         if (mc.theWorld != null)
@@ -114,10 +115,11 @@ public class BackTrack extends Module {
                     e.setCancelled(true);
                 }
             }
-    }
+    };
 
-    @EventTarget
-    private void onTick(TickEvent event) {
+
+    private final IEventListener<TickEvent> onTick = event ->
+    {
         if (mc.getNetHandler().getNetworkManager().getNetHandler()
                 != null && mc.getNetHandler().getNetworkManager().getNetHandler() instanceof OldServerPinger) return;
 
@@ -156,7 +158,8 @@ public class BackTrack extends Module {
             }
 
         }
-    }
+    };
+    
 
     private void resetPackets(INetHandler netHandler) {
         if (packets.size() > 0) {

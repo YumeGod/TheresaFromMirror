@@ -1,6 +1,7 @@
 package cn.loli.client.module.modules.misc;
 
 import cn.loli.client.Main;
+import cn.loli.client.events.ChatEvent;
 import cn.loli.client.events.Render2DEvent;
 import cn.loli.client.events.TickEvent;
 import cn.loli.client.gui.ttfr.HFontRenderer;
@@ -11,7 +12,8 @@ import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.utils.render.AnimationUtils;
 import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.*;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
@@ -61,9 +63,8 @@ public class HUD extends Module {
 
     public final ArrayList<Module> arraylist_mods = new ArrayList<>();
 
-
-    @EventTarget
-    public void onRender2D(Render2DEvent event) {
+    private final IEventListener<Render2DEvent> onRender2D = event ->
+    {
         ScaledResolution sr = new ScaledResolution(Minecraft.getMinecraft());
 
         switch (logoMode.getCurrentMode()) {
@@ -87,7 +88,8 @@ public class HUD extends Module {
         if (this.showNotifications.getObject()) {
             this.drawNotifications();
         }
-    }
+    };
+
 
     private void drawNotifications() {
         NotificationManager.render();
@@ -95,14 +97,14 @@ public class HUD extends Module {
 
     int rainbowOffset;
 
-    @EventTarget
-    public void onTick(TickEvent event) {
-        if (mc.thePlayer != null) {
-            if (mc.thePlayer.ticksExisted % 2 == 0) {
+    private final IEventListener<TickEvent> onTick = event ->
+    {
+        if (mc.thePlayer != null)
+            if (mc.thePlayer.ticksExisted % 2 == 0)
                 rainbowOffset++;
-            }
-        }
-    }
+
+    };
+
 
     private void drawArrayList(float x, float y, ScaledResolution sr) {
         if (showArrayList.getObject()) {

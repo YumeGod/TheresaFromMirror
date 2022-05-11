@@ -1,13 +1,15 @@
 package cn.loli.client.module.modules.player;
 
 import cn.loli.client.events.RenderEvent;
+import cn.loli.client.events.TickEvent;
 import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.player.rotation.Rotation;
 import cn.loli.client.value.ModeValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.util.MathHelper;
@@ -24,17 +26,16 @@ public class AutoPlace extends Module {
         super("Auto Place", "Make you able to place blocks quickly", ModuleCategory.PLAYER);
     }
 
-    @EventTarget
-    private void onPlace(RenderEvent event) {
-        if (mode.getCurrentMode().equalsIgnoreCase("Instant"))
-            onPlace();
-    }
+    private final IEventListener<RenderEvent> onPlace = event ->
+    {
+        if (mode.getCurrentMode().equalsIgnoreCase("Instant")) onPlace();
+    };
 
-    @EventTarget
-    private void onPlace(UpdateEvent event) {
-        if (mode.getCurrentMode().equalsIgnoreCase("Update"))
-            onPlace();
-    }
+    private final IEventListener<UpdateEvent> onPlaceUpdate = event ->
+    {
+        if (mode.getCurrentMode().equalsIgnoreCase("Update")) onPlace();
+    };
+
 
     private void onPlace() {
         if (isHoldingBlock()) {
@@ -69,12 +70,12 @@ public class AutoPlace extends Module {
 
     @Override
     protected void onEnable() {
-        
+
     }
 
 
     @Override
     protected void onDisable() {
-        
+
     }
 }

@@ -28,14 +28,14 @@ public class MixinEntityLivingBase extends MixinEntity{
     @Inject(method = "jump", at = @At("HEAD"), cancellable = true)
     private void jumphandle(CallbackInfo callbackInfo) {
         JumpEvent jumpEvent = new JumpEvent();
-        TheresaClient.getInstance().getEventBus().call(jumpEvent);
+        Main.INSTANCE.eventBus.call(jumpEvent);
         if (jumpEvent.isCancelled()) callbackInfo.cancel();
     }
 
     @Redirect(method = "jump", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/EntityLivingBase;rotationYaw:F"))
     public float onJump(EntityLivingBase instance) {
         JumpYawEvent jumpEvent = new JumpYawEvent(rotationYaw);
-        TheresaClient.getInstance().getEventBus().call(jumpEvent);
+        Main.INSTANCE.eventBus.call(jumpEvent);
         return jumpEvent.getYaw();
     }
 }

@@ -1,9 +1,11 @@
 package cn.loli.client.module.modules.render;
 
 import cn.loli.client.events.CameraEvent;
+import cn.loli.client.events.TickEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import org.lwjgl.opengl.Display;
 
 public class CamaraDebug extends Module {
@@ -27,12 +29,13 @@ public class CamaraDebug extends Module {
         super.onDisable();
     }
 
-    @EventTarget
-    private void onCamara(CameraEvent event){
+    private final IEventListener<CameraEvent> onCamara = event ->
+    {
         event.setYaw(cameraYaw);
         event.setPitch(cameraPitch);
         event.setPrevYaw(cameraYaw);
         event.setPrevPitch(cameraPitch);
-    }
+    };
+
 
 }

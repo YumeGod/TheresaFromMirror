@@ -1,6 +1,7 @@
 package cn.loli.client.module.modules.render;
 
 
+import cn.loli.client.events.CameraEvent;
 import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.Render2DEvent;
 import cn.loli.client.events.Render3DEvent;
@@ -12,7 +13,8 @@ import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ColorValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.entity.player.EntityPlayer;
@@ -68,9 +70,8 @@ public class ESP extends Module {
         super("ESP", "Make you able see others in your view", ModuleCategory.RENDER);
     }
 
-
-    @EventTarget
-    private void onRenderSR(Render2DEvent e) {
+    private final IEventListener<Render2DEvent> onRenderSR = event ->
+    {
         ScaledResolution res = new ScaledResolution(mc);
 
         for (EntityPlayer player : entityPosMap.keySet()) {
@@ -135,10 +136,10 @@ public class ESP extends Module {
             GL11.glPopMatrix();
 
         }
-    }
+    };
 
-    @EventTarget
-    private void onRender3D(Render3DEvent event) {
+    private final IEventListener<Render3DEvent> onRender3D = event ->
+    {
         ScaledResolution res = new ScaledResolution(mc);
         if (!entityPosMap.isEmpty())
             entityPosMap.clear();
@@ -184,11 +185,8 @@ public class ESP extends Module {
         for (EntityPlayer player : entityPosMap.keySet())
             if (icarus.getObject()) RenderUtils.drawIcarusESP(player, icarusColor.getObject(), false);
 
-    }
+    };
 
-    @EventTarget
-    private void onUpdate(MotionUpdateEvent event) {
-    }
 
     public static void startScissorBox(ScaledResolution sr, int x, int y, int width, int height) {
         int sf = sr.getScaleFactor();

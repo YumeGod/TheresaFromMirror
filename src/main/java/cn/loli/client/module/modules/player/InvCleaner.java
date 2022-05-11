@@ -6,7 +6,8 @@ import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -20,7 +21,7 @@ import java.util.List;
 
 public class InvCleaner extends Module {
 
-    private final List<Item> trashItems;
+    private final List<Item> trashItems = Arrays.asList(Items.dye, Items.paper, Items.saddle, Items.string, Items.banner);
 
     private final TimeHelper timeHelper = new TimeHelper();
     private final TimeHelper throwTimer = new TimeHelper();
@@ -50,11 +51,10 @@ public class InvCleaner extends Module {
 
     public InvCleaner() {
         super("Inv Cleaner", "Its sort the inventory for you", ModuleCategory.PLAYER);
-        trashItems = Arrays.asList(Items.dye, Items.paper, Items.saddle, Items.string, Items.banner);
     }
 
-    @EventTarget
-    private void onGui(TickEvent event) {
+    private final IEventListener<TickEvent> onGui = event ->
+    {
         if (mc.currentScreen instanceof GuiInventory) {
             if (!timeHelper.hasReached((long) (startDelay.getObject() + playerUtils.getRandomGaussian(20)))) {
                 throwTimer.reset();
@@ -117,7 +117,8 @@ public class InvCleaner extends Module {
                 }
             }
         }
-    }
+    };
+
 
     public boolean isBadStack(ItemStack is) {
         if ((is.getItem() instanceof ItemSword) && is != bestWeapon() && !preferSword.getObject())

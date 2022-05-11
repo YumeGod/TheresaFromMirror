@@ -1,6 +1,7 @@
 package cn.loli.client.module.modules.render;
 
 import cn.loli.client.events.RenderEvent;
+import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.injection.mixins.IAccessorRenderManager;
 import cn.loli.client.module.Module;
@@ -8,7 +9,8 @@ import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.player.rotation.RotationHook;
 import cn.loli.client.value.ColorValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -35,8 +37,7 @@ public class Trajectories extends Module {
         super("Trajectories", "You can see where your projectiles will hit", ModuleCategory.RENDER);
     }
 
-    @EventTarget
-    private void onRender(RenderEvent event) {
+    private final IEventListener<RenderEvent> onRender = event -> {
         this.positions.clear();
         ItemStack itemStack = mc.thePlayer.getCurrentEquippedItem();
         MovingObjectPosition m = null;
@@ -296,6 +297,8 @@ public class Trajectories extends Module {
                 GL11.glDisable(GL11.GL_LINE_SMOOTH);
             }
         }
-    }
+    };
+
+
 
 }

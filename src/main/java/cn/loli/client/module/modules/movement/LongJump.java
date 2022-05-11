@@ -4,8 +4,9 @@ import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PlayerMoveEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.potion.Potion;
 
@@ -18,10 +19,9 @@ public class LongJump extends Module {
         super("LongJump", "Jump more distance", ModuleCategory.MOVEMENT);
     }
 
-
-    @EventTarget
-    private void onPre(MotionUpdateEvent event) {
-        if (event.getEventType() == EventType.PRE) {
+    private final IEventListener<MotionUpdateEvent> onPre = e ->
+    {
+        if (e.getEventType() == EventType.PRE) {
             if (moveUtils.isOnGround(0.01) && stage == 0)
                 fallDistDamage();
             verticalSpeed = moveUtils.getJumpHeight(mc.thePlayer) * 1.4f;
@@ -32,10 +32,10 @@ public class LongJump extends Module {
 
             }
         }
-    }
+    };
 
-    @EventTarget
-    public void onMove(PlayerMoveEvent e) {
+    private final IEventListener<PlayerMoveEvent> onMove = e ->
+    {
         if (stage > 0) {
             if (stage == 1) {
                 speed *= 0.77;
@@ -56,7 +56,10 @@ public class LongJump extends Module {
             moveUtils.setMotion(e, Math.max(moveUtils.getBaseMoveSpeed(0.2831, 0.2), speed));
         } else
             moveUtils.setMotion(e, 0);
-    }
+    };
+
+
+
 
     @Override
     public void onEnable() {

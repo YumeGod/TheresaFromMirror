@@ -8,7 +8,8 @@ import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.player.InventoryUtil;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.resources.I18n;
@@ -45,8 +46,8 @@ public class ChestStealer extends Module {
         super("Chest Stealer", "You steal the items from a chest", ModuleCategory.PLAYER);
     }
 
-    @EventTarget
-    private void onGui(TickEvent event) {
+    private final IEventListener<TickEvent> onGui = event ->
+    {
         if (mc.currentScreen == null) {
             timeHelper.reset();
             startTimer.reset();
@@ -106,10 +107,10 @@ public class ChestStealer extends Module {
             if (isEmpty && autoClose.getObject())
                 mc.thePlayer.closeScreen();
         }
-    }
+    };
 
-    @EventTarget
-    private void onCheck(PacketEvent event) {
+    private final IEventListener<PacketEvent> onCheck = event ->
+    {
         final Packet<?> packet = event.getPacket();
 
         // Open delay (wait before you steal)
@@ -120,7 +121,8 @@ public class ChestStealer extends Module {
                 isChest = false;
 
         }
-    }
+    };
+
 
     private void addIntelligentSlotsToSteal() {
         float bestSwordDamage = -1, bestBowDamage = -1, bestPickAxeStrength = -1, bestAxeStrength = -1;

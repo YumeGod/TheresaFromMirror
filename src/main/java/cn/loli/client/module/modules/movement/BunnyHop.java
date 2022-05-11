@@ -4,7 +4,8 @@ import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.value.BooleanValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 
@@ -19,16 +20,16 @@ public class BunnyHop extends Module {
 
     @Override
     public void onEnable() {
-        
+
     }
 
     @Override
     public void onDisable() {
-        
+
     }
 
-    @EventTarget
-    private void onHop(UpdateEvent event) {
+    private final IEventListener<UpdateEvent> onHop = event ->
+    {
         if (mc.thePlayer.isSneaking() || mc.thePlayer.isInWater() || game.keyBindJump.isKeyDown() || game.keyBindBack.isKeyDown())
             return;
 
@@ -42,7 +43,8 @@ public class BunnyHop extends Module {
                 }
             }
         }
-    }
+    };
+
 
     private void getStrafe(double speed) {
         EntityPlayerSP player = Minecraft.getMinecraft().thePlayer;

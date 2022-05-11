@@ -1,11 +1,13 @@
 package cn.loli.client.module.modules.movement;
 
 import cn.loli.client.events.StepEvent;
+import cn.loli.client.events.TickEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.timer.TimeHelper;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.network.play.client.C0BPacketEntityAction;
 
@@ -26,8 +28,8 @@ public class Step extends Module {
         super.onDisable();
     }
 
-    @EventTarget
-    private void onStep(StepEvent event) {
+    private final IEventListener<StepEvent> onStep = event ->
+    {
         if (event.getEventType() == EventType.PRE) {
             if (this.resetTimer) {
                 this.resetTimer = false;
@@ -44,7 +46,7 @@ public class Step extends Module {
                 doNCPStep(realHeight);
             }
         }
-    }
+    };
 
 
     private void doNCPStep(double height) {
