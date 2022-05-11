@@ -4,16 +4,16 @@ import dev.xix.property.AbstractTheresaProperty;
 
 import java.util.function.Supplier;
 
-public final class TheresaEnumProperty<T extends Enum<?>> extends AbstractTheresaProperty<T> {
+public final class EnumProperty<T extends Enum<?>> extends AbstractTheresaProperty<T> {
     private final T[] enumValues;
 
 
-    public TheresaEnumProperty(final String name, final T value, final Supplier<Boolean> depedency) {
+    public EnumProperty(final String name, final T value, final Supplier<Boolean> depedency) {
         super(name, value, depedency);
         this.enumValues = getEnumConstants();
     }
 
-    public TheresaEnumProperty(final String name, final T value) {
+    public EnumProperty(final String name, final T value) {
         this(name, value, () -> true);
     }
 

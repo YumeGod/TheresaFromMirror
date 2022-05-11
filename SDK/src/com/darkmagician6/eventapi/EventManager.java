@@ -234,7 +234,7 @@ public final class EventManager {
      * After that is all done it will return the Event.
      *
      * @param event
-     *         Event to dispatch.
+     *         Event to call.
      *
      * @return Event in the state after dispatching it.
      */

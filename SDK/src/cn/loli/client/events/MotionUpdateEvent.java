@@ -3,7 +3,6 @@
 package cn.loli.client.events;
 
 import com.darkmagician6.eventapi.events.Event;
-import com.darkmagician6.eventapi.types.EventType;
 
 public class MotionUpdateEvent implements Event {
     private final EventType eventType;

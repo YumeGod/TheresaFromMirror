@@ -1,11 +1,17 @@
 package dev.xix.feature.module;
 
+import cn.loli.client.utils.player.InventoryUtil;
+import cn.loli.client.utils.player.PlayerUtils;
+import cn.loli.client.utils.player.movement.MoveUtils;
+import cn.loli.client.utils.player.rotation.RotationUtils;
 import dev.xix.TheresaClient;
 import dev.xix.event.impl.module.ModuleStatusEvent;
 import dev.xix.feature.ITheresaFeature;
 import dev.xix.feature.module.input.IInputtableTheresaModule;
 import dev.xix.feature.module.status.IToggleableTheresaModule;
 import dev.xix.gui.element.AbstractElement;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.settings.GameSettings;
 
 import java.util.*;
 
@@ -15,6 +21,15 @@ public abstract class AbstractTheresaModule implements ITheresaFeature, IInputta
     protected final String identifier;
 
     protected final TheresaModuleCategory theresaModuleCategory;
+
+    protected final Minecraft mc = Minecraft.getMinecraft();
+    protected final GameSettings game = mc.gameSettings;
+    protected final Random r = new Random();
+
+    protected final PlayerUtils playerUtils = PlayerUtils.getInstance();
+    protected final RotationUtils rotationUtils = RotationUtils.getInstance();
+    protected final InventoryUtil inventoryUtil = InventoryUtil.getInstance();
+    protected final MoveUtils moveUtils = MoveUtils.getInstance();
 
     protected boolean enabled;
     protected int key;

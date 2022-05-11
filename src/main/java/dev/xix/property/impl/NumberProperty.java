@@ -4,12 +4,12 @@ import dev.xix.property.AbstractTheresaProperty;
 
 import java.util.function.Supplier;
 
-public final class TheresaNumberProperty<T extends Number> extends AbstractTheresaProperty<T> {
+public final class NumberProperty<T extends Number> extends AbstractTheresaProperty<T> {
     private final T minimum;
     private final T maximum;
     private final T increment;
 
-    public TheresaNumberProperty(final String name, final T value, final T minimum, final T maximum, final T increment, final Supplier<Boolean> supplier) {
+    public NumberProperty(final String name, final T value, final T minimum, final T maximum, final T increment, final Supplier<Boolean> supplier) {
         super(name, value, supplier);
 
         this.minimum = minimum;
@@ -17,7 +17,7 @@ public final class TheresaNumberProperty<T extends Number> extends AbstractThere
         this.increment = increment;
     }
 
-    public TheresaNumberProperty(final String name, final T value, final T minimum, final T maximum, final T increment) {
+    public NumberProperty(final String name, final T value, final T minimum, final T maximum, final T increment) {
         this(name, value, minimum, maximum, increment, () -> true);
     }
 }

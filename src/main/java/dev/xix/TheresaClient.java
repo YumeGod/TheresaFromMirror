@@ -1,10 +1,10 @@
 package dev.xix;
 
-import cn.loli.client.module.ModuleManager;
 import dev.xix.event.Event;
 import dev.xix.event.bus.EventBus;
 import dev.xix.feature.module.TheresaModuleManager;
 import dev.xix.feature.module.input.TheresaInputManager;
+import dev.xix.gui.element.ElementManager;
 
 public final class TheresaClient {
 
@@ -12,18 +12,22 @@ public final class TheresaClient {
     private final String clientVersion;
     private final String[] clientDevelopers;
 
+    private final EventBus<Event> eventBus;
     private final TheresaModuleManager moduleManager;
     private final TheresaInputManager inputManager;
-    private final EventBus<Event> eventBus;
+    private final ElementManager elementManager;
+
 
     private TheresaClient() {
         this.clientName = "Theresa";
         this.clientVersion = "1.0-H";
         this.clientDevelopers = new String[]{"Mirror", "Yume", "xix"};
 
-        this.moduleManager = new TheresaModuleManager();
         this.eventBus = new EventBus<>();
-        inputManager = new TheresaInputManager();
+        this.moduleManager = new TheresaModuleManager();
+        this.elementManager = new ElementManager();
+        this.inputManager = new TheresaInputManager();
+        eventBus.register(elementManager);
     }
 
     public static TheresaClient getInstance() {
@@ -53,6 +57,8 @@ public final class TheresaClient {
     public TheresaInputManager getInputManager() {
         return inputManager;
     }
+
+    public ElementManager getElementManager() {return elementManager;}
 
     private static final class TheresaClientInstanceInitializer {
         private static final TheresaClient INSTANCE = new TheresaClient();
