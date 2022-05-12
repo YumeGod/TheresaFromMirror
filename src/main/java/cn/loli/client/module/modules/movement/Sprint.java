@@ -31,6 +31,7 @@ public class Sprint extends Module {
                         !mc.thePlayer.isPotionActive(Potion.blindness))) {
             mc.thePlayer.setSprinting(true);
         }
+
     };
 
 

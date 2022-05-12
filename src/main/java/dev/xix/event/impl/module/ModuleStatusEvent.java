@@ -1,5 +1,6 @@
 package dev.xix.event.impl.module;
 
+import cn.loli.client.module.Module;
 import dev.xix.event.EventCancellable;
 import dev.xix.feature.module.AbstractTheresaModule;
 

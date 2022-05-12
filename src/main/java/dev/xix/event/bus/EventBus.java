@@ -46,7 +46,11 @@ public final class EventBus<T> {
         final List<IEventListener<T>> callbacks = callbackMap.get(t.getClass());
         if (callbacks != null) {
             for (final IEventListener<T> callback : callbacks) {
-                callback.call(t);
+                try {
+                    callback.call(t);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

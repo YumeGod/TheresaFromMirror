@@ -1,23 +1,22 @@
 
 
-package cn.loli.client.module.modules.combat;
+package dev.xix.feature.impl.combat;
 
 import cn.loli.client.Main;
 import cn.loli.client.events.*;
 import cn.loli.client.injection.implementations.IEntityPlayer;
-import cn.loli.client.module.Module;
+import dev.xix.TheresaClient;
+import dev.xix.feature.module.AbstractTheresaModule;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.module.modules.misc.AntiBot;
-import cn.loli.client.module.modules.player.Scaffold;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.value.BooleanValue;
 import cn.loli.client.value.ColorValue;
 import cn.loli.client.value.ModeValue;
 import cn.loli.client.value.NumberValue;
-
 import dev.xix.event.EventType;
 import dev.xix.event.bus.IEventListener;
+import dev.xix.feature.module.TheresaModuleCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -43,11 +42,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
-public class Aura extends Module {
+public class Aura extends AbstractTheresaModule {
 
     private final ModeValue cpsMode = new ModeValue("CPS Mode", "Randomize", "Randomize", "Smooth", "Legit", "Hit Based");
-    private final NumberValue<Integer> minCps = new NumberValue<>("Min CPS", 8, 1, 20);
-    private final NumberValue<Integer> maxCps = new NumberValue<>("Max CPS", 8, 1, 40);
+    private final NumberValue<Integer> simpleCps = new NumberValue<>("Simple CPS", 8, 1, 20);
+    private final NumberValue<Integer> extendCps = new NumberValue<>("Extend CPS", 4, 0, 60);
     private final BooleanValue smoothRandomizing = new BooleanValue("Smooth-Randomizing", true);
     private final NumberValue<Float> smoothCpsSpeed = new NumberValue<>("Smooth-Delay", 0f, 0f, 1f);
     private final NumberValue<Float> smoothCpsRandomStrength = new NumberValue<>("Smooth-Random-Length", 0f, 0f, 1f);
@@ -146,13 +145,13 @@ public class Aura extends Module {
     int ticks, ignoreTicks;
 
     public Aura() {
-        super("Aura", "Automatically attacks enemies around you.", ModuleCategory.COMBAT);
+        super("Aura", TheresaModuleCategory.COMBAT);
     }
 
 
     @Override
     public void onEnable() {
-        crit = Main.INSTANCE.moduleManager.getModule(Criticals.class);
+        crit = TheresaClient.getInstance().getModuleManager().getModuleOrNull(Criticals.class);
         cps = 0;
         calculateCPS();
     }
@@ -233,24 +232,18 @@ public class Aura extends Module {
 
     private final IEventListener<MoveFlyEvent> onMoveFly = event ->
     {
-        if (noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
-            return;
         if (moveFix.getObject() && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() && target != null)
             event.setYaw(curYaw);
     };
 
     private final IEventListener<JumpYawEvent> onJump = event ->
     {
-        if (noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
-            return;
         if (moveFix.getObject() && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() && target != null)
             event.setYaw(curYaw);
     };
 
     private final IEventListener<MovementStateEvent> onSlient = event ->
     {
-        if (noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
-            return;
         if (moveFix.getObject() && target != null && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() && silentMoveFix.getObject()) {
             event.setSilentMoveFix(true);
             event.setYaw(curYaw);
@@ -259,8 +252,7 @@ public class Aura extends Module {
 
     private final IEventListener<MotionUpdateEvent> onMotionUpdate = event ->
     {
-        if (noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
-            return;
+
         if (target == null) {
             curYaw = mc.thePlayer.rotationYaw;
             curPitch = mc.thePlayer.rotationPitch;
@@ -295,16 +287,12 @@ public class Aura extends Module {
 
     private final IEventListener<TickAttackEvent> onAttack = event ->
     {
-        if (noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
-            return;
         if (target == null) return;
         if (attackWhen.getCurrentMode().equals("Tick")) attemptAttack();
     };
 
     private final IEventListener<PacketEvent> onPacket = event ->
     {
-        if (noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
-            return;
         if (event.getPacket() instanceof C07PacketPlayerDigging)
             if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.getHeldItem() != null
                     && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject()))
@@ -382,7 +370,7 @@ public class Aura extends Module {
 
         if (entity != null) {
             if (!durable.getCurrentMode().equals("Disable")) handleDura(durable.getCurrentMode().equals("Switch"));
-            if (crit.getState()) crit.onCrit(entity);
+            if (crit.getEnabled()) crit.onCrit(entity);
             mc.thePlayer.swingItem();
             mc.playerController.attackEntity(mc.thePlayer, entity);
         } else {
@@ -615,15 +603,15 @@ public class Aura extends Module {
     boolean wasCPSDrop = false;
 
     private void calculateCPS() {
-        int max = Math.max(minCps.getObject() , maxCps.getObject());
-        int min = Math.min(minCps.getObject() , maxCps.getObject());
+        int cps = simpleCps.getObject();
 
         switch (cpsMode.getCurrentMode()) {
             case "Legit": {
                 final Random random = new Random();
-                apd = min + (random.nextInt() * ((long) max - min));
+                final long maxCPS = cps + extendCps.getObject();
+                apd = cps + (random.nextInt() * (maxCPS - cps));
 
-                if (reset.hasReached((long) (1000.0 / playerUtils.randomInRange(min, (long) max)))) {
+                if (reset.hasReached((long) (1000.0 / playerUtils.randomInRange(cps, maxCPS)))) {
                     wasCPSDrop = !wasCPSDrop;
                     if (wasCPSDrop) reset.reset();
                 }
@@ -634,19 +622,19 @@ public class Aura extends Module {
                 if (wasCPSDrop) {
                     apd = timeCovert;
                 } else {
-                    apd = min + (random.nextInt() * ((long) max - min)) / timeCovert;
+                    apd = cps + (random.nextInt() * (maxCPS - cps)) / timeCovert;
                 }
                 break;
             }
             case "Randomize": {
-                apd = randomClickDelay(min, max);
+                apd = randomClickDelay(cps, cps + extendCps.getObject());
                 break;
             }
             case "Smooth": {
-                min = (int) playerUtils.smooth(min + max, min, smoothCpsSpeed.getObject() / 10, smoothRandomizing.getObject(), smoothCpsRandomStrength.getObject());
+                cps = (int) playerUtils.smooth(cps + extendCps.getObject(), cps, smoothCpsSpeed.getObject() / 10, smoothRandomizing.getObject(), smoothCpsRandomStrength.getObject());
             }
             default: {
-                apd = 1000 / min;
+                apd = 1000 / cps;
             }
         }
     }
@@ -666,8 +654,6 @@ public class Aura extends Module {
         if (target.isInvisible() && !invisible.getObject()) return false;
         if (!isInFOV(target, fov.getObject())) return false;
         if (!mc.thePlayer.canEntityBeSeen(target) && !throughBlock.getObject()) return false;
-        if (Main.INSTANCE.moduleManager.getModule(AntiBot.class).getState() && Main.INSTANCE.moduleManager.getModule(AntiBot.class).isBot(target))
-            return false;
 
         return target != mc.thePlayer && target.isEntityAlive() && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() + blockRange.getObject() && target.ticksExisted > ticksExisted.getObject();
     }
