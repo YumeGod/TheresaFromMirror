@@ -197,7 +197,7 @@ public class Aura extends Module {
             if (target != null) {
                 float[] rots;
                 rots = rotationUtils.facePlayer(target, mouse_vl_fix.getObject(), random.getObject(), !instant.getObject(), prediction.getObject(), mouseFix.getObject()
-                        , bestVector.getObject(), inaccuracy.getObject(), clampYaw.getObject(), rotationSpeed.getObject(), range.getObject(), customOffset.getObject(), yOffset.getObject());
+                        , bestVector.getObject(), inaccuracy.getObject(), clampYaw.getObject(), rotationSpeed.getObject(), range.getObject() + blockRange.getObject(), customOffset.getObject(), yOffset.getObject());
 
                 curYaw = rots[0];
                 curPitch = rots[1];

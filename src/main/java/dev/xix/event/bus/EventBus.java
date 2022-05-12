@@ -49,7 +49,7 @@ public final class EventBus<T> {
                 try {
                     callback.call(t);
                 } catch (Exception e) {
-                    e.printStackTrace();
+               //     e.printStackTrace();
                 }
             }
         }

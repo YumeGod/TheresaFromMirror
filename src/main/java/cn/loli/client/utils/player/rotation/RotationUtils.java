@@ -2,6 +2,7 @@ package cn.loli.client.utils.player.rotation;
 
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.utils.Utils;
+import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.RandomUtil;
 import com.google.common.base.Predicates;
 import net.minecraft.entity.Entity;
