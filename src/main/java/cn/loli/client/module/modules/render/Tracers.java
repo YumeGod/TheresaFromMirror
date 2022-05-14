@@ -8,11 +8,12 @@ import cn.loli.client.events.RenderEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.Utils;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.ColorValue;
-import cn.loli.client.value.NumberValue;
+
 
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
+import dev.xix.property.impl.ColorProperty;
+import dev.xix.property.impl.NumberProperty;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.INpc;
 import net.minecraft.entity.monster.IMob;
@@ -24,18 +25,18 @@ import org.lwjgl.opengl.GL11;
 import java.awt.*;
 
 public class Tracers extends Module {
-    private final BooleanValue players = new BooleanValue("Players", true);
-    private final BooleanValue animals = new BooleanValue("Animals", true);
-    private final BooleanValue mobs = new BooleanValue("Mobs", true);
-    private final BooleanValue children = new BooleanValue("Babies", true);
-    private final BooleanValue villagers = new BooleanValue("Villagers", true);
-    private final NumberValue<Integer> range = new NumberValue<>("Range", 64, 2, 256);
-    private final ColorValue playerColor = new ColorValue("PlayerColor", Color.RED);
-    private final ColorValue animalColor = new ColorValue("AnimalColor", Color.BLUE);
-    private final ColorValue mobColor = new ColorValue("MobColor", Color.YELLOW);
-    private final ColorValue childColor = new ColorValue("ChildColor", Color.GREEN);
-    private final ColorValue villagerColor = new ColorValue("VillagerColor", Color.MAGENTA);
-    private final BooleanValue opacityBasedOnDistance = new BooleanValue("OpacityBasedOnDistance", false);
+    private final BooleanProperty players = new BooleanProperty("Players", true);
+    private final BooleanProperty animals = new BooleanProperty("Animals", true);
+    private final BooleanProperty mobs = new BooleanProperty("Mobs", true);
+    private final BooleanProperty children = new BooleanProperty("Babies", true);
+    private final BooleanProperty villagers = new BooleanProperty("Villagers", true);
+    private final NumberProperty<Integer> range = new NumberProperty<>("Range", 64, 2, 256 , 1);
+    private final ColorProperty playerColor = new ColorProperty("PlayerColor", Color.RED);
+    private final ColorProperty animalColor = new ColorProperty("AnimalColor", Color.BLUE);
+    private final ColorProperty mobColor = new ColorProperty("MobColor", Color.YELLOW);
+    private final ColorProperty childColor = new ColorProperty("ChildColor", Color.GREEN);
+    private final ColorProperty villagerColor = new ColorProperty("VillagerColor", Color.MAGENTA);
+    private final BooleanProperty opacityBasedOnDistance = new BooleanProperty("OpacityBasedOnDistance", false);
 
     public Tracers() {
         super("Tracers", "Draws a line to other entities.", ModuleCategory.RENDER);
@@ -55,15 +56,15 @@ public class Tracers extends Module {
         GL11.glLineWidth(1.5F);
         for (Entity entity : mc.theWorld.loadedEntityList) {
             if (entity != mc.thePlayer && entity != null) {
-                if ((entity instanceof EntityPlayer && players.getObject())
-                        || (entity instanceof IAnimals && !(entity instanceof INpc) && !(entity instanceof IMob) && animals.getObject())
-                        || (entity instanceof IMob && mobs.getObject())
-                        || (entity instanceof INpc && villagers.getObject())) {
-                    if (Utils.isEntityChild(entity) && !children.getObject())
+                if ((entity instanceof EntityPlayer && players.getPropertyValue())
+                        || (entity instanceof IAnimals && !(entity instanceof INpc) && !(entity instanceof IMob) && animals.getPropertyValue())
+                        || (entity instanceof IMob && mobs.getPropertyValue())
+                        || (entity instanceof INpc && villagers.getPropertyValue())) {
+                    if (Utils.isEntityChild(entity) && !children.getPropertyValue())
                         continue;
 
                     float distance = mc.getRenderViewEntity().getDistanceToEntity(entity);
-                    if (distance > range.getObject()) continue;
+                    if (distance > range.getPropertyValue()) continue;
 
                     double posX = ((entity.lastTickPosX + (entity.posX - entity.lastTickPosX) - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosX()));
                     double posY = ((entity.lastTickPosY + (entity.posY - entity.lastTickPosY) - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosY()));
@@ -71,15 +72,15 @@ public class Tracers extends Module {
 
                     Color color;
 
-                    if (entity instanceof EntityPlayer) color = playerColor.getObject();
-                    else if (Utils.isEntityChild(entity)) color = childColor.getObject();
-                    else if (entity instanceof INpc) color = villagerColor.getObject();
-                    else if (entity instanceof IMob) color = mobColor.getObject();
-                    else color = animalColor.getObject();
+                    if (entity instanceof EntityPlayer) color = playerColor.getPropertyValue();
+                    else if (Utils.isEntityChild(entity)) color = childColor.getPropertyValue();
+                    else if (entity instanceof INpc) color = villagerColor.getPropertyValue();
+                    else if (entity instanceof IMob) color = mobColor.getPropertyValue();
+                    else color = animalColor.getPropertyValue();
 
                     GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
                     GL11.glColor4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f,
-                            opacityBasedOnDistance.getObject() ? 1 - distance / (range.getObject() / 2f + range.getObject() / 4f) : color.getAlpha() / 255f);
+                            opacityBasedOnDistance.getPropertyValue() ? 1 - distance / (range.getPropertyValue() / 2f + range.getPropertyValue() / 4f) : color.getAlpha() / 255f);
 
                     Vec3 eyes = new Vec3(0d, 0d, 1d).rotatePitch(-(float) Math.toRadians(mc.thePlayer.rotationPitch)).rotateYaw(-(float) Math.toRadians(mc.thePlayer.rotationYaw));
 

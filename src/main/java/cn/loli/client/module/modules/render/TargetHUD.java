@@ -12,8 +12,8 @@ import cn.loli.client.module.modules.combat.Aura;
 import cn.loli.client.utils.player.rotation.RotationHook;
 import cn.loli.client.utils.render.AnimationUtils;
 import cn.loli.client.utils.render.RenderUtils;
-import cn.loli.client.value.ModeValue;
-import cn.loli.client.value.NumberValue;
+import cn.loli.client.value.EnumProperty;
+import cn.loli.client.value.NumberProperty;
 import dev.xix.event.bus.IEventListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
@@ -55,10 +55,10 @@ public class TargetHUD extends Module {
     private final FloatBuffer modelMatrix = GLAllocation.createDirectFloatBuffer(16);
     private final FloatBuffer projectionMatrix = GLAllocation.createDirectFloatBuffer(16);
 
-    private final ModeValue mode = new ModeValue("Mode", "Genshin", "Genshin", "Fancy");
-    private final ModeValue font = new ModeValue("Font", "Genshin", "Genshin", "Roboto", "Ubuntu", "Dos");
-    private final NumberValue<Integer> targetAmount = new NumberValue<>("Display Amount", 5, 1, 6);
-    private final ModeValue sort = new ModeValue("Display", "Normal", "Normal", "Player");
+    private final EnumProperty mode = new EnumProperty<>("Mode", "Genshin", "Genshin", "Fancy");
+    private final EnumProperty font = new EnumProperty<>("Font", "Genshin", "Genshin", "Roboto", "Ubuntu", "Dos");
+    private final NumberProperty<Integer> targetAmount = new NumberProperty<>("Display Amount", 5, 1, 6);
+    private final EnumProperty sort = new EnumProperty<>("Display", "Normal", "Normal", "Player");
 
     public TargetHUD() {
         super("Target Hud", "Make you can check the detail of targets", ModuleCategory.RENDER);
@@ -70,7 +70,7 @@ public class TargetHUD extends Module {
 
         int renderIndex = 0;
 
-        if (entity != null && entity instanceof EntityPlayer && !playerList.containsKey(entity) && playerList.size() < targetAmount.getObject()) {
+        if (entity != null && entity instanceof EntityPlayer && !playerList.containsKey(entity) && playerList.size() < targetAmount.getPropertyValue()) {
             PlayerInfo info = new PlayerInfo((EntityPlayer) entity, System.currentTimeMillis());
             playerInfoList.add(info.player);
             playerList.put((EntityPlayer) entity, info);

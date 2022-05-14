@@ -34,4 +34,8 @@ public abstract class AbstractTheresaProperty<T> {
         this.propertyValue = value;
     }
 
+    public String getName() {
+        return name;
+    }
+
 }

@@ -59,14 +59,14 @@ public class NoRotate extends Module {
 
                 if (Main.INSTANCE.moduleManager.getModule(Abuser.class).getState()) {
                     if (Main.INSTANCE.moduleManager.getModule(Abuser.class).freezeTimer.hasReached(10000) ||
-                            (!Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.hasReached(175) && Main.INSTANCE.moduleManager.getModule(Abuser.class).updateFreeze.getObject() && Main.INSTANCE.moduleManager.getModule(Abuser.class).hasDisable))
+                            (!Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.hasReached(175) && Main.INSTANCE.moduleManager.getModule(Abuser.class).updateFreeze.getPropertyValue() && Main.INSTANCE.moduleManager.getModule(Abuser.class).hasDisable))
                         Main.INSTANCE.moduleManager.getModule(Abuser.class).freezeTimer.reset();
 
-                    if (Main.INSTANCE.moduleManager.getModule(Abuser.class).packetMeme.getObject())
+                    if (Main.INSTANCE.moduleManager.getModule(Abuser.class).packetMeme.getPropertyValue())
                         if (!Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.hasReached(175)) {
                             ChatUtils.info("Packet sent");
                             Main.INSTANCE.moduleManager.getModule(Abuser.class).resetTimer.reset();
-                            if (Main.INSTANCE.moduleManager.getModule(Abuser.class).packetMemeEdit.getObject())
+                            if (Main.INSTANCE.moduleManager.getModule(Abuser.class).packetMemeEdit.getPropertyValue())
                                 mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY() + 0.01,
                                         ((S08PacketPlayerPosLook) event.getPacket()).getZ(), false));
                             else

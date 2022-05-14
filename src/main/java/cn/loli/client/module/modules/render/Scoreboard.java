@@ -6,11 +6,12 @@ import cn.loli.client.events.Render2DEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.misc.HUD;
-import cn.loli.client.value.ModeValue;
+
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.EnumProperty;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.scoreboard.Score;
@@ -23,7 +24,22 @@ import java.util.List;
 
 public class Scoreboard extends Module {
 
-    ModeValue mode = new ModeValue("Position", "Normal", "Normal", "Arrays");
+    private enum MODE {
+        NORMAL("Normal"), ARRAYS("Arrays");
+
+        private final String name;
+
+        MODE(String s) {
+            this.name = s;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    EnumProperty mode = new EnumProperty<>("Position", MODE.ARRAYS);
 
     public Scoreboard() {
         super("Scoreboard", "Render the scoreboard", ModuleCategory.RENDER);
@@ -53,9 +69,9 @@ public class Scoreboard extends Module {
 
         int i1 = collection.size() * mc.fontRendererObj.FONT_HEIGHT;
         int j1 = 0;
-        if (mode.getCurrentMode().equals("Normal")) {
+        if (mode.getPropertyValue().toString().equals("Normal")) {
             j1 = scaledRes.getScaledHeight() / 2 - i1 / 3;
-        } else if (mode.getCurrentMode().equals("Arrays")) {
+        } else if (mode.getPropertyValue().toString().equals("Arrays")) {
             j1 = (int) Main.INSTANCE.moduleManager.getModule(HUD.class).maxY;
         }
         j1 += i1 + 4;

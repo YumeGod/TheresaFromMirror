@@ -5,11 +5,11 @@ import cn.loli.client.events.TickEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.timer.TimeHelper;
-import cn.loli.client.utils.player.InventoryUtil;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.NumberValue;
+
 
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
+import dev.xix.property.impl.NumberProperty;
 import net.minecraft.block.Block;
 import net.minecraft.client.gui.inventory.GuiChest;
 import net.minecraft.client.resources.I18n;
@@ -33,13 +33,13 @@ public class ChestStealer extends Module {
     private final TimeHelper startTimer = new TimeHelper();
     private final List<Integer> itemsToSteal = new ArrayList<>();
 
-    private static final NumberValue<Integer> startDelay = new NumberValue<>("Start Delay", 0, 0, 200);
-    private static final NumberValue<Integer> pickDelay = new NumberValue<>("Pick Delay", 0, 0, 300);
+    private static final NumberProperty<Integer> startDelay = new NumberProperty<>("Start Delay", 0, 0, 200 , 10);
+    private static final NumberProperty<Integer> pickDelay = new NumberProperty<>("Pick Delay", 0, 0, 300 , 10);
 
-    private final BooleanValue intelligent = new BooleanValue("Pick Useful", false);
-    private final BooleanValue stackItems = new BooleanValue("Stack Items", false);
-    private final BooleanValue randomPick = new BooleanValue("Pick Randomize", false);
-    private final BooleanValue autoClose = new BooleanValue("Auto Close", false);
+    private final BooleanProperty intelligent = new BooleanProperty("Pick Useful", false);
+    private final BooleanProperty stackItems = new BooleanProperty("Stack Items", false);
+    private final BooleanProperty randomPick = new BooleanProperty("Pick Randomize", false);
+    private final BooleanProperty autoClose = new BooleanProperty("Auto Close", false);
     boolean isChest = false;
 
     public ChestStealer() {
@@ -57,7 +57,7 @@ public class ChestStealer extends Module {
 
         if (mc.currentScreen instanceof GuiChest) {
 
-            if (!startTimer.hasReached((long) (startDelay.getObject() + inventoryUtil.getRandomGaussian(20))))
+            if (!startTimer.hasReached((long) (startDelay.getPropertyValue() + inventoryUtil.getRandomGaussian(20))))
                 return;
 
             itemsToSteal.clear();
@@ -71,7 +71,7 @@ public class ChestStealer extends Module {
             if (!chestName.equals(I18n.format("container.chest")) && !chestName.equals(I18n.format("container.chestDouble")))
                 return;
 
-            if (intelligent.getObject()) {
+            if (intelligent.getPropertyValue()) {
                 addIntelligentSlotsToSteal();
             } else {
                 for (int i = 0; i < inventory.getSizeInventory(); i++) {
@@ -82,16 +82,16 @@ public class ChestStealer extends Module {
                 }
             }
 
-            if (randomPick.getObject())
+            if (randomPick.getPropertyValue())
                 Collections.shuffle(itemsToSteal);
 
             for (final int i : itemsToSteal) {
                 final ItemStack stack = inventory.getStackInSlot(i);
                 if (stack != null) {
-                    double random = pickDelay.getObject() == 0 ? 0 : inventoryUtil.getRandomGaussian(20);
-                    if (!timeHelper.hasReached((long) (pickDelay.getObject() + random)))
+                    double random = pickDelay.getPropertyValue() == 0 ? 0 : inventoryUtil.getRandomGaussian(20);
+                    if (!timeHelper.hasReached((long) (pickDelay.getPropertyValue() + random)))
                         return;
-                    if (stackItems.getObject() && stack.stackSize != 64 && stack.getMaxStackSize() != 1 && inventoryUtil.getItemSize(stack.getItem(), inventory) != 0 && inventoryUtil.getItemSize(stack.getItem(), inventory) != 1) {
+                    if (stackItems.getPropertyValue() && stack.stackSize != 64 && stack.getMaxStackSize() != 1 && inventoryUtil.getItemSize(stack.getItem(), inventory) != 0 && inventoryUtil.getItemSize(stack.getItem(), inventory) != 1) {
                         mc.playerController.windowClick(chest.windowId, i, 0, 0, mc.thePlayer);
                         mc.playerController.windowClick(chest.windowId, i, 0, 6, mc.thePlayer);
                         mc.playerController.windowClick(chest.windowId, i, 0, 0, mc.thePlayer);
@@ -104,7 +104,7 @@ public class ChestStealer extends Module {
                 }
             }
 
-            if (isEmpty && autoClose.getObject())
+            if (isEmpty && autoClose.getPropertyValue())
                 mc.thePlayer.closeScreen();
         }
     };

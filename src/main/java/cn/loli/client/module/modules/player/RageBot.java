@@ -7,11 +7,12 @@ import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.render.RenderUtils;
 import cn.loli.client.utils.misc.WorldUtil;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.NumberValue;
+
 
 import dev.xix.event.EventType;
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
+import dev.xix.property.impl.NumberProperty;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.INpc;
@@ -35,18 +36,18 @@ public class RageBot extends Module {
 
     private Vec3 aimed;
     boolean aim;
-    private final BooleanValue invisibles = new BooleanValue("Invisibles", false);
-    private final BooleanValue players = new BooleanValue("Players", true);
-    private final BooleanValue animals = new BooleanValue("Animals", false);
-    private final BooleanValue mobs = new BooleanValue("Mobs", true);
-    private final BooleanValue armorStand = new BooleanValue("Armor Stand", true);
-    private final BooleanValue villagers = new BooleanValue("Villagers", false);
-    private final BooleanValue team = new BooleanValue("Team", false);
-    private final NumberValue<Integer> range = new NumberValue<>("Range", 50, 40, 120);
-    private final NumberValue<Float> fov = new NumberValue<>("FOV", 360f, 0f, 360f);
-    private final BooleanValue headshot = new BooleanValue("Shot Head", false);
-    private final NumberValue<Float> pre = new NumberValue<>("Velocity", 0.8f, 0f, 2f);
-    private final NumberValue<Float> y = new NumberValue<>("Y - Offset", 0f, -1f, 1f);
+    private final BooleanProperty invisibles = new BooleanProperty("Invisibles", false);
+    private final BooleanProperty players = new BooleanProperty("Players", true);
+    private final BooleanProperty animals = new BooleanProperty("Animals", false);
+    private final BooleanProperty mobs = new BooleanProperty("Mobs", true);
+    private final BooleanProperty armorStand = new BooleanProperty("Armor Stand", true);
+    private final BooleanProperty villagers = new BooleanProperty("Villagers", false);
+    private final BooleanProperty team = new BooleanProperty("Team", false);
+    private final NumberProperty<Integer> range = new NumberProperty<>("Range", 50, 40, 120 , 1);
+    private final NumberProperty<Float> fov = new NumberProperty<>("FOV", 360f, 0f, 360f , 1f);
+    private final BooleanProperty headshot = new BooleanProperty("Shot Head", false);
+    private final NumberProperty<Float> pre = new NumberProperty<>("Velocity", 0.8f, 0f, 2f , 0.1f);
+    private final NumberProperty<Float> y = new NumberProperty<>("Y - Offset", 0f, -1f, 1f , 0.1f);
 
     public RageBot() {
         super("RageBot", "Make you attack entity easily", ModuleCategory.PLAYER);
@@ -86,7 +87,7 @@ public class RageBot extends Module {
         }
 
         aim = true;
-        aimed = getFixedLocation(list.get(0), pre.getObject(), headshot.getObject());
+        aimed = getFixedLocation(list.get(0), pre.getPropertyValue(), headshot.getPropertyValue());
 
         final float[] rotations = getRotationToLocation(aimed);
         if (event.getEventType() == EventType.PRE) {
@@ -113,26 +114,26 @@ public class RageBot extends Module {
 
     private Vec3 getFixedLocation(final EntityLivingBase entity, final float velocity, final boolean head) {
         double x = entity.posX + ((entity.posX - entity.lastTickPosX) * velocity);
-        double y = entity.posY + ((entity.posY - entity.lastTickPosY) * (velocity * 0.3)) + (head ? entity.getEyeHeight() : 1.0) + this.y.getObject();
+        double y = entity.posY + ((entity.posY - entity.lastTickPosY) * (velocity * 0.3)) + (head ? entity.getEyeHeight() : 1.0) + this.y.getPropertyValue();
         double z = entity.posZ + ((entity.posZ - entity.lastTickPosZ) * velocity);
         return new Vec3(x, y, z);
     }
 
     private boolean canAttack(EntityLivingBase target) {
         if (target instanceof EntityPlayer || target instanceof EntityAnimal || target instanceof EntityMob || target instanceof INpc) {
-            if (target instanceof EntityPlayer && !players.getObject()) return false;
-            if (target instanceof EntityAnimal && !animals.getObject()) return false;
-            if (target instanceof EntityMob && !mobs.getObject()) return false;
-            if (target instanceof INpc && !villagers.getObject()) return false;
+            if (target instanceof EntityPlayer && !players.getPropertyValue()) return false;
+            if (target instanceof EntityAnimal && !animals.getPropertyValue()) return false;
+            if (target instanceof EntityMob && !mobs.getPropertyValue()) return false;
+            if (target instanceof INpc && !villagers.getPropertyValue()) return false;
         }
 
-        if (target instanceof EntityArmorStand && !armorStand.getObject()) return false;
-        if (target.isOnSameTeam(mc.thePlayer) && !team.getObject()) return false;
-        if (target.isInvisible() && !invisibles.getObject()) return false;
-        if (!isInFOV(target, fov.getObject())) return false;
+        if (target instanceof EntityArmorStand && !armorStand.getPropertyValue()) return false;
+        if (target.isOnSameTeam(mc.thePlayer) && !team.getPropertyValue()) return false;
+        if (target.isInvisible() && !invisibles.getPropertyValue()) return false;
+        if (!isInFOV(target, fov.getPropertyValue())) return false;
         if (!target.canEntityBeSeen(mc.thePlayer)) return false;
 
-        return target != mc.thePlayer && target.isEntityAlive() && mc.thePlayer.getDistanceToEntity(target) <= range.getObject();
+        return target != mc.thePlayer && target.isEntityAlive() && mc.thePlayer.getDistanceToEntity(target) <= range.getPropertyValue();
     }
 
 

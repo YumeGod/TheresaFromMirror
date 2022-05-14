@@ -6,9 +6,10 @@ import cn.loli.client.events.TickEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.ChatUtils;
-import cn.loli.client.value.NumberValue;
+
 
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.NumberProperty;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSnow;
 import net.minecraft.client.Minecraft;
@@ -26,7 +27,7 @@ public class TellyBridge extends Module {
         phase = Phase.PreJump;
     }
 
-    private final NumberValue<Integer> distance = new NumberValue<>("Distance", 5, 4, 6);
+    private final NumberProperty<Integer> distance = new NumberProperty<>("Distance", 5, 4, 6 , 1);
 
     private Phase phase;
     private float startYaw;
@@ -79,7 +80,7 @@ public class TellyBridge extends Module {
         }
 
         KeyBinding.setKeyBindState(mc.gameSettings.keyBindSprint.getKeyCode(), true);
-        if (Math.sqrt(mc.thePlayer.getDistanceSq(lastBlock)) > (distance.getObject() / 2)) {
+        if (Math.sqrt(mc.thePlayer.getDistanceSq(lastBlock)) > (distance.getPropertyValue() / 2)) {
             phase = Phase.Placing;
         } else if (!isAirBlock(getBlock(new BlockPos(mc.thePlayer.posX, mc.thePlayer.posY - 0.2, mc.thePlayer.posZ))) && phase.equals(Phase.Placing)) {
             phase = Phase.Turn;

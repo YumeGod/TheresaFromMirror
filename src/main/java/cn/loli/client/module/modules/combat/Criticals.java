@@ -4,7 +4,6 @@ package cn.loli.client.module.modules.combat;
 
 import cn.loli.client.Main;
 import cn.loli.client.events.MotionUpdateEvent;
-import cn.loli.client.events.PacketEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.movement.Speed;
@@ -12,24 +11,55 @@ import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
 import cn.loli.client.utils.misc.timer.TimeHelper;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.ModeValue;
+
 
 import dev.xix.event.EventType;
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
+import dev.xix.property.impl.EnumProperty;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.network.play.client.C02PacketUseEntity;
 import net.minecraft.network.play.client.C03PacketPlayer;
 
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Criticals extends Module {
-    private final ModeValue mode = new ModeValue("Mode", "Edit", "Edit", "Packet", "Recall");
-    private final ModeValue offsetvalue = new ModeValue("Offset Value", "NCP", "NCP", "Mini", "Chill", "Negative", "Positive", "HLess");
-    private final BooleanValue packetsWhenNoMove = new BooleanValue("packets when no move", false);
-    private final BooleanValue always = new BooleanValue("Always", false);
-    private final BooleanValue nodelay = new BooleanValue("No Delay", false);
+
+    private enum MODE {
+        EDIT("Edit"), PACKET("Packet"), RECALL("Recall");
+
+        private final String name;
+
+        MODE(String s) {
+            this.name = s;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    private final EnumProperty mode = new EnumProperty<>("Mode", MODE.PACKET);
+
+    private enum OFFSET_VALUE {
+        NCP("NCP"), MINI("Mini"), CHILL("Chill"), NEGATIVE("Negative"), POSITIVE("Positive"), ZERO("HLess");
+
+        private final String name;
+
+        OFFSET_VALUE(String s) {
+            this.name = s;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    private final EnumProperty offsetvalue = new EnumProperty<>("Offset Value", OFFSET_VALUE.NCP);
+    private final BooleanProperty packetsWhenNoMove = new BooleanProperty("packets when no move", false);
+    private final BooleanProperty always = new BooleanProperty("Always", false);
+    private final BooleanProperty nodelay = new BooleanProperty("No Delay", false);
 
     int counter = 0, stage = 0;
     double[] offset = new double[3];
@@ -44,7 +74,7 @@ public class Criticals extends Module {
     {
         double pos = 0;
         if (e.getEventType() == EventType.PRE) {
-            switch (offsetvalue.getCurrentMode()) {
+            switch (offsetvalue.getPropertyValue().toString()) {
                 case "NCP":
                     offset = new double[]{
                             ThreadLocalRandom.current().nextDouble(.003032422909396, .007032422909396),
@@ -85,14 +115,14 @@ public class Criticals extends Module {
                     break;
             }
 
-            if ("Recall".equalsIgnoreCase(mode.getCurrentMode())) {
+            if ("Recall".equalsIgnoreCase(mode.getPropertyValue().toString())) {
                 if (stage == 2) stage = 0;
                 if (counter == offset.length) counter = 0;
                 Speed speed = Main.INSTANCE.moduleManager.getModule(Speed.class);
                 Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
                 if (entity == null) return;
                 if (mc.thePlayer.onGround) {
-                    if (always.getObject() || entity.hurtResistantTime != 20)
+                    if (always.getPropertyValue() || entity.hurtResistantTime != 20)
                         if (playerUtils.isMoving2()) {
                             if (stage < 2) {
                                 if (speed.getState())
@@ -112,14 +142,14 @@ public class Criticals extends Module {
                 }
             }
 
-            if ("Edit".equals(mode.getCurrentMode())) {
+            if ("Edit".equals(mode.getPropertyValue().toString())) {
                 if (counter == offset.length) counter = 0;
                 if (stage == 1) stage = 0;
                 Speed speed = Main.INSTANCE.moduleManager.getModule(Speed.class);
                 Entity entity = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
                 if (entity == null) return;
                 if (mc.thePlayer.onGround) {
-                    if (always.getObject() || entity.hurtResistantTime != 20)
+                    if (always.getPropertyValue() || entity.hurtResistantTime != 20)
                         if (playerUtils.isMoving2()) {
                             if (counter == offset.length) {
                                 stage = 1;
@@ -140,10 +170,10 @@ public class Criticals extends Module {
         if (!(mc.thePlayer.isCollidedVertically && mc.thePlayer.onGround))
             return;
 
-        switch (mode.getCurrentMode()) {
+        switch (mode.getPropertyValue().toString()) {
             case "Packet":
-                if (always.getObject() || entity.hurtResistantTime != 20) {
-                    if (!i.hasReached(nodelay.getObject() ? 25 : 150)) return;
+                if (always.getPropertyValue() || entity.hurtResistantTime != 20) {
+                    if (!i.hasReached(nodelay.getPropertyValue() ? 25 : 150)) return;
                     for (double i : offset) sendPacket(i);
                     i.reset();
                 }
@@ -152,7 +182,7 @@ public class Criticals extends Module {
             case "Recall":
                 break;
             default:
-                NotificationManager.show(new Notification(NotificationType.WARNING, this.getName(), "Invalid mode: " + mode.getCurrentMode(), 2));
+                NotificationManager.show(new Notification(NotificationType.WARNING, this.getName(), "Invalid mode: " + mode.getPropertyValue(), 2));
         }
     }
 

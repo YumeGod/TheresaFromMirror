@@ -48,8 +48,7 @@ public final class EventBus<T> {
             for (final IEventListener<T> callback : callbacks) {
                 try {
                     callback.call(t);
-                } catch (Exception e) {
-               //     e.printStackTrace();
+                } catch (Exception ignored) {
                 }
             }
         }

@@ -8,10 +8,11 @@ import cn.loli.client.injection.mixins.IAccessorRenderManager;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.render.RenderUtils;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.ColorValue;
+
 
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
+import dev.xix.property.impl.ColorProperty;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.tileentity.TileEntity;
@@ -25,16 +26,16 @@ import java.awt.*;
 
 public class ItemESP extends Module {
 
-    private final BooleanValue box = new BooleanValue("2D Box", false);
-    private final BooleanValue cylinder = new BooleanValue("Cylinder", false);
-    private final BooleanValue cylinderCull = new BooleanValue("CylinderCull", false);
+    private final BooleanProperty box = new BooleanProperty("2D Box", false);
+    private final BooleanProperty cylinder = new BooleanProperty("Cylinder", false);
+    private final BooleanProperty cylinderCull = new BooleanProperty("CylinderCull", false);
 
 
-    private final BooleanValue chestDisplay = new BooleanValue("Chest", false);
-    private final BooleanValue itemDisplay = new BooleanValue("Item", false);
+    private final BooleanProperty chestDisplay = new BooleanProperty("Chest", false);
+    private final BooleanProperty itemDisplay = new BooleanProperty("Item", false);
 
-    private final ColorValue item = new ColorValue("Item-Color", new Color(150, 148, 148, 150));
-    private final ColorValue chest = new ColorValue("Chest-Color", new Color(150, 148, 148, 150));
+    private final ColorProperty item = new ColorProperty("Item-Color", new Color(150, 148, 148, 150));
+    private final ColorProperty chest = new ColorProperty("Chest-Color", new Color(150, 148, 148, 150));
 
 
     public ItemESP() {
@@ -43,8 +44,8 @@ public class ItemESP extends Module {
 
     private final IEventListener<RenderEvent> onRender = event ->
     {
-        if (cylinder.getObject()) {
-            if (itemDisplay.getObject()) {
+        if (cylinder.getPropertyValue()) {
+            if (itemDisplay.getPropertyValue()) {
                 for (Entity entity : mc.theWorld.loadedEntityList) {
                     if (entity instanceof EntityItem) {
                         final float partialTicks = ((IAccessorMinecraft) mc).getTimer().renderPartialTicks;
@@ -59,26 +60,26 @@ public class ItemESP extends Module {
 
                         GL11.glDisable(GL11.GL_TEXTURE_2D);
                         GL11.glEnable(GL11.GL_BLEND);
-                        if (cylinderCull.getObject())
+                        if (cylinderCull.getPropertyValue())
                             GL11.glDisable(GL11.GL_CULL_FACE);
 
                         GL11.glDisable(GL11.GL_DEPTH_TEST);
 
                         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                         GL11.glLineWidth(1);
-                        RenderUtils.color(item.getObject().getRGB());
+                        RenderUtils.color(item.getPropertyValue().getRGB());
                         final Cylinder cylinder = new Cylinder();
 
                         cylinder.setDrawStyle(GLU.GLU_LINE);
                         cylinder.setOrientation(GLU.GLU_INSIDE);
                         cylinder.draw(0.62f, 0.62f, entity.height, 8, 1);
-                        RenderUtils.color(RenderUtils.reAlpha(item.getObject().getRGB(), chest.getObject().getAlpha() / 255f));
+                        RenderUtils.color(RenderUtils.reAlpha(item.getPropertyValue().getRGB(), chest.getPropertyValue().getAlpha() / 255f));
                         cylinder.setDrawStyle(GLU.GLU_FILL);
                         cylinder.setOrientation(GLU.GLU_INSIDE);
                         cylinder.draw(0.62f, 0.65f, entity.height, 8, 1);
 
                         GL11.glDisable(GL11.GL_BLEND);
-                        if (cylinderCull.getObject())
+                        if (cylinderCull.getPropertyValue())
                             GL11.glEnable(GL11.GL_CULL_FACE);
                         GL11.glEnable(GL11.GL_TEXTURE_2D);
                         GL11.glEnable(GL11.GL_DEPTH_TEST);
@@ -88,7 +89,7 @@ public class ItemESP extends Module {
             }
 
 
-            if (chestDisplay.getObject()) {
+            if (chestDisplay.getPropertyValue()) {
                 for (TileEntity entity : mc.theWorld.loadedTileEntityList) {
                     if (entity instanceof TileEntityChest || entity instanceof TileEntityEnderChest) {
                         mc.theWorld.getBlockState(entity.getPos()).getBlock();
@@ -100,7 +101,7 @@ public class ItemESP extends Module {
                         GL11.glRotated(90, 1, 0, 0);
                         GL11.glDisable(GL11.GL_TEXTURE_2D);
                         GL11.glEnable(GL11.GL_BLEND);
-                        if (cylinderCull.getObject())
+                        if (cylinderCull.getPropertyValue())
                             GL11.glDisable(GL11.GL_CULL_FACE);
 
                         GL11.glDisable(GL11.GL_DEPTH_TEST);
@@ -108,21 +109,21 @@ public class ItemESP extends Module {
                         GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
                         GL11.glLineWidth(1);
 
-                        RenderUtils.color(chest.getObject().getRGB());
+                        RenderUtils.color(chest.getPropertyValue().getRGB());
                         final Cylinder cylinder = new Cylinder();
 
                         cylinder.setDrawStyle(GLU.GLU_LINE);
                         cylinder.setOrientation(GLU.GLU_INSIDE);
                         cylinder.draw(0.62f, 0.62f, 0.9f, 8, 1);
 
-                        RenderUtils.color(RenderUtils.reAlpha(chest.getObject().getRGB(), chest.getObject().getAlpha() / 255f));
+                        RenderUtils.color(RenderUtils.reAlpha(chest.getPropertyValue().getRGB(), chest.getPropertyValue().getAlpha() / 255f));
 
                         cylinder.setDrawStyle(GLU.GLU_FILL);
                         cylinder.setOrientation(GLU.GLU_INSIDE);
                         cylinder.draw(0.62f, 0.65f, 0.9f, 8, 1);
 
                         GL11.glDisable(GL11.GL_BLEND);
-                        if (cylinderCull.getObject())
+                        if (cylinderCull.getPropertyValue())
                             GL11.glEnable(GL11.GL_CULL_FACE);
 
                         GL11.glEnable(GL11.GL_TEXTURE_2D);

@@ -9,9 +9,10 @@ import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.render.RenderUtils;
-import cn.loli.client.value.ColorValue;
+
 
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.ColorProperty;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmorStand;
@@ -28,7 +29,7 @@ public class MurderMystery extends Module {
 
     private static EntityPlayer murder;
     private final List<String> alartedPlayers = new ArrayList<>();
-    private final ColorValue espColor = new ColorValue("ESP-Color", Color.BLUE);
+    private final ColorProperty espColor = new ColorProperty("ESP-Color", Color.BLUE);
 
     public MurderMystery() {
         super("Murder Mystery", "Find the Murder", ModuleCategory.PLAYER);
@@ -60,7 +61,7 @@ public class MurderMystery extends Module {
     private final IEventListener<RenderEvent> onRender = event ->
     {
         if (isMurder(murder))
-            RenderUtils.renderBox(murder, espColor.getObject().getRGB());
+            RenderUtils.renderBox(murder, espColor.getPropertyValue().getRGB());
     };
 
     private final IEventListener<UpdateEvent> onUpdate = event ->

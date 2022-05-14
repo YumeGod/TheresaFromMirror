@@ -7,10 +7,11 @@ import cn.loli.client.injection.mixins.IAccessorRenderManager;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.player.rotation.RotationHook;
-import cn.loli.client.value.ColorValue;
-import cn.loli.client.value.NumberValue;
+
 
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.ColorProperty;
+import dev.xix.property.impl.NumberProperty;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
@@ -29,9 +30,9 @@ public class Trajectories extends Module {
 
     private final ArrayList<Vec3> positions = new ArrayList<>();
 
-    public final ColorValue color = new ColorValue("Box-Color", new Color(239, 235, 235, 210));
+    public final ColorProperty color = new ColorProperty("Box-Color", new Color(239, 235, 235, 210));
 
-    private static final NumberValue<Float> lineWidth = new NumberValue<>("Width", 5f, 0.1f, 10f);
+    private static final NumberProperty<Float> lineWidth = new NumberProperty<>("Width", 5f, 0.1f, 10f , 0.1f);
 
     public Trajectories() {
         super("Trajectories", "You can see where your projectiles will hit", ModuleCategory.RENDER);
@@ -161,9 +162,9 @@ public class Trajectories extends Module {
                 GL11.glDisable(GL11.GL_TEXTURE_2D);
                 GlStateManager.disableCull();
                 GL11.glDepthMask(false);
-                Color color = this.color.getObject();
+                Color color = this.color.getPropertyValue();
                 GL11.glColor4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 0.7f);
-                GL11.glLineWidth((float) (lineWidth.getObject() / 2f));
+                GL11.glLineWidth((float) (lineWidth.getPropertyValue() / 2f));
                 Tessellator tessellator = Tessellator.getInstance();
                 WorldRenderer worldrenderer = tessellator.getWorldRenderer();
                 GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);

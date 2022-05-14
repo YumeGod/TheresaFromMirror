@@ -7,11 +7,12 @@ import cn.loli.client.injection.mixins.IAccessorRenderManager;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.render.RenderUtils;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.ColorValue;
-import cn.loli.client.value.NumberValue;
+
 
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
+import dev.xix.property.impl.ColorProperty;
+import dev.xix.property.impl.NumberProperty;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
@@ -21,12 +22,12 @@ public class Trail extends Module {
 
     private final ArrayList<double[]> positions = new ArrayList<>();
 
-    public final BooleanValue rainbow = new BooleanValue("Rainbow", false);
-    public static final NumberValue<Integer> length = new NumberValue<>("Length", 1000, 100, 3000);
+    public final BooleanProperty rainbow = new BooleanProperty("Rainbow", false);
+    public static final NumberProperty<Integer> length = new NumberProperty<>("Length", 1000, 100, 3000 , 100);
 
-    public final BooleanValue showInFirstPerson = new BooleanValue("Show In FirstPerson", true);
+    public final BooleanProperty showInFirstPerson = new BooleanProperty("Show In FirstPerson", true);
 
-    public final ColorValue trailColor = new ColorValue("Trail-Color", new Color(147, 144, 144, 210));
+    public final ColorProperty trailColor = new ColorProperty("Trail-Color", new Color(147, 144, 144, 210));
     int rainbowOffset;
 
     public Trail() {
@@ -34,8 +35,8 @@ public class Trail extends Module {
     }
 
     private final IEventListener<RenderEvent> onRender = event -> {
-        Color customColor = trailColor.getObject();
-        if (mc.gameSettings.thirdPersonView != 0 || showInFirstPerson.getObject()) {
+        Color customColor = trailColor.getPropertyValue();
+        if (mc.gameSettings.thirdPersonView != 0 || showInFirstPerson.getPropertyValue()) {
             GL11.glPushMatrix();
 
             GL11.glEnable(GL11.GL_LINE_SMOOTH);
@@ -46,7 +47,7 @@ public class Trail extends Module {
 
             int offset = 0;
             for (double[] pos : positions) {
-                if (rainbow.getObject())
+                if (rainbow.getPropertyValue())
                     customColor = RenderUtils.getRainbow((offset + rainbowOffset) * 100, 6000, 0.8F, 1F);
                 GL11.glColor4f(customColor.getRed() / 255F, customColor.getGreen() / 255F, customColor.getBlue() / 255F, customColor.getAlpha() / 255F);
                 GL11.glVertex3d(pos[0] - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosX(), pos[1] - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosY(), pos[2] - ((IAccessorRenderManager) mc.getRenderManager()).getRenderPosZ());
@@ -65,7 +66,7 @@ public class Trail extends Module {
     private final IEventListener<UpdateEvent> onUpdate = event -> {
         for (int i = 0; i < positions.size(); i++) {
             final double[] position = positions.get(i);
-            if (System.currentTimeMillis() - position[3] > length.getObject()) {
+            if (System.currentTimeMillis() - position[3] > length.getPropertyValue()) {
                 rainbowOffset++;
                 positions.remove(position);
             }

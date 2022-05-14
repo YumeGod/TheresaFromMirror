@@ -5,9 +5,9 @@ import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.injection.implementations.IPlayerControllerMP;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.value.NumberValue;
 
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.NumberProperty;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.network.play.client.C07PacketPlayerDigging;
@@ -16,7 +16,7 @@ import net.minecraft.util.EnumFacing;
 
 public class SpeedMine extends Module {
 
-    private final NumberValue<Float> speed = new NumberValue<>("Speed", 1.6f, 0.8f, 3.0f);
+    private final NumberProperty<Float> speed = new NumberProperty<>("Speed", 1.6f, 0.8f, 3.0f , 0.1f);
 
     public BlockPos blockPos;
     public EnumFacing facing;
@@ -36,7 +36,7 @@ public class SpeedMine extends Module {
         }
         else if (this.bzs) {
             final Block block = mc.theWorld.getBlockState(this.blockPos).getBlock();
-            this.bzx += block.getPlayerRelativeBlockHardness(mc.thePlayer, mc.theWorld, this.blockPos) * speed.getObject();
+            this.bzx += block.getPlayerRelativeBlockHardness(mc.thePlayer, mc.theWorld, this.blockPos) * speed.getPropertyValue();
             if (this.bzx >= 1.0f) {
                 mc.theWorld.setBlockState(this.blockPos, Blocks.air.getDefaultState(), 11);
                 mc.thePlayer.sendQueue.getNetworkManager().sendPacket(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.STOP_DESTROY_BLOCK, this.blockPos, this.facing));

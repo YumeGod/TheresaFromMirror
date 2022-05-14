@@ -2,11 +2,11 @@ package cn.loli.client.module.modules.combat;
 
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.value.BooleanValue;
+import dev.xix.property.impl.BooleanProperty;
 
 public class KeepSprint extends Module {
 
-    public final BooleanValue fake = new BooleanValue("FakeFov", true);
+    public final BooleanProperty fake = new BooleanProperty("FakeFov", true);
 
     public boolean modify = false;
 

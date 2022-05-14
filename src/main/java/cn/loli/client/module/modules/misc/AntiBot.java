@@ -5,11 +5,11 @@ import cn.loli.client.events.PacketEvent;
 import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.NumberValue;
 
 import dev.xix.event.EventType;
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
+import dev.xix.property.impl.NumberProperty;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.entity.Entity;
@@ -28,22 +28,22 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class AntiBot extends Module {
 
-    private final BooleanValue healthNaNCheck = new BooleanValue("Health NaN", false);
-    private final BooleanValue groundCheck = new BooleanValue("Check Ground", false);
-    private final BooleanValue groundSpawnCheck = new BooleanValue("Check Spawn", false);
-    private final BooleanValue nameCheck = new BooleanValue("Name", false);
-    private final BooleanValue swingCheck = new BooleanValue("Swing", false);
-    private final BooleanValue hitBefore = new BooleanValue("Need Hit", false);
-    private final BooleanValue tabListCheck = new BooleanValue("TabList", false);
-    private final BooleanValue staticPingCheck = new BooleanValue("Ping", false);
-    private final BooleanValue skinCheck = new BooleanValue("Skin", false);
-    private final BooleanValue duplicateEntityCheck = new BooleanValue("Duplicate", false);
-    private final BooleanValue soundCheck = new BooleanValue("Sound", false);
-    private final BooleanValue rotation = new BooleanValue("Illegal Rotation", false);
-    private final BooleanValue period = new BooleanValue("Tolerance Period", false);
+    private final BooleanProperty healthNaNCheck = new BooleanProperty("Health NaN", false);
+    private final BooleanProperty groundCheck = new BooleanProperty("Check Ground", false);
+    private final BooleanProperty groundSpawnCheck = new BooleanProperty("Check Spawn", false);
+    private final BooleanProperty nameCheck = new BooleanProperty("Name", false);
+    private final BooleanProperty swingCheck = new BooleanProperty("Swing", false);
+    private final BooleanProperty hitBefore = new BooleanProperty("Need Hit", false);
+    private final BooleanProperty tabListCheck = new BooleanProperty("TabList", false);
+    private final BooleanProperty staticPingCheck = new BooleanProperty("Ping", false);
+    private final BooleanProperty skinCheck = new BooleanProperty("Skin", false);
+    private final BooleanProperty duplicateEntityCheck = new BooleanProperty("Duplicate", false);
+    private final BooleanProperty soundCheck = new BooleanProperty("Sound", false);
+    private final BooleanProperty rotation = new BooleanProperty("Illegal Rotation", false);
+    private final BooleanProperty period = new BooleanProperty("Tolerance Period", false);
 
-    private final NumberValue<Integer> ticksExisted = new NumberValue<>("Ticks Existed", 0, 0, 100);
-    private final NumberValue<Integer> ping = new NumberValue<>("Ping", 0, -10, 500);
+    private final NumberProperty<Integer> ticksExisted = new NumberProperty<>("Ticks Existed", 0, 0, 100 , 1);
+    private final NumberProperty<Integer> ping = new NumberProperty<>("Ping", 0, -10, 500 , 1);
 
 
     private final ArrayList<Entity> madeSound = new ArrayList<>();
@@ -64,36 +64,36 @@ public class AntiBot extends Module {
     public boolean isBot(EntityLivingBase entity) {
         if (entity != null && entity != mc.thePlayer) {
             if (entity instanceof EntityPlayer) {
-                if (ticksExisted.getObject() != 0 && entity.ticksExisted < ticksExisted.getObject())
+                if (ticksExisted.getPropertyValue() != 0 && entity.ticksExisted < ticksExisted.getPropertyValue())
                     return false;
-                if (healthNaNCheck.getObject() && !Float.isNaN(entity.getHealth()))
+                if (healthNaNCheck.getPropertyValue() && !Float.isNaN(entity.getHealth()))
                     return true;
-                if (groundCheck.getObject() && entity.onGround && mc.theWorld.getBlockState(entity.getPosition().add(0, -0.05, 0)).getBlock() == Blocks.air)
+                if (groundCheck.getPropertyValue() && entity.onGround && mc.theWorld.getBlockState(entity.getPosition().add(0, -0.05, 0)).getBlock() == Blocks.air)
                     return true;
-                if (soundCheck.getObject() && !madeSound.contains(entity))
+                if (soundCheck.getPropertyValue() && !madeSound.contains(entity))
                     return true;
-                if (swingCheck.getObject() && !swingEntity.contains(entity))
+                if (swingCheck.getPropertyValue() && !swingEntity.contains(entity))
                     return true;
-                if (nameCheck.getObject() && !checkedName(entity))
+                if (nameCheck.getPropertyValue() && !checkedName(entity))
                     return true;
-                if (hitBefore.getObject() && !hitBeforeEntity.contains(entity))
+                if (hitBefore.getPropertyValue() && !hitBeforeEntity.contains(entity))
                     return true;
-                if (!isInTabList(entity) && tabListCheck.getObject())
+                if (!isInTabList(entity) && tabListCheck.getPropertyValue())
                     return true;
-                if (!hasPing(entity) && staticPingCheck.getObject())
+                if (!hasPing(entity) && staticPingCheck.getPropertyValue())
                     return true;
-                if (rotationEntity.contains(entity) && rotation.getObject())
+                if (rotationEntity.contains(entity) && rotation.getPropertyValue())
                     return true;
-                if (groundSpawnCheck.getObject() && groundSpawnEntity.contains(entity))
+                if (groundSpawnCheck.getPropertyValue() && groundSpawnEntity.contains(entity))
                     return true;
-                if (period.getObject() && !periodEntity.contains(entity))
+                if (period.getPropertyValue() && !periodEntity.contains(entity))
                     return true;
                 if (entity instanceof AbstractClientPlayer) {
-                    if (skinCheck.getObject() && !((AbstractClientPlayer) entity).hasSkin()) {
+                    if (skinCheck.getPropertyValue() && !((AbstractClientPlayer) entity).hasSkin()) {
                         return true;
                     }
                 }
-                return duplicateEntityCheck.getObject() && duplicates.contains(entity);
+                return duplicateEntityCheck.getPropertyValue() && duplicates.contains(entity);
             } else {
                 return false;
             }
@@ -108,7 +108,7 @@ public class AntiBot extends Module {
                 if (isWrongRotation((EntityPlayer) entity)) {
                     rotationEntity.add(entity);
                 }
-                if (duplicateEntityCheck.getObject()) {
+                if (duplicateEntityCheck.getPropertyValue()) {
                     final ArrayList<EntityPlayer> entities = getPlayersByName(entity.getName());
                     final ArrayList<NetworkPlayerInfo> tabList = searchPlayers(entity.getName());
                     if (tabList.size() > 1 && entities.size() < tabList.size()) {
@@ -169,7 +169,7 @@ public class AntiBot extends Module {
                 if (mc.theWorld != null) {
                     final EntityPlayer player = mc.theWorld.getPlayerEntityByUUID(((S0CPacketSpawnPlayer) event.getPacket()).getPlayer());
                     if (player != null)
-                        if ((!player.onGround || playerUtils.getBlockUnderPlayer(1) == Blocks.air) && groundSpawnCheck.getObject())
+                        if ((!player.onGround || playerUtils.getBlockUnderPlayer(1) == Blocks.air) && groundSpawnCheck.getPropertyValue())
                             groundSpawnEntity.add(player);
 
                     if (mc.thePlayer.ticksExisted < 60) {
@@ -223,7 +223,7 @@ public class AntiBot extends Module {
 
         for (NetworkPlayerInfo playerInfo : mc.thePlayer.sendQueue.getPlayerInfoMap()) {
             if (playerInfo.getGameProfile().getId().equals(entity.getUniqueID()))
-                if (playerInfo.getResponseTime() > ping.getObject().intValue())
+                if (playerInfo.getResponseTime() > ping.getPropertyValue().intValue())
                     return true;
         }
         return false;

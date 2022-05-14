@@ -11,21 +11,38 @@ import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.ModeValue;
+
 
 import dev.xix.event.EventType;
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
+import dev.xix.property.impl.EnumProperty;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.util.AxisAlignedBB;
 
 public class NoFall extends Module {
-    private final ModeValue mode = new ModeValue("Mode", "Packet", "Packet", "Vulcan", "Edit", "Collision");
+
+    private enum MODE {
+        PACKET("Packet"), VULCAN("Vulcan") , EDIT("Edit") , COLLISION("Collision");
+
+        private final String name;
+
+        MODE(String s) {
+            this.name = s;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    private final EnumProperty mode = new EnumProperty<>("Mode", MODE.EDIT);
 
     private float fallDist, lastTickFallDist;
 
-    private final BooleanValue cancel = new BooleanValue("Silent", false);
-    private final BooleanValue isVoid = new BooleanValue("Ignore Void", false);
+    private final BooleanProperty cancel = new BooleanProperty("Silent", false);
+    private final BooleanProperty isVoid = new BooleanProperty("Ignore Void", false);
 
     public NoFall() {
         super("NoFall", "Negates fall damage.", ModuleCategory.PLAYER);
@@ -43,9 +60,9 @@ public class NoFall extends Module {
         fallDist += mc.thePlayer.fallDistance - lastTickFallDist;
         lastTickFallDist = mc.thePlayer.fallDistance;
 
-        switch (mode.getCurrentMode()) {
+        switch ( mode.getPropertyValue().toString()) {
             case "Packet":
-                if (fallDist > 2F && (isVoid.getObject() || isBlockUnder())) {
+                if (fallDist > 2F && (isVoid.getPropertyValue() || isBlockUnder())) {
                     mc.thePlayer.sendQueue.addToSendQueue(new C03PacketPlayer(true));
                     fallDist *= .1;
                 }
@@ -63,12 +80,12 @@ public class NoFall extends Module {
                 }
                 break;
             case "Edit":
-                if (fallDist > 2F && (isVoid.getObject() || isBlockUnder()))
+                if (fallDist > 2F && (isVoid.getPropertyValue() || isBlockUnder()))
                     event.setOnGround(true);
                 break;
             case "Collision":
                 if (fallDist > 3) {
-                    if (cancel.getObject()) {
+                    if (cancel.getPropertyValue()) {
                         mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C06PacketPlayerPosLook(
                                 (mc.thePlayer.posX + mc.thePlayer.lastTickPosX) / 2,
                                 (mc.thePlayer.posY - (mc.thePlayer.posY % (1 / 64.0))),
@@ -84,7 +101,7 @@ public class NoFall extends Module {
                 }
                 break;
             default:
-                NotificationManager.show(new Notification(NotificationType.WARNING, this.getName(), "Invalid mode: " + mode.getCurrentMode(), 2));
+                NotificationManager.show(new Notification(NotificationType.WARNING, this.getName(), "Invalid mode: " + mode.getPropertyValue().toString(), 2));
                 break;
         }
 
@@ -94,7 +111,7 @@ public class NoFall extends Module {
     {
         if (event.getPacket() instanceof C03PacketPlayer) {
             C03PacketPlayer look = (C03PacketPlayer) event.getPacket();
-            if (cancel.getObject() && mode.getCurrentMode().equals("Packet"))
+            if (cancel.getPropertyValue() && mode.getPropertyValue().toString().equals("Packet"))
                 if (look.getRotating() && look.isMoving())
                     if ((fallDist > 1) && isBlockUnder())
                         event.setPacket(new C03PacketPlayer.C04PacketPlayerPosition

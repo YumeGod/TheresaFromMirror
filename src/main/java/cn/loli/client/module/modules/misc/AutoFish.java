@@ -8,12 +8,13 @@ import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.player.rotation.RotationHook;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.ModeValue;
-import cn.loli.client.value.NumberValue;
+
 
 import dev.xix.event.EventType;
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
+import dev.xix.property.impl.EnumProperty;
+import dev.xix.property.impl.NumberProperty;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.init.Items;
 import net.minecraft.network.play.server.S29PacketSoundEffect;
@@ -22,17 +23,33 @@ import org.lwjgl.input.Keyboard;
 
 public class AutoFish extends Module {
 
-    private final ModeValue mode = new ModeValue("Mode", "Bounce", "Bounce", "Splash", "Both");
 
-    private final BooleanValue cast = new BooleanValue("Cast", false);
-    private final BooleanValue move = new BooleanValue("Auto-Move", false);
+    private enum MODE {
+        BOUNCE("Bounce"), SPLASH("Splash") , BOTH("Both");
 
-    private final BooleanValue glitch = new BooleanValue("Glitch", false);
-    private final BooleanValue lock = new BooleanValue("Locked", false);
+        private final String name;
 
-    private static final NumberValue<Integer> role = new NumberValue<>("Rod Handle Delay", 4500, 2000, 5000);
-    private static final NumberValue<Integer> hold = new NumberValue<>("Catch Delay", 150, 0, 300);
-    private static final NumberValue<Integer> rerole = new NumberValue<>("Re Cast Delay", 150, 0, 500);
+        MODE(String s) {
+            this.name = s;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    private final EnumProperty mode = new EnumProperty<>("Mode", MODE.BOUNCE);
+
+    private final BooleanProperty cast = new BooleanProperty("Cast", false);
+    private final BooleanProperty move = new BooleanProperty("Auto-Move", false);
+
+    private final BooleanProperty glitch = new BooleanProperty("Glitch", false);
+    private final BooleanProperty lock = new BooleanProperty("Locked", false);
+
+    private static final NumberProperty<Integer> role = new NumberProperty<>("Rod Handle Delay", 4500, 2000, 5000 , 500);
+    private static final NumberProperty<Integer> hold = new NumberProperty<>("Catch Delay", 150, 0, 300 , 50);
+    private static final NumberProperty<Integer> rerole = new NumberProperty<>("Re Cast Delay", 150, 0, 500 , 50);
 
     private final TimeHelper timer = new TimeHelper();
     private boolean shouldCatch = false;
@@ -49,7 +66,7 @@ public class AutoFish extends Module {
         if (e.getPacket() instanceof S29PacketSoundEffect) {
             S29PacketSoundEffect packet = (S29PacketSoundEffect) e.getPacket();
             if (!shouldReCast && packet.getSoundName().equals("random.splash")
-                    && !mode.getCurrentMode().equalsIgnoreCase("Bounce")) {
+                    && !mode.getPropertyValue().toString().equals("Bounce")) {
                 shouldCatch = true;
                 timer.reset();
             }
@@ -61,17 +78,17 @@ public class AutoFish extends Module {
     {
         if (e.getEventType() == EventType.PRE) {
             if (mc.thePlayer.getHeldItem().getItem() == Items.fishing_rod) {
-                if (move.getObject())
+                if (move.getPropertyValue())
                     if (mc.thePlayer.ticksExisted % 2 == 0)
                         moveUtils.addMotion(0.18, RotationHook.yaw + 90);
                     else
                         moveUtils.addMotion(-0.18, RotationHook.yaw + 90);
 
-                if (glitch.getObject()) {
+                if (glitch.getPropertyValue()) {
                     e.setX(e.getX() + mc.thePlayer.ticksExisted % 2 == 0 ? 1 : -1 * playerUtils.randomInRange(0.01, 0.02));
                     e.setZ(e.getZ() + mc.thePlayer.ticksExisted % 2 == 0 ? 1 : -1 * playerUtils.randomInRange(0.01, 0.02));
                 }
-                if (lock.getObject()) {
+                if (lock.getPropertyValue()) {
                     e.setYaw((float) (yaw * playerUtils.randomInRange(0.99, 1.01)));
                     e.setPitch((float) (pitch * playerUtils.randomInRange(0.99, 1.01)));
                 }
@@ -97,13 +114,13 @@ public class AutoFish extends Module {
 
         if (mc.thePlayer.fishEntity == null) {
             if (shouldReCast) {
-                if (timer.hasReached(rerole.getObject())) {
+                if (timer.hasReached(rerole.getPropertyValue())) {
                     ((IAccessorMinecraft) mc).invokeRightClickMouse();
                     timer.reset();
                     shouldCatch = false;
                     shouldReCast = false;
                 }
-            } else if (cast.getObject() && timer.hasReached(role.getObject())) {
+            } else if (cast.getPropertyValue() && timer.hasReached(role.getPropertyValue())) {
                 ((IAccessorMinecraft) mc).invokeRightClickMouse();
                 timer.reset();
                 shouldCatch = false;
@@ -111,14 +128,14 @@ public class AutoFish extends Module {
             }
         } else if (staticCheck() && waterCheck()) {
             if (shouldCatch) {
-                if (timer.hasReached(hold.getObject())) {
+                if (timer.hasReached(hold.getPropertyValue())) {
                     ((IAccessorMinecraft) mc).invokeRightClickMouse();
                     timer.reset();
                     shouldCatch = false;
                     shouldReCast = true;
                 }
             } else {
-                if (!mode.getCurrentMode().equalsIgnoreCase("Splash")
+                if (!mode.getPropertyValue().toString().equals("Splash")
                         && bounceCheck()) {
                     timer.reset();
                     shouldCatch = true;

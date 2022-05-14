@@ -23,7 +23,7 @@ public final class EnumProperty<T extends Enum<?>> extends AbstractTheresaProper
     }
 
     @SuppressWarnings("unchecked")
-    private T[] getEnumConstants() {
+    public T[] getEnumConstants() {
         return (T[]) propertyValue.getClass().getEnumConstants();
     }
 

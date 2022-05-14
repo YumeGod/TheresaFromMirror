@@ -7,10 +7,11 @@ import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.player.InventoryUtil;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.NumberValue;
+
 
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
+import dev.xix.property.impl.NumberProperty;
 import net.minecraft.client.gui.inventory.GuiInventory;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -31,9 +32,9 @@ public class AutoArmor extends Module {
     private final TimeHelper timeHelper = new TimeHelper();
     private final TimeHelper throwTimer = new TimeHelper();
 
-    private final BooleanValue inv = new BooleanValue("On Inventory", false);
-    private static final NumberValue<Integer> startDelay = new NumberValue<>("Start Delay", 0, 0, 200);
-    private static final NumberValue<Integer> throwDelay = new NumberValue<>("Throw Delay", 0, 0, 300);
+    private final BooleanProperty inv = new BooleanProperty("On Inventory", false);
+    private static final NumberProperty<Integer> startDelay = new NumberProperty<>("Start Delay", 0, 0, 200 , 10);
+    private static final NumberProperty<Integer> throwDelay = new NumberProperty<>("Throw Delay", 0, 0, 300 , 10);
 
     public AutoArmor() {
         super("Auto Armor", "Make you automatically put the armor on", ModuleCategory.PLAYER);
@@ -42,49 +43,49 @@ public class AutoArmor extends Module {
     private final IEventListener<TickEvent> onGui = event ->
     {
         if (mc.currentScreen instanceof GuiInventory) {
-            if (!timeHelper.hasReached((long) (startDelay.getObject() + inventoryUtil.getRandomGaussian(20)))) {
+            if (!timeHelper.hasReached((long) (startDelay.getPropertyValue() + inventoryUtil.getRandomGaussian(20)))) {
                 throwTimer.reset();
                 return;
             }
         } else {
             timeHelper.reset();
-            if (inv.getObject())
+            if (inv.getPropertyValue())
                 return;
         }
 
         for (int i = 5; i < 45; i++) {
             if (mc.thePlayer.inventoryContainer.getSlot(i).getHasStack()) {
                 final ItemStack is = mc.thePlayer.inventoryContainer.getSlot(i).getStack();
-                double random = throwDelay.getObject() == 0 ? 0 : inventoryUtil.getRandomGaussian(20);
-                if (throwTimer.hasReached((long) (throwDelay.getObject() + random))) {
+                double random = throwDelay.getPropertyValue() == 0 ? 0 : inventoryUtil.getRandomGaussian(20);
+                if (throwTimer.hasReached((long) (throwDelay.getPropertyValue() + random))) {
                     if (is.getItem() instanceof ItemArmor && isTrashArmor(is)) {
                         mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, i, 1, 4, mc.thePlayer);
                         throwTimer.reset();
-                        if (throwDelay.getObject() != 0) {
+                        if (throwDelay.getPropertyValue() != 0) {
                             break;
                         }
                     } else if (is.getItem() instanceof ItemArmor && helmet.contains(is.getItem()) && is == bestHelmet() && !mc.thePlayer.inventoryContainer.getSlot(5).getHasStack()) {
                         mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, i, 0, 1, mc.thePlayer);
                         throwTimer.reset();
-                        if (throwDelay.getObject() != 0) {
+                        if (throwDelay.getPropertyValue() != 0) {
                             break;
                         }
                     } else if (is.getItem() instanceof ItemArmor && chest.contains(is.getItem()) && is == bestChestplate() && !mc.thePlayer.inventoryContainer.getSlot(6).getHasStack()) {
                         mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, i, 0, 1, mc.thePlayer);
                         throwTimer.reset();
-                        if (throwDelay.getObject() != 0) {
+                        if (throwDelay.getPropertyValue() != 0) {
                             break;
                         }
                     } else if (is.getItem() instanceof ItemArmor && legging.contains(is.getItem()) && is == bestLeggings() && !mc.thePlayer.inventoryContainer.getSlot(7).getHasStack()) {
                         mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, i, 0, 1, mc.thePlayer);
                         throwTimer.reset();
-                        if (throwDelay.getObject() != 0) {
+                        if (throwDelay.getPropertyValue() != 0) {
                             break;
                         }
                     } else if (is.getItem() instanceof ItemArmor && boot.contains(is.getItem()) && is == bestBoots() && !mc.thePlayer.inventoryContainer.getSlot(8).getHasStack()) {
                         mc.playerController.windowClick(mc.thePlayer.inventoryContainer.windowId, i, 0, 1, mc.thePlayer);
                         throwTimer.reset();
-                        if (throwDelay.getObject() != 0) {
+                        if (throwDelay.getPropertyValue() != 0) {
                             break;
                         }
                     }

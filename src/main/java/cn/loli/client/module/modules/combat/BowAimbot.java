@@ -7,12 +7,13 @@ import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.misc.AntiBot;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.player.FormulaHelper;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.ModeValue;
-import cn.loli.client.value.NumberValue;
+
 
 import dev.xix.event.EventType;
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
+import dev.xix.property.impl.EnumProperty;
+import dev.xix.property.impl.NumberProperty;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.client.Minecraft;
@@ -33,24 +34,39 @@ import java.util.stream.Stream;
 
 public class BowAimbot extends Module {
 
-    private final BooleanValue invisibles = new BooleanValue("Invisibles", false);
-    private final BooleanValue players = new BooleanValue("Players", true);
-    private final BooleanValue animals = new BooleanValue("Animals", false);
-    private final BooleanValue mobs = new BooleanValue("Mobs", true);
-    private final BooleanValue armorStand = new BooleanValue("Armor Stand", true);
-    private final BooleanValue villagers = new BooleanValue("Villagers", false);
-    private final BooleanValue team = new BooleanValue("Team", false);
-    private final NumberValue<Integer> range = new NumberValue<>("Range", 50, 40, 120);
-    private final NumberValue<Float> fov = new NumberValue<>("FOV", 360f, 0f, 360f);
-    private final BooleanValue slient = new BooleanValue("Slient", true);
-    private final BooleanValue auto = new BooleanValue("Auto Release", true);
-    private final BooleanValue throughWalls = new BooleanValue("Through Walls", true);
-    private final BooleanValue moveFix = new BooleanValue("Move Fix", false);
-    private final BooleanValue clamp = new BooleanValue("Clamp", false);
+    private final BooleanProperty invisibles = new BooleanProperty("Invisibles", false);
+    private final BooleanProperty players = new BooleanProperty("Players", true);
+    private final BooleanProperty animals = new BooleanProperty("Animals", false);
+    private final BooleanProperty mobs = new BooleanProperty("Mobs", true);
+    private final BooleanProperty armorStand = new BooleanProperty("Armor Stand", true);
+    private final BooleanProperty villagers = new BooleanProperty("Villagers", false);
+    private final BooleanProperty team = new BooleanProperty("Team", false);
+    private final NumberProperty<Integer> range = new NumberProperty<>("Range", 50, 40, 120 , 1);
+    private final NumberProperty<Float> fov = new NumberProperty<>("FOV", 360f, 0f, 360f , 1f);
+    private final BooleanProperty slient = new BooleanProperty("Slient", true);
+    private final BooleanProperty auto = new BooleanProperty("Auto Release", true);
+    private final BooleanProperty throughWalls = new BooleanProperty("Through Walls", true);
+    private final BooleanProperty moveFix = new BooleanProperty("Move Fix", false);
+    private final BooleanProperty clamp = new BooleanProperty("Clamp", false);
 
-    private final BooleanValue prediction = new BooleanValue("Prediction", false);
+    private final BooleanProperty prediction = new BooleanProperty("Prediction", false);
 
-    private final ModeValue mode = new ModeValue("Priority", "Angle", "Armor", "Range", "Fov", "Angle", "Health", "Hurt Time");
+    private enum MODE {
+        ANGLE("Angle"), ARMOR("Armor"), RANGE("Range"), FOV("Fov Based"), HEALTH("Health"), Hurt_Time("Hurt Time");
+
+        private final String name;
+
+        MODE(String s) {
+            this.name = s;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    private final EnumProperty mode = new EnumProperty<>("Priority", MODE.FOV);
 
     private Entity curEntity;
     float yaw, pitch;
@@ -62,17 +78,17 @@ public class BowAimbot extends Module {
 
 
     private final IEventListener<MoveFlyEvent> onMoveFly = event -> {
-        if (moveFix.getObject() && allowAiming(mc.thePlayer))
+        if (moveFix.getPropertyValue() && allowAiming(mc.thePlayer))
             event.setYaw(yaw);
     };
 
     private final IEventListener<JumpYawEvent> onJump = event -> {
-        if (moveFix.getObject() && allowAiming(mc.thePlayer))
+        if (moveFix.getPropertyValue() && allowAiming(mc.thePlayer))
             event.setYaw(yaw);
     };
 
     private final IEventListener<MovementStateEvent> onSilent = event -> {
-        if (moveFix.getObject() && allowAiming(mc.thePlayer)) {
+        if (moveFix.getPropertyValue() && allowAiming(mc.thePlayer)) {
             event.setYaw(yaw);
             event.setSilentMoveFix(true);
         }
@@ -80,7 +96,7 @@ public class BowAimbot extends Module {
 
     private final IEventListener<MotionUpdateEvent> onMotion = event -> {
         if (event.getEventType() == EventType.PRE) {
-            if (slient.getObject() && allowAiming(mc.thePlayer)) {
+            if (slient.getPropertyValue() && allowAiming(mc.thePlayer)) {
                 if (!Float.isNaN(pitch)) {
                     event.setYaw(yaw);
                     event.setPitch(pitch);
@@ -90,7 +106,7 @@ public class BowAimbot extends Module {
     };
 
     private final IEventListener<UpdateEvent> onUpdate = event -> {
-        if (!slient.getObject() && allowAiming(mc.thePlayer)) {
+        if (!slient.getPropertyValue() && allowAiming(mc.thePlayer)) {
             mc.thePlayer.rotationYaw = yaw;
             mc.thePlayer.rotationPitch = pitch;
         }
@@ -113,16 +129,16 @@ public class BowAimbot extends Module {
                 final double g = getGravity();
 
                 float pitch = FormulaHelper.getProjectileMotion(v, g, x, deltaY);
-                float[] rotations = rotationUtils.facePlayer(entity, false, false, false, prediction.getObject(), true, false, 0, clamp.getObject(), 180, 6, false, 0);
+                float[] rotations = rotationUtils.facePlayer(entity, false, false, false, prediction.getPropertyValue(), true, false, 0, clamp.getPropertyValue(), 180, 6, false, 0);
                 pitch = MathHelper.clamp_float(pitch, -90, 90);
 
                 yaw = rotations[0];
                 this.pitch = pitch;
 
-                if (v == 1F && auto.getObject()) {
+                if (v == 1F && auto.getPropertyValue()) {
                     if (timeHelper.hasReached(200))
                         mc.playerController.onStoppedUsingItem(mc.thePlayer);
-                } else if (auto.getObject()) {
+                } else if (auto.getPropertyValue()) {
                     timeHelper.reset();
                 }
 
@@ -142,21 +158,21 @@ public class BowAimbot extends Module {
 
     private boolean canAttack(EntityLivingBase target) {
         if (target instanceof EntityPlayer || target instanceof EntityAnimal || target instanceof EntityMob || target instanceof INpc) {
-            if (target instanceof EntityPlayer && !players.getObject()) return false;
-            if (target instanceof EntityAnimal && !animals.getObject()) return false;
-            if (target instanceof EntityMob && !mobs.getObject()) return false;
-            if (target instanceof INpc && !villagers.getObject()) return false;
+            if (target instanceof EntityPlayer && !players.getPropertyValue()) return false;
+            if (target instanceof EntityAnimal && !animals.getPropertyValue()) return false;
+            if (target instanceof EntityMob && !mobs.getPropertyValue()) return false;
+            if (target instanceof INpc && !villagers.getPropertyValue()) return false;
         }
 
-        if (target instanceof EntityArmorStand && !armorStand.getObject()) return false;
-        if (playerUtils.isOnSameTeam(target) && !team.getObject()) return false;
-        if (target.isInvisible() && !invisibles.getObject()) return false;
-        if (!isInFOV(target, fov.getObject())) return false;
-        if (!throughWalls.getObject() && !target.canEntityBeSeen(mc.thePlayer)) return false;
+        if (target instanceof EntityArmorStand && !armorStand.getPropertyValue()) return false;
+        if (playerUtils.isOnSameTeam(target) && !team.getPropertyValue()) return false;
+        if (target.isInvisible() && !invisibles.getPropertyValue()) return false;
+        if (!isInFOV(target, fov.getPropertyValue())) return false;
+        if (!throughWalls.getPropertyValue() && !target.canEntityBeSeen(mc.thePlayer)) return false;
         if (Main.INSTANCE.moduleManager.getModule(AntiBot.class).getState() && Main.INSTANCE.moduleManager.getModule(AntiBot.class).isBot(target))
             return false;
 
-        return target != mc.thePlayer && target.isEntityAlive() && mc.thePlayer.getDistanceToEntity(target) <= range.getObject();
+        return target != mc.thePlayer && target.isEntityAlive() && mc.thePlayer.getDistanceToEntity(target) <= range.getPropertyValue();
     }
 
     private boolean isInFOV(EntityLivingBase entity, double angle) {
@@ -275,7 +291,7 @@ public class BowAimbot extends Module {
                 .map(entity -> (EntityLivingBase) entity)
                 .filter(this::canAttack);
 
-        switch (mode.getCurrentMode()) {
+        switch (mode.getPropertyValue().toString()) {
             case "Armor": {
                 stream = stream.sorted(Comparator.comparingInt(o -> ((o instanceof EntityPlayer ? ((EntityPlayer) o).inventory.getTotalArmorValue() : (int) o.getHealth()))));
                 break;
@@ -284,7 +300,7 @@ public class BowAimbot extends Module {
                 stream = stream.sorted((o1, o2) -> (int) (o1.getDistanceToEntity(mc.thePlayer) - o2.getDistanceToEntity(mc.thePlayer)));
                 break;
             }
-            case "Fov": {
+            case "Fov Based": {
                 stream = stream.sorted(Comparator.comparingDouble(o -> getDistanceBetweenAngles(mc.thePlayer.rotationPitch, getRotations(o)[0])));
                 break;
             }

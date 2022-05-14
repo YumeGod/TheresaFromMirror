@@ -5,13 +5,13 @@ import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.MouseOverEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.value.NumberValue;
 
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.NumberProperty;
 
 public class Range extends Module {
 
-    public static final NumberValue<Integer> range = new NumberValue<>("Range", 6, 3, 100);
+    public static final NumberProperty<Integer> range = new NumberProperty<>("Range", 6, 3, 100 , 1);
 
     public Range() {
         super("Range", "You get more range", ModuleCategory.COMBAT);
@@ -19,13 +19,13 @@ public class Range extends Module {
 
     private final IEventListener<MouseOverEvent> onRange = e ->
     {
-        e.setRange(range.getObject());
+        e.setRange(range.getPropertyValue());
         e.setRangeCheck(false);
     };
 
     private final IEventListener<BlockReachEvent> onReach = e ->
     {
-        e.setRange(range.getObject());
+        e.setRange(range.getPropertyValue());
     };
 
 }

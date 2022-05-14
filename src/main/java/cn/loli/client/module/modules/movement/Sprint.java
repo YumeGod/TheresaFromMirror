@@ -2,18 +2,35 @@
 
 package cn.loli.client.module.modules.movement;
 
-import cn.loli.client.events.JumpEvent;
+
 import cn.loli.client.events.TickEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.value.ModeValue;
+
 
 import dev.xix.event.EventType;
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.EnumProperty;
 import net.minecraft.potion.Potion;
 
 public class Sprint extends Module {
-    private final ModeValue mode = new ModeValue("Mode", "Legit", "Legit", "Rage");
+
+    private enum MODE {
+        LEGIT("Legit"), RAGE("Rage");
+
+        private final String name;
+
+        MODE(String s) {
+            this.name = s;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    private final EnumProperty mode = new EnumProperty<>("Mode", MODE.LEGIT);
 
     public Sprint() {
         super("Sprint", "Automatically sprints for you.", ModuleCategory.MOVEMENT);
@@ -23,7 +40,7 @@ public class Sprint extends Module {
     {
         if (event.getEventType() != EventType.PRE) return;
 
-        if (mode.getCurrentMode().equalsIgnoreCase("Rage") ||
+        if (mode.getPropertyValue().toString().equals("Rage") ||
                 (!mc.thePlayer.movementInput.sneak &&
                         (mc.thePlayer.movementInput.moveForward >= 0.8F) &&
                         !mc.thePlayer.isSprinting() &&

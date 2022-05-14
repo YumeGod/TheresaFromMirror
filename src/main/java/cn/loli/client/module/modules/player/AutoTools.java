@@ -5,9 +5,9 @@ import cn.loli.client.events.RenderEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.player.InventoryUtil;
-import cn.loli.client.value.BooleanValue;
 
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.Entity;
@@ -22,8 +22,8 @@ import net.minecraft.util.MovingObjectPosition;
 
 public class AutoTools extends Module {
 
-    private final BooleanValue sword = new BooleanValue("Sword-Swap", false);
-    private final BooleanValue mouseCheck = new BooleanValue("Hold-Check", false);
+    private final BooleanProperty sword = new BooleanProperty("Sword-Swap", false);
+    private final BooleanProperty mouseCheck = new BooleanProperty("Hold-Check", false);
 
 
     public AutoTools() {
@@ -52,16 +52,16 @@ public class AutoTools extends Module {
         if ((e.getPacket() instanceof C02PacketUseEntity)
                 && ((C02PacketUseEntity) e.getPacket()).getAction().equals(C02PacketUseEntity.Action.ATTACK)) {
             boolean checks = !mc.thePlayer.isEating();
-            if (checks && sword.getObject())
+            if (checks && sword.getPropertyValue())
                 bestSword();
         }
 
         if (e.getPacket() instanceof C07PacketPlayerDigging) {
             C07PacketPlayerDigging packetPlayerDigging = (C07PacketPlayerDigging) e.getPacket();
             if ((packetPlayerDigging.getStatus() == C07PacketPlayerDigging.Action.START_DESTROY_BLOCK)) {
-                if ((mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK || !mouseCheck.getObject()) && !mc.thePlayer.capabilities.isCreativeMode) {
-                    BlockPos blockPosHit = mouseCheck.getObject() ? mc.objectMouseOver.getBlockPos() : packetPlayerDigging.getPosition();
-                    if (blockPosHit != null || !mouseCheck.getObject()) {
+                if ((mc.objectMouseOver.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK || !mouseCheck.getPropertyValue()) && !mc.thePlayer.capabilities.isCreativeMode) {
+                    BlockPos blockPosHit = mouseCheck.getPropertyValue() ? mc.objectMouseOver.getBlockPos() : packetPlayerDigging.getPosition();
+                    if (blockPosHit != null || !mouseCheck.getPropertyValue()) {
                         mc.thePlayer.inventory.currentItem = getBestTool(blockPosHit);
                         mc.playerController.updateController();
                     }

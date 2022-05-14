@@ -6,11 +6,11 @@ import cn.loli.client.events.PlayerMoveEvent;
 import cn.loli.client.events.RenderEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.ModeValue;
-import cn.loli.client.value.NumberValue;
 
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
+import dev.xix.property.impl.EnumProperty;
+import dev.xix.property.impl.NumberProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.BlockPos;
@@ -23,17 +23,32 @@ import java.util.List;
 
 public class TargetStrafe extends Module {
 
+    private enum MODE {
+        CIRCLE("Circle"), FREEZE("Freeze");
+
+        private final String name;
+
+        MODE(String s) {
+            this.name = s;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
     // Need to be holding space
-    public final BooleanValue holdSpaceProperty = new BooleanValue("Hold Space", true);
+    public final BooleanProperty holdSpaceProperty = new BooleanProperty("Hold Space", true);
     // Pattern mode
-    private final ModeValue modeProperty = new ModeValue("Mode", "Circle", "Freeze", "Circle");
+    private final EnumProperty modeProperty = new EnumProperty<>("Mode", MODE.CIRCLE);
     // Radius & points
-    private final NumberValue<Integer> pointsProperty = new NumberValue<>("Points", 12, 1, 18);
-    private final NumberValue<Double> radiusProperty = new NumberValue<>("Radius", 2.0, 0.1, 6.0);
+    private final NumberProperty<Integer> pointsProperty = new NumberProperty<>("Points", 12, 1, 18, 1);
+    private final NumberProperty<Double> radiusProperty = new NumberProperty<>("Radius", 2.0, 0.1, 6.0, 0.1);
     // Adaptive
-    private final BooleanValue adaptiveSpeedProperty = new BooleanValue("Adapt Speed", true);
+    private final BooleanProperty adaptiveSpeedProperty = new BooleanProperty("Adapt Speed", true);
     //Direction Keys
-    private final BooleanValue directionKeyProperty = new BooleanValue("Direction Keys", true);
+    private final BooleanProperty directionKeyProperty = new BooleanProperty("Direction Keys", true);
 
     private final List<Point> currentPoints = new ArrayList<>();
     public EntityLivingBase currentTarget;
@@ -50,7 +65,7 @@ public class TargetStrafe extends Module {
         this.currentTarget = Main.INSTANCE.moduleManager.getModule(Aura.class).target;
 
         if (this.currentTarget != null) {
-            if (this.directionKeyProperty.getObject()) {
+            if (this.directionKeyProperty.getPropertyValue()) {
                 if (mc.gameSettings.keyBindLeft.isPressed()) {
                     this.direction = 1;
                 }
@@ -60,7 +75,7 @@ public class TargetStrafe extends Module {
                 }
             }
 
-            this.collectPoints(this.pointsProperty.getObject() * radiusProperty.getObject().intValue(), this.radiusProperty.getObject(), this.currentTarget);
+            this.collectPoints(this.pointsProperty.getPropertyValue() * radiusProperty.getPropertyValue().intValue(), this.radiusProperty.getPropertyValue(), this.currentTarget);
             this.currentPoint = this.findOptimalPoint(this.currentTarget, this.currentPoints);
         } else {
             this.currentPoint = null;
@@ -68,9 +83,8 @@ public class TargetStrafe extends Module {
     };
 
 
-
     private Point findOptimalPoint(EntityLivingBase target, List<Point> points) {
-        if ("Freeze".equals(modeProperty.getCurrentMode())) {
+        if ("Freeze".equals(modeProperty.getPropertyValue().toString())) {
             return getClosestPoint(mc.thePlayer.posX, mc.thePlayer.posZ, points);
         }
         final Point closest = getClosestPoint(mc.thePlayer.posX, mc.thePlayer.posZ, points);
@@ -185,7 +199,7 @@ public class TargetStrafe extends Module {
     }
 
     public boolean shouldAdaptSpeed() {
-        if (!adaptiveSpeedProperty.getObject())
+        if (!adaptiveSpeedProperty.getPropertyValue())
             return false;
         return isCloseToPoint(currentPoint);
     }
@@ -198,7 +212,7 @@ public class TargetStrafe extends Module {
 
     public boolean shouldStrafe() {
         return Main.INSTANCE.moduleManager.getModule(TargetStrafe.class).getState() &&
-                (!holdSpaceProperty.getObject() || Keyboard.isKeyDown(Keyboard.KEY_SPACE)) &&
+                (!holdSpaceProperty.getPropertyValue() || Keyboard.isKeyDown(Keyboard.KEY_SPACE)) &&
                 currentTarget != null &&
                 currentPoint != null;
     }
