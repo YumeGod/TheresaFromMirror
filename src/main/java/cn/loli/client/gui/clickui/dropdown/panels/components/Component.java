@@ -1,13 +1,13 @@
 package cn.loli.client.gui.clickui.dropdown.panels.components;
 
 import cn.loli.client.module.Module;
-import cn.loli.client.value.Value;
+import dev.xix.property.AbstractTheresaProperty;
 
 public class Component {
-    public Value value;
+    public AbstractTheresaProperty value;
     public float x,y;
 
-    public Component(Value v) {
+    public Component(AbstractTheresaProperty v) {
         this.value = v;
     }
 

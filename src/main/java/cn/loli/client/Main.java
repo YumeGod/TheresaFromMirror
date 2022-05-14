@@ -19,13 +19,13 @@ import cn.loli.client.script.java.sfontmanager.SFontLoader;
 import cn.loli.client.utils.misc.ExploitFix;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.others.SoundFxPlayer;
-import cn.loli.client.value.ValueManager;
 import com.Kernel32;
 
 
 import dev.xix.event.Event;
 import dev.xix.event.bus.EventBus;
 import dev.xix.event.bus.IEventListener;
+import dev.xix.property.PropertyManager;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -83,7 +83,7 @@ public class Main {
     public Logger logger;
     public ModuleManager moduleManager;
     public CommandManager commandManager;
-    public ValueManager valueManager;
+    public PropertyManager valueManager;
     public FileManager fileManager;
 
     public Queue<Packet<?>> packetQueue;
@@ -136,7 +136,7 @@ public class Main {
         //File Load
         fileManager = new FileManager();
         //Value Load
-        valueManager = new ValueManager();
+        valueManager = new PropertyManager();
         //Command init
         commandManager = new CommandManager();
         //Module init

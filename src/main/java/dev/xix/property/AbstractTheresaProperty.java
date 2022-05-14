@@ -1,10 +1,14 @@
 package dev.xix.property;
 
+import cn.loli.client.gui.clickui.dropdown.Panel;
+import cn.loli.client.gui.clickui.dropdown.panels.components.Component;
+
 import java.util.function.Supplier;
 
 public abstract class AbstractTheresaProperty<T> {
     protected final String name;
     protected final String identifier;
+    public Component component;
 
     protected T propertyValue;
 
