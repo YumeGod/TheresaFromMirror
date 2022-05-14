@@ -17,6 +17,7 @@ public class BooleanProperty extends AbstractTheresaProperty<Boolean> {
 
     public BooleanProperty(final String name, final boolean value) {
         super(name, value, () -> true);
+        this.component = new BooleanComponent(this);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package dev.xix.property.impl;
 
+import cn.loli.client.gui.clickui.dropdown.panels.components.ModeComponent;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -19,6 +20,7 @@ public class EnumProperty<T extends Enum<?>> extends AbstractTheresaProperty<T> 
     public EnumProperty(final String name, final T value, final Supplier<Boolean> depedency) {
         super(name, value, depedency);
         this.enumValues = getEnumConstants();
+        this.component = new ModeComponent(this);
     }
 
     public EnumProperty(final String name, final T value) {

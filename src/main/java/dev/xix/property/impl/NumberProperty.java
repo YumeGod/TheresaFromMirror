@@ -1,5 +1,6 @@
 package dev.xix.property.impl;
 
+import cn.loli.client.gui.clickui.dropdown.panels.components.NumberComponent;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -18,10 +19,14 @@ public class NumberProperty<T extends Number> extends AbstractTheresaProperty<T>
 
     public NumberProperty(final String name, final T value, final T minimum, final T maximum, final T increment, final Supplier<Boolean> supplier) {
         super(name, value, supplier);
-
         this.minimum = minimum;
         this.maximum = maximum;
         this.increment = increment;
+        component = new NumberComponent(this);
+    }
+
+    public NumberProperty(final String name, final T value, final T minimum, final T maximum, final T increment) {
+        this(name, value, minimum, maximum, increment, () -> true);
     }
 
     public T getIncrement() {
@@ -34,10 +39,6 @@ public class NumberProperty<T extends Number> extends AbstractTheresaProperty<T>
 
     public T getMinimum() {
         return minimum;
-    }
-
-    public NumberProperty(final String name, final T value, final T minimum, final T maximum, final T increment) {
-        this(name, value, minimum, maximum, increment, () -> true);
     }
 
     @Override
