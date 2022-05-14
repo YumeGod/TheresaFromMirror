@@ -32,13 +32,11 @@ public class ModeComponent extends Component {
 
         if (((EnumProperty) value).open) {
             float yy = y + 11;
-            int i = 0;
             for (Enum m : ((EnumProperty) value).getEnumConstants()) {
                 if (isHovered(x + 5 - width2, yy, x + 20, yy + 14, mouseX, mouseY)) {
-                    value.setPropertyValue(i);
+                    value.setPropertyValue(m);
                     ((EnumProperty) value).open = false;
                 }
-                i++;
                 yy += 14;
             }
         }
