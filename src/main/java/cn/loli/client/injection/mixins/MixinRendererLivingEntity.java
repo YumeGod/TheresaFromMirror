@@ -51,7 +51,7 @@ public abstract class MixinRendererLivingEntity<T extends EntityLivingBase> {
         for (LayerRenderer<T> layerRenderer : layerRenderers) {
             boolean combineTextures = layerRenderer.shouldCombineTextures();
 
-            if (Main.INSTANCE.moduleManager.getModule(OldAnimations.class).getState() && Main.INSTANCE.moduleManager.getModule(OldAnimations.class).damageFlash.getObject()) {
+            if (Main.INSTANCE.moduleManager.getModule(OldAnimations.class).getState() && Main.INSTANCE.moduleManager.getModule(OldAnimations.class).damageFlash.getPropertyValue()) {
                 combineTextures = true;
             }
 
@@ -67,10 +67,10 @@ public abstract class MixinRendererLivingEntity<T extends EntityLivingBase> {
     @Redirect(method = "renderModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/ModelBase;render(Lnet/minecraft/entity/Entity;FFFFFF)V"))
     protected void renderModel(ModelBase instance, Entity entityIn, float p_78088_2_, float p_78088_3_, float p_78088_4_, float p_78088_5_, float p_78088_6_, float scale) {
         ESP esp = Main.INSTANCE.moduleManager.getModule(ESP.class);
-        Color color = esp.chamsColor.getObject();
-        Color color2 = esp.throughWallsColor.getObject();
+        Color color = esp.chamsColor.getPropertyValue();
+        Color color2 = esp.throughWallsColor.getPropertyValue();
 
-        if (esp.getState() && esp.chams.getObject() &&
+        if (esp.getState() && esp.chams.getPropertyValue() &&
                 (entityIn instanceof EntityPlayer && entityIn != Minecraft.getMinecraft().thePlayer) && !entityIn.isInvisible()) {
             GL11.glPushMatrix();
             GL11.glDisable(GL11.GL_DEPTH_TEST);

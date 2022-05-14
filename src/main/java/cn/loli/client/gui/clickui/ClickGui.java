@@ -1,10 +1,8 @@
 package cn.loli.client.gui.clickui;
 
 import cn.loli.client.Main;
-import cn.loli.client.gui.clickui.dropdown.panels.components.BooleanComponent;
 import cn.loli.client.gui.clickui.dropdown.panels.components.ModeComponent;
 import cn.loli.client.gui.clickui.dropdown.panels.components.NumberComponent;
-import cn.loli.client.gui.ttfr.HFontRenderer;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.render.AnimationUtils;
@@ -21,7 +19,6 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.Objects;
 import static cn.loli.client.gui.guiscreen.GuiReconnectIRC.isHovered;
 
@@ -225,17 +222,17 @@ public class ClickGui extends GuiScreen {
                             mc.draw(x + width - 35, valuesY, partialTicks);
                             valuesY += v.clickgui_anim;
                         } else if (v instanceof StringProperty) {
-                            if (((StringProperty) v).text == null) {
-                                ((StringProperty) v).text = new GuiTextBox(0, Main.INSTANCE.fontLoaders.get("heiti17"), 0, 0, 0, 0);
-                                ((StringProperty) v).text.setText(((StringValue) v).getObject());
+                            if (((StringProperty) v).textBox == null) {
+                                ((StringProperty) v).textBox = new GuiTextBox(0, Main.INSTANCE.fontLoaders.get("heiti17"), 0, 0, 0, 0);
+                                ((StringProperty) v).textBox.setText(((StringProperty) v).getPropertyValue());
                             } else {
-                                ((StringProperty) v).text.xPosition = (int) (x + width - 80);
-                                ((StringProperty) v).text.yPosition = (int) valuesY - 2;
-                                ((StringProperty) v).text.height = 14;
-                                ((StringProperty) v).text.width = 60;
-                                RenderUtils.drawRoundedRect(((StringValue) v).text.xPosition - 1, ((StringValue) v).text.yPosition - 1, ((StringValue) v).text.width + 2, ((StringValue) v).text.height + 2, 2, new Color(200, 200, 200).getRGB());
-                                ((StringProperty) v).text.drawTextBox();
-                                v.setPropertyValue(((StringProperty) v).text.getText());
+                                ((StringProperty) v).textBox.xPosition = (int) (x + width - 80);
+                                ((StringProperty) v).textBox.yPosition = (int) valuesY - 2;
+                                ((StringProperty) v).textBox.height = 14;
+                                ((StringProperty) v).textBox.width = 60;
+                                RenderUtils.drawRoundedRect(((StringProperty) v).textBox.xPosition - 1, ((StringProperty) v).textBox.yPosition - 1, ((StringProperty) v).textBox.width + 2, ((StringProperty) v).textBox.height + 2, 2, new Color(200, 200, 200).getRGB());
+                                ((StringProperty) v).textBox.drawTextBox();
+                                v.setPropertyValue(((StringProperty) v).textBox.getText());
                             }
                         } else if (v instanceof ColorProperty) {
                             // Color
@@ -367,8 +364,8 @@ public class ClickGui extends GuiScreen {
                 if (m == curModule) {
                     for (AbstractTheresaProperty v : Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName()))) {
                         if (v instanceof StringProperty) {
-                            if (((StringProperty) v).text != null) {
-                                ((StringProperty) v).text.textboxKeyTyped(typedChar, keyCode);
+                            if (((StringProperty) v).textBox != null) {
+                                ((StringProperty) v).textBox.textboxKeyTyped(typedChar, keyCode);
                             }
                         }
                     }
@@ -432,8 +429,8 @@ public class ClickGui extends GuiScreen {
                             mc.onMouse(mouseX, mouseY, mouseButton);
                             valuesY += v.clickgui_anim;
                         } else if (v instanceof StringProperty) {
-                            if (((StringProperty) v).text != null) {
-                                ((StringProperty) v).text.mouseClicked(mouseX, mouseY, mouseButton);
+                            if (((StringProperty) v).textBox != null) {
+                                ((StringProperty) v).textBox.mouseClicked(mouseX, mouseY, mouseButton);
                             }
                         } else if (v instanceof ColorProperty) {
                             valuesY += 30;

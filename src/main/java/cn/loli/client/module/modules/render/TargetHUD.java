@@ -55,12 +55,28 @@ public class TargetHUD extends Module {
     private final FloatBuffer modelMatrix = GLAllocation.createDirectFloatBuffer(16);
     private final FloatBuffer projectionMatrix = GLAllocation.createDirectFloatBuffer(16);
 
-    private final EnumProperty mode = new EnumProperty<>("Mode", "Genshin", "Genshin", "Fancy");
+    private enum MODE {
+        Genshin,
+        Fancy
+    }
 
+    private enum FONT {
+        Genshin,
+        Roboto,
+        Ubuntu,
+        Dos
+    }
 
-    private final EnumProperty font = new EnumProperty<>("Font", "Genshin", "Genshin", "Roboto", "Ubuntu", "Dos");
-    private final NumberProperty<Integer> targetAmount = new NumberProperty<>("Display Amount", 5, 1, 6);
-    private final EnumProperty sort = new EnumProperty<>("Display", "Normal", "Normal", "Player");
+    private enum SORT {
+        Normal,
+        Player
+    }
+
+    private final EnumProperty mode = new EnumProperty<>("Mode", MODE.Genshin);
+
+    private final EnumProperty font = new EnumProperty<>("Font", FONT.Genshin);
+    private final NumberProperty<Integer> targetAmount = new NumberProperty<>("Display Amount", 5, 1, 6, 1);
+    private final EnumProperty sort = new EnumProperty<>("Display", SORT.Normal);
 
     public TargetHUD() {
         super("Target Hud", "Make you can check the detail of targets", ModuleCategory.RENDER);
@@ -148,7 +164,6 @@ public class TargetHUD extends Module {
                 ? Main.INSTANCE.moduleManager.getModule(Aura.class).target
                 : rotationUtils.rayCastedEntity(6.0, RotationHook.yaw, RotationHook.pitch);
     };
-
 
 
     private Vec3 getVec3(final EntityPlayer var0) {

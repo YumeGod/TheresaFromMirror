@@ -21,8 +21,8 @@ public class ModeComponent extends Component {
     public void onMouse(int mouseX, int mouseY, int button) {
         HFontRenderer font = Main.INSTANCE.fontLoaders.get("heiti16");
         float width2 = 0;
-        for (String mode : ((EnumProperty) value).getModes()) {
-            float temp = font.getStringWidth(mode);
+        for (Enum mode : ((EnumProperty) value).getEnumConstants()) {
+            float temp = font.getStringWidth(mode.name());
             if (width2 < temp) width2 = temp;
         }
 
@@ -33,7 +33,7 @@ public class ModeComponent extends Component {
         if (((EnumProperty) value).open) {
             float yy = y + 11;
             int i = 0;
-            for (String m : ((EnumProperty) value).getModes()) {
+            for (Enum m : ((EnumProperty) value).getEnumConstants()) {
                 if (isHovered(x + 5 - width2, yy, x + 20, yy + 14, mouseX, mouseY)) {
                     value.setPropertyValue(i);
                     ((EnumProperty) value).open = false;
@@ -52,14 +52,14 @@ public class ModeComponent extends Component {
         HFontRenderer font = Main.INSTANCE.fontLoaders.get("heiti17");
         float width2 = 0;
 
-        for (String mode : ((EnumProperty) value).getModes()) {
-            float temp = font.getStringWidth(mode);
+        for (Enum mode : ((EnumProperty) value).getEnumConstants()) {
+            float temp = font.getStringWidth(mode.name());
             if (width2 < temp) width2 = temp;
         }
 
         RenderUtils.drawRoundRect(x + 5 - width2, y - 1, x + 20, y + 11 + value.clickgui_anim, 2, theme.option_bg.getRGB());
 
-        font.drawCenteredString(((EnumProperty) value).getCurrentMode(), x + 12 - width2 / 2, y + 1, theme.value_mode_current.getRGB());
+        font.drawCenteredString(((Enum) ((EnumProperty) value).getPropertyValue()).name(), x + 12 - width2 / 2, y + 1, theme.value_mode_current.getRGB());
 
         if (((EnumProperty) value).open) {
             value.clickgui_anim = AnimationUtils.smoothAnimation(value.clickgui_anim, ((EnumProperty) value).getEnumConstants().length * 14, ANIMATION_SPEED, ANIMATION_SCALE);
@@ -69,9 +69,9 @@ public class ModeComponent extends Component {
 
         if (((EnumProperty) value).open) {
             float yy = y + 14;
-            for (String mode : ((EnumProperty) value).getModes()) {
+            for (Enum mode : ((EnumProperty) value).getEnumConstants()) {
                 if (y + 18 + value.clickgui_anim >= yy + 14) {
-                    font.drawCenteredString(mode, x + 12 - width2 / 2, yy, theme.value_mode_unsel.getRGB());
+                    font.drawCenteredString(mode.name(), x + 12 - width2 / 2, yy, theme.value_mode_unsel.getRGB());
                 }
 
                 yy += 14;

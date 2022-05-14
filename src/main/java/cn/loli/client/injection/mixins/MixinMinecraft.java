@@ -110,7 +110,7 @@ public abstract class MixinMinecraft {
     @Redirect(method = "sendClickBlockToController", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;isUsingItem()Z"))
     private boolean blockHit(EntityPlayerSP player) {
         BlockHit blockHit = Main.INSTANCE.moduleManager.getModule(BlockHit.class);
-        if (blockHit.getState() && !blockHit.animationsOnly.getObject()) return false;
+        if (blockHit.getState() && !blockHit.animationsOnly.getPropertyValue()) return false;
         return player.isUsingItem();
     }
 

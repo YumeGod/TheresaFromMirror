@@ -43,7 +43,7 @@ public class MixinLayerHeldItem {
             }
 
             if (entitylivingbaseIn instanceof EntityPlayer) {
-                if (Main.INSTANCE.moduleManager.getModule(OldAnimations.class).getState() && Main.INSTANCE.moduleManager.getModule(OldAnimations.class).oldBlocking.getObject()) {
+                if (Main.INSTANCE.moduleManager.getModule(OldAnimations.class).getState() && Main.INSTANCE.moduleManager.getModule(OldAnimations.class).oldBlocking.getPropertyValue()) {
                     if (((EntityPlayer) entitylivingbaseIn).isBlocking()) {
                         float itemScale = 0.0325f;
 

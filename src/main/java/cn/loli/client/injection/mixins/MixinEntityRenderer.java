@@ -83,12 +83,12 @@ public abstract class MixinEntityRenderer {
 
     @ModifyVariable(method = {"orientCamera"}, ordinal = 3, at = @At(value = "STORE", ordinal = -1), require = 1)
     private double view(double value) {
-        return (Main.INSTANCE.moduleManager.getModule(ViewClip.class).getState() && Main.INSTANCE.moduleManager.getModule(ViewClip.class).extend.getObject()) ? Main.INSTANCE.moduleManager.getModule(ViewClip.class).dis.getObject() : value;
+        return (Main.INSTANCE.moduleManager.getModule(ViewClip.class).getState() && Main.INSTANCE.moduleManager.getModule(ViewClip.class).extend.getPropertyValue()) ? Main.INSTANCE.moduleManager.getModule(ViewClip.class).dis.getPropertyValue() : value;
     }
 
     @ModifyVariable(method = {"orientCamera"}, ordinal = 7, at = @At(value = "STORE", ordinal = -1), require = 1)
     private double viewport(double value) {
-        return (Main.INSTANCE.moduleManager.getModule(ViewClip.class).getState() && Main.INSTANCE.moduleManager.getModule(ViewClip.class).extend.getObject()) ? Main.INSTANCE.moduleManager.getModule(ViewClip.class).dis.getObject() : (Main.INSTANCE.moduleManager.getModule(ViewClip.class).getState() && !Main.INSTANCE.moduleManager.getModule(ViewClip.class).extend.getObject()) ? 4.0 : value;
+        return (Main.INSTANCE.moduleManager.getModule(ViewClip.class).getState() && Main.INSTANCE.moduleManager.getModule(ViewClip.class).extend.getPropertyValue()) ? Main.INSTANCE.moduleManager.getModule(ViewClip.class).dis.getPropertyValue() : (Main.INSTANCE.moduleManager.getModule(ViewClip.class).getState() && !Main.INSTANCE.moduleManager.getModule(ViewClip.class).extend.getPropertyValue()) ? 4.0 : value;
     }
 
     @Inject(method = "orientCamera", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getRenderViewEntity()Lnet/minecraft/entity/Entity;", ordinal = 0, shift = At.Shift.AFTER), cancellable = true)

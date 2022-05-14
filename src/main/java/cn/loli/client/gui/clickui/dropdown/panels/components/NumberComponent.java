@@ -45,7 +45,7 @@ public class NumberComponent extends Component {
         // Number value
         RenderUtils.drawRoundRect(x, y, x + width, y + 6, 3, theme.option_bg.getRGB());
 
-        float vX = (((Number) value.getPropertyValue()).floatValue() - ((NumberProperty<?>) value).getMin().floatValue()) / (((NumberValue<?>) value).getMax().floatValue() - ((NumberValue<?>) value).getMin().floatValue());
+        float vX = (((Number) value.getPropertyValue()).floatValue() - ((NumberProperty<?>) value).getMinimum().floatValue()) / (((NumberProperty<?>) value).getMaximum().floatValue() - ((NumberProperty<?>) value).getMinimum().floatValue());
         value.clickgui_anim = sizeDrag ? vX * (width) : AnimationUtils.smoothAnimation(value.clickgui_anim, vX * (width), ANIMATION_SPEED, ANIMATION_SCALE);
         //RenderUtils.drawRoundRect(x + width - showValueX + 5, valuesY + 13, x + width - showValueX + 10 + v.clickgui_anim, valuesY + 19, 3, theme.themeColor.getRGB());
 
@@ -55,27 +55,27 @@ public class NumberComponent extends Component {
 
         DecimalFormat df = new DecimalFormat("#.##");
 
-        String bs = df.format(value.getObject());
+        String bs = df.format(value.getPropertyValue());
         Main.INSTANCE.fontLoaders.get("heiti18").drawString(bs, x + vX * (width) / 2 - (Main.INSTANCE.fontLoaders.get("heiti16").getStringWidth(bs)) / 2f, y - 1, theme.value_number_value.getRGB(), false);
 
         // 设置number的值
         if (((NumberProperty<?>) value).clickgui_drag && Mouse.isButtonDown(0)) {
-            float v1 = (mouseX - x) / width * (((NumberProperty<?>) value).getMax().floatValue() - ((NumberProperty<?>) value).getMin().floatValue()) + ((NumberProperty<?>) value).getMin().floatValue();
-            if (v1 <= ((NumberProperty<?>) value).getMin().floatValue()) {
-                v1 = (((NumberProperty<?>) value).getMin().floatValue());
+            float v1 = (mouseX - x) / width * (((NumberProperty<?>) value).getMaximum().floatValue() - ((NumberProperty<?>) value).getMinimum().floatValue()) + ((NumberProperty<?>) value).getMinimum().floatValue();
+            if (v1 <= ((NumberProperty<?>) value).getMinimum().floatValue()) {
+                v1 = (((NumberProperty<?>) value).getMinimum().floatValue());
             }
 
-            if (v1 >= ((NumberProperty<?>) value).getMax().floatValue()) {
-                v1 = (((NumberProperty<?>) value).getMax().floatValue());
+            if (v1 >= ((NumberProperty<?>) value).getMaximum().floatValue()) {
+                v1 = (((NumberProperty<?>) value).getMaximum().floatValue());
             }
-            if (((NumberProperty<?>) value).getMax() instanceof Integer) {
-                value.setObject((int) v1);
-            } else if (((NumberProperty<?>) value).getMax() instanceof Float) {
-                value.setObject(v1);
-            } else if (((NumberProperty<?>) value).getMax() instanceof Double) {
-                value.setObject(((double) v1));
-            } else if (((NumberProperty<?>) value).getMax() instanceof Long) {
-                value.setObject((long) v1);
+            if (((NumberProperty<?>) value).getMaximum() instanceof Integer) {
+                value.setPropertyValue((int) v1);
+            } else if (((NumberProperty<?>) value).getMaximum() instanceof Float) {
+                value.setPropertyValue((v1));
+            } else if (((NumberProperty<?>) value).getMaximum() instanceof Double) {
+                value.setPropertyValue(((double) v1));
+            } else if (((NumberProperty<?>) value).getMaximum() instanceof Long) {
+                value.setPropertyValue((long) v1);
             }
 
         } else {

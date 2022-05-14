@@ -2,21 +2,16 @@ package cn.loli.client.gui.clickui.dropdown.panels;
 
 import cn.loli.client.Main;
 import cn.loli.client.gui.clickui.GuiTextBox;
-import cn.loli.client.gui.clickui.dropdown.ClickUI;
 import cn.loli.client.gui.clickui.dropdown.Panel;
 import cn.loli.client.gui.clickui.dropdown.panels.components.BooleanComponent;
 import cn.loli.client.gui.clickui.dropdown.panels.components.ModeComponent;
 import cn.loli.client.gui.clickui.dropdown.panels.components.NumberComponent;
-import cn.loli.client.gui.ttfr.HFontRenderer;
 import cn.loli.client.module.Module;
-import cn.loli.client.utils.render.AnimationUtils;
 import cn.loli.client.utils.render.RenderUtils;
 import dev.xix.property.AbstractTheresaProperty;
 import dev.xix.property.impl.*;
-import net.minecraft.util.ResourceLocation;
-import org.lwjgl.input.Mouse;
+
 import java.awt.*;
-import java.text.DecimalFormat;
 import java.util.Objects;
 
 public class ValuePanel extends Panel {
@@ -56,18 +51,18 @@ public class ValuePanel extends Panel {
                 valuesY += v.clickgui_anim;
                 valuesY += 10;
             } else if (v instanceof StringProperty) {
-                if (((StringProperty) v).text == null) {
-                    ((StringProperty) v).text = new GuiTextBox(0, Main.INSTANCE.fontLoaders.get("heiti17"), 0, 0, 0, 0);
-                    ((StringProperty) v).text.setText(((StringValue) v).getObject());
+                if (((StringProperty) v).textBox == null) {
+                    ((StringProperty) v).textBox = new GuiTextBox(0, Main.INSTANCE.fontLoaders.get("heiti17"), 0, 0, 0, 0);
+                    ((StringProperty) v).textBox.setText(((StringProperty) v).getPropertyValue());
                 } else {
-                    ((StringProperty) v).text.xPosition = (int) (x + width - 80);
-                    ((StringProperty) v).text.yPosition = (int) valuesY - 2;
+                    ((StringProperty) v).textBox.xPosition = (int) (x + width - 80);
+                    ((StringProperty) v).textBox.yPosition = (int) valuesY - 2;
 
-                    ((StringProperty) v).text.height = 14;
-                    ((StringProperty) v).text.width = 60;
-                    RenderUtils.drawRoundedRect(((StringProperty) v).text.xPosition - 1, ((StringProperty) v).text.yPosition - 1, ((StringProperty) v).text.width + 2, ((StringValue) v).text.height + 2, 2, new Color(200, 200, 200).getRGB());
-                    ((StringProperty) v).text.drawTextBox();
-                    v.setPropertyValue(((StringProperty) v).text.getText());
+                    ((StringProperty) v).textBox.height = 14;
+                    ((StringProperty) v).textBox.width = 60;
+                    RenderUtils.drawRoundedRect(((StringProperty) v).textBox.xPosition - 1, ((StringProperty) v).textBox.yPosition - 1, ((StringProperty) v).textBox.width + 2, ((StringProperty) v).textBox.height + 2, 2, new Color(200, 200, 200).getRGB());
+                    ((StringProperty) v).textBox.drawTextBox();
+                    v.setPropertyValue(((StringProperty) v).textBox.getText());
                 }
             } else if (v instanceof ColorProperty) {
                 // Color
@@ -106,8 +101,8 @@ public class ValuePanel extends Panel {
                 my1 += v.clickgui_anim;
                 my1 += 10;
             } else if (v instanceof StringProperty) {
-                if (((StringProperty) v).text != null) {
-                    ((StringProperty) v).text.mouseClicked((int) mx, (int) my, mouseButton);
+                if (((StringProperty) v).textBox != null) {
+                    ((StringProperty) v).textBox.mouseClicked((int) mx, (int) my, mouseButton);
                 }
             } else if (v instanceof ColorProperty) {
                 my1 += 50;
