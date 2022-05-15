@@ -102,6 +102,10 @@ public class JSModule extends Module {
         invoke("on_animation", event);
     };
 
+    private final IEventListener<CameraEvent> onCamera = event -> {
+        invoke("on_camera" , event);
+    };
+
     @Override
     public void onDisable() {
         invoke("on_disable");

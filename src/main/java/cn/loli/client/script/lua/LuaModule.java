@@ -112,6 +112,10 @@ public class LuaModule extends Module {
         invoke("on_animation");
     };
 
+    private final IEventListener<CameraEvent> onCamera = event -> {
+        invoke("on_camera");
+    };
+
     @Override
     public void onDisable() {
         invoke("on_disable");
