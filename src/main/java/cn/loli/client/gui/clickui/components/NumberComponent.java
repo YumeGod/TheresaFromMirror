@@ -25,9 +25,7 @@ public class NumberComponent extends Component {
 
     @Override
     public void onMouse(int mouseX, int mouseY, int button) {
-        System.out.println("HI");
         if (isHovered(x, y, x + width, y + 6, mouseX, mouseY)) {
-            System.out.println("HI 1");
             ((NumberProperty<?>) value).clickgui_drag = true;
         }
     }
