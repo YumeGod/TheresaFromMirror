@@ -38,7 +38,7 @@ public class Scoreboard extends Module {
             return name;
         }
     }
-
+    
     EnumProperty mode = new EnumProperty<>("Position", MODE.ARRAYS);
 
     public Scoreboard() {

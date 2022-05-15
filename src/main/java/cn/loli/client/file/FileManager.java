@@ -281,7 +281,7 @@ public class FileManager {
                             }
                         }
                         if (value instanceof EnumProperty) {
-                            Main.INSTANCE.valueManager.modeSelect.put(value, Arrays.binarySearch(((EnumProperty<?>) value).getEnumConstants(), (EnumProperty) value.getPropertyValue()));
+                            Main.INSTANCE.valueManager.modeSelect.put(value, Arrays.binarySearch(((EnumProperty<?>) value).getEnumConstants(), value.getPropertyValue()));
                         }
 
                         Main.INSTANCE.valueManager.keyBind.put(value, valueObject.get(value.getName()).getAsJsonObject().get("keybind").getAsInt());

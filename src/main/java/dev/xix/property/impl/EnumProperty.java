@@ -27,9 +27,9 @@ public class EnumProperty<T extends Enum<?>> extends AbstractTheresaProperty<T> 
         this(name, value, () -> true);
     }
 
-
     public String getCurrentMode(){
-        return getPropertyValue().name();
+        return getPropertyValue().name().replaceAll("_", " ").toLowerCase().substring(0, 1).toUpperCase() +
+                getPropertyValue().name().replaceAll("_", " ").toLowerCase().substring(1);
     }
 
     public void setValue(final int index) {

@@ -361,7 +361,7 @@ public class ClickGui extends GuiScreen {
 
         for (Module m : Main.INSTANCE.moduleManager.getModules()) {
             if (m.getCategory() == curType) {
-                if (!m.getName().contains(searchField.getText()) && searchField.getText() != "") {
+                if (!m.getName().contains(searchField.getText()) && !Objects.equals(searchField.getText(), "")) {
                     continue;
                 }
                 if (m == curModule) {
