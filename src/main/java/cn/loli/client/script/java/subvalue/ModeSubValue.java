@@ -3,8 +3,7 @@
 package cn.loli.client.script.java.subvalue;
 
 
-import cn.loli.client.gui.clickui.dropdown.panels.components.BooleanComponent;
-import cn.loli.client.gui.clickui.dropdown.panels.components.ModeComponent;
+import cn.loli.client.gui.clickui.components.ModeComponent;
 import dev.xix.property.impl.EnumProperty;
 
 import java.util.function.Supplier;

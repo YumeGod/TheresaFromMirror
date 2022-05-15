@@ -3,9 +3,9 @@ package cn.loli.client.gui.clickui.dropdown.panels;
 import cn.loli.client.Main;
 import cn.loli.client.gui.clickui.GuiTextBox;
 import cn.loli.client.gui.clickui.dropdown.Panel;
-import cn.loli.client.gui.clickui.dropdown.panels.components.BooleanComponent;
-import cn.loli.client.gui.clickui.dropdown.panels.components.ModeComponent;
-import cn.loli.client.gui.clickui.dropdown.panels.components.NumberComponent;
+import cn.loli.client.gui.clickui.components.BooleanComponent;
+import cn.loli.client.gui.clickui.components.ModeComponent;
+import cn.loli.client.gui.clickui.components.NumberComponent;
 import cn.loli.client.module.Module;
 import cn.loli.client.utils.render.RenderUtils;
 import dev.xix.property.AbstractTheresaProperty;
@@ -77,7 +77,7 @@ public class ValuePanel extends Panel {
             valuesY += 20;
             RenderUtils.drawRect(x + width - 40, valuesY - 5, x + width - 10, valuesY - 5 + 0.5f, theme.value_line.getRGB());
         }
-        maxHeight = valuesY - this.y;
+        maxHeight = valuesY - this.y - scroll + 20;
     }
 
     @Override

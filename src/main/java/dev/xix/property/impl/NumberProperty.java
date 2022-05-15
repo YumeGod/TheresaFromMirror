@@ -1,6 +1,6 @@
 package dev.xix.property.impl;
 
-import cn.loli.client.gui.clickui.dropdown.panels.components.NumberComponent;
+import cn.loli.client.gui.clickui.components.NumberComponent;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;

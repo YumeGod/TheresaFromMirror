@@ -1,7 +1,7 @@
-package cn.loli.client.gui.clickui.dropdown.panels.components;
+package cn.loli.client.gui.clickui.components;
 
 import cn.loli.client.Main;
-import cn.loli.client.module.Module;
+import cn.loli.client.gui.clickui.ClickGui;
 import cn.loli.client.utils.render.AnimationUtils;
 import cn.loli.client.utils.render.RenderUtils;
 import dev.xix.property.AbstractTheresaProperty;
@@ -25,7 +25,9 @@ public class NumberComponent extends Component {
 
     @Override
     public void onMouse(int mouseX, int mouseY, int button) {
+        System.out.println("HI");
         if (isHovered(x, y, x + width, y + 6, mouseX, mouseY)) {
+            System.out.println("HI 1");
             ((NumberProperty<?>) value).clickgui_drag = true;
         }
     }

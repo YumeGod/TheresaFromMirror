@@ -1,8 +1,8 @@
 package cn.loli.client.gui.clickui;
 
 import cn.loli.client.Main;
-import cn.loli.client.gui.clickui.dropdown.panels.components.ModeComponent;
-import cn.loli.client.gui.clickui.dropdown.panels.components.NumberComponent;
+import cn.loli.client.gui.clickui.components.ModeComponent;
+import cn.loli.client.gui.clickui.components.NumberComponent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.render.AnimationUtils;
@@ -35,7 +35,10 @@ public class ClickGui extends GuiScreen {
     private static final float WINDOW_MIN_WIDTH = 420; //窗口最小宽度
     private static final float WINDOW_MIN_HEIGHT = 300; //窗口最小高度
 
-    static float x = -1, y = -1, width = 0, height = 0;//坐标和宽高
+    public static float x = -1;
+    public static float y = -1;
+    static float width = 0;
+    static float height = 0;//坐标和宽高
 
     public static Theme theme = new Theme(); //主题
     private boolean drag; //主窗体是否被拖动
