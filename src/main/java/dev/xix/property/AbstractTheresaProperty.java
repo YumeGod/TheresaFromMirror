@@ -1,7 +1,6 @@
 package dev.xix.property;
 
-import cn.loli.client.gui.clickui.dropdown.Panel;
-import cn.loli.client.gui.clickui.dropdown.panels.components.Component;
+import cn.loli.client.gui.clickui.components.Component;
 import com.google.gson.JsonObject;
 
 import java.util.function.Supplier;

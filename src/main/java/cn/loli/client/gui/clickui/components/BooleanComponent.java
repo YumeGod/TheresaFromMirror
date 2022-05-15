@@ -1,6 +1,5 @@
-package cn.loli.client.gui.clickui.dropdown.panels.components;
+package cn.loli.client.gui.clickui.components;
 
-import cn.loli.client.module.Module;
 import cn.loli.client.utils.render.AnimationUtils;
 import cn.loli.client.utils.render.RenderUtils;
 import dev.xix.property.AbstractTheresaProperty;

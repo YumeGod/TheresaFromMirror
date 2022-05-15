@@ -54,7 +54,6 @@ public class Client {
                     if (received.equals("FuckYou"))
                         Objects.requireNonNull(output).writeUTF(name + ":" + password);
                 }
-
             } catch (IOException e) {
                 try {
                     serverSocket.close();

@@ -3,8 +3,7 @@
 package cn.loli.client.script.java.subvalue;
 
 
-import cn.loli.client.gui.clickui.dropdown.panels.components.ModeComponent;
-import cn.loli.client.gui.clickui.dropdown.panels.components.NumberComponent;
+import cn.loli.client.gui.clickui.components.NumberComponent;
 import dev.xix.property.impl.NumberProperty;
 
 import java.util.function.Supplier;
