@@ -32,8 +32,8 @@ public class Client {
     static Entity.State state = Entity.State.USER;
 
     public static void main(String[] args) {
-        name = "SuperSkidder";
-        password = "SuperSkidder123";
+        name = "VanillaMirror";
+        password = "hazenova3C";
 
 
         new Thread(() -> {

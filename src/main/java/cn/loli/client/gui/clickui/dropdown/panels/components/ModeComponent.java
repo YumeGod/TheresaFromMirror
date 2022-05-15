@@ -22,7 +22,7 @@ public class ModeComponent extends Component {
         HFontRenderer font = Main.INSTANCE.fontLoaders.get("heiti16");
         float width2 = 0;
         for (Enum mode : ((EnumProperty) value).getEnumConstants()) {
-            float temp = font.getStringWidth(mode.name());
+            float temp = font.getStringWidth(transform(mode.name()));
             if (width2 < temp) width2 = temp;
         }
 
@@ -51,13 +51,13 @@ public class ModeComponent extends Component {
         float width2 = 0;
 
         for (Enum mode : ((EnumProperty) value).getEnumConstants()) {
-            float temp = font.getStringWidth(mode.name());
+            float temp = font.getStringWidth(transform(mode.name()));
             if (width2 < temp) width2 = temp;
         }
 
         RenderUtils.drawRoundRect(x + 5 - width2, y - 1, x + 20, y + 11 + value.clickgui_anim, 2, theme.option_bg.getRGB());
 
-        font.drawCenteredString(((Enum) ((EnumProperty) value).getPropertyValue()).name(), x + 12 - width2 / 2, y + 1, theme.value_mode_current.getRGB());
+        font.drawCenteredString(transform(((Enum) value.getPropertyValue()).name()), x + 12 - width2 / 2, y + 1, theme.value_mode_current.getRGB());
 
         if (((EnumProperty) value).open) {
             value.clickgui_anim = AnimationUtils.smoothAnimation(value.clickgui_anim, ((EnumProperty) value).getEnumConstants().length * 14, ANIMATION_SPEED, ANIMATION_SCALE);
@@ -69,7 +69,7 @@ public class ModeComponent extends Component {
             float yy = y + 14;
             for (Enum mode : ((EnumProperty) value).getEnumConstants()) {
                 if (y + 18 + value.clickgui_anim >= yy + 14) {
-                    font.drawCenteredString(mode.name(), x + 12 - width2 / 2, yy, theme.value_mode_unsel.getRGB());
+                    font.drawCenteredString(transform(mode.name()), x + 12 - width2 / 2, yy, theme.value_mode_unsel.getRGB());
                 }
 
                 yy += 14;
@@ -77,4 +77,8 @@ public class ModeComponent extends Component {
         }
     }
 
+    String transform(String s){
+        return s.replaceAll("_", " ").toLowerCase().substring(0, 1).toUpperCase() +
+                s.replaceAll("_", " ").toLowerCase().substring(1);
+    }
 }

@@ -113,7 +113,7 @@ public class PropertyManager {
                 if (value instanceof EnumProperty) {
                     EnumProperty modeValue = (EnumProperty) value;
                     Integer integer = modeSelect.get(value);
-                    modeSelect.put(modeValue, Arrays.binarySearch(((EnumProperty<?>) value).getEnumConstants(), (EnumProperty) value.getPropertyValue()));
+                    modeSelect.put(modeValue, Arrays.binarySearch(((EnumProperty<?>) value).getEnumConstants(), value.getPropertyValue()));
                     modeValue.setValue(integer);
                     ChatUtils.info("Value " + value.getName() + " is now " + value.getPropertyValue());
                 }
