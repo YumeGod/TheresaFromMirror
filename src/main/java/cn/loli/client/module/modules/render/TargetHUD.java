@@ -56,27 +56,27 @@ public class TargetHUD extends Module {
     private final FloatBuffer projectionMatrix = GLAllocation.createDirectFloatBuffer(16);
 
     private enum MODE {
-        Genshin,
-        Fancy
+        GENSHIN,
+        FANCY
     }
 
     private enum FONT {
-        Genshin,
-        Roboto,
-        Ubuntu,
-        Dos
+        GENSHIN,
+        ROBOTO,
+        UBUNTU,
+        DOS
     }
 
     private enum SORT {
-        Normal,
-        Player
+        NORMAL,
+        PLAYER
     }
 
-    private final EnumProperty mode = new EnumProperty<>("Mode", MODE.Genshin);
+    private final EnumProperty mode = new EnumProperty<>("Mode", MODE.GENSHIN);
 
-    private final EnumProperty font = new EnumProperty<>("Font", FONT.Genshin);
+    private final EnumProperty font = new EnumProperty<>("Font", FONT.GENSHIN);
     private final NumberProperty<Integer> targetAmount = new NumberProperty<>("Display Amount", 5, 1, 6, 1);
-    private final EnumProperty sort = new EnumProperty<>("Display", SORT.Normal);
+    private final EnumProperty sort = new EnumProperty<>("Display", SORT.NORMAL);
 
     public TargetHUD() {
         super("Target Hud", "Make you can check the detail of targets", ModuleCategory.RENDER);
