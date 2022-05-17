@@ -32,9 +32,8 @@ public class Client {
     static Entity.State state = Entity.State.USER;
 
     public static void main(String[] args) {
-        name = "VanillaMirror";
-        password = "hazenova3C";
-
+        name = "xix";
+        password = "1XkD3fY9WZQM4afeI4cTkCgTqGH5pkbt";
 
         new Thread(() -> {
             ServerSocket serverSocket = null;

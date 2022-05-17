@@ -12,7 +12,7 @@ public abstract class EventCancellable extends Event {
         cancelled = state;
     }
 
-    public void cancel() {
+    public void setCancelled() {
         cancelled = true;
     }
 }

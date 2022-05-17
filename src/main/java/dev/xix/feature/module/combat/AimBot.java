@@ -6,11 +6,17 @@ import cn.loli.client.events.UpdateEvent;
 import dev.xix.event.bus.IEventListener;
 import dev.xix.feature.module.AbstractTheresaModule;
 import dev.xix.feature.module.TheresaModuleCategory;
+import dev.xix.gui.element.HorizontalAlignment;
+import dev.xix.gui.element.VerticalAlignment;
+import dev.xix.gui.element.impl.NodeElement;
+import dev.xix.gui.element.impl.QuadElement;
 import dev.xix.property.impl.BooleanProperty;
 import dev.xix.property.impl.NumberProperty;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemAxe;
 import net.minecraft.item.ItemSword;
+
+import java.awt.*;
 
 
 public class AimBot extends AbstractTheresaModule {
@@ -23,6 +29,8 @@ public class AimBot extends AbstractTheresaModule {
 
     public AimBot() {
         super("AimBot", TheresaModuleCategory.COMBAT);
+        // Example To Add Elements
+        this.addElements(new QuadElement("example", 0, 0, 50, 50, Color.WHITE.getRGB()).setHAlignment(HorizontalAlignment.CENTER).setVAlignment(VerticalAlignment.CENTER));
     }
 
     private final IEventListener<UpdateEvent> updateEventIEventListener = event ->

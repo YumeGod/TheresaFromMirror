@@ -280,7 +280,7 @@ public class Abuser extends Module {
             for (PosLookPacket packet : Main.INSTANCE.moduleManager.getModule(Abuser.class).flagStock) {
                 if (System.currentTimeMillis() - packet.time > 3000) {
                     mc.getNetHandler().getNetworkManager().sendPacket(packet.getPacket());
-                    Main.INSTANCE.moduleManager.getModule(Abuser.class).flagStock.remove(packet);
+                    flagStock.remove(packet);
                 }
             }
         }

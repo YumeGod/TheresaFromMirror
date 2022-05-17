@@ -517,6 +517,8 @@ public class Aura extends Module {
                         mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
                         mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot + spoof));
                         mc.getNetHandler().getNetworkManager().sendPacket(new C08PacketPlayerBlockPlacement(mc.thePlayer.getHeldItem()));
+                        mc.getNetHandler().addToSendQueue(new C02PacketUseEntity(target, target.getPositionVector()));
+                        mc.getNetHandler().addToSendQueue(new C02PacketUseEntity(target, C02PacketUseEntity.Action.INTERACT));
                         break;
                     case "switch":
                         mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(curSlot));
