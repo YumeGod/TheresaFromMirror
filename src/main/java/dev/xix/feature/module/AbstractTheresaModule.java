@@ -22,14 +22,14 @@ public abstract class AbstractTheresaModule implements ITheresaFeature, IInputta
 
     protected final TheresaModuleCategory theresaModuleCategory;
 
-    protected final Minecraft mc = Minecraft.getMinecraft();
-    protected final GameSettings game = mc.gameSettings;
-    protected final Random r = new Random();
+    protected static final Minecraft mc = Minecraft.getMinecraft();
+    protected static final GameSettings game = mc.gameSettings;
+    protected static final Random r = new Random();
 
-    protected final PlayerUtils playerUtils = PlayerUtils.getInstance();
-    protected final RotationUtils rotationUtils = RotationUtils.getInstance();
-    protected final InventoryUtil inventoryUtil = InventoryUtil.getInstance();
-    protected final MoveUtils moveUtils = MoveUtils.getInstance();
+    protected static final PlayerUtils playerUtils = PlayerUtils.getInstance();
+    protected static final RotationUtils rotationUtils = RotationUtils.getInstance();
+    protected static final InventoryUtil inventoryUtil = InventoryUtil.getInstance();
+    protected static final MoveUtils moveUtils = MoveUtils.getInstance();
 
     protected boolean enabled;
     protected int key;

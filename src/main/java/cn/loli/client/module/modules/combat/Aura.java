@@ -11,12 +11,13 @@ import cn.loli.client.module.modules.misc.AntiBot;
 import cn.loli.client.module.modules.player.Scaffold;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.render.RenderUtils;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.ColorValue;
-import cn.loli.client.value.ModeValue;
-import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
+import dev.xix.property.impl.ColorProperty;
+import dev.xix.property.impl.EnumProperty;
+import dev.xix.property.impl.NumberProperty;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -44,81 +45,210 @@ import java.util.stream.Stream;
 
 public class Aura extends Module {
 
-    private final ModeValue cpsMode = new ModeValue("CPS Mode", "Randomize", "Randomize", "Smooth", "Legit", "Hit Based");
-    private final NumberValue<Integer> simpleCps = new NumberValue<>("Simple CPS", 8, 1, 20);
-    private final NumberValue<Integer> extendCps = new NumberValue<>("Extend CPS", 4, 0, 60);
-    private final BooleanValue smoothRandomizing = new BooleanValue("Smooth-Randomizing", true);
-    private final NumberValue<Float> smoothCpsSpeed = new NumberValue<>("Smooth-Delay", 0f, 0f, 1f);
-    private final NumberValue<Float> smoothCpsRandomStrength = new NumberValue<>("Smooth-Random-Length", 0f, 0f, 1f);
+    private enum CPS_MODE {
+        RANDOM("Randomize"), SMOOTH("Smooth"), LEGIT("Legit"), HIT_BASED("Hit Based");
 
-    private static final NumberValue<Integer> ticksExisted = new NumberValue<>("Ticks Existed", 20, 0, 500);
-    private static final NumberValue<Integer> fov = new NumberValue<>("FOV", 360, 0, 360);
-    private static final NumberValue<Float> range = new NumberValue<>("Range", 3f, 1f, 6f);
-    private static final NumberValue<Float> blockRange = new NumberValue<>("BlockRange", 2f, 0f, 3f);
+        private final String name;
 
-    private static final NumberValue<Float> inaccuracy = new NumberValue<>("Inaccuracy", 0f, 0f, 1f);
-    public static final NumberValue<Integer> target_Amount = new NumberValue<>("Targets Amount", 1, 1, 5);
-    public static final NumberValue<Integer> switchDelay = new NumberValue<>("Switch Delay", 100, 0, 500);
+        CPS_MODE(String s) {
+            this.name = s;
+        }
 
-    public static final NumberValue<Integer> hurtTime = new NumberValue<>("Multi Hurt Time", 20, 0, 20);
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 
-    private final BooleanValue multi = new BooleanValue("Multi", false);
+    private final EnumProperty cpsMode = new EnumProperty<>("CPS Mode", CPS_MODE.RANDOM);
+    private final NumberProperty<Integer> minCps = new NumberProperty<>("Min CPS", 8, 1, 20, 1);
+    private final NumberProperty<Integer> maxCps = new NumberProperty<>("Max CPS", 8, 1, 40, 1);
+    private final BooleanProperty smoothRandomizing = new BooleanProperty("Smooth-Randomizing", true);
+    private final NumberProperty<Float> smoothCpsSpeed = new NumberProperty<>("Smooth-Delay", 0f, 0f, 1f, 0.01f);
+    private final NumberProperty<Float> smoothCpsRandomStrength = new NumberProperty<>("Smooth-Random-Length", 0f, 0f, 1f, 0.01f);
 
-    private final ModeValue mode = new ModeValue("Priority", "Angle", "Armor", "Range", "Fov", "Angle", "Health", "Hurt Time");
+    private static final NumberProperty<Integer> ticksExisted = new NumberProperty<>("Ticks Existed", 20, 0, 500, 10);
+    private static final NumberProperty<Integer> fov = new NumberProperty<>("FOV", 360, 0, 360, 1);
+    private static final NumberProperty<Float> range = new NumberProperty<>("Range", 3f, 1f, 6f, 0.1f);
+    private static final NumberProperty<Float> blockRange = new NumberProperty<>("BlockRange", 2f, 0f, 3f, 0.1f);
 
-    public static final NumberValue<Integer> unBlockTweak = new NumberValue<>("UnBlock Tweak", 0, 0, 100);
-    private final ModeValue blockMode = new ModeValue("Block Mode", "Desync", "NCP", "Idle", "Desync", "Always", "Legit", "Dada-Legit", "Vanilla", "Semi-Vanilla", "Spoof-Switch", "Switch", "Null");
-    private final ModeValue blockWhen = new ModeValue("Block when", "On Attack", "On Attack", "On Tick", "Sync", "Reverse");
-    private final ModeValue blockSense = new ModeValue("Block style", "Sync", "Sync", "Desync");
-    public static final NumberValue<Integer> desyncTick = new NumberValue<>("Desync-Choke-Tick", 2, 0, 5);
-    private final ModeValue attackWhen = new ModeValue("Attack when", "Pre", "Pre", "Post", "Tick");
-    private final ModeValue durable = new ModeValue("Durable Status", "Disable", "Disable", "Sync", "Switch");
-    private final BooleanValue sprintSpam = new BooleanValue("Sprint Spam", false);
+    private static final NumberProperty<Float> inaccuracy = new NumberProperty<>("Inaccuracy", 0f, 0f, 1f, 0.01f);
+    public static final NumberProperty<Integer> target_Amount = new NumberProperty<>("Targets Amount", 1, 1, 5, 1);
+    public static final NumberProperty<Integer> switchDelay = new NumberProperty<>("Switch Delay", 100, 0, 500, 10);
 
-    private final BooleanValue autoBlock = new BooleanValue("AutoBlock", true);
-    private static final BooleanValue invisible = new BooleanValue("Invisible", false);
-    private static final BooleanValue players = new BooleanValue("Players", true);
-    private static final BooleanValue animals = new BooleanValue("Animals", false);
-    private static final BooleanValue mobs = new BooleanValue("Mobs", true);
-    private static final BooleanValue boss = new BooleanValue("Boss", true);
-    private static final BooleanValue villagers = new BooleanValue("Villagers", false);
-    private static final BooleanValue team = new BooleanValue("Team", false);
+    public static final NumberProperty<Integer> hurtTime = new NumberProperty<>("Multi Hurt Time", 20, 0, 20, 1);
 
-    private static final BooleanValue witherPriority = new BooleanValue("Wither Priority", false);
+    private final BooleanProperty multi = new BooleanProperty("Multi", false);
 
-    private final BooleanValue rotations = new BooleanValue("Rotations", false);
+    private enum MODE {
+        ANGLE("Angle"), ARMOR("Armor"), RANGE("Range"), FOV("Fov Based"), HEALTH("Health"), Hurt_Time("Hurt Time");
 
-    public static final NumberValue<Integer> yOffset = new NumberValue<>("Custom Y Offset", 50, 0, 150);
-    private final BooleanValue customOffset = new BooleanValue("Custom Pitch", false);
+        private final String name;
 
-    private final BooleanValue silent = new BooleanValue("Silent", true);
+        MODE(String s) {
+            this.name = s;
+        }
 
-    private final BooleanValue noInv = new BooleanValue("No Inv", true);
-    private final BooleanValue autoCloseInv = new BooleanValue("Auto Close Inv", false);
-    private final BooleanValue clampYaw = new BooleanValue("Clamp", true);
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 
-    private final BooleanValue moveFix = new BooleanValue("Move Fix", false);
-    private final BooleanValue silentMoveFix = new BooleanValue("Silent Fix", false);
 
-    private final BooleanValue noScaffold = new BooleanValue("No Scaffold", false);
-    private final BooleanValue swingWhenMisAttack = new BooleanValue("Swing when mis attack", false);
-    private final BooleanValue rayCast = new BooleanValue("Ray Cast", false);
-    private static final BooleanValue throughBlock = new BooleanValue("Through Block", true);
+    private final EnumProperty mode = new EnumProperty<>("Priority", MODE.ANGLE);
 
-    private final BooleanValue mouseFix = new BooleanValue("Mouse Fix", true);
-    private final BooleanValue mouse_vl_fix = new BooleanValue("Mouse VL Fix", true);
-    private final BooleanValue random = new BooleanValue("Random", false);
-    private final BooleanValue instant = new BooleanValue("Instant", false);
-    private final BooleanValue prediction = new BooleanValue("Prediction", false);
-    private final BooleanValue bestVector = new BooleanValue("Resolver", false);
+    public static final NumberProperty<Integer> unBlockTweak = new NumberProperty<>("UnBlock Tweak", 0, 0, 100, 1);
 
-    private static final NumberValue<Integer> rotationSpeed = new NumberValue<>("Rotation Speed", 180, 0, 180);
+    //Mode ENUM FOR BLOCK MODE
+    private enum BLOCK_MODE {
+        NCP("NCP"), IDLE("Idle"), ALWAYS("Always"), LEGIT("Legit"), VANILLA("Vanilla"), SWITCH("Switch");
 
-    private final ModeValue esp = new ModeValue("Target ESP", "Box", "Box", "2D", "Icarus");
+        private final String name;
 
-    private final BooleanValue show = new BooleanValue("Show-Target", true);
+        BLOCK_MODE(String s) {
+            this.name = s;
+        }
 
-    private final ColorValue espColor = new ColorValue("ESP-Color", Color.BLUE);
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    private final EnumProperty blockMode = new EnumProperty<>("Block Mode", BLOCK_MODE.NCP);
+
+    private enum BLOCK_WHEN {
+        ATTACK("On Attack"), TICK("On Tick"), SYNC("Sync");
+
+        private final String name;
+
+        BLOCK_WHEN(String s) {
+            this.name = s;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    private final EnumProperty blockWhen = new EnumProperty<>("Block when", BLOCK_WHEN.TICK);
+
+    private enum BLOCK_STYLE {
+        SYNC("Sync"), DESYNC("De Sync");
+
+        private final String name;
+
+        BLOCK_STYLE(String s) {
+            this.name = s;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+
+    private final EnumProperty blockSense = new EnumProperty<>("Block style", BLOCK_STYLE.SYNC);
+    public static final NumberProperty<Integer> desyncTick = new NumberProperty<>("Desync-Choke-Tick", 2, 0, 5, 1);
+
+    private enum ATTACK_WHEN {
+        PRE("On Pre"), POST("On Post"), TICK("On Tick");
+
+        private final String name;
+
+        ATTACK_WHEN(String s) {
+            this.name = s;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    private final EnumProperty attackWhen = new EnumProperty<>("Attack when", ATTACK_WHEN.PRE);
+
+    private enum DURABLE_STATUS {
+        DISABLE("Disabled"), SYNC("Sync"), SWITCH("SWITCH");
+
+        private final String name;
+
+        DURABLE_STATUS(String s) {
+            this.name = s;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+
+    private final EnumProperty durable = new EnumProperty<>("Durable Status", DURABLE_STATUS.DISABLE);
+    private final BooleanProperty sprintSpam = new BooleanProperty("Sprint Spam", false);
+
+    private final BooleanProperty autoBlock = new BooleanProperty("AutoBlock", true);
+    private static final BooleanProperty invisible = new BooleanProperty("Invisible", false);
+    private static final BooleanProperty players = new BooleanProperty("Players", true);
+    private static final BooleanProperty animals = new BooleanProperty("Animals", false);
+    private static final BooleanProperty mobs = new BooleanProperty("Mobs", true);
+    private static final BooleanProperty boss = new BooleanProperty("Boss", true);
+    private static final BooleanProperty villagers = new BooleanProperty("Villagers", false);
+    private static final BooleanProperty team = new BooleanProperty("Team", false);
+
+    private static final BooleanProperty witherPriority = new BooleanProperty("Wither Priority", false);
+
+    private final BooleanProperty rotations = new BooleanProperty("Rotations", false);
+
+    public static final NumberProperty<Integer> yOffset = new NumberProperty<>("Custom Y Offset", 50, 0, 150, 10);
+    private final BooleanProperty customOffset = new BooleanProperty("Custom Pitch", false);
+
+    private final BooleanProperty silent = new BooleanProperty("Silent", true);
+
+    private final BooleanProperty noInv = new BooleanProperty("No Inv", true);
+    private final BooleanProperty autoCloseInv = new BooleanProperty("Auto Close Inv", false);
+    private final BooleanProperty clampYaw = new BooleanProperty("Clamp", true);
+
+    private final BooleanProperty moveFix = new BooleanProperty("Move Fix", false);
+    private final BooleanProperty silentMoveFix = new BooleanProperty("Silent Fix", false);
+
+    private final BooleanProperty noScaffold = new BooleanProperty("No Scaffold", false);
+    private final BooleanProperty swingWhenMisAttack = new BooleanProperty("Swing when mis attack", false);
+    private final BooleanProperty rayCast = new BooleanProperty("Ray Cast", false);
+    private static final BooleanProperty throughBlock = new BooleanProperty("Through Block", true);
+
+    private final BooleanProperty mouseFix = new BooleanProperty("Mouse Fix", true);
+    private final BooleanProperty mouse_vl_fix = new BooleanProperty("Mouse VL Fix", true);
+    private final BooleanProperty random = new BooleanProperty("Random", false);
+    private final BooleanProperty instant = new BooleanProperty("Instant", false);
+    private final BooleanProperty prediction = new BooleanProperty("Prediction", false);
+    private final BooleanProperty bestVector = new BooleanProperty("Resolver", false);
+
+    private static final NumberProperty<Integer> rotationSpeed = new NumberProperty<>("Rotation Speed", 180, 0, 180, 5);
+
+    private enum ESP_MODE {
+        BOX("Box"), TWO_D("2D"), ICARUS("Icarus");
+
+        private final String name;
+
+        ESP_MODE(String s) {
+            this.name = s;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    private final EnumProperty esp = new EnumProperty<>("Target ESP", ESP_MODE.BOX);
+
+    private final BooleanProperty show = new BooleanProperty("Show-Target", true);
+
+    private final ColorProperty espColor = new ColorProperty("ESP-Color", Color.BLUE);
 
     public EntityLivingBase target;
 
@@ -169,8 +299,8 @@ public class Aura extends Module {
     }
 
 
-    @EventTarget
-    private void onRender(RenderEvent event) {
+    private final IEventListener<RenderEvent> onRender = event ->
+    {
         try {
             update();
         } catch (Exception e) {
@@ -180,10 +310,10 @@ public class Aura extends Module {
         /*
          *  CPS 运算
          */
-        if (target != null && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() &&
+        if (target != null && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getPropertyValue() &&
                 attackTimer.hasReached(apd)) {
             cps++;
-            if (!cpsMode.getCurrentMode().equals("Hit Based"))
+            if (!cpsMode.getPropertyValue().toString().equals(CPS_MODE.HIT_BASED))
                 calculateCPS();
             attackTimer.reset();
         }
@@ -192,11 +322,11 @@ public class Aura extends Module {
          *  转头 运算
          */
 
-        if (rotations.getObject()) {
+        if (rotations.getPropertyValue()) {
             if (target != null) {
                 float[] rots;
-                rots = rotationUtils.facePlayer(target, mouse_vl_fix.getObject(), random.getObject(), !instant.getObject(), prediction.getObject(), mouseFix.getObject()
-                        , bestVector.getObject(), inaccuracy.getObject(), clampYaw.getObject(), rotationSpeed.getObject(), range.getObject(), customOffset.getObject(), yOffset.getObject());
+                rots = rotationUtils.facePlayer(target, mouse_vl_fix.getPropertyValue(), random.getPropertyValue(), !instant.getPropertyValue(), prediction.getPropertyValue(), mouseFix.getPropertyValue()
+                        , bestVector.getPropertyValue(), inaccuracy.getPropertyValue(), clampYaw.getPropertyValue(), rotationSpeed.getPropertyValue(), range.getPropertyValue() + blockRange.getPropertyValue(), customOffset.getPropertyValue(), yOffset.getPropertyValue());
 
                 curYaw = rots[0];
                 curPitch = rots[1];
@@ -205,74 +335,67 @@ public class Aura extends Module {
                 curPitch = mc.thePlayer.rotationPitch;
             }
 
-            if (!silent.getObject()) {
+            if (!silent.getPropertyValue()) {
                 mc.thePlayer.rotationYaw = curYaw;
                 mc.thePlayer.rotationPitch = curPitch;
             }
         }
 
-        if (target != null && show.getObject()) {
+        if (target != null && show.getPropertyValue()) {
             EntityLivingBase entity = target;
 
-            switch (esp.getCurrentMode()) {
+            switch (esp.getPropertyValue().toString()) {
                 case "Box":
-                    RenderUtils.renderBox(entity, espColor.getObject().getRGB());
+                    RenderUtils.renderBox(entity, espColor.getPropertyValue().getRGB());
                     break;
                 case "2D":
-                    RenderUtils.draw2DESP(entity, espColor.getObject().getRGB());
+                    RenderUtils.draw2DESP(entity, espColor.getPropertyValue().getRGB());
                     break;
                 case "Icarus":
-                    RenderUtils.drawIcarusESP(entity, espColor.getObject(), true);
+                    RenderUtils.drawIcarusESP(entity, espColor.getPropertyValue(), true);
                     break;
             }
 
         }
-
-    }
-
+    };
 
 
-    //Rotate Strafe
-
-    @EventTarget
-    public void onMoveFly(MoveFlyEvent event) {
-        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
+    private final IEventListener<MoveFlyEvent> onMoveFly = event ->
+    {
+        if (noScaffold.getPropertyValue() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
             return;
-        if (moveFix.getObject() && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() && target != null)
+        if (moveFix.getPropertyValue() && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getPropertyValue() && target != null)
             event.setYaw(curYaw);
-    }
+    };
 
-
-    @EventTarget
-    public void onJump(JumpYawEvent event) {
-        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
+    private final IEventListener<JumpYawEvent> onJump = event ->
+    {
+        if (noScaffold.getPropertyValue() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
             return;
-        if (moveFix.getObject() && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() && target != null)
+        if (moveFix.getPropertyValue() && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getPropertyValue() && target != null)
             event.setYaw(curYaw);
-    }
+    };
 
-    @EventTarget
-    public void onSlient(MovementStateEvent event) {
-        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
+    private final IEventListener<MovementStateEvent> onSlient = event ->
+    {
+        if (noScaffold.getPropertyValue() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
             return;
-        if (moveFix.getObject() && target != null && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() && silentMoveFix.getObject()) {
+        if (moveFix.getPropertyValue() && target != null && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getPropertyValue() && silentMoveFix.getPropertyValue()) {
             event.setSilentMoveFix(true);
             event.setYaw(curYaw);
         }
-    }
+    };
 
-
-    //Listen to Attack
-    @EventTarget
-    private void onMotionUpdate(MotionUpdateEvent event) {
-        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
+    private final IEventListener<MotionUpdateEvent> onMotionUpdate = event ->
+    {
+        if (noScaffold.getPropertyValue() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
             return;
         if (target == null) {
             curYaw = mc.thePlayer.rotationYaw;
             curPitch = mc.thePlayer.rotationPitch;
 
             if (mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword
-                    && autoBlock.getObject() && isBlocking) {
+                    && autoBlock.getPropertyValue() && isBlocking) {
                 ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
                 mc.thePlayer.sendQueue.addToSendQueue(new C07PacketPlayerDigging(C07PacketPlayerDigging.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, EnumFacing.DOWN));
                 isBlocking = false;
@@ -281,40 +404,39 @@ public class Aura extends Module {
         }
 
         if (event.getEventType() == EventType.PRE) {
-            if (rotations.getObject()) {
-                if (silent.getObject()) {
+            if (rotations.getPropertyValue()) {
+                if (silent.getPropertyValue()) {
                     event.setYaw(curYaw);
                     event.setPitch(curPitch);
                 }
             }
-            if (blockWhen.getCurrentMode().equals("Reverse") && ignoreTicks == 2) handleAutoBlock(true);
-            if (blockWhen.getCurrentMode().equals("On Tick")) handleAutoBlock(true);
-            if (attackWhen.getCurrentMode().equals("Pre")) attemptAttack();
+            if (blockWhen.getPropertyValue().toString().equals("Reverse") && ignoreTicks == 2) handleAutoBlock(true);
+            if (blockWhen.getPropertyValue().toString().equals("On Tick")) handleAutoBlock(true);
+            if (attackWhen.getPropertyValue().toString().equals("Pre")) attemptAttack();
         } else if (event.getEventType() == EventType.POST) {
-            if (attackWhen.getCurrentMode().equals("Post")) attemptAttack();
-            if (blockWhen.getCurrentMode().equals("On Tick") || blockWhen.getCurrentMode().equals("Sync") || blockWhen.getCurrentMode().equals("Reverse"))
+            if (attackWhen.getPropertyValue().toString().equals("Post")) attemptAttack();
+            if (blockWhen.getPropertyValue().toString().equals("On Tick") || blockWhen.getPropertyValue().toString().equals("Sync") || blockWhen.getPropertyValue().toString().equals("Reverse"))
                 handleAutoBlock(false);
             ignoreTicks++;
         }
-    }
+    };
 
-    @EventTarget
-    private void onAttack(TickAttackEvent event) {
-        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
+
+    private final IEventListener<TickAttackEvent> onAttack = event ->
+    {
+        if (noScaffold.getPropertyValue() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
             return;
         if (target == null) return;
-        if (attackWhen.getCurrentMode().equals("Tick")) attemptAttack();
-    }
+        if (attackWhen.getPropertyValue().toString().equals("Tick")) attemptAttack();
+    };
 
-    //Desync autoblock
-
-    @EventTarget
-    private void onPacket(PacketEvent event) {
-        if(noScaffold.getObject() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
+    private final IEventListener<PacketEvent> onPacket = event ->
+    {
+        if (noScaffold.getPropertyValue() && Main.INSTANCE.moduleManager.getModule(Scaffold.class).getState())
             return;
         if (event.getPacket() instanceof C07PacketPlayerDigging)
-            if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.getHeldItem() != null
-                    && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject()))
+            if (blockSense.getPropertyValue().toString().equals("Desync") && (mc.thePlayer.getHeldItem() != null
+                    && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getPropertyValue()))
                 if (target != null)
                     if (isBlocking) {
                         if (ticks < 1) desyncPackets.add(event.getPacket());
@@ -322,10 +444,10 @@ public class Aura extends Module {
                     }
 
         if (event.getPacket() instanceof C03PacketPlayer)
-            if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.getHeldItem() != null
-                    && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject()))
+            if (blockSense.getPropertyValue().toString().equals("Desync") && (mc.thePlayer.getHeldItem() != null
+                    && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getPropertyValue()))
                 if (target != null) {
-                    if (!isBlocking && ticks < 2 + desyncTick.getObject()) {
+                    if (!isBlocking && ticks < 2 + desyncTick.getPropertyValue()) {
                         desyncPackets.add(event.getPacket());
                         event.setCancelled(true);
                         ticks++;
@@ -337,39 +459,40 @@ public class Aura extends Module {
                 }
 
         if (event.getPacket() instanceof C08PacketPlayerBlockPlacement)
-            if (blockSense.getCurrentMode().equalsIgnoreCase("Desync") && (mc.thePlayer.getHeldItem() != null
-                    && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject())) {
-                if (ticks > 1 + desyncTick.getObject())
+            if (blockSense.getPropertyValue().toString().equals("Desync") && (mc.thePlayer.getHeldItem() != null
+                    && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getPropertyValue())) {
+                if (ticks > 1 + desyncTick.getPropertyValue())
                     attemptRelease();
 
                 if (ticks != 0)
                     event.setCancelled(true);
             }
-    }
+    };
+
 
     //尝试进行Attack
     private void attemptAttack() {
         if (target == null) return;
         //Pre Attack
-        if (mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject()) {
-            if (blockWhen.getCurrentMode().equals("On Attack") || blockWhen.getCurrentMode().equals("Sync"))
+        if (mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getPropertyValue()) {
+            if (blockWhen.getPropertyValue().toString().equals("On Attack") || blockWhen.getPropertyValue().toString().equals("Sync"))
                 handleAutoBlock(true);
 
-            if (sprintSpam.getObject())
+            if (sprintSpam.getPropertyValue())
                 mc.getNetHandler().getNetworkManager().sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.STOP_SPRINTING));
 
             while (cps > 0) {
                 attack(target);
-                if (multi.getObject())
+                if (multi.getPropertyValue())
                     targets.stream().filter(target -> target != this.target &&
-                            target.hurtResistantTime <= hurtTime.getObject()).forEach(this::attack);
+                            target.hurtResistantTime <= hurtTime.getPropertyValue()).forEach(this::attack);
                 cps--;
             }
 
-            if (sprintSpam.getObject())
+            if (sprintSpam.getPropertyValue())
                 mc.getNetHandler().getNetworkManager().sendPacket(new C0BPacketEntityAction(mc.thePlayer, C0BPacketEntityAction.Action.START_SPRINTING));
 
-            if (blockWhen.getCurrentMode().equals("On Attack"))
+            if (blockWhen.getPropertyValue().toString().equals("On Attack"))
                 handleAutoBlock(false);
         }
     }
@@ -377,27 +500,28 @@ public class Aura extends Module {
 
     //具体的Attack方式
     private void attack(Entity entity) {
-        if (mc.currentScreen != null && noInv.getObject()) {
-            if (autoCloseInv.getObject())
+        if (mc.currentScreen != null && noInv.getPropertyValue()) {
+            if (autoCloseInv.getPropertyValue())
                 mc.thePlayer.closeScreen();
             else return;
         }
 
-        if (rayCast.getObject())
-            entity = rotationUtils.rayCastedEntity(range.getObject() + 0.5657, curYaw, curPitch);
+        if (rayCast.getPropertyValue())
+            entity = rotationUtils.rayCastedEntity(range.getPropertyValue() + 0.5657, curYaw, curPitch);
 
         if (entity != null) {
-            if (!durable.getCurrentMode().equals("Disable")) handleDura(durable.getCurrentMode().equals("Switch"));
+            if (!durable.getPropertyValue().toString().equals("Disable"))
+                handleDura(durable.getPropertyValue().toString().equals("Switch"));
             if (crit.getState()) crit.onCrit(entity);
             mc.thePlayer.swingItem();
             mc.playerController.attackEntity(mc.thePlayer, entity);
         } else {
             //不打人
-            if (!swingWhenMisAttack.getObject())
+            if (!swingWhenMisAttack.getPropertyValue())
                 mc.thePlayer.swingItem();
         }
 
-        if (cpsMode.getCurrentMode().equals("Hit Based")) calculateCPS();
+        if (cpsMode.getPropertyValue().toString().equals(CPS_MODE.HIT_BASED)) calculateCPS();
     }
 
 
@@ -422,10 +546,10 @@ public class Aura extends Module {
 
         if (target == null) return;
 
-        if (mc.thePlayer.getDistanceToEntity(target) - 0.5657 > range.getObject())
+        if (mc.thePlayer.getDistanceToEntity(target) - 0.5657 > range.getPropertyValue())
             index = 0;
 
-        if (switchTimer.hasReached(switchDelay.getObject())
+        if (switchTimer.hasReached(switchDelay.getPropertyValue())
                 && targets.size() > 1) {
             switchTimer.reset();
             ++index;
@@ -437,15 +561,15 @@ public class Aura extends Module {
     private void handleAutoBlock(boolean unblock) {
         final int curSlot = mc.thePlayer.inventory.currentItem;
         if (unblock) {
-            if (!unblockTimer.hasReached(unBlockTweak.getObject())) return;
+            if (!unblockTimer.hasReached(unBlockTweak.getPropertyValue())) return;
             unblockTimer.reset();
 
             if (mc.thePlayer.isBlocking() || mc.thePlayer.getHeldItem() != null
-                    && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() && isBlocking) {
+                    && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getPropertyValue() && isBlocking) {
 
                 ((IEntityPlayer) mc.thePlayer).setItemInUseCount(0);
 
-                switch (blockMode.getCurrentMode().toLowerCase()) {
+                switch ((blockMode.getPropertyValue()).toString().toLowerCase()) {
                     case "desync":
                     case "dada-desync":
                         mc.getNetHandler().addToSendQueue(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
@@ -488,10 +612,10 @@ public class Aura extends Module {
                 }
             }
         } else {
-            if ((mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getObject() || mc.thePlayer.isBlocking()) && !isBlocking) {
+            if ((mc.thePlayer.getHeldItem() != null && mc.thePlayer.getHeldItem().getItem() instanceof ItemSword && autoBlock.getPropertyValue() || mc.thePlayer.isBlocking()) && !isBlocking) {
                 ((IEntityPlayer) mc.thePlayer).setItemInUseCount(mc.thePlayer.getHeldItem().getMaxItemUseDuration());
 
-                switch (blockMode.getCurrentMode().toLowerCase()) {
+                switch ((blockMode.getPropertyValue().toString()).toLowerCase()) {
                     case "ncp":
                     case "desync":
                     case "always":
@@ -565,7 +689,7 @@ public class Aura extends Module {
                 .map(entity -> (EntityLivingBase) entity)
                 .filter(Aura::canAttack);
 
-        switch (mode.getCurrentMode()) {
+        switch (mode.getPropertyValue().toString()) {
             case "Armor": {
                 stream = stream.sorted(Comparator.comparingInt(o -> ((o instanceof EntityPlayer ? ((EntityPlayer) o).inventory.getTotalArmorValue() : (int) o.getHealth()))));
                 break;
@@ -574,7 +698,7 @@ public class Aura extends Module {
                 stream = stream.sorted((o1, o2) -> (int) (o1.getDistanceToEntity(mc.thePlayer) - o2.getDistanceToEntity(mc.thePlayer)));
                 break;
             }
-            case "Fov": {
+            case "Fov Based": {
                 stream = stream.sorted(Comparator.comparingDouble(o -> getDistanceBetweenAngles(mc.thePlayer.rotationPitch, getRotations(o)[0])));
                 break;
             }
@@ -598,7 +722,7 @@ public class Aura extends Module {
 
         List<EntityLivingBase> list;
 
-        if (witherPriority.getObject()) {
+        if (witherPriority.getPropertyValue()) {
             List<EntityLivingBase> sortedList = stream.collect(Collectors.toList());
             list = new ArrayList<>();
             list.addAll(sortedList.stream().filter((entity) -> entity instanceof EntityWither).collect(Collectors.toList()));
@@ -610,51 +734,51 @@ public class Aura extends Module {
         if (Keyboard.isKeyDown(Keyboard.KEY_LMENU))
             Collections.reverse(list);
 
-        return list.subList(0, Math.min(list.size(), target_Amount.getObject()));
+        return list.subList(0, Math.min(list.size(), target_Amount.getPropertyValue()));
 
     }
 
     //计算CPS
     private long randomClickDelay(final double minCPS, final double maxCPS) {
-        return (long) (1000L / (minCPS + ((maxCPS - minCPS) * playerUtils.randomInRange(0.4 , 1.0))));
+        return (long) (1000L / (minCPS + ((maxCPS - minCPS) * playerUtils.randomInRange(0.4, 1.0))));
     }
 
 
     boolean wasCPSDrop = false;
 
     private void calculateCPS() {
-        int cps = simpleCps.getObject();
+        int max = Math.max(minCps.getPropertyValue(), maxCps.getPropertyValue());
+        int min = Math.min(minCps.getPropertyValue(), maxCps.getPropertyValue());
 
-        switch (cpsMode.getCurrentMode()) {
+        switch (cpsMode.getPropertyValue().toString()) {
             case "Legit": {
-                    final Random random = new Random();
-                    final long maxCPS = cps + extendCps.getObject();
-                    apd = cps + (random.nextInt() * (maxCPS - cps));
+                final Random random = new Random();
+                apd = min + (random.nextInt() * ((long) max - min));
 
-                    if (reset.hasReached((long) (1000.0 / playerUtils.randomInRange(cps, maxCPS)))) {
-                        wasCPSDrop = !wasCPSDrop;
-                        if (wasCPSDrop) reset.reset();
-                    }
+                if (reset.hasReached((long) (1000.0 / playerUtils.randomInRange(min, (long) max)))) {
+                    wasCPSDrop = !wasCPSDrop;
+                    if (wasCPSDrop) reset.reset();
+                }
 
-                    final long cur = System.currentTimeMillis() * random.nextInt(220);
+                final long cur = System.currentTimeMillis() * random.nextInt(220);
 
-                    long timeCovert = Math.max(apd, cur) / 3;
-                    if (wasCPSDrop) {
-                        apd = timeCovert;
-                    } else {
-                        apd = cps + (random.nextInt() * (maxCPS - cps)) / timeCovert;
-                    }
+                long timeCovert = Math.max(apd, cur) / 3;
+                if (wasCPSDrop) {
+                    apd = timeCovert;
+                } else {
+                    apd = min + (random.nextInt() * ((long) max - min)) / timeCovert;
+                }
                 break;
             }
             case "Randomize": {
-                apd = randomClickDelay(cps, cps + extendCps.getObject());
+                apd = randomClickDelay(min, max);
                 break;
             }
             case "Smooth": {
-                cps = (int) playerUtils.smooth(cps + extendCps.getObject(), cps, smoothCpsSpeed.getObject() / 10, smoothRandomizing.getObject(), smoothCpsRandomStrength.getObject());
+                min = (int) playerUtils.smooth(min + max, min, smoothCpsSpeed.getPropertyValue() / 10, smoothRandomizing.getPropertyValue(), smoothCpsRandomStrength.getPropertyValue());
             }
             default: {
-                apd = 1000 / cps;
+                apd = 1000 / min;
             }
         }
     }
@@ -662,22 +786,22 @@ public class Aura extends Module {
     //限制
     private static boolean canAttack(EntityLivingBase target) {
         if (target instanceof EntityPlayer || target instanceof EntityAnimal || target instanceof EntityMob || target instanceof INpc) {
-            if (target instanceof EntityPlayer && !players.getObject()) return false;
-            if (target instanceof EntityAnimal && !animals.getObject()) return false;
-            if (target instanceof EntityWither && boss.getObject())
-                return mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() + blockRange.getObject(); // true
-            if (target instanceof EntityMob && !mobs.getObject()) return false;
-            if (target instanceof INpc && !villagers.getObject()) return false;
+            if (target instanceof EntityPlayer && !players.getPropertyValue()) return false;
+            if (target instanceof EntityAnimal && !animals.getPropertyValue()) return false;
+            if (target instanceof EntityWither && boss.getPropertyValue())
+                return mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getPropertyValue() + blockRange.getPropertyValue(); // true
+            if (target instanceof EntityMob && !mobs.getPropertyValue()) return false;
+            if (target instanceof INpc && !villagers.getPropertyValue()) return false;
         }
         if (target instanceof EntityArmorStand) return false;
-        if (playerUtils.isOnSameTeam(target) && team.getObject()) return false;
-        if (target.isInvisible() && !invisible.getObject()) return false;
-        if (!isInFOV(target, fov.getObject())) return false;
-        if (!mc.thePlayer.canEntityBeSeen(target) && !throughBlock.getObject()) return false;
+        if (playerUtils.isOnSameTeam(target) && team.getPropertyValue()) return false;
+        if (target.isInvisible() && !invisible.getPropertyValue()) return false;
+        if (!isInFOV(target, fov.getPropertyValue())) return false;
+        if (!mc.thePlayer.canEntityBeSeen(target) && !throughBlock.getPropertyValue()) return false;
         if (Main.INSTANCE.moduleManager.getModule(AntiBot.class).getState() && Main.INSTANCE.moduleManager.getModule(AntiBot.class).isBot(target))
             return false;
 
-        return target != mc.thePlayer && target.isEntityAlive() && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getObject() + blockRange.getObject() && target.ticksExisted > ticksExisted.getObject();
+        return target != mc.thePlayer && target.isEntityAlive() && mc.thePlayer.getDistanceToEntity(target) - 0.5657 <= range.getPropertyValue() + blockRange.getPropertyValue() && target.ticksExisted > ticksExisted.getPropertyValue();
     }
 
     private static boolean isInFOV(EntityLivingBase entity, double angle) {

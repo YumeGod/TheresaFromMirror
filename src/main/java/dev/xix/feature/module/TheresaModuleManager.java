@@ -1,10 +1,8 @@
 package dev.xix.feature.module;
 
-import cn.loli.client.module.modules.combat.Velocity;
-import com.google.common.collect.ImmutableClassToInstanceMap;
+
 import com.google.common.collect.ImmutableMap;
 import dev.xix.TheresaClient;
-import dev.xix.feature.module.combat.VelocityModule;
 
 import java.util.Arrays;
 
@@ -15,7 +13,6 @@ public final class TheresaModuleManager {
     public TheresaModuleManager() {
         this.modules = registerModules(
                 // COMBAT
-                new VelocityModule()
                 // MOVEMENT
                 // PLAYER
                 // WORLD

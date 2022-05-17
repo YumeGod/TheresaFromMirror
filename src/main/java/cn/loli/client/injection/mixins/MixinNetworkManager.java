@@ -2,6 +2,7 @@
 
 package cn.loli.client.injection.mixins;
 
+import cn.loli.client.Main;
 import cn.loli.client.events.PacketEvent;
 
 import dev.xix.TheresaClient;
@@ -22,7 +23,7 @@ public abstract class MixinNetworkManager {
     @Inject(method = "channelRead0*", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/Packet;processPacket(Lnet/minecraft/network/INetHandler;)V", shift = At.Shift.BEFORE), cancellable = true)
     private void packetReceived(ChannelHandlerContext p_channelRead0_1_, Packet packet, CallbackInfo ci) {
         PacketEvent event = new PacketEvent(EventType.RECEIVE, packet);
-        TheresaClient.getInstance().getEventBus().call(event);
+        Main.INSTANCE.eventBus.call(event);
 
         if (event.isCancelled()) ci.cancel();
     }
@@ -30,7 +31,7 @@ public abstract class MixinNetworkManager {
     @Inject(method = "sendPacket(Lnet/minecraft/network/Packet;)V", at = @At("HEAD"), cancellable = true)
     private void sendPacket(Packet packetIn, CallbackInfo ci) {
         PacketEvent event = new PacketEvent(EventType.SEND, packetIn);
-        TheresaClient.getInstance().getEventBus().call(event);
+        Main.INSTANCE.eventBus.call(event);
 
         if (event.isCancelled()) ci.cancel();
     }

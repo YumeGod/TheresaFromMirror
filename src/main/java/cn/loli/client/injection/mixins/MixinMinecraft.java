@@ -69,13 +69,13 @@ public abstract class MixinMinecraft {
         lastFrame = currentTime;
         AnimationUtils.delta = deltaTime;
 
-        TheresaClient.getInstance().getEventBus().call(new LoopEvent());
+        Main.INSTANCE.eventBus.call(new LoopEvent());
     }
 
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;dispatchKeypresses()V", shift = At.Shift.AFTER))
     private void onKey(CallbackInfo ci) {
         if (Keyboard.getEventKeyState() && currentScreen == null)
-            TheresaClient.getInstance().getEventBus().call(new KeyEvent(Keyboard.getEventKey() == 0 ? Keyboard.getEventCharacter() + 256 : Keyboard.getEventKey()));
+            Main.INSTANCE.eventBus.call(new KeyEvent(Keyboard.getEventKey() == 0 ? Keyboard.getEventCharacter() + 256 : Keyboard.getEventKey()));
 
         if (currentScreen == null && Keyboard.isKeyDown(Keyboard.KEY_PERIOD) && gameSettings.chatVisibility != EntityPlayer.EnumChatVisibility.HIDDEN) {
             displayGuiScreen(new GuiChat());
@@ -84,17 +84,17 @@ public abstract class MixinMinecraft {
 
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/profiler/Profiler;startSection(Ljava/lang/String;)V" , ordinal = 0, shift = At.Shift.AFTER))
     private void onPreTick(CallbackInfo ci) {
-        TheresaClient.getInstance().getEventBus().call(new TickEvent(EventType.PRE));
+        Main.INSTANCE.eventBus.call(new TickEvent(EventType.PRE));
     }
 
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/profiler/Profiler;endSection()V", shift = At.Shift.BEFORE))
     private void onPostTick(CallbackInfo ci) {
-        TheresaClient.getInstance().getEventBus().call(new TickEvent(EventType.POST));
+        Main.INSTANCE.eventBus.call(new TickEvent(EventType.POST));
     }
 
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;isUsingItem()Z", ordinal = 0, shift = At.Shift.BEFORE))
     private void onAttack(CallbackInfo ci) {
-        TheresaClient.getInstance().getEventBus().call(new TickAttackEvent());
+        Main.INSTANCE.eventBus.call(new TickAttackEvent());
     }
 
     @Inject(method = "shutdown", at = @At("HEAD"))
@@ -104,19 +104,19 @@ public abstract class MixinMinecraft {
 
     @Inject(method = "resize", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;updateFramebufferSize()V", shift = At.Shift.AFTER))
     private void updateClickGuiPosition(int width, int height, CallbackInfo ci) {
-        TheresaClient.getInstance().getEventBus().call(new WindowResizeEvent(width, height));
+        Main.INSTANCE.eventBus.call(new WindowResizeEvent(width, height));
     }
 
     @Redirect(method = "sendClickBlockToController", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;isUsingItem()Z"))
     private boolean blockHit(EntityPlayerSP player) {
         BlockHit blockHit = Main.INSTANCE.moduleManager.getModule(BlockHit.class);
-        if (blockHit.getState() && !blockHit.animationsOnly.getObject()) return false;
+        if (blockHit.getState() && !blockHit.animationsOnly.getPropertyValue()) return false;
         return player.isUsingItem();
     }
 
 
     @Inject(method = "runTick", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/GuiScreen;allowUserInput:Z", shift = At.Shift.BEFORE))
     private void GuiHandle(CallbackInfo ci) {
-        TheresaClient.getInstance().getEventBus().call(new GuiHandleEvent());
+        Main.INSTANCE.eventBus.call(new GuiHandleEvent());
     }
 }

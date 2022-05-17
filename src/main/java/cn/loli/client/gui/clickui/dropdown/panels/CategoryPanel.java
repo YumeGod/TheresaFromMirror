@@ -35,7 +35,7 @@ public class CategoryPanel extends Panel {
             mn++;
         }
 
-        maxHeight = mn * 25 + TITLE_HEIGHT + 10;
+        maxHeight = mn * 25 + TITLE_HEIGHT + 30;
     }
 
     @Override

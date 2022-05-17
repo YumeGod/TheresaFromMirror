@@ -1,29 +1,28 @@
-
-
-package cn.loli.client.value;
+package dev.xix.property.impl;
 
 import cn.loli.client.gui.clickui.GuiTextBox;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import dev.xix.property.AbstractTheresaProperty;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Predicate;
+import java.util.function.Supplier;
 
-public class StringValue extends Value<String> {
-    public GuiTextBox text;
+public class StringProperty extends AbstractTheresaProperty<String> {
+    public GuiTextBox textBox;
 
-    public StringValue(String name, String defaultVal) {
-        this(name, defaultVal, null);
+    public StringProperty(final String name, final String value, final Supplier<Boolean> dependency) {
+        super(name, value, dependency);
     }
 
-    public StringValue(String name, String defaultVal, Predicate<String> validator) {
-        super(name, defaultVal, validator);
+    public StringProperty(final String name, final String value) {
+        super(name, value, () -> true);
     }
 
     @Override
     public void addToJsonObject(@NotNull JsonObject obj) {
-        obj.addProperty(getName(), getObject());
+        obj.addProperty(getName(), getPropertyValue());
     }
 
     @Override
@@ -32,7 +31,7 @@ public class StringValue extends Value<String> {
             JsonElement element = obj.get(getName());
 
             if (element instanceof JsonPrimitive && ((JsonPrimitive) element).isString()) {
-                setObject(element.getAsString());
+                setPropertyValue(element.getAsString());
             } else {
                 throw new IllegalArgumentException("Entry '" + getName() + "' is not valid");
             }

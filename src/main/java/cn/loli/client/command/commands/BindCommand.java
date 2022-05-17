@@ -8,12 +8,12 @@ import cn.loli.client.command.CommandException;
 import cn.loli.client.events.KeyEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.utils.misc.ChatUtils;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.ModeValue;
-import cn.loli.client.value.NumberValue;
-import cn.loli.client.value.Value;
-import com.darkmagician6.eventapi.EventManager;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
+import dev.xix.property.AbstractTheresaProperty;
+import dev.xix.property.impl.BooleanProperty;
+import dev.xix.property.impl.EnumProperty;
+import dev.xix.property.impl.NumberProperty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.input.Keyboard;
@@ -27,12 +27,12 @@ public class BindCommand extends Command {
     @Nullable
     private Module currentModule = null;
     private String owner;
-    private Value<?> currentValue = null;
+    private AbstractTheresaProperty<?> currentValue = null;
 
     public BindCommand() {
         super("bind");
 
-        EventManager.register(this);
+         Main.INSTANCE.eventBus.register(this);
     }
 
     //TODO: 将使用抽象类来解决这堆狗屎代码 因为这很愚蠢
@@ -59,12 +59,12 @@ public class BindCommand extends Command {
             } else if (args[1].equalsIgnoreCase("show")) {
                 ChatUtils.success(ChatUtils.SECONDARY_COLOR + mod.getName() + ChatUtils.PRIMARY_COLOR + " is bound to " + ChatUtils.SECONDARY_COLOR + Keyboard.getKeyName(mod.getKeybind()));
             } else {
-                Value<?> value = null;
+                AbstractTheresaProperty<?> value = null;
                 try {
                     value = Main.INSTANCE.valueManager.get(args[0], args[1], true);
                     if (value != null) {
                         if (args.length > 2) {
-                            if (value instanceof ModeValue) {
+                            if (value instanceof EnumProperty) {
                                 Integer mode = Integer.parseInt(args[2]);
                                 Main.INSTANCE.valueManager.modeSelect.put(value, mode);
                                 if (args.length > 3) {
@@ -79,7 +79,7 @@ public class BindCommand extends Command {
                                     ChatUtils.info("Listening for keybinds for " + ChatUtils.SECONDARY_COLOR + value.getName());
                                 }
                             }
-                            if (value instanceof NumberValue) {
+                            if (value instanceof NumberProperty) {
                                 Number number = Double.parseDouble(args[2]);
                                 Main.INSTANCE.valueManager.numberPick.put(value, number);
                                 if (args.length > 3) {
@@ -94,7 +94,7 @@ public class BindCommand extends Command {
                                     ChatUtils.info("Listening for keybinds for " + ChatUtils.SECONDARY_COLOR + value.getName());
                                 }
                             }
-                            if (value instanceof BooleanValue) {
+                            if (value instanceof BooleanProperty) {
                                 int key = Keyboard.getKeyIndex(args[2].toUpperCase());
                                 Main.INSTANCE.valueManager.ownerMap.put(value, args[0]);
                                 Main.INSTANCE.valueManager.keyBind.put(value, key);
@@ -149,8 +149,7 @@ public class BindCommand extends Command {
         } else return new ArrayList<>();
     }
 
-    @EventTarget
-    public void onKey(@NotNull KeyEvent event) {
+    private final IEventListener<@NotNull KeyEvent> onKey = event -> {
         if (active) {
             if (currentModule != null) {
                 currentModule.setKeybind(event.getKey());
@@ -165,5 +164,6 @@ public class BindCommand extends Command {
             active = false;
             currentModule = null;
         }
-    }
+    };
+
 }

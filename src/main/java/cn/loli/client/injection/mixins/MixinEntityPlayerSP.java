@@ -55,7 +55,7 @@ public class MixinEntityPlayerSP extends MixinEntity {
         cacheGround = onGround;
 
         MotionUpdateEvent event = new MotionUpdateEvent(EventType.PRE, posX, posY, posZ, rotationYaw, rotationPitch, onGround);
-        TheresaClient.getInstance().getEventBus().call(event);
+        Main.INSTANCE.eventBus.call(event);
 
         posX = event.getX();
         posY = event.getY();
@@ -86,7 +86,7 @@ public class MixinEntityPlayerSP extends MixinEntity {
 
         onGround = cacheGround;
 
-        TheresaClient.getInstance().getEventBus().call(new MotionUpdateEvent(EventType.POST, posX, posY, posZ, rotationYaw, rotationPitch, onGround));
+        Main.INSTANCE.eventBus.call(new MotionUpdateEvent(EventType.POST, posX, posY, posZ, rotationYaw, rotationPitch, onGround));
     }
 
 
@@ -97,7 +97,7 @@ public class MixinEntityPlayerSP extends MixinEntity {
 
     @Inject(method = "onUpdate", at = @At("RETURN"))
     private void onUpdate(CallbackInfo ci) {
-        TheresaClient.getInstance().getEventBus().call(new UpdateEvent());
+        Main.INSTANCE.eventBus.call(new UpdateEvent());
     }
 
 
@@ -135,7 +135,7 @@ public class MixinEntityPlayerSP extends MixinEntity {
     @Override
     public void moveEntity(double x, double y, double z) {
         PlayerMoveEvent moveEvent = new PlayerMoveEvent(x, y, z);
-        TheresaClient.getInstance().getEventBus().call(moveEvent);
+        Main.INSTANCE.eventBus.call(moveEvent);
 
         if (moveEvent.isCancelled())
             return;

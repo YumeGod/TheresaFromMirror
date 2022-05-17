@@ -1,16 +1,15 @@
 package cn.loli.client.module.modules.misc.skyblock;
 
-import cn.loli.client.events.MotionUpdateEvent;
-import cn.loli.client.events.RenderBlockEvent;
-import cn.loli.client.events.RenderEvent;
-import cn.loli.client.events.TickEvent;
+import cn.loli.client.events.*;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.timer.TimeHelper;
 import cn.loli.client.utils.player.rotation.RotationHook;
-import cn.loli.client.value.BooleanValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -36,8 +35,8 @@ public class AutoFarm extends Module {
     TimeHelper delay = new TimeHelper();
     MovingObjectPosition ray;
 
-    private final BooleanValue heuristic = new BooleanValue("Heuristic", false);
-    private final BooleanValue slient = new BooleanValue("Slient-Rotate", false);
+    private final BooleanProperty heuristic = new BooleanProperty("Heuristic", false);
+    private final BooleanProperty slient = new BooleanProperty("Slient-Rotate", false);
 
     PlantSeedTask action;
 
@@ -47,19 +46,20 @@ public class AutoFarm extends Module {
 
     //TODO : Auto Farm
 
-    @EventTarget
-    public void onMotion(MotionUpdateEvent e) {
+    private final IEventListener<MotionUpdateEvent> onMotion = e ->
+    {
         if (e.getEventType() == EventType.PRE) {
-            if (slient.getObject()) {
+            if (slient.getPropertyValue()) {
                 e.setYaw(yaw);
                 e.setPitch(pitch);
             }
         }
-    }
+    };
 
-    @EventTarget
-    private void onRotate(RenderEvent e) {
-        if (!heuristic.getObject()) {
+
+    private final IEventListener<RenderEvent> onRotate = e ->
+    {
+        if (!heuristic.getPropertyValue()) {
             if (time.hasReached(500)) {
                 for (int y = 6; y >= -1; --y)
                     for (int x = -9; x <= 9; ++x)
@@ -100,13 +100,14 @@ public class AutoFarm extends Module {
             yaw = mc.thePlayer.rotationYaw;
             pitch = mc.thePlayer.rotationPitch;
         }
-    }
+    };
 
-    @EventTarget
-    private void onSort(TickEvent e) {
+
+    private final IEventListener<TickEvent> onSort = e ->
+    {
         if (Keyboard.isKeyDown(Keyboard.KEY_LMENU)) return;
 
-        if (!slient.getObject()) {
+        if (!slient.getPropertyValue()) {
             mc.thePlayer.rotationYaw = yaw;
             mc.thePlayer.rotationPitch = pitch;
         }
@@ -148,12 +149,13 @@ public class AutoFarm extends Module {
 
             }
         }
-    }
+    };
 
-    @EventTarget
-    private void onRender(RenderBlockEvent e) {
+
+    private final IEventListener<RenderBlockEvent> onRender = e ->
+    {
         //Added to List
-        if (heuristic.getObject()) {
+        if (heuristic.getPropertyValue()) {
             BlockPos pos = new BlockPos(e.x, e.y, e.z);
             if (!plantSeedTaskArrayList.contains(new PlantSeedTask(pos, false)) && isBlockValid(pos, false))
                 plantSeedTaskArrayList.add(new PlantSeedTask(pos, false));
@@ -161,7 +163,8 @@ public class AutoFarm extends Module {
             if (!plantSeedTaskArrayList.contains(new PlantSeedTask(pos, true)) && isBlockValid(pos, true))
                 plantSeedTaskArrayList.add(new PlantSeedTask(pos, true));
         }
-    }
+    };
+
 
     private boolean isBlockValid(BlockPos position, boolean isPlant) {
         boolean temp = false;

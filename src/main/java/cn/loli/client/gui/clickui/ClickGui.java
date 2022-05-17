@@ -1,15 +1,14 @@
 package cn.loli.client.gui.clickui;
 
 import cn.loli.client.Main;
-import cn.loli.client.gui.clickui.dropdown.panels.components.BooleanComponent;
-import cn.loli.client.gui.clickui.dropdown.panels.components.ModeComponent;
-import cn.loli.client.gui.clickui.dropdown.panels.components.NumberComponent;
-import cn.loli.client.gui.ttfr.HFontRenderer;
+import cn.loli.client.gui.clickui.components.ModeComponent;
+import cn.loli.client.gui.clickui.components.NumberComponent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.render.AnimationUtils;
 import cn.loli.client.utils.render.RenderUtils;
-import cn.loli.client.value.*;
+import dev.xix.property.AbstractTheresaProperty;
+import dev.xix.property.impl.*;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
@@ -20,10 +19,8 @@ import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.Objects;
-
-import static cn.loli.client.value.ColorValue.isHovered;
+import static cn.loli.client.gui.guiscreen.GuiReconnectIRC.isHovered;
 
 public class ClickGui extends GuiScreen {
     //常量
@@ -38,7 +35,10 @@ public class ClickGui extends GuiScreen {
     private static final float WINDOW_MIN_WIDTH = 420; //窗口最小宽度
     private static final float WINDOW_MIN_HEIGHT = 300; //窗口最小高度
 
-    static float x = -1, y = -1, width = 0, height = 0;//坐标和宽高
+    public static float x = -1;
+    public static float y = -1;
+    static float width = 0;
+    static float height = 0;//坐标和宽高
 
     public static Theme theme = new Theme(); //主题
     private boolean drag; //主窗体是否被拖动
@@ -209,40 +209,40 @@ public class ClickGui extends GuiScreen {
                     RenderUtils.drawRoundRect(x + width - showValueX, y + 45, x + width - 10, y + height - 20, 3, -1);
                     showValueX = AnimationUtils.smoothAnimation(showValueX, width / 3, ANIMATION_SPEED * 2, ANIMATION_SCALE);
                     valuesY = y + 55 + values_wheel;
-                    for (Value v : Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName()))) {
+                    for (AbstractTheresaProperty v : Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName()))) {
                         Main.INSTANCE.fontLoaders.get("heiti18").drawString(v.getName(), x + width - showValueX + 5, valuesY + 1, theme.value_name.getRGB());
-                        if (v instanceof BooleanValue) {
+                        if (v instanceof BooleanProperty) {
                             v.component.draw(x + width - 35, valuesY, partialTicks);
-                        } else if (v instanceof NumberValue) {
+                        } else if (v instanceof NumberProperty) {
                             NumberComponent nc = (NumberComponent) v.component;
                             nc.setSizeDrag(sizeDrag);
                             nc.setMouseX(mouseX);
                             nc.setWidth(showValueX - 30);
                             nc.draw(x + width - showValueX + 15, valuesY + 13, partialTicks);
                             valuesY += 8;
-                        } else if (v instanceof ModeValue) {
+                        } else if (v instanceof EnumProperty) {
                             ModeComponent mc = (ModeComponent) v.component;
                             mc.draw(x + width - 35, valuesY, partialTicks);
                             valuesY += v.clickgui_anim;
-                        } else if (v instanceof StringValue) {
-                            if (((StringValue) v).text == null) {
-                                ((StringValue) v).text = new GuiTextBox(0, Main.INSTANCE.fontLoaders.get("heiti17"), 0, 0, 0, 0);
-                                ((StringValue) v).text.setText(((StringValue) v).getObject());
+                        } else if (v instanceof StringProperty) {
+                            if (((StringProperty) v).textBox == null) {
+                                ((StringProperty) v).textBox = new GuiTextBox(0, Main.INSTANCE.fontLoaders.get("heiti17"), 0, 0, 0, 0);
+                                ((StringProperty) v).textBox.setText(((StringProperty) v).getPropertyValue());
                             } else {
-                                ((StringValue) v).text.xPosition = (int) (x + width - 80);
-                                ((StringValue) v).text.yPosition = (int) valuesY - 2;
-                                ((StringValue) v).text.height = 14;
-                                ((StringValue) v).text.width = 60;
-                                RenderUtils.drawRoundedRect(((StringValue) v).text.xPosition - 1, ((StringValue) v).text.yPosition - 1, ((StringValue) v).text.width + 2, ((StringValue) v).text.height + 2, 2, new Color(200, 200, 200).getRGB());
-                                ((StringValue) v).text.drawTextBox();
-                                v.setObject(((StringValue) v).text.getText());
+                                ((StringProperty) v).textBox.xPosition = (int) (x + width - 80);
+                                ((StringProperty) v).textBox.yPosition = (int) valuesY - 2;
+                                ((StringProperty) v).textBox.height = 14;
+                                ((StringProperty) v).textBox.width = 60;
+                                RenderUtils.drawRoundedRect(((StringProperty) v).textBox.xPosition - 1, ((StringProperty) v).textBox.yPosition - 1, ((StringProperty) v).textBox.width + 2, ((StringProperty) v).textBox.height + 2, 2, new Color(200, 200, 200).getRGB());
+                                ((StringProperty) v).textBox.drawTextBox();
+                                v.setPropertyValue(((StringProperty) v).textBox.getText());
                             }
-                        } else if (v instanceof ColorValue) {
+                        } else if (v instanceof ColorProperty) {
                             // Color
                             if (isHovered(x, y, x + width, y + height - 20, mouseX, mouseY)) {
-                                ((ColorValue) v).draw(x + width - 70, valuesY + 1, 40, 40, mouseX, mouseY);
+                                ((ColorProperty) v).draw(x + width - 70, valuesY + 1, 40, 40, mouseX, mouseY);
                             } else {
-                                ((ColorValue) v).draw(x + width - 70, valuesY + 1, 40, 40, -1, -1);
+                                ((ColorProperty) v).draw(x + width - 70, valuesY + 1, 40, 40, -1, -1);
                             }
 
                             valuesY += 30;
@@ -361,14 +361,14 @@ public class ClickGui extends GuiScreen {
 
         for (Module m : Main.INSTANCE.moduleManager.getModules()) {
             if (m.getCategory() == curType) {
-                if (!m.getName().contains(searchField.getText()) && searchField.getText() != "") {
+                if (!m.getName().contains(searchField.getText()) && !Objects.equals(searchField.getText(), "")) {
                     continue;
                 }
                 if (m == curModule) {
-                    for (Value v : Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName()))) {
-                        if (v instanceof StringValue) {
-                            if (((StringValue) v).text != null) {
-                                ((StringValue) v).text.textboxKeyTyped(typedChar, keyCode);
+                    for (AbstractTheresaProperty v : Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName()))) {
+                        if (v instanceof StringProperty) {
+                            if (((StringProperty) v).textBox != null) {
+                                ((StringProperty) v).textBox.textboxKeyTyped(typedChar, keyCode);
                             }
                         }
                     }
@@ -420,22 +420,22 @@ public class ClickGui extends GuiScreen {
             if (m.getCategory() == curType) {
                 if (m == curModule && isHovered(x + width - showValueX, y + 45, x + width - 10, y + height - 20, mouseX, mouseY)) {
                     float valuesY = y + 55 + values_wheel;
-                    for (Value v : Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName()))) {
-                        if (v instanceof BooleanValue) {
+                    for (AbstractTheresaProperty v : Objects.requireNonNull(Main.INSTANCE.valueManager.getAllValuesFrom(m.getName()))) {
+                        if (v instanceof BooleanProperty) {
                             v.component.onMouse(mouseX, mouseY, mouseButton);
-                        } else if (v instanceof NumberValue) {
+                        } else if (v instanceof NumberProperty) {
                             NumberComponent nc = (NumberComponent) v.component;
                             nc.onMouse(mouseX, mouseY, mouseButton);
                             valuesY += 8;
-                        } else if (v instanceof ModeValue) {
+                        } else if (v instanceof EnumProperty) {
                             ModeComponent mc = (ModeComponent) v.component;
                             mc.onMouse(mouseX, mouseY, mouseButton);
                             valuesY += v.clickgui_anim;
-                        } else if (v instanceof StringValue) {
-                            if (((StringValue) v).text != null) {
-                                ((StringValue) v).text.mouseClicked(mouseX, mouseY, mouseButton);
+                        } else if (v instanceof StringProperty) {
+                            if (((StringProperty) v).textBox != null) {
+                                ((StringProperty) v).textBox.mouseClicked(mouseX, mouseY, mouseButton);
                             }
-                        } else if (v instanceof ColorValue) {
+                        } else if (v instanceof ColorProperty) {
                             valuesY += 30;
                         }
                         valuesY += 20;

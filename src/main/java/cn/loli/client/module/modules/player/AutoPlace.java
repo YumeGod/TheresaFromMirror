@@ -1,13 +1,16 @@
 package cn.loli.client.module.modules.player;
 
 import cn.loli.client.events.RenderEvent;
+import cn.loli.client.events.TickEvent;
 import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.player.rotation.Rotation;
-import cn.loli.client.value.ModeValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+
+import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.EnumProperty;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.network.play.client.C0APacketAnimation;
 import net.minecraft.util.MathHelper;
@@ -16,29 +19,58 @@ import net.minecraft.util.Vec3;
 
 public class AutoPlace extends Module {
 
-    private final ModeValue mode = new ModeValue("Place Mode", "Update", "Update", "Instant");
-    private final ModeValue placetype = new ModeValue("Place Type", "Slient", "Slient", "Legit");
+    private enum PLACE_MODE {
+        UPDATE("Update"), INSTANT("Intant");
+
+        private final String name;
+
+        PLACE_MODE(String s) {
+            this.name = s;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    private enum PLACE_TYPE {
+        LEGIT("Legit"), SILENT("Silent");
+
+        private final String name;
+
+        PLACE_TYPE(String s) {
+            this.name = s;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    private final EnumProperty mode = new EnumProperty<>("Place Mode", PLACE_MODE.UPDATE);
+    private final EnumProperty placetype = new EnumProperty<>("Place Type", PLACE_TYPE.LEGIT);
 
 
     public AutoPlace() {
         super("Auto Place", "Make you able to place blocks quickly", ModuleCategory.PLAYER);
     }
 
-    @EventTarget
-    private void onPlace(RenderEvent event) {
-        if (mode.getCurrentMode().equalsIgnoreCase("Instant"))
-            onPlace();
-    }
+    private final IEventListener<RenderEvent> onPlace = event ->
+    {
+        if (mode.getPropertyValue().toString().equals("Instant")) onPlace();
+    };
 
-    @EventTarget
-    private void onPlace(UpdateEvent event) {
-        if (mode.getCurrentMode().equalsIgnoreCase("Update"))
-            onPlace();
-    }
+    private final IEventListener<UpdateEvent> onPlaceUpdate = event ->
+    {
+        if (mode.getPropertyValue().toString().equals("Update")) onPlace();
+    };
+
 
     private void onPlace() {
         if (isHoldingBlock()) {
-            if (placetype.getCurrentMode().equalsIgnoreCase("Slient")) {
+            if (placetype.getPropertyValue().toString().equals("Slient")) {
                 final Vec3 eyesPos = new Vec3(mc.thePlayer.posX, mc.thePlayer.getEntityBoundingBox().minY + mc.thePlayer.getEyeHeight(), mc.thePlayer.posZ);
                 final Vec3 rotationVector = getVectorForRotation(new Rotation(mc.thePlayer.rotationYaw, mc.thePlayer.rotationPitch));
                 final Vec3 vector = eyesPos.addVector(rotationVector.xCoord * 4, rotationVector.yCoord * 4, rotationVector.zCoord * 4);
@@ -69,12 +101,12 @@ public class AutoPlace extends Module {
 
     @Override
     protected void onEnable() {
-        
+
     }
 
 
     @Override
     protected void onDisable() {
-        
+
     }
 }

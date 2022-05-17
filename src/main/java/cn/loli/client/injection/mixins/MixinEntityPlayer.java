@@ -36,7 +36,7 @@ public abstract class MixinEntityPlayer extends EntityLivingBase implements IEnt
     public float getEyeHeight() {
         EntityPlayer player = Minecraft.getMinecraft().thePlayer;
 
-        if (Main.INSTANCE.moduleManager.getModule(OldAnimations.class).getState() && Main.INSTANCE.moduleManager.getModule(OldAnimations.class).oldSneaking.getObject()) {
+        if (Main.INSTANCE.moduleManager.getModule(OldAnimations.class).getState() && Main.INSTANCE.moduleManager.getModule(OldAnimations.class).oldSneaking.getPropertyValue()) {
             int timeDelay = 1000 / 60;
 
             if (player.isSneaking()) {
@@ -95,7 +95,7 @@ public abstract class MixinEntityPlayer extends EntityLivingBase implements IEnt
             this.motionZ /= 0.6D;
             this.setSprinting(true);
 
-            if (Main.INSTANCE.moduleManager.getModule(KeepSprint.class).fake.getObject()) {
+            if (Main.INSTANCE.moduleManager.getModule(KeepSprint.class).fake.getPropertyValue()) {
                 Main.INSTANCE.moduleManager.getModule(KeepSprint.class).modify = true;
             }
         }

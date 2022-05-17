@@ -2,15 +2,18 @@
 
 package cn.loli.client.module.modules.render;
 
+import cn.loli.client.events.Render3DEvent;
 import cn.loli.client.events.TickEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.NumberProperty;
 
 public class FullBright extends Module {
-    private final NumberValue<Integer> gamma = new NumberValue<>("Gamma", 100, 1, 100);
+    private final NumberProperty<Integer> gamma = new NumberProperty<>("Gamma", 100, 1, 100 , 1);
     private float oldGamma;
 
     public FullBright() {
@@ -29,13 +32,14 @@ public class FullBright extends Module {
         mc.gameSettings.gammaSetting = oldGamma;
     }
 
-    @EventTarget
-    public void onTick(TickEvent e) {
+    private final IEventListener<TickEvent> onTick = e ->
+    {
         if (e.getEventType() != EventType.POST) return;
 
-        if (mc.gameSettings.gammaSetting != gamma.getObject()) {
+        if (mc.gameSettings.gammaSetting != gamma.getPropertyValue()) {
             oldGamma = mc.gameSettings.gammaSetting;
-            mc.gameSettings.gammaSetting = gamma.getObject();
+            mc.gameSettings.gammaSetting = gamma.getPropertyValue();
         }
-    }
+    };
+
 }

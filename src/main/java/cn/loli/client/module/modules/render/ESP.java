@@ -1,6 +1,7 @@
 package cn.loli.client.module.modules.render;
 
 
+import cn.loli.client.events.CameraEvent;
 import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.Render2DEvent;
 import cn.loli.client.events.Render3DEvent;
@@ -9,10 +10,11 @@ import cn.loli.client.injection.mixins.IAccessorRenderManager;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.render.RenderUtils;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.ColorValue;
-import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+
+import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
+import dev.xix.property.impl.ColorProperty;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.entity.player.EntityPlayer;
@@ -45,19 +47,19 @@ public class ESP extends Module {
     private final FloatBuffer modelMatrix = GLAllocation.createDirectFloatBuffer(16);
     private final FloatBuffer projectionMatrix = GLAllocation.createDirectFloatBuffer(16);
 
-    private final BooleanValue box = new BooleanValue("2D Box", false);
-    private final BooleanValue healthbar = new BooleanValue("Health Bar", false);
-    private final BooleanValue nametags = new BooleanValue("Name tags", false);
-    private final BooleanValue invis = new BooleanValue("Ignore Invis", false);
-    private final BooleanValue icarus = new BooleanValue("Icarus", false);
+    private final BooleanProperty box = new BooleanProperty("2D Box", false);
+    private final BooleanProperty healthbar = new BooleanProperty("Health Bar", false);
+    private final BooleanProperty nametags = new BooleanProperty("Name tags", false);
+    private final BooleanProperty invis = new BooleanProperty("Ignore Invis", false);
+    private final BooleanProperty icarus = new BooleanProperty("Icarus", false);
 
-    public final BooleanValue chams = new BooleanValue("Chams", false);
+    public final BooleanProperty chams = new BooleanProperty("Chams", false);
 
-    public final ColorValue boxColor = new ColorValue("Box-Color", new Color(239, 235, 235, 210));
-    public final ColorValue icarusColor = new ColorValue("Icarus-Color", new Color(147, 144, 144, 210));
+    public final ColorProperty boxColor = new ColorProperty("Box-Color", new Color(239, 235, 235, 210));
+    public final ColorProperty icarusColor = new ColorProperty("Icarus-Color", new Color(147, 144, 144, 210));
 
-    public final ColorValue chamsColor = new ColorValue("Cham-Default-Color", new Color(187, 21, 21, 210));
-    public final ColorValue throughWallsColor = new ColorValue("Cham-ThroughWalls-Color", new Color(23, 74, 183, 210));
+    public final ColorProperty chamsColor = new ColorProperty("Cham-Default-Color", new Color(187, 21, 21, 210));
+    public final ColorProperty throughWallsColor = new ColorProperty("Cham-ThroughWalls-Color", new Color(23, 74, 183, 210));
 
 
     //TODO: ESP Overlay
@@ -68,9 +70,8 @@ public class ESP extends Module {
         super("ESP", "Make you able see others in your view", ModuleCategory.RENDER);
     }
 
-
-    @EventTarget
-    private void onRenderSR(Render2DEvent e) {
+    private final IEventListener<Render2DEvent> onRenderSR = event ->
+    {
         ScaledResolution res = new ScaledResolution(mc);
 
         for (EntityPlayer player : entityPosMap.keySet()) {
@@ -83,7 +84,7 @@ public class ESP extends Module {
             float y = positions[2];
             float y2 = positions[3];
 
-            if (healthbar.getObject()) {
+            if (healthbar.getPropertyValue()) {
                 drawRect((int) (x - 2.5), (int) (y - 0.5F), (int) (x - 0.5F), (int) (y2 + 0.5F), 0x96000000);
 
                 float health = player.getHealth();
@@ -102,7 +103,7 @@ public class ESP extends Module {
                 if (needScissor)
                     endScissorBox();
             }
-            if (nametags.getObject()) {
+            if (nametags.getPropertyValue()) {
                 String text = "(" + EnumChatFormatting.GOLD + Math.round(mc.thePlayer.getDistanceToEntity(player)) + "m" + EnumChatFormatting.RESET + ")" + player.getDisplayName().getUnformattedText();
                 float xDif = x2 - x;
                 float minScale = 0.65F;
@@ -119,10 +120,10 @@ public class ESP extends Module {
                 GL11.glScalef(1.0F, 1.0F, 1.0F);
                 GL11.glPopMatrix();
             }
-            if (box.getObject()) {
+            if (box.getPropertyValue()) {
                 GL11.glDisable(GL11.GL_TEXTURE_2D);
                 enableAlpha();
-                RenderUtils.color(boxColor.getObject().getRGB());
+                RenderUtils.color(boxColor.getPropertyValue().getRGB());
                 GL11.glBegin(GL11.GL_LINE_LOOP);
                 GL11.glVertex2f(x, y);
                 GL11.glVertex2f(x, y2);
@@ -135,18 +136,18 @@ public class ESP extends Module {
             GL11.glPopMatrix();
 
         }
-    }
+    };
 
-    @EventTarget
-    private void onRender3D(Render3DEvent event) {
+    private final IEventListener<Render3DEvent> onRender3D = event ->
+    {
         ScaledResolution res = new ScaledResolution(mc);
         if (!entityPosMap.isEmpty())
             entityPosMap.clear();
 
-        if (box.getObject() || healthbar.getObject() || nametags.getObject()) {
+        if (box.getPropertyValue() || healthbar.getPropertyValue() || nametags.getPropertyValue()) {
             int scaleFactor = res.getScaleFactor();
             for (EntityPlayer player : mc.theWorld.playerEntities) {
-                if (player.getDistanceToEntity(mc.thePlayer) < 1.0F || (player.isInvisible() && invis.getObject()))
+                if (player.getDistanceToEntity(mc.thePlayer) < 1.0F || (player.isInvisible() && invis.getPropertyValue()))
                     continue;
 
                 GL11.glPushMatrix();
@@ -182,13 +183,10 @@ public class ESP extends Module {
         }
 
         for (EntityPlayer player : entityPosMap.keySet())
-            if (icarus.getObject()) RenderUtils.drawIcarusESP(player, icarusColor.getObject(), false);
+            if (icarus.getPropertyValue()) RenderUtils.drawIcarusESP(player, icarusColor.getPropertyValue(), false);
 
-    }
+    };
 
-    @EventTarget
-    private void onUpdate(MotionUpdateEvent event) {
-    }
 
     public static void startScissorBox(ScaledResolution sr, int x, int y, int width, int height) {
         int sf = sr.getScaleFactor();

@@ -8,22 +8,39 @@ import cn.loli.client.injection.mixins.IAccessorEntityPlayer;
 import cn.loli.client.injection.mixins.IAccessorMinecraft;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.ModeValue;
-import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
+import dev.xix.property.impl.EnumProperty;
+import dev.xix.property.impl.NumberProperty;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.MathHelper;
 
 public class Speed extends Module {
 
-    public final ModeValue modes = new ModeValue("Mode", "Mini", "PacketAbusing", "Mini", "Zoom", "Bunny");
-    private final NumberValue<Float> multiply = new NumberValue<>("Multiply", 1f, 1f, 2f);
-    private final BooleanValue boost = new BooleanValue("Boost", true);
-    private final BooleanValue clips = new BooleanValue("Clips", true);
-    private final BooleanValue ySpoof = new BooleanValue("Y Spoof", true);
+    private enum MODE {
+        MINI("Mini"), PACKET_ABUSING("PacketAbusing"), ZOOM("Zoom"), BUNNY("Bunny");
+
+        private final String name;
+
+        MODE(String s) {
+            this.name = s;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    public final EnumProperty modes = new EnumProperty<>("Mode", MODE.BUNNY);
+    private final NumberProperty<Float> multiply = new NumberProperty<>("Multiply", 1f, 1f, 2f, 0.1f);
+    private final BooleanProperty boost = new BooleanProperty("Boost", true);
+    private final BooleanProperty clips = new BooleanProperty("Clips", true);
+    private final BooleanProperty ySpoof = new BooleanProperty("Y Spoof", true);
 
     double distance;
     int stage;
@@ -53,13 +70,13 @@ public class Speed extends Module {
         }
     }
 
-    @EventTarget
-    private void onUpdate(UpdateEvent event) {
+    private final IEventListener<UpdateEvent> onUpdate = e ->
+    {
         if (mc.thePlayer == null
                 || mc.theWorld == null)
             return;
 
-        if ("PacketAbusing".equals(modes.getCurrentMode())) {
+        if ("PacketAbusing".equals(modes.getPropertyValue())) {
             ((IAccessorMinecraft) mc).getTimer().timerSpeed = 1.0F;
             if (mc.thePlayer.onGround) {
                 if (mc.thePlayer.ticksExisted % 20 == 0) {
@@ -69,15 +86,15 @@ public class Speed extends Module {
                 }
             }
         }
-    }
+    };
 
-    @EventTarget
-    private void onMove(PlayerMoveEvent event) {
-        switch (modes.getCurrentMode()) {
+    private final IEventListener<PlayerMoveEvent> onMove = event ->
+    {
+        switch (modes.getPropertyValue().toString()) {
             case "Mini": {
                 if (playerUtils.isMoving2()) {
                     if (playerUtils.isInLiquid()) return;
-                    if (boost.getObject()) {
+                    if (boost.getPropertyValue()) {
                         speed = getLegitSpeed(stage) * 0.96;
                         if (speed < moveUtils.getBaseMoveSpeed())
                             speed = moveUtils.getBaseMoveSpeed();
@@ -95,7 +112,7 @@ public class Speed extends Module {
                     mc.getNetHandler().addToSendQueue(new C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX + event.getX(), mc.thePlayer.posY, mc.thePlayer.posZ + event.getZ(), true));
                     event.setX(event.getX() * 2);
                     event.setZ(event.getZ() * 2);
-                    mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + (0.11D * multiply.getObject()), mc.thePlayer.posZ);
+                    mc.thePlayer.setPosition(mc.thePlayer.posX, mc.thePlayer.posY + (0.11D * multiply.getPropertyValue()), mc.thePlayer.posZ);
                 } else {
                     moveUtils.setMotion(event, moveUtils.getBaseMoveSpeed(0.2691, 0.2));
                 }
@@ -132,23 +149,22 @@ public class Speed extends Module {
                 break;
             }
         }
+    };
 
-    }
-
-    @EventTarget
-    private void onMove(MotionUpdateEvent event) {
+    private final IEventListener<MotionUpdateEvent> onMoveUpdate = event ->
+    {
         if (event.getEventType() == EventType.PRE) {
-            switch (modes.getCurrentMode()) {
+            switch (modes.getPropertyValue().toString()) {
                 case "Mini": {
                     if (playerUtils.isMoving2()) {
                         if (playerUtils.isInLiquid())
                             return;
 
-                        double motionX = mc.gameSettings.keyBindForward.isKeyDown() && clips.getObject() ? (MathHelper.sin((float) Math.toRadians(mc.thePlayer.rotationYaw)) * 0.065) : 0;
-                        double motionZ = mc.gameSettings.keyBindForward.isKeyDown() && clips.getObject() ? (MathHelper.cos((float) Math.toRadians(mc.thePlayer.rotationYaw)) * 0.065) : 0;
+                        double motionX = mc.gameSettings.keyBindForward.isKeyDown() && clips.getPropertyValue() ? (MathHelper.sin((float) Math.toRadians(mc.thePlayer.rotationYaw)) * 0.065) : 0;
+                        double motionZ = mc.gameSettings.keyBindForward.isKeyDown() && clips.getPropertyValue() ? (MathHelper.cos((float) Math.toRadians(mc.thePlayer.rotationYaw)) * 0.065) : 0;
 
                         if (mc.thePlayer.onGround) {
-                            mc.thePlayer.setPosition(mc.thePlayer.posX - motionX, mc.thePlayer.posY + (0.11D * multiply.getObject()), mc.thePlayer.posZ + motionZ);
+                            mc.thePlayer.setPosition(mc.thePlayer.posX - motionX, mc.thePlayer.posY + (0.11D * multiply.getPropertyValue()), mc.thePlayer.posZ + motionZ);
                         }
                     }
                     break;
@@ -165,18 +181,16 @@ public class Speed extends Module {
                 }
             }
 
-            if (ySpoof.getObject())
+            if (ySpoof.getPropertyValue())
                 if (mc.thePlayer.onGround)
                     event.setY(event.getY() + 2.40201E-6D);
         }
+    };
 
-
-    }
-
-    @EventTarget
-    private void onJump(JumpEvent event) {
+    private final IEventListener<JumpEvent> onJump = event ->
+    {
         event.setCancelled(true);
-    }
+    };
 
 
     private double getLegitSpeed(int stage) {

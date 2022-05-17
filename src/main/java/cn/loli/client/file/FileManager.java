@@ -5,17 +5,18 @@ package cn.loli.client.file;
 import cn.loli.client.Main;
 import cn.loli.client.module.Module;
 import cn.loli.client.utils.misc.ChatUtils;
-import cn.loli.client.value.ModeValue;
-import cn.loli.client.value.NumberValue;
-import cn.loli.client.value.Value;
 import com.google.common.io.Files;
 import com.google.gson.*;
+import dev.xix.property.AbstractTheresaProperty;
+import dev.xix.property.impl.EnumProperty;
+import dev.xix.property.impl.NumberProperty;
 import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -112,10 +113,10 @@ public class FileManager {
         {
             JsonObject valuesObject = new JsonObject();
 
-            for (Map.Entry<String, List<Value>> stringListEntry : Main.INSTANCE.valueManager.getAllValues().entrySet()) {
+            for (Map.Entry<String, List<AbstractTheresaProperty>> stringListEntry : Main.INSTANCE.valueManager.getAllValues().entrySet()) {
                 JsonObject value = new JsonObject();
 
-                for (Value value1 : stringListEntry.getValue()) value1.addToJsonObject(value);
+                for (AbstractTheresaProperty value1 : stringListEntry.getValue()) value1.addToJsonObject(value);
 
                 valuesObject.add(stringListEntry.getKey(), value);
             }
@@ -146,36 +147,36 @@ public class FileManager {
 
             obj.add("modules", cfgModuleObject);
 
-            for (Map.Entry<String, List<Value>> stringListEntry : Main.INSTANCE.valueManager.getAllValues().entrySet()) {
+            for (Map.Entry<String, List<AbstractTheresaProperty>> stringListEntry : Main.INSTANCE.valueManager.getAllValues().entrySet()) {
                 JsonObject jsonObject = new JsonObject();
 
-                for (Value values : stringListEntry.getValue()) values.addToJsonObject(jsonObject);
+                for (AbstractTheresaProperty values : stringListEntry.getValue()) values.addToJsonObject(jsonObject);
 
                 cfgValueObject.add(stringListEntry.getKey(), jsonObject);
             }
 
             obj.add("values", cfgValueObject);
 
-            for (Map.Entry<String, List<Value>> stringListEntry : Main.INSTANCE.valueManager.getAllValues().entrySet()) {
+            for (Map.Entry<String, List<AbstractTheresaProperty>> stringListEntry : Main.INSTANCE.valueManager.getAllValues().entrySet()) {
                 JsonObject fatherObject = new JsonObject();
 
-                for (Value values : stringListEntry.getValue()) {
+                for (AbstractTheresaProperty values : stringListEntry.getValue()) {
                     JsonObject jsonObject = new JsonObject();
 
                     int keybind = Main.INSTANCE.valueManager.keyBind.get(values) == null ? 0 : Main.INSTANCE.valueManager.keyBind.get(values);
-                    if (values instanceof NumberValue) {
-                        NumberValue numberValue = (NumberValue) values;
+                    if (values instanceof NumberProperty) {
+                        NumberProperty numberValue = (NumberProperty) values;
                         if (Main.INSTANCE.valueManager.numberPick.get(values) != null) {
-                            if (numberValue.getObject() instanceof Integer) {
+                            if (numberValue.getPropertyValue() instanceof Integer) {
                                 jsonObject.addProperty("value", Main.INSTANCE.valueManager.numberPick.get(values).intValue());
-                            } else if (numberValue.getObject() instanceof Float) {
+                            } else if (numberValue.getPropertyValue() instanceof Float) {
                                 jsonObject.addProperty("value", Main.INSTANCE.valueManager.numberPick.get(values).floatValue());
                             } else {
                                 jsonObject.addProperty("value", Main.INSTANCE.valueManager.numberPick.get(values).doubleValue());
                             }
                         }
                     }
-                    if (values instanceof ModeValue) {
+                    if (values instanceof EnumProperty) {
                         if (Main.INSTANCE.valueManager.modeSelect.get(values) != null) {
                             Main.INSTANCE.println("ModeValue");
                             jsonObject.addProperty("mode", Main.INSTANCE.valueManager.modeSelect.get(values));
@@ -231,7 +232,7 @@ public class FileManager {
 
             if (valuesElement instanceof JsonObject) {
                 for (Map.Entry<String, JsonElement> stringJsonElementEntry : ((JsonObject) valuesElement).entrySet()) {
-                    List<Value> values = Main.INSTANCE.valueManager.getAllValuesFrom(stringJsonElementEntry.getKey());
+                    List<AbstractTheresaProperty> values = Main.INSTANCE.valueManager.getAllValuesFrom(stringJsonElementEntry.getKey());
 
                     if (values == null) {
                         continue;
@@ -243,7 +244,7 @@ public class FileManager {
 
                     JsonObject valueObject = (JsonObject) stringJsonElementEntry.getValue();
 
-                    for (Value value : values) {
+                    for (AbstractTheresaProperty value : values) {
                         try {
                             value.fromJsonObject(valueObject);
                         } catch (Exception ignored) {
@@ -256,7 +257,7 @@ public class FileManager {
 
             if (keyBindsElement instanceof JsonObject) {
                 for (Map.Entry<String, JsonElement> stringJsonElementEntry : ((JsonObject) keyBindsElement).entrySet()) {
-                    List<Value> values = Main.INSTANCE.valueManager.getAllValuesFrom(stringJsonElementEntry.getKey());
+                    List<AbstractTheresaProperty> values = Main.INSTANCE.valueManager.getAllValuesFrom(stringJsonElementEntry.getKey());
 
                     if (values == null) {
                         continue;
@@ -268,19 +269,19 @@ public class FileManager {
 
                     JsonObject valueObject = (JsonObject) stringJsonElementEntry.getValue();
 
-                    for (Value value : values) {
-                        if (values instanceof NumberValue) {
-                            NumberValue numberValue = (NumberValue) values;
-                            if (numberValue.getObject() instanceof Integer) {
-                                Main.INSTANCE.valueManager.numberPick.put(value, ((Number) numberValue.getObject()).intValue());
-                            } else if (numberValue.getObject() instanceof Float) {
-                                Main.INSTANCE.valueManager.numberPick.put(value, ((Number) numberValue.getObject()).floatValue());
+                    for (AbstractTheresaProperty value : values) {
+                        if (value instanceof NumberProperty) {
+                            NumberProperty numberValue = (NumberProperty) value;
+                            if (numberValue.getPropertyValue() instanceof Integer) {
+                                Main.INSTANCE.valueManager.numberPick.put(value, ((Number) numberValue.getPropertyValue()).intValue());
+                            } else if (numberValue.getPropertyValue() instanceof Float) {
+                                Main.INSTANCE.valueManager.numberPick.put(value, ((Number) numberValue.getPropertyValue()).floatValue());
                             } else {
-                                Main.INSTANCE.valueManager.numberPick.put(value, ((Number) numberValue.getObject()).doubleValue());
+                                Main.INSTANCE.valueManager.numberPick.put(value, ((Number) numberValue.getPropertyValue()).doubleValue());
                             }
                         }
-                        if (values instanceof ModeValue) {
-                            Main.INSTANCE.valueManager.modeSelect.put(value, ((ModeValue) values).getObject());
+                        if (value instanceof EnumProperty) {
+                            Main.INSTANCE.valueManager.modeSelect.put(value, Arrays.binarySearch(((EnumProperty<?>) value).getEnumConstants(), value.getPropertyValue()));
                         }
 
                         Main.INSTANCE.valueManager.keyBind.put(value, valueObject.get(value.getName()).getAsJsonObject().get("keybind").getAsInt());
@@ -381,7 +382,7 @@ public class FileManager {
 
             if (valuesElement instanceof JsonObject) {
                 for (Map.Entry<String, JsonElement> stringJsonElementEntry : ((JsonObject) valuesElement).entrySet()) {
-                    List<Value> values = Main.INSTANCE.valueManager.getAllValuesFrom(stringJsonElementEntry.getKey());
+                    List<AbstractTheresaProperty> values = Main.INSTANCE.valueManager.getAllValuesFrom(stringJsonElementEntry.getKey());
 
                     if (values == null) {
                         backupReasons.add("Value owner '" + stringJsonElementEntry.getKey() + "' doesn't exist");
@@ -395,7 +396,7 @@ public class FileManager {
 
                     JsonObject valueObject = (JsonObject) stringJsonElementEntry.getValue();
 
-                    for (Value value : values) {
+                    for (AbstractTheresaProperty value : values) {
                         try {
                             value.fromJsonObject(valueObject);
                         } catch (Exception e) {

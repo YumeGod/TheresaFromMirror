@@ -6,11 +6,13 @@ import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.ModeValue;
-import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
+import dev.xix.property.impl.EnumProperty;
+import dev.xix.property.impl.NumberProperty;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
@@ -31,67 +33,82 @@ import java.util.List;
 
 public class Scaffold extends Module {
 
-    private final NumberValue<Integer> delay = new NumberValue<>("Delay", 0, 0, 500);
-    private final BooleanValue random = new BooleanValue("Delay-Randomize", false);
+    private final NumberProperty<Integer> delay = new NumberProperty<>("Delay", 0, 0, 500, 10);
+    private final BooleanProperty random = new BooleanProperty("Delay-Randomize", false);
 
-    private final BooleanValue slient = new BooleanValue("Slient", false);
-    private final BooleanValue expand = new BooleanValue("Expend", false);
-    private final BooleanValue diagonal = new BooleanValue("Diagonal", false);
+    private final BooleanProperty slient = new BooleanProperty("Slient", false);
+    private final BooleanProperty expand = new BooleanProperty("Expend", false);
+    private final BooleanProperty diagonal = new BooleanProperty("Diagonal", false);
 
-    private final BooleanValue mouseFix = new BooleanValue("Mouse Fix", true);
-    private final BooleanValue mouse_vl_fix = new BooleanValue("Mouse VL Fix", true);
+    private final BooleanProperty mouseFix = new BooleanProperty("Mouse Fix", true);
+    private final BooleanProperty mouse_vl_fix = new BooleanProperty("Mouse VL Fix", true);
 
-    private final NumberValue<Integer> expandLength = new NumberValue<>("Expand Length", 0, 0, 6);
-    private final BooleanValue allDirectionExpand = new BooleanValue("All Direction", true);
+    private final NumberProperty<Integer> expandLength = new NumberProperty<>("Expand Length", 0, 0, 6, 1);
+    private final BooleanProperty allDirectionExpand = new BooleanProperty("All Direction", true);
 
-    private final BooleanValue rotation = new BooleanValue("Rotation", false);
-    private final BooleanValue keeprotation = new BooleanValue("Keep Rotation", false);
+    private final BooleanProperty rotation = new BooleanProperty("Rotation", false);
+    private final BooleanProperty keeprotation = new BooleanProperty("Keep Rotation", false);
 
-    private final BooleanValue dynamicYaw = new BooleanValue("Dynamic Yaw", false);
-    private final BooleanValue randomizePitch = new BooleanValue("Randomize Pitch", false);
+    private final BooleanProperty dynamicYaw = new BooleanProperty("Dynamic Yaw", false);
+    private final BooleanProperty randomizePitch = new BooleanProperty("Randomize Pitch", false);
 
-    private final BooleanValue staticPitch = new BooleanValue("Static Pitch", false);
-    private final NumberValue<Integer> pitch = new NumberValue<>("Static Pitch Range", 80, 70, 90);
-    private final NumberValue<Integer> switchDelay = new NumberValue<>("Switch Delay", 0, 0, 1000);
-
-
-    private final BooleanValue rayCast = new BooleanValue("Ray Cast", false);
-    private final BooleanValue clampYaw = new BooleanValue("Clamp", true);
-
-    private final BooleanValue moveFix = new BooleanValue("Move Fix", false);
-    private final BooleanValue silentMoveFix = new BooleanValue("Silent Fix", false);
-    private final BooleanValue shouldyaw = new BooleanValue("Silent Yaw Fix", false);
-
-    private final BooleanValue upScaffold = new BooleanValue("UP-Scaffold", false);
-    private final BooleanValue downScaffold = new BooleanValue("Down-Scaffold", false);
-
-    private final BooleanValue sprint = new BooleanValue("Sprint", true);
-    private final BooleanValue jump = new BooleanValue("AutoJump", false);
-    private final BooleanValue sameY = new BooleanValue("Same Y", false);
-
-    private final BooleanValue prediction = new BooleanValue("Prediction", false);
-    private final BooleanValue randomAim = new BooleanValue("Random Aim", false);
-
-    private final BooleanValue simple = new BooleanValue("Simple", false);
-
-    private final BooleanValue rotateInAir = new BooleanValue("Rotation When Air", false);
-
-    private final BooleanValue blockCheck = new BooleanValue("Check Block", false);
-    private final BooleanValue allowAir = new BooleanValue("Allow Air", false);
-    private final BooleanValue switchBlocks = new BooleanValue("Block Picker", false);
-    private final BooleanValue automaticVector = new BooleanValue("Auto HitVec", false);
-
-    private final BooleanValue facingCheck = new BooleanValue("Facing Check", false);
-    private final BooleanValue canUpCheck = new BooleanValue("Can UP Check", false);
-
-    private final BooleanValue noSwing = new BooleanValue("No Swing", false);
+    private final BooleanProperty staticPitch = new BooleanProperty("Static Pitch", false);
+    private final NumberProperty<Integer> pitch = new NumberProperty<>("Static Pitch Range", 80, 70, 90, 1);
+    private final NumberProperty<Integer> switchDelay = new NumberProperty<>("Switch Delay", 0, 0, 1000, 10);
 
 
-    private final BooleanValue mistake = new BooleanValue("Mistake", false);
-    private final NumberValue<Integer> mistakerate = new NumberValue<>("Mistake Rate", 80, 70, 90);
+    private final BooleanProperty rayCast = new BooleanProperty("Ray Cast", false);
+    private final BooleanProperty clampYaw = new BooleanProperty("Clamp", true);
 
-    private final ModeValue eventMode = new ModeValue("Work on...", "On Tick", "On Tick", "On Pre", "On Post");
-    private final BooleanValue sneak = new BooleanValue("Sprint-Spoof", false);
+    private final BooleanProperty moveFix = new BooleanProperty("Move Fix", false);
+    private final BooleanProperty silentMoveFix = new BooleanProperty("Silent Fix", false);
+    private final BooleanProperty shouldyaw = new BooleanProperty("Silent Yaw Fix", false);
+
+    private final BooleanProperty upScaffold = new BooleanProperty("UP-Scaffold", false);
+    private final BooleanProperty downScaffold = new BooleanProperty("Down-Scaffold", false);
+
+    private final BooleanProperty sprint = new BooleanProperty("Sprint", true);
+    private final BooleanProperty jump = new BooleanProperty("AutoJump", false);
+    private final BooleanProperty sameY = new BooleanProperty("Same Y", false);
+
+    private final BooleanProperty prediction = new BooleanProperty("Prediction", false);
+    private final BooleanProperty randomAim = new BooleanProperty("Random Aim", false);
+
+    private final BooleanProperty simple = new BooleanProperty("Simple", false);
+
+    private final BooleanProperty rotateInAir = new BooleanProperty("Rotation When Air", false);
+
+    private final BooleanProperty blockCheck = new BooleanProperty("Check Block", false);
+    private final BooleanProperty allowAir = new BooleanProperty("Allow Air", false);
+    private final BooleanProperty switchBlocks = new BooleanProperty("Block Picker", false);
+    private final BooleanProperty automaticVector = new BooleanProperty("Auto HitVec", false);
+
+    private final BooleanProperty facingCheck = new BooleanProperty("Facing Check", false);
+    private final BooleanProperty canUpCheck = new BooleanProperty("Can UP Check", false);
+
+    private final BooleanProperty noSwing = new BooleanProperty("No Swing", false);
+
+
+    private final BooleanProperty mistake = new BooleanProperty("Mistake", false);
+    private final NumberProperty<Integer> mistakerate = new NumberProperty<>("Mistake Rate", 80, 70, 90, 1);
+
+    private enum MODE {
+        TICK("On Tick"), PRE("On Pre"), POST("On Post");
+
+        private final String name;
+
+        MODE(String s) {
+            this.name = s;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    private final EnumProperty eventMode = new EnumProperty<>("Work on...", MODE.TICK);
+    private final BooleanProperty sneak = new BooleanProperty("Sprint-Spoof", false);
 
     int silentSlot = -1;
     int startY;
@@ -141,100 +158,95 @@ public class Scaffold extends Module {
     @Override
     public void onDisable() {
 
-        if (slient.getObject())
+        if (slient.getPropertyValue())
             mc.getNetHandler().getNetworkManager().sendPacket(new C09PacketHeldItemChange(mc.thePlayer.inventory.currentItem));
 
         switchTimer.reset();
     }
 
-    @EventTarget
-    private void onRender(RenderEvent e) {
+    private final IEventListener<RenderEvent> onRender = event ->
+    {
         ray = rotationUtils.rayCastedBlock(curYaw, curPitch);
 
         if (curPos != null) {
-            if ((!mc.thePlayer.onGround && rotateInAir.getObject()) || (ray == null || (ray.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || (!ray.getBlockPos().equals(curPos)) && ray.sideHit == enumFacing || (ray.sideHit != enumFacing && ray.getBlockPos().equals(curPos))))) {
-                float[] rotation = rotationUtils.faceBlock(curPos, mc.theWorld.getBlockState(curPos).getBlock().getBlockBoundsMaxY() - mc.theWorld.getBlockState(curPos).getBlock().getBlockBoundsMinY() + 0.5D, mouse_vl_fix.getObject(), mouseFix.getObject(), prediction.getObject(), randomAim.getObject(), randomizePitch.getObject(), clampYaw.getObject(), 180);
+            if ((!mc.thePlayer.onGround && rotateInAir.getPropertyValue()) || (ray == null || (ray.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK || (!ray.getBlockPos().equals(curPos)) && ray.sideHit == enumFacing || (ray.sideHit != enumFacing && ray.getBlockPos().equals(curPos))))) {
+                float[] rotation = rotationUtils.faceBlock(curPos, mc.theWorld.getBlockState(curPos).getBlock().getBlockBoundsMaxY() - mc.theWorld.getBlockState(curPos).getBlock().getBlockBoundsMinY() + 0.5D, mouse_vl_fix.getPropertyValue(), mouseFix.getPropertyValue(), prediction.getPropertyValue(), randomAim.getPropertyValue(), randomizePitch.getPropertyValue(), clampYaw.getPropertyValue(), 180);
 
                 if (rotation != null)
-                    if (simple.getObject()) {
-                        curYaw = (dynamicYaw.getObject() ? moveUtils.getDirection(mc.thePlayer.rotationYaw) : mc.thePlayer.rotationYaw) + 180;
-                        curPitch = mc.thePlayer.onGround || staticPitch.getObject() ? (float) pitch.getObject() : rotation[1];
+                    if (simple.getPropertyValue()) {
+                        curYaw = (dynamicYaw.getPropertyValue() ? moveUtils.getDirection(mc.thePlayer.rotationYaw) : mc.thePlayer.rotationYaw) + 180;
+                        curPitch = mc.thePlayer.onGround || staticPitch.getPropertyValue() ? (float) pitch.getPropertyValue() : rotation[1];
                     } else {
                         curYaw = rotation[0];
-                        if (!staticPitch.getObject())
+                        if (!staticPitch.getPropertyValue())
                             curPitch = rotation[1];
                         else
-                            curPitch = (float) pitch.getObject();
+                            curPitch = (float) pitch.getPropertyValue();
                     }
 
             }
         }
+    };
+
+    private final IEventListener<MoveFlyEvent> onMoveFly = event ->
+    {
+        if (moveFix.getPropertyValue() && rotation.getPropertyValue())
+            event.setYaw(curYaw);
+    };
+
+    private final IEventListener<JumpYawEvent> onJump = event ->
+    {
+        if (moveFix.getPropertyValue() && rotation.getPropertyValue())
+            event.setYaw(curYaw);
+    };
 
 
-    }
-
-
-    @EventTarget
-    private void onMoveFly(MoveFlyEvent e) {
-        if (moveFix.getObject() && rotation.getObject())
-            e.setYaw(curYaw);
-    }
-
-
-    @EventTarget
-    private void onJump(JumpYawEvent e) {
-        if (moveFix.getObject() && rotation.getObject())
-            e.setYaw(curYaw);
-    }
-
-
-    @EventTarget
-    private void onSlient(MovementStateEvent e) {
-        if (moveFix.getObject() && rotation.getObject() && silentMoveFix.getObject()) {
+    private final IEventListener<MovementStateEvent> onSilent = e ->
+    {
+        if (moveFix.getPropertyValue() && rotation.getPropertyValue() && silentMoveFix.getPropertyValue()) {
             e.setSilentMoveFix(true);
             e.setYaw(curYaw);
-            if (shouldyaw.getObject()) {
+            if (shouldyaw.getPropertyValue()) {
                 e.setShouldYaw(rotationUtils.getYaw(calcShouldYaw()) + 180);
                 e.setFixYaw(true);
             }
         }
-    }
+    };
 
-
-    @EventTarget
-    private void onMotion(MotionUpdateEvent e) {
+    private final IEventListener<MotionUpdateEvent> onMotion = e ->
+    {
         if (e.getEventType() == EventType.PRE) {
-            if (rotation.getObject()) {
-                if (keeprotation.getObject() || playerUtils.getBlockUnderPlayer(0.01F) == Blocks.air) {
+            if (rotation.getPropertyValue()) {
+                if (keeprotation.getPropertyValue() || playerUtils.getBlockUnderPlayer(0.01F) == Blocks.air) {
                     e.setYaw(curYaw);
-                    e.setPitch(curPitch + (float) (randomizePitch.getObject() ? playerUtils.randomInRange(-0.1, 0.1) : 0));
+                    e.setPitch(curPitch + (float) (randomizePitch.getPropertyValue() ? playerUtils.randomInRange(-0.1, 0.1) : 0));
                 }
             }
 
-            if (eventMode.getCurrentMode().equals("On Pre"))
+            if (eventMode.getPropertyValue().toString().equals("On Pre"))
                 onWorking();
         } else {
-            if (eventMode.getCurrentMode().equals("On Post"))
+            if (eventMode.getPropertyValue().toString().equals("On Post"))
                 onWorking();
         }
-    }
+    };
 
-    @EventTarget
-    private void onTick(TickAttackEvent event) {
-        if (eventMode.getCurrentMode().equals("On Tick"))
+    private final IEventListener<TickAttackEvent> onTick = e ->
+    {
+        if (eventMode.getPropertyValue().toString().equals("On Tick"))
             onWorking();
-    }
+    };
 
 
     private void onWorking() {
-        final double y = sameY.getObject() && playerUtils.isMoving2() ? startY : mc.thePlayer.posY;
+        final double y = sameY.getPropertyValue() && playerUtils.isMoving2() ? startY : mc.thePlayer.posY;
 
-        if (!sprint.getObject()) {
+        if (!sprint.getPropertyValue()) {
             ((IAccessorKeyBinding) mc.gameSettings.keyBindSprint).setPressed(false);
             mc.thePlayer.setSprinting(false);
         }
 
-        if ((!playerUtils.isMoving2() && mc.gameSettings.keyBindJump.isKeyDown()) || downScaffold.getObject() && playerUtils.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode()) || mc.thePlayer.onGround)
+        if ((!playerUtils.isMoving2() && mc.gameSettings.keyBindJump.isKeyDown()) || downScaffold.getPropertyValue() && playerUtils.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode()) || mc.thePlayer.onGround)
             startY = (int) mc.thePlayer.posY;
 
         boolean flag = true;
@@ -251,11 +263,11 @@ public class Scaffold extends Module {
                 canBuild = true;
 
 
-            if (blockCheck.getObject() && allowAir.getObject() || !rayCast.getObject()
+            if (blockCheck.getPropertyValue() && allowAir.getPropertyValue() || !rayCast.getPropertyValue()
                     || (ray != null && ray.getBlockPos() != null && mc.theWorld.getBlockState(ray.getBlockPos()).getBlock().getMaterial() != Material.air))
-                if (!rayCast.getObject() || (ray != null && ray.getBlockPos() != null)) {
-                    if (timeHelper.hasReached(delay.getObject())) {
-                        final BlockPos blockpos = rayCast.getObject() ? ray.getBlockPos() : curPos;
+                if (!rayCast.getPropertyValue() || (ray != null && ray.getBlockPos() != null)) {
+                    if (timeHelper.hasReached(delay.getPropertyValue())) {
+                        final BlockPos blockpos = rayCast.getPropertyValue() ? ray.getBlockPos() : curPos;
                         if (blockpos != null && mc.theWorld.getBlockState(curPos) != null && mc.theWorld.getBlockState(blockpos).getBlock().getMaterial() != Material.air) {
                             if (this.silentSlot != -1) {
                                 final ItemStack item = mc.thePlayer.inventory.getCurrentItem();
@@ -264,12 +276,12 @@ public class Scaffold extends Module {
                                 }
                             }
 
-                            if (slient.getObject() && (itemStack == null || !(itemStack.getItem() instanceof ItemBlock)) || switchBlocks.getObject()) {
+                            if (slient.getPropertyValue() && (itemStack == null || !(itemStack.getItem() instanceof ItemBlock)) || switchBlocks.getPropertyValue()) {
                                 for (int i = 0; i < 9; i++) {
                                     final ItemStack item = mc.thePlayer.inventory.getStackInSlot(i);
                                     if (item != null && item.getItem() instanceof ItemBlock) {
                                         if (!blackList.contains(Block.getBlockFromItem(item.getItem()))) {
-                                            if ((!switchBlocks.getObject() || !switchedSlots.contains(i)) && (this.silentSlot == -1 || switchBlocks.getObject() && !switchedSlots.contains(i))) {
+                                            if ((!switchBlocks.getPropertyValue() || !switchedSlots.contains(i)) && (this.silentSlot == -1 || switchBlocks.getPropertyValue() && !switchedSlots.contains(i))) {
                                                 if (mc.thePlayer.inventory.currentItem != i) {
                                                     itemStack = item;
                                                     if (silentSlot != i) {
@@ -295,23 +307,23 @@ public class Scaffold extends Module {
 
                             if (itemStack != null && itemStack.getItem() instanceof ItemBlock) {
                                 Vec3 vec3 = new Vec3(curPos.getX() + 0.5, curPos.getY() + 0.5, curPos.getZ() + 0.5);
-                                if (automaticVector.getObject() && ray != null && ray.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
+                                if (automaticVector.getPropertyValue() && ray != null && ray.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK)
                                     vec3 = ray.hitVec;
-                                if (!blockCheck.getObject() || ray != null && ray.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK || ray != null && allowAir.getObject() && ray.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY)
-                                    if ((!rayCast.getObject() || !facingCheck.getObject()) || ray != null && ray.sideHit == enumFacing || (downScaffold.getObject() && mc.gameSettings.keyBindSneak.isKeyDown()))
-                                        if (!sameY.getObject() || !rayCast.getObject() || (((blockpos.getY() == startY - 1 || !playerUtils.isMoving2() && mc.gameSettings.keyBindJump.isKeyDown()) && (!ray.sideHit.equals(EnumFacing.UP))) || !playerUtils.isMoving2()))
-                                            if (!canUpCheck.getObject() || enumFacing != EnumFacing.UP || (ray != null && ray.getBlockPos() != null && ray.getBlockPos().equals(blockpos))) {
-                                                if (rayCast.getObject() ? (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, itemStack, blockpos, ray.sideHit, ray.hitVec)) : mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, itemStack, curPos, enumFacing, vec3)) {
+                                if (!blockCheck.getPropertyValue() || ray != null && ray.typeOfHit == MovingObjectPosition.MovingObjectType.BLOCK || ray != null && allowAir.getPropertyValue() && ray.typeOfHit != MovingObjectPosition.MovingObjectType.ENTITY)
+                                    if ((!rayCast.getPropertyValue() || !facingCheck.getPropertyValue()) || ray != null && ray.sideHit == enumFacing || (downScaffold.getPropertyValue() && mc.gameSettings.keyBindSneak.isKeyDown()))
+                                        if (!sameY.getPropertyValue() || !rayCast.getPropertyValue() || (((blockpos.getY() == startY - 1 || !playerUtils.isMoving2() && mc.gameSettings.keyBindJump.isKeyDown()) && (!ray.sideHit.equals(EnumFacing.UP))) || !playerUtils.isMoving2()))
+                                            if (!canUpCheck.getPropertyValue() || enumFacing != EnumFacing.UP || (ray != null && ray.getBlockPos() != null && ray.getBlockPos().equals(blockpos))) {
+                                                if (rayCast.getPropertyValue() ? (mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, itemStack, blockpos, ray.sideHit, ray.hitVec)) : mc.playerController.onPlayerRightClick(mc.thePlayer, mc.theWorld, itemStack, curPos, enumFacing, vec3)) {
                                                     flag = false;
 
-                                                    if (!noSwing.getObject())
+                                                    if (!noSwing.getPropertyValue())
                                                         mc.thePlayer.swingItem();
                                                     else
                                                         mc.getNetHandler().getNetworkManager().sendPacket(new C0APacketAnimation());
 
                                                     int blocks = 0;
 
-                                                    if (switchBlocks.getObject()) {
+                                                    if (switchBlocks.getPropertyValue()) {
                                                         for (int i = 0; i < 9; i++) {
                                                             final ItemStack item = mc.thePlayer.inventory.getStackInSlot(i);
                                                             if (item != null && item.getItem() instanceof ItemBlock) {
@@ -321,8 +333,8 @@ public class Scaffold extends Module {
                                                             }
                                                         }
                                                     }
-                                                    if (itemSwitchTimer.hasReached(switchDelay.getObject()) || !switchBlocks.getObject()) {
-                                                        if (silentSlot != -1 && slient.getObject() && switchBlocks.getObject() && blocks > 1)
+                                                    if (itemSwitchTimer.hasReached(switchDelay.getPropertyValue()) || !switchBlocks.getPropertyValue()) {
+                                                        if (silentSlot != -1 && slient.getPropertyValue() && switchBlocks.getPropertyValue() && blocks > 1)
                                                             switchedSlots.add(silentSlot);
                                                         if (blocks <= switchedSlots.size())
                                                             switchedSlots.clear();
@@ -338,7 +350,7 @@ public class Scaffold extends Module {
                         if (itemStack != null && itemStack.stackSize == 0 && this.silentSlot != -1) {
                             mc.thePlayer.inventory.mainInventory[this.silentSlot] = null;
                         }
-                        if (flag && !mistake.getObject() && playerUtils.randomInRange(0, 100) <= mistakerate.getObject() && itemStack != null && itemStack.getItem() instanceof ItemBlock) {
+                        if (flag && !mistake.getPropertyValue() && playerUtils.randomInRange(0, 100) <= mistakerate.getPropertyValue() && itemStack != null && itemStack.getItem() instanceof ItemBlock) {
                             if (mc.playerController.sendUseItem(mc.thePlayer, mc.theWorld, itemStack)) {
                                 mc.entityRenderer.itemRenderer.resetEquippedProgress2();
                             }
@@ -350,9 +362,9 @@ public class Scaffold extends Module {
 
     }
 
-    @EventTarget
-    private void onPacket(PacketEvent e) {
-        if (sneak.getObject())
+    private final IEventListener<PacketEvent> onPacket = e ->
+    {
+        if (sneak.getPropertyValue())
             if (e.getPacket() instanceof C0BPacketEntityAction) {
                 final C0BPacketEntityAction c0B = (C0BPacketEntityAction) e.getPacket();
 
@@ -366,33 +378,24 @@ public class Scaffold extends Module {
                     e.setCancelled(true);
                 }
             }
-    }
+    };
 
-    @EventTarget
-    public void onMove(PlayerMoveEvent event) {
-    }
-
-
-    @EventTarget
-    private void onUpdate(UpdateEvent e) {
-        if (sprint.getObject()) {
+    private final IEventListener<UpdateEvent> onUpdate = e ->
+    {
+        if (sprint.getPropertyValue()) {
             mc.thePlayer.setSprinting(true);
         }
         ((IAccessorKeyBinding) mc.gameSettings.keyBindSprint).setPressed(false);
 
-        if (sameY.getObject())
+        if (sameY.getPropertyValue())
             if (!mc.thePlayer.onGround)
                 mc.thePlayer.jumpMovementFactor = 0.02f;
             else {
-                if (jump.getObject() && playerUtils.isMoving2())
+                if (jump.getPropertyValue() && playerUtils.isMoving2())
                     mc.thePlayer.jump();
             }
-    }
+    };
 
-    @EventTarget
-    private void onJump(JumpEvent e) {
-        //  if (jump.getObject()) e.setCancelled(true);
-    }
 
     public BlockPos searchPos(BlockPos pos) {
         for (int x = -1; x < 1; x++)
@@ -426,11 +429,11 @@ public class Scaffold extends Module {
     }
 
     public Vec3 expand(Vec3 position) {
-        if (expand.getObject()) {
-            final double direction = allDirectionExpand.getObject() ? moveUtils.getDirection(mc.thePlayer.rotationYaw) : mc.thePlayer.rotationYaw;
+        if (expand.getPropertyValue()) {
+            final double direction = allDirectionExpand.getPropertyValue() ? moveUtils.getDirection(mc.thePlayer.rotationYaw) : mc.thePlayer.rotationYaw;
             final Vec3 expandVector = new Vec3(-Math.sin(direction / 180 * Math.PI), 0, Math.cos(direction / 180 * Math.PI));
             int bestExpand = 0;
-            for (int i = 0; i < expandLength.getObject(); i++) {
+            for (int i = 0; i < expandLength.getPropertyValue(); i++) {
                 if (mc.gameSettings.keyBindJump.isKeyDown() && !playerUtils.isMoving2())
                     break;
                 if (getBlockPosToPlaceOn(new BlockPos(position.addVector(0, -1, 0).add(new Vec3(expandVector.xCoord * i, expandVector.yCoord * i, expandVector.zCoord * i)))) != null && enumFacing != EnumFacing.UP) {
@@ -449,11 +452,11 @@ public class Scaffold extends Module {
         final BlockPos blockPos2 = pos.add(1, 0, 0);
         final BlockPos blockPos3 = pos.add(0, 0, -1);
         final BlockPos blockPos4 = pos.add(0, 0, 1);
-        final boolean isDown = downScaffold.getObject() && playerUtils.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode());
+        final boolean isDown = downScaffold.getPropertyValue() && playerUtils.isKeyDown(mc.gameSettings.keyBindSneak.getKeyCode());
         if (isDown)
             ((IAccessorKeyBinding) mc.gameSettings.keyBindSneak).setPressed(false);
         final float down = isDown ? 1 : 0;
-        if (upScaffold.getObject() && mc.theWorld.getBlockState(pos.add(0, -1 - down, 0)).getBlock() != Blocks.air) {
+        if (upScaffold.getPropertyValue() && mc.theWorld.getBlockState(pos.add(0, -1 - down, 0)).getBlock() != Blocks.air) {
             enumFacing = EnumFacing.UP;
             return (pos.add(0, -1 - down, 0));
         } else if (isDown && mc.theWorld.getBlockState(pos).getBlock() != Blocks.air) {
@@ -472,64 +475,64 @@ public class Scaffold extends Module {
         } else if (mc.theWorld.getBlockState(pos.add(0, 0 - down, 1)).getBlock() != Blocks.air) {
             enumFacing = EnumFacing.NORTH;
             return (pos.add(0, 0 - down, 1));
-        } else if (mc.theWorld.getBlockState(blockPos1.add(0, -1 - down, 0)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos1.add(0, -1 - down, 0)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.DOWN;
             return (blockPos1.add(0, -1 - down, 0));
-        } else if (mc.theWorld.getBlockState(blockPos1.add(-1, 0 - down, 0)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos1.add(-1, 0 - down, 0)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.EAST;
             return (blockPos1.add(-1, 0 - down, 0));
-        } else if (mc.theWorld.getBlockState(blockPos1.add(1, 0 - down, 0)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos1.add(1, 0 - down, 0)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.WEST;
             return (blockPos1.add(1, 0 - down, 0));
-        } else if (mc.theWorld.getBlockState(blockPos1.add(0, 0 - down, -1)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos1.add(0, 0 - down, -1)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.SOUTH;
             return (blockPos1.add(0, 0 - down, -1));
-        } else if (mc.theWorld.getBlockState(blockPos1.add(0, 0 - down, 1)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos1.add(0, 0 - down, 1)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.NORTH;
             return (blockPos1.add(0, 0 - down, 1));
-        } else if (mc.theWorld.getBlockState(blockPos2.add(0, -1 - down, 0)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos2.add(0, -1 - down, 0)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.UP;
             return (blockPos2.add(0, -1 - down, 0));
-        } else if (mc.theWorld.getBlockState(blockPos2.add(-1, 0 - down, 0)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos2.add(-1, 0 - down, 0)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.EAST;
             return (blockPos2.add(-1, 0 - down, 0));
-        } else if (mc.theWorld.getBlockState(blockPos2.add(1, 0 - down, 0)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos2.add(1, 0 - down, 0)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.WEST;
             return (blockPos2.add(1, 0 - down, 0));
-        } else if (mc.theWorld.getBlockState(blockPos2.add(0, 0 - down, -1)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos2.add(0, 0 - down, -1)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.SOUTH;
             return (blockPos2.add(0, 0 - down, -1));
-        } else if (mc.theWorld.getBlockState(blockPos2.add(0, 0 - down, 1)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos2.add(0, 0 - down, 1)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.NORTH;
             return (blockPos2.add(0, 0 - down, 1));
-        } else if (mc.theWorld.getBlockState(blockPos3.add(0, -1 - down, 0)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos3.add(0, -1 - down, 0)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.UP;
             return (blockPos3.add(0, -1 - down, 0));
-        } else if (mc.theWorld.getBlockState(blockPos3.add(-1, 0 - down, 0)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos3.add(-1, 0 - down, 0)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.EAST;
             return (blockPos3.add(-1, 0 - down, 0));
-        } else if (mc.theWorld.getBlockState(blockPos3.add(1, 0 - down, 0)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos3.add(1, 0 - down, 0)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.WEST;
             return (blockPos3.add(1, 0 - down, 0));
-        } else if (mc.theWorld.getBlockState(blockPos3.add(0, 0 - down, -1)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos3.add(0, 0 - down, -1)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.SOUTH;
             return (blockPos3.add(0, 0 - down, -1));
-        } else if (mc.theWorld.getBlockState(blockPos3.add(0, 0 - down, 1)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos3.add(0, 0 - down, 1)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.NORTH;
             return (blockPos3.add(0, 0 - down, 1));
-        } else if (mc.theWorld.getBlockState(blockPos4.add(0, -1 - down, 0)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos4.add(0, -1 - down, 0)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.UP;
             return (blockPos4.add(0, -1 - down, 0));
-        } else if (mc.theWorld.getBlockState(blockPos4.add(-1, 0 - down, 0)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos4.add(-1, 0 - down, 0)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.EAST;
             return (blockPos4.add(-1, 0 - down, 0));
-        } else if (mc.theWorld.getBlockState(blockPos4.add(1, 0 - down, 0)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos4.add(1, 0 - down, 0)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.WEST;
             return (blockPos4.add(1, 0 - down, 0));
-        } else if (mc.theWorld.getBlockState(blockPos4.add(0, 0 - down, -1)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos4.add(0, 0 - down, -1)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.SOUTH;
             return (blockPos4.add(0, 0 - down, -1));
-        } else if (mc.theWorld.getBlockState(blockPos4.add(0, 0 - down, 1)).getBlock() != Blocks.air && diagonal.getObject()) {
+        } else if (mc.theWorld.getBlockState(blockPos4.add(0, 0 - down, 1)).getBlock() != Blocks.air && diagonal.getPropertyValue()) {
             enumFacing = EnumFacing.NORTH;
             return (blockPos4.add(0, 0 - down, 1));
         }

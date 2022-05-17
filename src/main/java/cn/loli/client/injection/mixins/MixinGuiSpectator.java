@@ -2,6 +2,7 @@
 
 package cn.loli.client.injection.mixins;
 
+import cn.loli.client.Main;
 import cn.loli.client.events.Render2DEvent;
 
 import dev.xix.TheresaClient;
@@ -18,6 +19,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinGuiSpectator {
     @Inject(method = "renderTooltip", at = @At("RETURN"))
     private void renderTooltip(ScaledResolution sr, float partialTicks, CallbackInfo ci) {
-        TheresaClient.getInstance().getEventBus().call(new Render2DEvent());
+        Main.INSTANCE.eventBus.call(new Render2DEvent());
     }
 }

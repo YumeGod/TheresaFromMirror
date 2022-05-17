@@ -1,16 +1,25 @@
 package dev.xix.property;
 
+import cn.loli.client.gui.clickui.components.Component;
+import com.google.gson.JsonObject;
+
 import java.util.function.Supplier;
 
 public abstract class AbstractTheresaProperty<T> {
     protected final String name;
     protected final String identifier;
-
+    public Component component;
     protected T propertyValue;
 
     protected final Supplier<Boolean> propertyDependency;
 
+    // Animation variables
+    public float clickgui_anim;
 
+
+    public abstract void addToJsonObject(JsonObject obj);
+
+    public abstract void fromJsonObject(JsonObject obj);
     protected AbstractTheresaProperty() {
         this(null, null);
     }
@@ -32,6 +41,10 @@ public abstract class AbstractTheresaProperty<T> {
 
     public void setPropertyValue(final T value) {
         this.propertyValue = value;
+    }
+
+    public String getName() {
+        return name;
     }
 
 }

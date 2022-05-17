@@ -100,21 +100,21 @@ public abstract class MixinItemRenderer {
                     case EAT:
                     case DRINK:
                         AnimationEvent eatAnimation = new AnimationEvent(EventType.EAT, player, partialTicks, f, f1, false);
-                        TheresaClient.getInstance().getEventBus().call(eatAnimation);
+                        Main.INSTANCE.eventBus.call(eatAnimation);
                         if (eatAnimation.isCancelable()) break;
                         this.performDrinking(player, partialTicks);
                         this.transformFirstPersonItem(f, f4);
                         break;
                     case BLOCK:
                         AnimationEvent blockAnimation = new AnimationEvent(EventType.BLOCK, player, partialTicks, f, f1, false);
-                        TheresaClient.getInstance().getEventBus().call(blockAnimation);
+                        Main.INSTANCE.eventBus.call(blockAnimation);
                         if (blockAnimation.isCancelable()) break;
                         this.transformFirstPersonItem(f, f4);
                         this.doBlockTransformations();
                         break;
                     case BOW:
                         AnimationEvent bowAnimation = new AnimationEvent(EventType.BOW, player, partialTicks, f, f1, false);
-                        TheresaClient.getInstance().getEventBus().call(bowAnimation);
+                        Main.INSTANCE.eventBus.call(bowAnimation);
                         if (bowAnimation.isCancelable()) break;
                         this.transformFirstPersonItem(f, f4);
                         this.doBowTransformations(partialTicks, player);

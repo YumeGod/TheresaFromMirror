@@ -1,14 +1,17 @@
 package cn.loli.client.module.modules.combat;
 
 import cn.loli.client.events.PacketEvent;
+import cn.loli.client.events.RenderEvent;
 import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.injection.implementations.IS27PacketExplosion;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.ChatUtils;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+
+import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
+import dev.xix.property.impl.NumberProperty;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S12PacketEntityVelocity;
@@ -22,17 +25,17 @@ public class Velocity extends Module {
 
     private final Queue<TimestampedPacket> packets = new ConcurrentLinkedDeque<>();
 
-    private final NumberValue<Integer> horizon = new NumberValue<>("Horizon", 80, 0, 100);
-    private final NumberValue<Integer> vertical = new NumberValue<>("Vertical", 80, 0, 100);
-    private final BooleanValue explosion = new BooleanValue("Explosion", true);
-    private final BooleanValue legit = new BooleanValue("Jump", false);
-    private final BooleanValue choke = new BooleanValue("Choke", false);
-    private final BooleanValue reverseHorizon = new BooleanValue("Reverse Horizon", false);
-    private final BooleanValue kbAlert = new BooleanValue("Alert", false);
-    private final NumberValue<Integer> delay = new NumberValue<>("Choke Delay", 400, 0, 800);
-    public final BooleanValue antifall = new BooleanValue("AntiFall", false);
-    private final NumberValue<Integer> limit = new NumberValue<>("Choke Limit", 8000, 0, 25000);
-    private final BooleanValue debug = new BooleanValue("Debug", false);
+    private final NumberProperty<Integer> horizon = new NumberProperty<>("Horizon", 80, 0, 100 , 1);
+    private final NumberProperty<Integer> vertical = new NumberProperty<>("Vertical", 80, 0, 100 , 1);
+    private final BooleanProperty explosion = new BooleanProperty("Explosion", true);
+    private final BooleanProperty legit = new BooleanProperty("Jump", false);
+    private final BooleanProperty choke = new BooleanProperty("Choke", false);
+    private final BooleanProperty reverseHorizon = new BooleanProperty("Reverse Horizon", false);
+    private final BooleanProperty kbAlert = new BooleanProperty("Alert", false);
+    private final NumberProperty<Integer> delay = new NumberProperty<>("Choke Delay", 400, 0, 800 , 50);
+    public final BooleanProperty antifall = new BooleanProperty("AntiFall", false);
+    private final NumberProperty<Integer> limit = new NumberProperty<>("Choke Limit", 8000, 0, 25000 , 500);
+    private final BooleanProperty debug = new BooleanProperty("Debug", false);
 
 
     public Velocity() {
@@ -41,41 +44,41 @@ public class Velocity extends Module {
 
     @Override
     public void onEnable() {
-        
+
     }
 
     @Override
     public void onDisable() {
-        
+
     }
 
-    @EventTarget
-    private void onUpdate(UpdateEvent e) {
-//        ChatUtils.info("Hurttime: " + mc.thePlayer.hurtResistantTime + " | " + mc.thePlayer.velocityChanged);
-        if (legit.getObject()) {
+    private final IEventListener<UpdateEvent> onUpdate = e ->
+    {
+        if (legit.getPropertyValue()) {
             if (mc.thePlayer.hurtTime == 10 && mc.thePlayer.onGround) {
                 mc.thePlayer.jump();
             }
         } else
             resetPackets(mc.getNetHandler().getNetworkManager().getNetHandler());
-    }
+    };
 
-    @EventTarget
-    private void onPacket(PacketEvent event) {
+
+    private final IEventListener<PacketEvent> onPacket = event ->
+    {
         //计算水平和垂直的数值
-        float hor = horizon.getObject().floatValue() / 100;
-        float ver = vertical.getObject().floatValue() / 100;
+        float hor = horizon.getPropertyValue().floatValue() / 100;
+        float ver = vertical.getPropertyValue().floatValue() / 100;
 
-        if (reverseHorizon.getObject()) hor = -hor;
+        if (reverseHorizon.getPropertyValue()) hor = -hor;
 
-        if (legit.getObject()) return; //如果是Legit就不执行操作行为
+        if (legit.getPropertyValue()) return; //如果是Legit就不执行操作行为
 
-        if (event.getPacket() instanceof S27PacketExplosion && explosion.getObject()) {
+        if (event.getPacket() instanceof S27PacketExplosion && explosion.getPropertyValue()) {
             S27PacketExplosion packet = (S27PacketExplosion) event.getPacket();
 
-            if (kbAlert.getObject()) kbAlert(event);
+            if (kbAlert.getPropertyValue()) kbAlert(event);
 
-            event.setCancelled(horizon.getObject() == 0 && vertical.getObject() == 0);
+            event.setCancelled(horizon.getPropertyValue() == 0 && vertical.getPropertyValue() == 0);
 
             //Editing
             ((IS27PacketExplosion) packet).setX(packet.func_149149_c() * hor);
@@ -83,13 +86,13 @@ public class Velocity extends Module {
             ((IS27PacketExplosion) packet).setZ(packet.func_149147_e() * hor);
 
             //调试输出
-            if (debug.getObject())
+            if (debug.getPropertyValue())
                 ChatUtils.info("Giga " + (Math.abs(packet.func_149149_c()) + Math.abs(packet.func_149144_d()) + Math.abs(packet.func_149147_e())) * 8000);
 
 
             if (!event.isCancelled()) {   //是否被取消 如果没有进行Choke处理
-                if (choke.getObject() && //数值限定
-                        (Math.abs(packet.func_149149_c()) + Math.abs(packet.func_149144_d()) + Math.abs(packet.func_149147_e())) * 8000 < limit.getObject()) {
+                if (choke.getPropertyValue() && //数值限定
+                        (Math.abs(packet.func_149149_c()) + Math.abs(packet.func_149144_d()) + Math.abs(packet.func_149147_e())) * 8000 < limit.getPropertyValue()) {
                     //取消这个包的效果
                     event.setCancelled(true);
 
@@ -109,19 +112,19 @@ public class Velocity extends Module {
                 double x = packet.getMotionX() * hor, y = packet.getMotionY() * ver, z = packet.getMotionZ() * hor;
 
 
-                if (kbAlert.getObject()) kbAlert(event);
+                if (kbAlert.getPropertyValue()) kbAlert(event);
 
                 //移除该包效果 改为自定义
                 event.setCancelled(true);
 
-                if (horizon.getObject() == 0 && vertical.getObject() == 0) return;
+                if (horizon.getPropertyValue() == 0 && vertical.getPropertyValue() == 0) return;
 
                 //调试输出
-                if (debug.getObject())
+                if (debug.getPropertyValue())
                     ChatUtils.info(String.valueOf(Math.abs(packet.getMotionX()) + Math.abs(packet.getMotionZ()) + Math.abs(packet.getMotionY())));
 
-                if (choke.getObject() && //考虑Choke的情况以及是否应该进行Choke的行为(通过查看包原本倍率)
-                        Math.abs(packet.getMotionX()) + Math.abs(packet.getMotionZ()) + Math.abs(packet.getMotionY()) < limit.getObject()) {
+                if (choke.getPropertyValue() && //考虑Choke的情况以及是否应该进行Choke的行为(通过查看包原本倍率)
+                        Math.abs(packet.getMotionX()) + Math.abs(packet.getMotionZ()) + Math.abs(packet.getMotionY()) < limit.getPropertyValue()) {
                     //取消这个包的效果
                     event.setCancelled(true);
 
@@ -138,7 +141,7 @@ public class Velocity extends Module {
 
             }
         }
-    }
+    };
 
 
     private void addPackets(TimestampedPacket packet, PacketEvent eventReadPacket) {
@@ -156,7 +159,7 @@ public class Velocity extends Module {
                 try {
                     for (final TimestampedPacket timestampedPacket : packets) {
                         final long timestamp = timestampedPacket.timestamp;
-                        if (Math.abs(timestamp - System.currentTimeMillis()) >= delay.getObject()) {
+                        if (Math.abs(timestamp - System.currentTimeMillis()) >= delay.getPropertyValue()) {
                             timestampedPacket.packet.processPacket(netHandler);
                             packets.remove(timestampedPacket);
                         }

@@ -6,7 +6,7 @@ import cn.loli.client.Main;
 import cn.loli.client.command.Command;
 import cn.loli.client.command.CommandException;
 import cn.loli.client.utils.misc.ChatUtils;
-import cn.loli.client.value.Value;
+import dev.xix.property.AbstractTheresaProperty;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public class ValueCommand extends Command {
             throw new CommandException("Usage: ." + alias + " <owner> <name> <value>");
         }
 
-        Value value = Main.INSTANCE.valueManager.get(args[0], args[1], true);
+        AbstractTheresaProperty value = Main.INSTANCE.valueManager.get(args[0], args[1], true);
 
         if (value == null) {
             throw new CommandException("Value '" + args[0] + "/" + args[1] + "' doesn't exist");
@@ -31,7 +31,7 @@ public class ValueCommand extends Command {
 
         String val = args[2];
 
-        if (value.getObject() instanceof Boolean) {
+        if (value.getPropertyValue() instanceof Boolean) {
             boolean newVal = false;
             boolean ok = false;
 
@@ -45,39 +45,39 @@ public class ValueCommand extends Command {
             }
 
             if (ok) {
-                value.setObject(newVal);
+                value.setPropertyValue(newVal);
                 ChatUtils.success(ChatUtils.SECONDARY_COLOR + args[0] + "/" + args[1] + ChatUtils.PRIMARY_COLOR + " was set to " + ChatUtils.SECONDARY_COLOR + val);
             } else {
                 throw new CommandException(val + " is not valid (allowed: true, false)");
             }
         }
-        if (value.getObject() instanceof Integer) {
+        if (value.getPropertyValue() instanceof Integer) {
             try {
-                value.setObject(Integer.parseInt(val));
+                value.setPropertyValue(Integer.parseInt(val));
                 ChatUtils.success(ChatUtils.SECONDARY_COLOR + args[0] + "/" + args[1] + ChatUtils.PRIMARY_COLOR + " was set to " + ChatUtils.SECONDARY_COLOR + val);
             } catch (NumberFormatException e) {
                 throw new CommandException("'" + val + " is not a valid int");
             }
         }
-        if (value.getObject() instanceof Long) {
+        if (value.getPropertyValue() instanceof Long) {
             try {
-                value.setObject(Long.parseLong(val));
+                value.setPropertyValue(Long.parseLong(val));
                 ChatUtils.success(ChatUtils.SECONDARY_COLOR + args[0] + "/" + args[1] + ChatUtils.PRIMARY_COLOR + " was set to " + ChatUtils.SECONDARY_COLOR + val);
             } catch (NumberFormatException e) {
                 throw new CommandException("'" + val + " is not a valid long");
             }
         }
-        if (value.getObject() instanceof Float) {
+        if (value.getPropertyValue() instanceof Float) {
             try {
-                value.setObject(Float.parseFloat(val));
+                value.setPropertyValue(Float.parseFloat(val));
                 ChatUtils.success(ChatUtils.SECONDARY_COLOR + args[0] + "/" + args[1] + ChatUtils.PRIMARY_COLOR + " was set to " + ChatUtils.SECONDARY_COLOR + val);
             } catch (NumberFormatException e) {
                 throw new CommandException("'" + val + " is not a valid float");
             }
         }
-        if (value.getObject() instanceof Double) {
+        if (value.getPropertyValue() instanceof Double) {
             try {
-                value.setObject(Double.parseDouble(val));
+                value.setPropertyValue(Double.parseDouble(val));
                 ChatUtils.success(ChatUtils.SECONDARY_COLOR + args[0] + "/" + args[1] + ChatUtils.PRIMARY_COLOR + " was set to " + ChatUtils.SECONDARY_COLOR + val);
             } catch (NumberFormatException e) {
                 throw new CommandException("'" + val + " is not a valid double");

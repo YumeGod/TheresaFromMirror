@@ -1,19 +1,18 @@
 package cn.loli.client.module.modules.misc;
 
 import cn.loli.client.Main;
-import cn.loli.client.events.MotionUpdateEvent;
-import cn.loli.client.events.PacketEvent;
-import cn.loli.client.events.TickEvent;
-import cn.loli.client.events.UpdateEvent;
+import cn.loli.client.events.*;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.module.modules.player.NoRotate;
 import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.misc.timer.TimeHelper;
-import cn.loli.client.value.BooleanValue;
-import cn.loli.client.value.NumberValue;
-import com.darkmagician6.eventapi.EventTarget;
+
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
+import dev.xix.property.impl.BooleanProperty;
+import dev.xix.property.impl.NumberProperty;
 import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -33,23 +32,23 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Abuser extends Module {
 
-    private final BooleanValue fly = new BooleanValue("OldVerus-Fly-Bypass", false);
-    private final BooleanValue range = new BooleanValue("Simple-Reach-Bypass", false);
-    private final BooleanValue ncp = new BooleanValue("NCP-Timer-Flag", false);
-    private final BooleanValue redesky = new BooleanValue("Rede-Sky-Semi", false);
-    private final BooleanValue hypixel = new BooleanValue("Hypixel-Semi", false);
-    public final BooleanValue packetMeme = new BooleanValue("Hypixel-Meme", false);
-    public final BooleanValue packetMemeEdit = new BooleanValue("Hypixel-Meme-Transform", false);
-    private final BooleanValue packetFreeze = new BooleanValue("Hypixel-Freeze", false);
-    public final BooleanValue updateFreeze = new BooleanValue("Hypixel-Freeze-Update", true);
-    private final BooleanValue packetBrust = new BooleanValue("Brust", false);
-    private final BooleanValue lesspacket = new BooleanValue("Less-Packet", false);
-    private final BooleanValue packetDormant = new BooleanValue("Position-Dormant", false);
-    private final NumberValue<Integer> collectTimer = new NumberValue<>("Dormant-Collect-Timer", 10, 1, 30);
-    private final NumberValue<Integer> dormantLatency = new NumberValue<>("Dormant-Collect-Latency", 4, 1, 20);
-    private final NumberValue<Integer> freezeLatency = new NumberValue<>("Freeze-Collect-Latency", 15, 10, 50);
-    private final BooleanValue positionSpoof = new BooleanValue("Position-Spoof", false);
-    private final BooleanValue sneak = new BooleanValue("Sprint-Spoof", false);
+    private final BooleanProperty fly = new BooleanProperty("OldVerus-Fly-Bypass", false);
+    private final BooleanProperty range = new BooleanProperty("Simple-Reach-Bypass", false);
+    private final BooleanProperty ncp = new BooleanProperty("NCP-Timer-Flag", false);
+    private final BooleanProperty redesky = new BooleanProperty("Rede-Sky-Semi", false);
+    private final BooleanProperty hypixel = new BooleanProperty("Hypixel-Semi", false);
+    public final BooleanProperty packetMeme = new BooleanProperty("Hypixel-Meme", false);
+    public final BooleanProperty packetMemeEdit = new BooleanProperty("Hypixel-Meme-Transform", false);
+    private final BooleanProperty packetFreeze = new BooleanProperty("Hypixel-Freeze", false);
+    public final BooleanProperty updateFreeze = new BooleanProperty("Hypixel-Freeze-Update", true);
+    private final BooleanProperty packetBrust = new BooleanProperty("Brust", false);
+    private final BooleanProperty lesspacket = new BooleanProperty("Less-Packet", false);
+    private final BooleanProperty packetDormant = new BooleanProperty("Position-Dormant", false);
+    private final NumberProperty<Integer> collectTimer = new NumberProperty<>("Dormant-Collect-Timer", 10, 1, 30 , 1);
+    private final NumberProperty<Integer> dormantLatency = new NumberProperty<>("Dormant-Collect-Latency", 4, 1, 20 , 1);
+    private final NumberProperty<Integer> freezeLatency = new NumberProperty<>("Freeze-Collect-Latency", 15, 10, 50 , 1);
+    private final BooleanProperty positionSpoof = new BooleanProperty("Position-Spoof", false);
+    private final BooleanProperty sneak = new BooleanProperty("Sprint-Spoof", false);
 
     public boolean hasDisable;
     public double x, y, z;
@@ -78,18 +77,18 @@ public class Abuser extends Module {
 
     }
 
-    @EventTarget
-    private void onPost(PacketEvent event) {
+    private final IEventListener<PacketEvent> onPost = event ->
+    {
         if (mc.isSingleplayer()) return;
 
-        if (range.getObject()) {
+        if (range.getPropertyValue()) {
             if (event.getPacket() instanceof C0FPacketConfirmTransaction) {
                 if (((C0FPacketConfirmTransaction) event.getPacket()).getWindowId() >= 0)
                     event.setCancelled(true);
             }
         }
 
-        if (sneak.getObject())
+        if (sneak.getPropertyValue())
             if (event.getPacket() instanceof C0BPacketEntityAction) {
                 final C0BPacketEntityAction c0B = (C0BPacketEntityAction) event.getPacket();
 
@@ -104,13 +103,13 @@ public class Abuser extends Module {
                 }
             }
 
-        if (redesky.getObject()) {
+        if (redesky.getPropertyValue()) {
             if (event.getPacket() instanceof C00PacketKeepAlive || event.getPacket() instanceof C0FPacketConfirmTransaction
                     || event.getPacket() instanceof C13PacketPlayerAbilities || event.getPacket() instanceof C17PacketCustomPayload || event.getPacket() instanceof C18PacketSpectate)
                 event.setCancelled(true);
         }
 
-        if (hypixel.getObject()) {
+        if (hypixel.getPropertyValue()) {
             if (event.getPacket() instanceof S07PacketRespawn) {
                 hasDisable = false;
                 timer.reset();
@@ -149,14 +148,14 @@ public class Abuser extends Module {
 
                     mc.thePlayer.setPositionAndRotation(d0, d1, d2, f, f1);
 
-                    if (freezeTimer.hasReached(10000) || (!resetTimer.hasReached(175)) && (updateFreeze.getObject()) && hasDisable)
+                    if (freezeTimer.hasReached(10000) || (!resetTimer.hasReached(175)) && (updateFreeze.getPropertyValue()) && hasDisable)
                         freezeTimer.reset();
 
-                    if (packetMeme.getObject())
+                    if (packetMeme.getPropertyValue())
                         if (!resetTimer.hasReached(175)) {
                             ChatUtils.info("Packet sent");
                             resetTimer.reset();
-                            if (packetMemeEdit.getObject())
+                            if (packetMemeEdit.getPropertyValue())
                                 mc.getNetHandler().getNetworkManager().sendPacket(new C03PacketPlayer.C04PacketPlayerPosition(((S08PacketPlayerPosLook) event.getPacket()).getX(), ((S08PacketPlayerPosLook) event.getPacket()).getY(), ((S08PacketPlayerPosLook) event.getPacket()).getZ(), false));
                             else
                                 event.setCancelled(true);
@@ -166,7 +165,7 @@ public class Abuser extends Module {
                             return;
                         } else {
                             for (PosLookPacket packet : flagStock) {
-                                if (packet.isExpired()){
+                                if (packet.isExpired()) {
                                     mc.getNetHandler().getNetworkManager().sendPacket(packet.getPacket());
                                     flagStock.remove(packet);
                                 }
@@ -188,7 +187,7 @@ public class Abuser extends Module {
 
             if (event.getPacket() instanceof S00PacketKeepAlive) {
                 if (hasDisable) {
-                    if (packetBrust.getObject() || hypixel.getObject()) {
+                    if (packetBrust.getPropertyValue() || hypixel.getPropertyValue()) {
                         packets.add(event.getPacket());
                         event.setCancelled(true);
                     }
@@ -204,7 +203,7 @@ public class Abuser extends Module {
                         invalid = 0;
                     }
 
-                    if (packetBrust.getObject() || hypixel.getObject()) {
+                    if (packetBrust.getPropertyValue() || hypixel.getPropertyValue()) {
                         packets.add(event.getPacket());
                         event.setCancelled(true);
                     }
@@ -213,37 +212,37 @@ public class Abuser extends Module {
         }
 
         if (event.getPacket() instanceof C03PacketPlayer) {
-            if (lesspacket.getObject())
+            if (lesspacket.getPropertyValue())
                 if (!((C03PacketPlayer) event.getPacket()).isMoving() && !((C03PacketPlayer) event.getPacket()).getRotating())
                     event.setCancelled(true);
 
             if (!event.isCancelled()) {
                 //Packet Dormant
-                if (packetDormant.getObject() && mc.thePlayer.ticksExisted > 32) {
+                if (packetDormant.getPropertyValue() && mc.thePlayer.ticksExisted > 32) {
                     //Collect Packets for 1 second
                     if (!choke.hasReached(10000)) return;
 
-                    if (!positionSpoof.getObject() || !(((C03PacketPlayer) event.getPacket()).isMoving() && ((C03PacketPlayer) event.getPacket()).getRotating()))
+                    if (!positionSpoof.getPropertyValue() || !(((C03PacketPlayer) event.getPacket()).isMoving() && ((C03PacketPlayer) event.getPacket()).getRotating()))
                         dormant.add(event.getPacket());
                     else
                         dormant.add(new C03PacketPlayer.C04PacketPlayerPosition(x, y, z, ((C03PacketPlayer) event.getPacket()).isOnGround()));
 
                     event.setCancelled(true);
-                    if (choke.hasReached(10000 + collectTimer.getObject().longValue() * 100)) choke.reset();
+                    if (choke.hasReached(10000 + collectTimer.getPropertyValue().longValue() * 100)) choke.reset();
                 }
 
 
-                if (packetFreeze.getObject())
-                    if (!freezeTimer.hasReached(freezeLatency.getObject().longValue() * 100)) {
+                if (packetFreeze.getPropertyValue())
+                    if (!freezeTimer.hasReached(freezeLatency.getPropertyValue().longValue() * 100)) {
                         dormant.add(event.getPacket());
                         event.setCancelled(true);
                     }
 
                 //position Spoof
                 if (!event.isCancelled()) {
-                    if (positionSpoof.getObject())
+                    if (positionSpoof.getPropertyValue())
                         if (((C03PacketPlayer) event.getPacket()).isMoving() && ((C03PacketPlayer) event.getPacket()).getRotating())
-                            if (!packetDormant.getObject()) {
+                            if (!packetDormant.getPropertyValue()) {
                                 mc.getNetHandler().getNetworkManager().sendPacket
                                         (new C03PacketPlayer.C04PacketPlayerPosition(x, y, z, ((C03PacketPlayer) event.getPacket()).isOnGround()), null);
                                 event.setCancelled(true);
@@ -251,32 +250,32 @@ public class Abuser extends Module {
                 }
             }
         }
-    }
+    };
 
-    @EventTarget
-    private void onTick(TickEvent event) {
+    private final IEventListener<TickEvent> onTick = event ->
+    {
         if (mc.isSingleplayer()) return;
 
-        if (packetBrust.getObject() || hypixel.getObject()) {
+        if (packetBrust.getPropertyValue() || hypixel.getPropertyValue()) {
             if (!burst.hasReached(delay)) return;
             resetPackets(mc.getNetHandler());
             burst.reset();
         }
 
-        if (packetDormant.getObject()) {
+        if (packetDormant.getPropertyValue()) {
             if (!dormantTimer.hasReached(dormantDelay)) return;
             dormantTimer.reset();
             resetPacket();
-            if (dormantDelay > dormantLatency.getObject() * 100) dormantDelay = 50;
+            if (dormantDelay > dormantLatency.getPropertyValue() * 100) dormantDelay = 50;
             else dormantDelay += 25;
         }
 
-        if (packetFreeze.getObject()) {
-            if (!freezeTimer.hasReached(freezeLatency.getObject() * 100)) return;
+        if (packetFreeze.getPropertyValue()) {
+            if (!freezeTimer.hasReached(freezeLatency.getPropertyValue() * 100)) return;
             resetPacket();
         }
 
-        if (!flagStock.isEmpty() && hasDisable){
+        if (!flagStock.isEmpty() && hasDisable) {
             for (PosLookPacket packet : Main.INSTANCE.moduleManager.getModule(Abuser.class).flagStock) {
                 if (System.currentTimeMillis() - packet.time > 3000) {
                     mc.getNetHandler().getNetworkManager().sendPacket(packet.getPacket());
@@ -284,14 +283,14 @@ public class Abuser extends Module {
                 }
             }
         }
+    };
 
-    }
 
-    @EventTarget
-    private void onMotionUpdate(MotionUpdateEvent event) {
+    private final IEventListener<MotionUpdateEvent> onMotionUpdate = event ->
+    {
         if (mc.isSingleplayer()) return;
         if (event.getEventType() == EventType.PRE) {
-            if (hypixel.getObject()) {
+            if (hypixel.getPropertyValue()) {
                 if (!hasDisable && timer.hasReached(1000)) {
                     event.setX(0);
                     event.setY(120);
@@ -300,13 +299,13 @@ public class Abuser extends Module {
                 }
             }
         }
-    }
+    };
 
-    @EventTarget
-    private void onUpdate(UpdateEvent event) {
+    private final IEventListener<UpdateEvent> onUpdate = event ->
+    {
         if (mc.isSingleplayer()) return;
 
-        if (ncp.getObject()) {
+        if (ncp.getPropertyValue()) {
             if (mc.thePlayer.ticksExisted % 30 == 0) {
                 mc.getNetHandler().getNetworkManager().sendPacket
                         (new C03PacketPlayer.C06PacketPlayerPosLook(mc.thePlayer.posX, mc.thePlayer.posY
@@ -315,7 +314,7 @@ public class Abuser extends Module {
             }
         }
 
-        if (fly.getObject()) {
+        if (fly.getPropertyValue()) {
             mc.getNetHandler().getNetworkManager().sendPacket
                     (new C08PacketPlayerBlockPlacement(new BlockPos(-1, -1, -1), 255
                             , new ItemStack(Items.water_bucket), 0, 0.5f, 0));
@@ -324,7 +323,7 @@ public class Abuser extends Module {
                             , new ItemStack(Blocks.stone.getItem(mc.theWorld, new BlockPos(-1, -1, -1))), 0, 0.94f, 0));
 
         }
-    }
+    };
 
 
     //Reset Packets
@@ -335,7 +334,7 @@ public class Abuser extends Module {
                     packets.get(0).processPacket(netHandler);
                     if (packets.get(0) instanceof S32PacketConfirmTransaction) {
                         /*
-                                                if (packetChoke.getObject()) {
+                                                if (packetChoke.getPropertyValue()) {
                             if (invalid > 8) {
                                 mc.getNetHandler().getNetworkManager().sendPacket(new C0FPacketConfirmTransaction(1, ((S32PacketConfirmTransaction) packets.get(0)).getActionNumber(), true));
                                 invalid = 0;

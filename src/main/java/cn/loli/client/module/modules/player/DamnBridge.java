@@ -1,11 +1,13 @@
 package cn.loli.client.module.modules.player;
 
+import cn.loli.client.events.PacketEvent;
 import cn.loli.client.events.TickEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
 import cn.loli.client.utils.misc.ChatUtils;
 import cn.loli.client.utils.player.PlayerUtils;
-import com.darkmagician6.eventapi.EventTarget;
+
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSnow;
 import net.minecraft.client.Minecraft;
@@ -58,8 +60,8 @@ public class DamnBridge extends Module {
         }
     }
 
-    @EventTarget
-    private void onTick(TickEvent event) {
+    private final IEventListener<TickEvent> onTick = event ->
+    {
         if (lastBlock == null || mc.playerController.getCurrentGameType().isCreative()) {
             ChatUtils.send(("Error: no blocks nearby found"));
             this.setState(false);
@@ -86,7 +88,8 @@ public class DamnBridge extends Module {
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindForward.getKeyCode(), true);
             KeyBinding.setKeyBindState(mc.gameSettings.keyBindBack.getKeyCode(), false);
         }
-    }
+    };
+
 
     private boolean isAirBlock(final Block block) {
         return block.getMaterial().isReplaceable() && (!(block instanceof BlockSnow) || block.getBlockBoundsMaxY() <= 0.125);

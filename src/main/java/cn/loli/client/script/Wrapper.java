@@ -9,7 +9,7 @@ import cn.loli.client.module.modules.combat.TargetStrafe;
 import cn.loli.client.script.java.sfontmanager.SFontLoader;
 import cn.loli.client.utils.player.movement.MoveUtils;
 import cn.loli.client.utils.player.rotation.RotationHook;
-import cn.loli.client.value.Value;
+import dev.xix.property.AbstractTheresaProperty;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Timer;
 import org.jetbrains.annotations.NotNull;
@@ -37,8 +37,8 @@ public class Wrapper {
      * @param object The Value-object
      *               this method will add the value to the owner if it doesn't exist
      */
-    public void register(String name, @NotNull Value object) {
-        List<Value> values = new ArrayList<>();
+    public void register(String name, @NotNull AbstractTheresaProperty object) {
+        List<AbstractTheresaProperty> values = new ArrayList<>();
         if (Main.INSTANCE.valueManager.valueMap.get(name) != null)
             values = Main.INSTANCE.valueManager.valueMap.get(name);
 

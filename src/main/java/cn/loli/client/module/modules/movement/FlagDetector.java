@@ -3,6 +3,7 @@
 package cn.loli.client.module.modules.movement;
 
 import cn.loli.client.Main;
+import cn.loli.client.events.UpdateEvent;
 import cn.loli.client.notifications.Notification;
 import cn.loli.client.notifications.NotificationManager;
 import cn.loli.client.notifications.NotificationType;
@@ -10,8 +11,9 @@ import cn.loli.client.events.MotionUpdateEvent;
 import cn.loli.client.events.PacketEvent;
 import cn.loli.client.module.Module;
 import cn.loli.client.module.ModuleCategory;
-import com.darkmagician6.eventapi.EventTarget;
+
 import dev.xix.event.EventType;
+import dev.xix.event.bus.IEventListener;
 import net.minecraft.network.play.server.S08PacketPlayerPosLook;
 import net.minecraft.util.Vec3;
 
@@ -27,8 +29,8 @@ public class FlagDetector extends Module {
         super("FlagDetector", "Detects flags/violations/setbacks", ModuleCategory.MOVEMENT);
     }
 
-    @EventTarget
-    private void onMove(MotionUpdateEvent event) {
+    private final IEventListener<MotionUpdateEvent> onMove = event ->
+    {
         if (event.getEventType() != EventType.POST) return;
 
         List<Long> remove = new ArrayList<>();
@@ -47,10 +49,10 @@ public class FlagDetector extends Module {
         while (lastLocations.size() > 30) {
             lastLocations.remove(0);
         }
-    }
+    };
 
-    @EventTarget
-    private void onPacket(PacketEvent event) {
+    private final IEventListener<PacketEvent> onPacket = event ->
+    {
         if (event.getPacket() instanceof S08PacketPlayerPosLook) {
             S08PacketPlayerPosLook p = (S08PacketPlayerPosLook) event.getPacket();
             boolean setback = lastLocations.stream().anyMatch(loc -> p.getX() == loc.xCoord && p.getY() == loc.yCoord && p.getZ() == loc.zCoord);
@@ -63,5 +65,6 @@ public class FlagDetector extends Module {
                 }
             }
         }
-    }
+    };
+
 }
