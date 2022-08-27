@@ -33,7 +33,7 @@ public class Client {
 
     public static void main(String[] args) {
         name = "xix";
-        password = "1XkD3fY9WZQM4afeI4cTkCgTqGH5pkbt";
+        password = "5315544236";
 
         new Thread(() -> {
             ServerSocket serverSocket = null;
